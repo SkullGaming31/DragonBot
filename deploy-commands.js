@@ -1,4 +1,3 @@
-const fs = require('fs');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { SlashCommandBuilder } = require('@discordjs/builders');
@@ -8,9 +7,7 @@ const clientId = process.env.clientId;
 const guildId = process.env.guildId;
 
 const commands = [
-	new SlashCommandBuilder().setName('ping').setDescription('Replies with pong!'),
-	new SlashCommandBuilder().setName('server').setDescription('Replies with server info!'),
-	new SlashCommandBuilder().setName('user').setDescription('Replies with user info!'),
+	new SlashCommandBuilder().setName('ping').setDescription('Replies with pong!').setName('server').setDescription('shows server info'),
 ]
 	.map(command => command.toJSON());
 

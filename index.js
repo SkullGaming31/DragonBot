@@ -1,5 +1,6 @@
 const { Client, Intents, Collection } = require('discord.js');
 require('dotenv').config();
+const github = require('./githubApi');
 const fs = require('fs');
 const client = new Client({ intents: [
     Intents.FLAGS.GUILDS,
