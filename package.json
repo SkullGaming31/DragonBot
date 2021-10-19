@@ -35,7 +35,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "register": "node deploy-commands.js"
+    "deploy": "node deploy-commands.js"
   },
   "keywords": [],
   "author": "",
