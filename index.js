@@ -51,6 +51,31 @@ client.on('messageCreate', async (message) => {
 	const adminRole = message.guild.roles.cache.get('899658881490374707'); // Admin Role ID
 	const modRole = message.guild.roles.cache.get('899658962880835624'); // Moderator Role ID
 	const ownerRole = message.guild.roles.cache.get('883536958595411968');// Owner Role ID
+	const linkWhitelist = ['https://twitch.tv/', 'twitch.tv/', 'https://twitter.com/', 'twitter.com/', 'https://instagram.com/', 'instagram.com/', 'https://tiktok.com/', 'tiktok.com/'];
+
+	let foundInText = false;
+	const nowlive = message.guild.channels.cache.get('900150882409271326'); // now-live ChannelID
+	for (const i in linkWhitelist) {
+		if (message.content.toLowerCase().includes(linkWhitelist[i].toLowerCase())) { foundInText = true; }
+		if (foundInText && message.channelId !== '900150882409271326') {
+			try {
+				const linkDetection = new MessageEmbed()
+					.setTitle('Link Detected')
+					.setDescription(`:x: ${message.author} **Links should only be posted in ${nowlive}**`)
+					.setColor('RED')
+					.setFooter(`${guildName}`)
+					.setThumbnail(message.author.avatarURL())
+					.setTimestamp(Date.now());
+				message.channel.send({ content: `${message.author}`, embeds: [linkDetection] });
+				await message.delete({ timeout: 1000 });
+				foundInText = false;
+			}
+			catch (e) {
+				console.log(console.log(e));
+			}
+		}
+	}
+
 	if (mentionedMember) { // Anti-Ping System works
 		if (mentionedMember.roles.cache.has(adminRole.id) || mentionedMember.roles.cache.has(modRole.id) || mentionedMember.roles.cache.has(ownerRole.id)) {
 			const supportChannel = message.guild.channels.cache.get('899451865924763682'); // supportChannel ID
