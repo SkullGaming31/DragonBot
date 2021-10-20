@@ -1,20 +1,21 @@
 {
   "devDependencies": {
-    "discord.js": "^13.1.0",
     "eslint": "^7.32.0"
   },
   "name": "discord",
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
-    "@discordjs/builders": "^0.6.0",
+    "@discordjs/builders": "^0.7.0",
     "@discordjs/rest": "^0.1.0-canary.0",
     "@octokit/endpoint": "^6.0.12",
+    "@sapphire/snowflake": "^2.1.2",
     "asynckit": "^0.4.0",
     "callsites": "^3.1.0",
     "combined-stream": "^1.0.8",
     "delayed-stream": "^1.0.0",
-    "discord-api-types": "^0.22.0",
+    "discord-api-types": "^0.20.2",
+    "discord.js": "^13.2.0",
     "dot-prop": "^6.0.1",
     "dotenv": "^10.0.0",
     "is-obj": "^2.0.0",
@@ -34,7 +35,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "register": "node deploy-commands.js"
+    "deploy": "node deploy-commands.js"
   },
   "keywords": [],
   "author": "",
