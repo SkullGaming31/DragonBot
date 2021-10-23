@@ -5,6 +5,7 @@ const client = new Client({
 	intents: [
 		Intents.FLAGS.GUILDS,
 		Intents.FLAGS.GUILD_MESSAGES,
+		Intents.FLAGS.GUILD_INVITES,
 	],
 });
 client.commands = new Collection();
@@ -12,6 +13,8 @@ client.commands = new Collection();
 //  ready event
 client.once('ready', () => {
 	console.log(`Logged in as ${client.user.tag}`);
+
+	client.guilds.cache.filter((g) => g.me.permissions.has('MANAGE_GUILD')).forEach((g) => g.invites.fetch({ cache: true }));
 });
 
 // Someone Joins the Discord Server
@@ -46,13 +49,27 @@ client.on('messageCreate', async (message) => {
 	console.log(`${message.author.username} said: ${message.content}`);
 
 	if (message.channel.type === 'DM' || message.author.bot) return;
+	if (!message.guild) return;
+	if (message.member.permissions.has('KICK_MEMBERS')) return;
+	async function deleteMessage() {
+		console.log('message deleted');
+		message.delete({ timeout: 1000 });
+		message.channel.send({ content: 'You can not post that link here' });
+	}
 	const guildName = message.guild.name;
 	const mentionedMember = message.mentions.members.first();
 	const adminRole = message.guild.roles.cache.get('899658881490374707'); // Admin Role ID
 	const modRole = message.guild.roles.cache.get('899658962880835624'); // Moderator Role ID
 	const ownerRole = message.guild.roles.cache.get('883536958595411968');// Owner Role ID
 	const linkWhitelist = ['https://twitch.tv/', 'twitch.tv/', 'https://twitter.com/', 'twitter.com/', 'https://instagram.com/', 'instagram.com/', 'https://tiktok.com/', 'tiktok.com/'];
+	const forbiddenLinkList = ['discord.com/invite/', 'discord.com/', 'discord.gg/', 'https://discord.com/invite/', 'https://discord.com/', 'https://discord.gg/', '.gift'];
 
+	// delete discord links sent to the discord server
+	forbiddenLinkList.forEach((link) => {
+		if (message.content.includes(link)) return deleteMessage();
+	});
+
+	// TODO: send deleted message and message author name to a logs channel!
 	let foundInText = false;
 	const nowlive = message.guild.channels.cache.get('900150882409271326'); // now-live ChannelID
 	for (const i in linkWhitelist) {
@@ -67,7 +84,7 @@ client.on('messageCreate', async (message) => {
 					.setThumbnail(message.author.avatarURL())
 					.setTimestamp(Date.now());
 				message.channel.send({ content: `${message.author}`, embeds: [linkDetection] });
-				await message.delete({ timeout: 1000 });
+				await deleteMessage();
 				foundInText = false;
 			}
 			catch (e) {
