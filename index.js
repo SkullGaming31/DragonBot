@@ -10,11 +10,11 @@ const client = new Client({
 });
 client.commands = new Collection();
 
-process.on('uncaughtException', (error) => {
+process.on('uncaughtException', error => {
 	console.log(error);
 });
   
-process.on('unhandledRejection', (error) => {
+process.on('unhandledRejection', error => {
 	console.log(error);
 });
 
