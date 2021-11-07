@@ -10,11 +10,11 @@ module.exports = {
 	 */
 	async execute(message) {
 		const linkWhitelist = ['https://twitch.tv/', 'twitch.tv/', 'https://twitter.com/', 'twitter.com/', 'https://instagram.com/', 'instagram.com/', 'https://tiktok.com/', 'tiktok.com/'];
-		const targetChannel = message.guild.channels.cache.find(channel => channel.id === '901487955607158847');// Logs Channel
+		const targetChannel = message.guild.channels.cache.find(channel => channel.id === process.env.LOGS_CHANNEL);// Logs Channel
 		let foundInText = false;
 		const guildName = message.guild.name;
 
-		const nowlive = message.guild.channels.cache.get('900150882409271326'); // now-live ChannelID
+		const nowlive = message.guild.channels.cache.get(process.env.NOW_LIVE_CHANNEL); // now-live ChannelID
 		for (const link in linkWhitelist) {
 			if (message.content.toLowerCase().includes(linkWhitelist[link].toLowerCase())) { foundInText = true; }
 			if (foundInText && message.channelId !== '900150882409271326') {
@@ -26,16 +26,18 @@ module.exports = {
 						.setFooter(`${guildName}`)
 						.setThumbnail(message.author.avatarURL())
 						.setTimestamp(Date.now());
+						
 					await message.channel.send({ embeds: [linkDetection] });
-					message.delete().catch((e) => { console.log(e); });
+					message.delete().catch((e) => { console.error(e); });
 					foundInText = false;
+
 					const logsEmbed = new MessageEmbed()
 						.setTitle('Automated Message Deletion')
 						.setDescription(`${message.author.username} posted ${message.content} in ${message.channel}`)
 						.setColor('PURPLE')
 						.setTimestamp(Date.now());
 					if (targetChannel.isText()) targetChannel.send({ embeds: [logsEmbed] });
-					console.log('was ' + foundInText);
+					if (!foundInText) break;
 				}
 				catch (e) {
 					console.log(e);

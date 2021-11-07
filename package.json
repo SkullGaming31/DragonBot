@@ -3,12 +3,11 @@
     "eslint": "^7.32.0"
   },
   "name": "discord",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "main": "index.js",
   "dependencies": {
     "@discordjs/builders": "^0.7.0",
     "@discordjs/rest": "^0.1.0-canary.0",
-    "@octokit/endpoint": "^6.0.12",
     "@sapphire/snowflake": "^2.1.2",
     "asynckit": "^0.4.0",
     "callsites": "^3.1.0",
@@ -23,7 +22,6 @@
     "mime-db": "^1.49.0",
     "mime-types": "^2.1.32",
     "node-fetch": "^2.6.1",
-    "octokit": "^1.7.0",
     "ow": "^0.27.0",
     "ts-mixer": "^6.0.0",
     "tslib": "^2.3.1",
@@ -39,6 +37,6 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "description": ""
 }
