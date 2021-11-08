@@ -6,10 +6,6 @@ const client = new Client({
 		Intents.FLAGS.GUILDS,
 		Intents.FLAGS.GUILD_MESSAGES,
 		Intents.FLAGS.GUILD_INVITES,
-<<<<<<< HEAD
-		Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-=======
->>>>>>> bcb44298c191ebeebfff534cdec342069177df74
 	],
 });
 client.commands = new Collection();
