@@ -7,15 +7,20 @@ const { MessageEmbed, CommandInteraction } = require('discord.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('get-help')
-		.setDescription('get help for an issue your having with overlay expert'),
+		.setDescription('get help for an issue your having with overlay expert')
+		.addUserOption(option => option.setName('user')
+			.setDescription('the user you want to mention')
+			.setRequired(false)),
 	/**
 	* 
-	* @param {CommandInteraction} interaction 
+	* @param {CommandInteraction} interaction
+	* @returns
 	*/
 	async execute(interaction) {
 		const guildName = interaction.guild.name;
+		const user = interaction.options.getUser('user');
+
 		const helpEmbed = new MessageEmbed()
-			.setTitle('Overlay Expert')
 			.setDescription('To begin helping you, please: ')
 			.setColor('WHITE')
 			.addField('1.', 'go live on Twitch', false)
@@ -23,6 +28,13 @@ module.exports = {
 			.addField('3.', 'navigate to your Twitch channel (i.e. `https://twitch.tv/YOUR_USERNAME`)', false)
 			.addField('4.', 'take a screenshot and upload it here (screenshots of your extension configuration screen or builder may also be helpful) If you or your viewers are **watching from the Twitch mobile app** or other device, please type `/mobile`.', false)
 			.setFooter(`${guildName}`);
-		await interaction.reply({ content: ' ', embeds: [helpEmbed] });
+		if (user) {
+			helpEmbed.setTitle(`**_${user.username}_**`);
+			await interaction.reply({ content: `${user}`, embeds: [helpEmbed] });
+		}
+		else {
+			helpEmbed.setTitle(`${interaction.user.username}`);
+			await interaction.reply({ embeds: [helpEmbed] });
+		}
 	},
 };

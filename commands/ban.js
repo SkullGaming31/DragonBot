@@ -3,10 +3,10 @@ const { Client, CommandInteraction, GuildMember, MessageEmbed } = require('disco
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('kick')
-		.setDescription('kick a member from the server')
+		.setName('ban')
+		.setDescription('ban a member from the server')
 		.addUserOption(option => option.setName('target')
-			.setDescription('the user you want to mention')
+			.setDescription('the user you want to ban')
 			.setRequired(true)),
 	/**
 	* 
@@ -24,13 +24,13 @@ module.exports = {
 		if (target.roles.highest.position >= interaction.user.roles.highest.position) {
 			return interaction.followUp({ content: 'you cant take action on this user as there role is highter then yours' });
 		}
-		const removedEmbed = new MessageEmbed()
+		const bannedEmbed = new MessageEmbed()
 			.setTitle(`${guildName}`)
 			.setDescription('')
-			.addField('Kicked from: ', `${guildName}`, true)
+			.addField('Banned from: ', `${guildName}`, true)
 			.addField('Reason: ', `${reason}`, true);
-		await target.send({ embeds: [removedEmbed] });
-		target.kick({ reason: reason });
+		await target.send({ embeds: [bannedEmbed] });
+		target.ban({ reason: reason });
 
 		interaction.followUp({ content: `kicked ${interaction.user.tag} Successfully, Reason: ${reason}` });
 	},

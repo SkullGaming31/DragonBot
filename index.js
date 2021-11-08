@@ -13,25 +13,9 @@ client.commands = new Collection();
 process.on('uncaughtException', error => {
 	console.log(error);
 });
-  
+
 process.on('unhandledRejection', error => {
 	console.log(error);
-});
-
-client.on('interactionCreate', async (interaction) => {// commands are done in this code block
-	if (interaction.channel.type === 'DM') return;
-	console.log(`${interaction.user.tag} in #${interaction.channel.name} triggered an interaction.`);
-	if (!interaction.isCommand()) return;
-
-	const command = interaction.client.commands.get(interaction.commandName); // this will read commands from there own .js file
-
-	try {
-		await command.execute(interaction);
-	}
-	catch (error) {
-		console.error(error);
-		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-	}
 });
 
 // use to read commands from here but same issue that was having with loading events.

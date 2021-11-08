@@ -1,4 +1,4 @@
-const { MessageEmbed, Message, TextChannel, MessageMentions: { USERS_PATTERN, CHANNELS_PATTERN, EVERYONE_PATTERN } } = require('discord.js');
+const { MessageEmbed, Message, TextChannel } = require('discord.js');
 
 module.exports = {
 	name: 'messageCreate',

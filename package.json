@@ -33,7 +33,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "deploy": "node deploy-commands.js"
+    "deploy": "node deploy-commands.js",
+    "remove": "node remove-Commands.js"
   },
   "keywords": [],
   "author": "",
