@@ -1,4 +1,4 @@
-const { Client, Intents, Collection, MessageEmbed } = require('discord.js');
+const { Client, Intents, Collection } = require('discord.js');
 require('dotenv').config();
 const fs = require('fs');
 const client = new Client({
@@ -19,12 +19,21 @@ process.on('unhandledRejection', error => {
 });
 
 // use to read commands from here but same issue that was having with loading events.
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-	// Set a new item in the Collection
-	// With the key as the command name and the value as the exported module
-	client.commands.set(command.data.name, command);
+// const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+// for (const file of commandFiles) {
+// 	const command = require(`./commands/${file}`);
+// 	// Set a new item in the Collection
+// 	// With the key as the command name and the value as the exported module
+// 	client.commands.set(command.data.name, command);
+// }
+
+const commandFolders = fs.readdirSync('./commands');
+for (const folder of commandFolders) {
+	const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
+	for (const file of commandFiles) {
+		const command = require(`./commands/${folder}/${file}`);
+		client.commands.set(command.name, command);
+	}
 }
 
 // used to load events from an events folder but was having issues with intelisense
