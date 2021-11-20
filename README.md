@@ -1,31 +1,6 @@
 <!-- # overlayExpertDiscordBot
   **_Check out the .env.example to find out what needs to be added to the .env file_**
 
-## DONE:
-* [x] fix deploying commands
-* [x] add link detection/deletion if not twitch/instagram/tiktok/twitter etc and not in NOW-LIVE channel.
-   * [x] send {deleted message} and {message author name} to a logs channel!
-* [x] detect all discord links/discord nitro scam links and delete
-
-## Bugs
-
-
-## Features
-* [x] link detect and delete(if not in correct channel)
-* [x] discord nitro .gift scam links automatically removed
-* [x] all discord invite links deleted when posted
-* [ ] Ticket System
-* [ ] Warning System
-* [ ] Github Integration
-
-run:<br>
-npm run start 'starts the bot'<br>
-npm run dev 'starts the bot but will restart the bot any time any saving is done or a file is added/removed'
-npm run deploy 'to register commands' to the guild<br> -->
-
-<!-- # overlayExpertDiscordBot
-  **_Check out the .env.example to find out what needs to be added to the .env file_**
-
 
 ## Bugs
 
@@ -70,10 +45,10 @@ npm run deploy 'to register commands' to the guild<br>
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">SkulledBot</h3>
+<h3 align="center">Overylay Expert</h3>
 
   <p align="center">
-    Twitch Chatbot
+    Discord bot for Overlay Experts
     <br />
     <a href="https://github.com/skullgaming31/overlayExpertDiscord"><strong>Explore the docs »</strong></a>
     <br />
@@ -142,20 +117,12 @@ Here's a blank template to get started: To avoid retyping too much info. Do a se
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
-  Discord.js requirements
-  ```sh
-  npm install discord.js @discordjs/rest discord-api-types
-  ```
+*
 
 ### Installation
 
-1. create a Discord Developer Application [Discord Developer Portal](https://discord.com/developers/applications)
-1A. in the bot tab add a bot to the application, copy the bot token
+1. create a Discord Developer Application [Discord Developer Portal](https://discord.com/developers/applications)<br>
+1A. in the bot tab add a bot to the application, copy the bot token<br>
 2. Clone the repo
    ```sh
    git clone https://github.com/skullgaming31/overlayExpertDiscord.git
@@ -164,7 +131,7 @@ This is an example of how to list things you need to use the software and how to
    ```sh
    npm install
    ```
-4. add all the nessary .env info needed check out .env.example to find out whats needed
+4. add all the nessary .env info needed, check out the .env.example to find out whats needed
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -172,7 +139,12 @@ This is an example of how to list things you need to use the software and how to
 
 <!-- USAGE EXAMPLES -->
 ## Usage
-
+if you have installed nodemon you can use the dev script aswell, which will auto restart after every save.
+```sh
+npm run start 'starts the bot'
+npm run dev 'starts the bot but will restart the bot any time any saving is done or a file is added/removed'
+npm run deploy 'to register commands' to the guild
+```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -224,9 +196,9 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@skullgaming31](https://twitter.com/skullgaming31) - email@email_client.com
+Corey - [@skullgaming31](https://twitter.com/skullgaming31) - email@email_client.com
 
-Project Link: [skulledbot](https://github.com/skullgaming31/overlayExpertDiscord)
+Project Link: [Overy Expert](https://github.com/skullgaming31/overlayExpertDiscord)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -235,7 +207,7 @@ Project Link: [skulledbot](https://github.com/skullgaming31/overlayExpertDiscord
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* []()
+* [Marc Andrews](https://github.com/marcandrews)
 * []()
 * []()
 
