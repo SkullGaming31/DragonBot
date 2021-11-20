@@ -50,11 +50,6 @@ npm run deploy 'to register commands' to the guild<br>
   <p align="center">
     Discord bot for Overlay Experts
     <br />
-    <a href="https://github.com/skullgaming31/overlayExpertDiscord"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/skullgaming31/overlayExpertDiscord">View Demo</a>
-    ·
     <a href="https://github.com/skullgaming31/overlayExpertDiscord/issues">Report Bug</a>
     ·
     <a href="https://github.com/skullgaming31/overlayExpertDiscord/issues">Request Feature</a>
@@ -93,10 +88,9 @@ npm run deploy 'to register commands' to the guild<br>
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-
+<div id="#about-the-project">
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email`, `email_client`, `project_title`, `project_description`
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
