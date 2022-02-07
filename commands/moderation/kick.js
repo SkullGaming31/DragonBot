@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { Client, CommandInteraction, GuildMember, MessageEmbed } = require('discord.js');
 
 module.exports = {
+	name: 'kick',
 	data: new SlashCommandBuilder()
 		.setName('kick')
 		.setDescription('kick a member from the server')
@@ -18,7 +19,7 @@ module.exports = {
 	async execute(interaction) {
 		// DOES NOT WORK YET
 		const guildName = interaction.guild.name;
-		const target = interaction.options.getUser('target');
+		const target = interaction.options.getMember('target');
 		const reason = interaction.options.getString('reason') || 'No Reason provided';
 
 		if (target.roles.highest.position >= interaction.user.roles.highest.position) {

@@ -5,6 +5,7 @@ const { MessageEmbed, CommandInteraction } = require('discord.js');
 * @params {interactionCreate} interaction
 */
 module.exports = {
+	name: 'get-help',
 	data: new SlashCommandBuilder()
 		.setName('get-help')
 		.setDescription('get help for an issue your having with overlay expert')
@@ -29,12 +30,14 @@ module.exports = {
 			.addField('4.', 'take a screenshot and upload it here (screenshots of your extension configuration screen or builder may also be helpful) If you or your viewers are **watching from the Twitch mobile app** or other device, please type `/mobile`.', false)
 			.setFooter(`${guildName}`);
 		if (user) {
+			await interaction.deferReply();
 			helpEmbed.setTitle(`**_${user.username}_**`);
-			await interaction.reply({ content: `${user}`, embeds: [helpEmbed] });
+			interaction.editReply({ content: `${user}`, embeds: [helpEmbed] });
 		}
 		else {
+			await interaction.deferReply();
 			helpEmbed.setTitle(`${interaction.user.username}`);
-			await interaction.reply({ embeds: [helpEmbed] });
+			interaction.editReply({ embeds: [helpEmbed] });
 		}
 	},
 };

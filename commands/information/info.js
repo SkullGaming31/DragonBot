@@ -2,6 +2,7 @@ const { SlashCommandBuilder, SlashCommandSubcommandGroupBuilder } = require('@di
 const { CommandInteraction, MessageEmbed } = require('discord.js');
 
 module.exports = {
+	name: 'info',
 	data: new SlashCommandBuilder()
 		.setName('info')
 		.setDescription('Returns Info Based on input!')
@@ -25,25 +26,29 @@ module.exports = {
 					.setTitle(`${user.tag}`)
 					.setDescription('')
 					.setColor('DARK_RED')
-					.addField('**Your Id:** ', `**${user.id}**`, true)
-					.addField('**Your Username:** ', `**${user.username}**`, true)
-					.addField('**Your Tag:** ', `**${user.tag}**`, true)
-					.addField('**Warnings:** ', '**0**', true)
-					.addField('**Your Roles:** ', '**WIP**', true)
+					.addField('Your Id: ', `${user.id}`, true)
+					.addField('Your Username: ', `${user.username}`, true)
+					.addField('Your Tag: ', `${user.tag}`, true)
+					.addField('Warnings: ', '0', true)
+					.setThumbnail(user.displayAvatarURL())
 					.setFooter(`${guildName}`);
-				await interaction.reply({ embeds: [targetEmbed] });
+				await interaction.deferReply();
+				interaction.editReply({ embeds: [targetEmbed] });
 			} else {
 				const userEmbed = new MessageEmbed()
 					.setTitle(`${interaction.user.tag}`)
 					.setDescription('')
 					.setColor('DARK_RED')
-					.addField('**Your id:** ', `**${interaction.user.id}**`, true)
-					.addField('**Your Username:** ', `**${interaction.user.username}**`, true)
-					.addField('**Your Tag:** ', `**${interaction.user.tag}**`, true)
-					.addField('**Warnings:** ', '**0**', true)
-					.addField('**Your Roles:** ', '**WIP**', true)
+					.addField('_Your id:_ ', `${interaction.user.id}`, true)
+					.addField('_Your Username:_ ', `${interaction.user.username}`, true)
+					.addField('_Your Tag:_ ', `${interaction.user.tag}`, true)
+					.addField('_Account Created:_ ', `${interaction.user.createdAt}`, true)
+					.addField('_Warnings:_ ', '0', true)
+					.addField('_Joined:_ ', `${interaction.guild.joinedAt}`, true)
+					.setThumbnail(interaction.user.displayAvatarURL())
 					.setFooter(`${guildName}`);
-				await interaction.reply({ embeds: [userEmbed] });
+				await interaction.deferReply();
+				interaction.editReply({ embeds: [userEmbed] });
 			}
 		}
 		else if (interaction.options.getSubcommand() === 'server') {
@@ -51,9 +56,10 @@ module.exports = {
 				.setTitle(`${guildName}`)
 				.setDescription('')
 				.setFooter(`${guildName}`)
-				.addField('Server Name: ', `**${guildName}**`, true)
-				.addField('Total Members: ', `**${interaction.guild.memberCount}**`, true);
-			await interaction.reply({ embeds: [serverEmbed] });
+				.addField('Server Name: ', `${guildName}`, true)
+				.addField('Total Members: ', `${interaction.guild.memberCount}`, true);
+			await interaction.deferReply();
+			interaction.editReply({ embeds: [serverEmbed] });
 		}
 	},
 };

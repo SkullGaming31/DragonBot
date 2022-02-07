@@ -9,15 +9,24 @@ module.exports = {
 	 * @returns 
 	 */
 	async execute(message) {
-		const linkWhitelist = ['https://twitch.tv/', 'twitch.tv/', 'https://twitter.com/', 'twitter.com/', 'https://instagram.com/', 'instagram.com/', 'https://tiktok.com/', 'tiktok.com/'];
-		const targetChannel = message.guild.channels.cache.find(channel => channel.id === process.env.LOGS_CHANNEL);// Logs Channel
+		const nowLive = process.env.NOW_LIVE_CHANNEL;
+		const logsChannel = process.env.LOGS_CHANNEL;
+		const linkWhitelist = [
+			'https://twitch.tv/', 'twitch.tv/',
+			'https://twitter.com/', 'twitter.com/',
+			'https://instagram.com/', 'instagram.com/',
+			'https://tiktok.com/', 'tiktok.com/',
+			'https://github.com/', 'github.com/',
+		];
+		const targetChannel = message.guild.channels.cache.find(channel => channel.id === logsChannel);// Logs Channel
 		let foundInText = false;
 		const guildName = message.guild.name;
 
-		const nowlive = message.guild.channels.cache.get(process.env.NOW_LIVE_CHANNEL); // now-live ChannelID
+		const nowlive = message.guild.channels.cache.get(nowLive); // now-live ChannelID
 		for (const link in linkWhitelist) {
+			if (message.author.bot) return;
 			if (message.content.toLowerCase().includes(linkWhitelist[link].toLowerCase())) { foundInText = true; }
-			if (foundInText && message.channelId !== '900150882409271326') {
+			if (foundInText && message.channelId !== nowLive) {// NOW LIVE Channel ID
 				try {
 					const linkDetection = new MessageEmbed()
 						.setTitle('Link Detected')

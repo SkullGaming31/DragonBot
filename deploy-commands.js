@@ -14,6 +14,8 @@ const commands = [
 	new SlashCommandBuilder().setName('kick').setDescription('kick a member from the server').addUserOption(option => option.setName('target').setDescription('the user in which to kick from the server').setRequired(true)),
 	new SlashCommandBuilder().setName('ban').setDescription('ban a member from the server').addUserOption(option => option.setName('target').setDescription('the user you want to ban').setRequired(true)),
 	new SlashCommandBuilder().setName('info').setDescription('Returns Info Based on input!').addSubcommand(subCommand => subCommand.setName('user').setDescription('Get Information of a user mentioned').addUserOption(option => option.setName('target').setDescription('the User Mentioned'))).addSubcommand(subCommand => subCommand.setName('server').setDescription('Get info about the server')),
+	new SlashCommandBuilder().setName('mute').setDescription('mute a member from the server').addUserOption(option => option.setName('target').setDescription('the user you want to mute').setRequired(true)).addStringOption(option => option.setName('reason').setDescription('the reason for muting').setRequired(false)).addStringOption(option => option.setName('custom-time').setDescription('provide a custom time(1s,1m,1h,1d)').setRequired(false)),
+	new SlashCommandBuilder().setName('unmute').setDescription('unmute a member').addUserOption(option => option.setName('target').setDescription('the user you want to unmute').setRequired(true)),
 ]
 	.map(command => command.toJSON());
 

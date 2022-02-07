@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { Client, CommandInteraction, GuildMember, MessageEmbed } = require('discord.js');
 
 module.exports = {
+	name: 'ban',
 	data: new SlashCommandBuilder()
 		.setName('ban')
 		.setDescription('ban a member from the server')

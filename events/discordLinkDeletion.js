@@ -11,7 +11,8 @@ module.exports = {
 	async execute(message) {
 		let sentInText = false;
 		const guildName = message.guild.name;
-		const targetChannel = message.guild.channels.cache.find(channel => channel.id === process.env.LOGS_CHANNEL);// add logs channel id to .env
+		const logsChannel = process.env.LOGS_CHANNEL;
+		const targetChannel = message.guild.channels.cache.find(channel => channel.id === logsChannel);
 		const discordInviteList = ['discord.com/invite/', 'discord.com/', 'discord.gg/', 'https://discord.com/invite/', 'https://discord.com/', 'https://discord.gg/', '.gift'];
 
 		for (const dInvite in discordInviteList) {// discord link detection
