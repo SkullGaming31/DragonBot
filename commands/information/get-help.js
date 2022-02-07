@@ -13,7 +13,6 @@ module.exports = {
 			.setDescription('the user you want to mention')
 			.setRequired(false)),
 	/**
-	* 
 	* @param {CommandInteraction} interaction
 	* @returns
 	*/
@@ -38,6 +37,12 @@ module.exports = {
 			await interaction.deferReply();
 			helpEmbed.setTitle(`${interaction.user.username}`);
 			interaction.editReply({ embeds: [helpEmbed] });
+			helpEmbed.setTitle(`**_${user.username}_**`);
+			await interaction.reply({ content: `${user}`, embeds: [helpEmbed] });
+		}
+		else {
+			helpEmbed.setTitle(`${interaction.user.username}`);
+			await interaction.reply({ embeds: [helpEmbed] });
 		}
 	},
 };
