@@ -26,6 +26,14 @@ module.exports = {
 					.setTitle(`${user.tag}`)
 					.setDescription('')
 					.setColor('DARK_RED')
+					.addField('Your Id: ', `${user.id}`, true)
+					.addField('Your Username: ', `${user.username}`, true)
+					.addField('Your Tag: ', `${user.tag}`, true)
+					.addField('Warnings: ', '0', true)
+					.setThumbnail(user.displayAvatarURL())
+					.setFooter(`${guildName}`);
+				await interaction.deferReply();
+				interaction.editReply({ embeds: [targetEmbed] });
 					.addField('**Your Id:** ', `${user.id}`, true)
 					.addField('**Your Username:** ', `${user.username}`, true)
 					.addField('**Your Tag:** ', `${user.tag}`, true)
@@ -39,6 +47,16 @@ module.exports = {
 					.setTitle(`${interaction.user.tag}`)
 					.setDescription('')
 					.setColor('DARK_RED')
+					.addField('_Your id:_ ', `${interaction.user.id}`, true)
+					.addField('_Your Username:_ ', `${interaction.user.username}`, true)
+					.addField('_Your Tag:_ ', `${interaction.user.tag}`, true)
+					.addField('_Account Created:_ ', `${interaction.user.createdAt}`, true)
+					.addField('_Warnings:_ ', '0', true)
+					.addField('_Joined:_ ', `${interaction.guild.joinedAt}`, true)
+					.setThumbnail(interaction.user.displayAvatarURL())
+					.setFooter(`${guildName}`);
+				await interaction.deferReply();
+				interaction.editReply({ embeds: [userEmbed] });
 					.addField('**Your id:** ', `${interaction.user.id}`, true)
 					.addField('**Your Username:** ', `${interaction.user.username}`, true)
 					.addField('**Your Tag:** ', `${interaction.user.tag}`, true)
@@ -54,6 +72,10 @@ module.exports = {
 				.setTitle(`${guildName}`)
 				.setDescription('')
 				.setFooter(`${guildName}`)
+				.addField('Server Name: ', `${guildName}`, true)
+				.addField('Total Members: ', `${interaction.guild.memberCount}`, true);
+			await interaction.deferReply();
+			interaction.editReply({ embeds: [serverEmbed] });
 				.addField('Server Name: ', `**${guildName}**`, true)
 				.addField('Total Members: ', `**${interaction.guild.memberCount}**`, true);
 			await interaction.reply({ embeds: [serverEmbed] });

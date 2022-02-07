@@ -1,11 +1,10 @@
-const { MessageEmbed, Message, TextChannel } = require('discord.js');
+const { MessageEmbed, Message } = require('discord.js');
 
 module.exports = {
 	name: 'messageCreate',
 	/**
 	 * 
 	 * @param {Message} message 
-	 * @param {CommandInteraction} interaction
 	 * @returns 
 	 */
 
@@ -38,10 +37,11 @@ module.exports = {
 				message.delete();
 			}
 		}
-		if (!message.member.roles.cache.has(adminRole.id) || !message.member.roles.cache.has(modRole.id)) {// word detection
+		// update .env with admin/moderator role id's to stop mods/admins from recieving a message when they say either of the 3 words
+		if (!message.member.roles.cache.has(adminRole.id) || !message.member.roles.cache.has(modRole.id)) {
 			if (message.content.includes('help') || message.content.includes('xbox') || message.content.includes('ps4')) {
 				const messageEmbed = new MessageEmbed()
-					.setTitle(message.author.tag)
+					.setTitle(`${message.author.tag}`)
 					.setDescription('Please run the /get-help Command in this channel for support and follow the bots response!!!')
 					.setThumbnail(message.author.displayAvatarURL())
 					.setFooter(`${guildName}`);

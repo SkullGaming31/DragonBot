@@ -13,7 +13,6 @@ module.exports = {
 			.setDescription('the user you want to mention')
 			.setRequired(false)),
 	/**
-	* 
 	* @param {CommandInteraction} interaction
 	* @returns
 	*/
@@ -30,6 +29,14 @@ module.exports = {
 			.addField('4.', 'take a screenshot and upload it here (screenshots of your extension configuration screen or builder may also be helpful) If you or your viewers are **watching from the Twitch mobile app** or other device, please type `/mobile`.', false)
 			.setFooter(`${guildName}`);
 		if (user) {
+			await interaction.deferReply();
+			helpEmbed.setTitle(`**_${user.username}_**`);
+			interaction.editReply({ content: `${user}`, embeds: [helpEmbed] });
+		}
+		else {
+			await interaction.deferReply();
+			helpEmbed.setTitle(`${interaction.user.username}`);
+			interaction.editReply({ embeds: [helpEmbed] });
 			helpEmbed.setTitle(`**_${user.username}_**`);
 			await interaction.reply({ content: `${user}`, embeds: [helpEmbed] });
 		}

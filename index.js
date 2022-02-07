@@ -1,6 +1,8 @@
 const { Client, Intents, Collection } = require('discord.js');
+const config = require('./config');
 require('dotenv').config();
 const fs = require('fs');
+const db = require('./database');
 const client = new Client({
 	intents: [
 		Intents.FLAGS.GUILDS,
@@ -48,4 +50,4 @@ for (const file of eventFiles) {
 	}
 }
 
-client.login(process.env.TOKEN);
+client.login(config.DISCORD_BOT_TOKEN);
