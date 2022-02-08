@@ -1,34 +1,8 @@
 <!-- # overlayExpertDiscordBot
-  **_Check out the .env.example to find out what needs to be added to the .env file_**
-
-
-## Bugs
-
-run:<br>
-npm run start 'starts the bot'<br>
-npm run dev 'starts the bot but will restart the bot any time any saving is done or a file is added/removed'
-npm run deploy 'to register commands' to the guild<br>
--->
+  **_Check out the .env.example to find out what needs to be added to the .env file_** 
 
 <div id="top"></div>
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Don't forget to give the project a star!
-*** Thanks again! Now go create something AMAZING! :D
--->
-
-
-
 <!-- PROJECT SHIELDS -->
-<!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
--->
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -94,10 +68,7 @@ npm run deploy 'to register commands' to the guild<br>
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email`, `email_client`, `project_title`, `project_description`
-
 <p align="right">(<a href="#top">back to top</a>)</p>
-
 
 
 ### Built With
@@ -116,23 +87,25 @@ Here's a blank template to get started: To avoid retyping too much info. Do a se
 ### Prerequisites
 
 This is an example of how to list things you need to use the software and how to install them.
-* npm
+
+  **install the latest version of NPM**
   ```sh
-* npm install npm@latest -g
+ npm install npm@latest -g
   ```
-* Discord.js requirements
+ **Discord.js requirements**
   ```sh
-* npm install discord.js @discordjs/rest discord-api-types
+ npm install discord.js @discordjs/rest discord-api-types
   ```
-  Suggested QOL installs
+ **Suggested QOL installs**
   ```sh
-* npm install nodemon -g
+ npm install -g -D nodemon
   ```
 
 ### Installation
 
 1. create a Discord Developer Application [Discord Developer Portal](https://discord.com/developers/applications)<br>
 1A. in the bot tab add a bot to the application, copy the bot token<br>
+1B. add all the nessary .env info needed, check out the .env.example to find out whats needed
 2. Clone the repo
    ```sh
    git clone https://github.com/skullgaming31/overlayExpertDiscord.git
@@ -141,7 +114,6 @@ This is an example of how to list things you need to use the software and how to
    ```sh
    npm install
    ```
-4. add all the nessary .env info needed, check out the .env.example to find out whats needed
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -153,7 +125,7 @@ if you have installed nodemon you can use the dev script aswell, which will auto
 ```sh
 npm run start 'starts the bot'
 npm run dev 'starts the bot but will restart the bot any time any saving is done or a file is added/removed'
-npm run deploy 'to register commands' to the guild
+npm run deploy 'to register commands to the guild'
 ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -166,6 +138,12 @@ npm run deploy 'to register commands' to the guild
 * [x] link detect and delete(if not in correct channel)
 * [x] discord nitro .gift scam links automatically removed
 * [x] all discord invite links deleted when posted
+* [ ] Ticket System
+* [ ] Warning System
+* [ ] Github Integration
+* [ ] detect tweets by Overlay Expert and send them to announcments with everyone tag!
+
+## Bugs
 
 See the [open issues](https://github.com/skullgaming31/overlayExpertDiscord/issues) for a full list of proposed features (and known issues).
 
@@ -203,7 +181,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@skullgaming31](https://twitter.com/skullgaming31) - skullgamingg31@gmail.com
+Corey - [@skullgaming31](https://twitter.com/skullgaming31) - skullgamingg31@gmail.com
 
 Project Link: [OverlayExpertDiscordBot](https://github.com/skullgaming31/overlayExpertDiscord)
 
