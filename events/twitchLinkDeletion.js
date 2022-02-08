@@ -1,16 +1,16 @@
-const { MessageEmbed, Message, TextChannel } = require('discord.js');
+const { MessageEmbed, Message } = require('discord.js');
+const config = require('../config');
 
 module.exports = {
 	name: 'messageCreate',
 	/**
 	 * 
 	 * @param {Message} message 
-	 * @param {CommandInteraction} interaction
 	 * @returns 
 	 */
 	async execute(message) {
-		const nowLive = process.env.NOW_LIVE_CHANNEL;
-		const logsChannel = process.env.LOGS_CHANNEL;
+		const nowLive = config.DISCORD_NOW_LIVE_CHANNEL;
+		const logsChannel = config.DISCORD_LOGS_CHANNEL_ID;
 		const linkWhitelist = [
 			'https://twitch.tv/', 'twitch.tv/',
 			'https://twitter.com/', 'twitter.com/',

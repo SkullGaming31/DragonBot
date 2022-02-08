@@ -1,9 +1,9 @@
 const { MessageEmbed, Message } = require('discord.js');
+const config = require('../config');
 
 module.exports = {
 	name: 'messageCreate',
 	/**
-	 * 
 	 * @param {Message} message 
 	 * @returns 
 	 */
@@ -17,8 +17,8 @@ module.exports = {
 		const guildName = message.guild.name;
 		const mentionedMember = message.mentions.members.first();
 
-		const adminRoleID = process.env.ADMIN_ROLE_ID;
-		const moderatorRoleID = process.env.MODERATOR_ROLE_ID;
+		const adminRoleID = config.DISCORD_ADMIN_ROLE_ID;
+		const moderatorRoleID = config.DISCORD_MODERATOR_ROLE_ID;
 		const adminRole = message.guild.roles.cache.get(adminRoleID); // Admin Role ID
 		const modRole = message.guild.roles.cache.get(moderatorRoleID); // Moderator Role ID
 
