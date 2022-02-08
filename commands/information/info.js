@@ -34,6 +34,14 @@ module.exports = {
 					.setFooter(`${guildName}`);
 				await interaction.deferReply();
 				interaction.editReply({ embeds: [targetEmbed] });
+					.addField('**Your Id:** ', `${user.id}`, true)
+					.addField('**Your Username:** ', `${user.username}`, true)
+					.addField('**Your Tag:** ', `${user.tag}`, true)
+					.addField('**Warnings:** ', '0', true)
+					.addField('**Your Roles:** ', 'WIP', true)
+					.setThumbnail(user.displayAvatarURL())
+					.setFooter(`${guildName}`);
+				await interaction.reply({ embeds: [targetEmbed] });
 			} else {
 				const userEmbed = new MessageEmbed()
 					.setTitle(`${interaction.user.tag}`)
@@ -49,6 +57,14 @@ module.exports = {
 					.setFooter(`${guildName}`);
 				await interaction.deferReply();
 				interaction.editReply({ embeds: [userEmbed] });
+					.addField('**Your id:** ', `${interaction.user.id}`, true)
+					.addField('**Your Username:** ', `${interaction.user.username}`, true)
+					.addField('**Your Tag:** ', `${interaction.user.tag}`, true)
+					.addField('**Warnings:** ', '0', true)
+					.addField('**Your Roles:** ', 'WIP', true)
+					.setThumbnail(interaction.user.displayAvatarURL())
+					.setFooter(`${guildName}`);
+				await interaction.reply({ embeds: [userEmbed] });
 			}
 		}
 		else if (interaction.options.getSubcommand() === 'server') {
@@ -60,6 +76,9 @@ module.exports = {
 				.addField('Total Members: ', `${interaction.guild.memberCount}`, true);
 			await interaction.deferReply();
 			interaction.editReply({ embeds: [serverEmbed] });
+				.addField('Server Name: ', `**${guildName}**`, true)
+				.addField('Total Members: ', `**${interaction.guild.memberCount}**`, true);
+			await interaction.reply({ embeds: [serverEmbed] });
 		}
 	},
 };

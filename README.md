@@ -185,6 +185,7 @@ Corey - [@skullgaming31](https://twitter.com/skullgaming31) - skullgamingg31@gma
 
 Project Link: [OverlayExpertDiscordBot](https://github.com/skullgaming31/overlayExpertDiscord)
 
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
@@ -192,7 +193,7 @@ Project Link: [OverlayExpertDiscordBot](https://github.com/skullgaming31/overlay
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* []()
+* [Marc Andrews](https://github.com/marcandrews)
 * []()
 * []()
 
@@ -215,3 +216,4 @@ Project Link: [OverlayExpertDiscordBot](https://github.com/skullgaming31/overlay
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/linkedin_username
 [product-screenshot]: images/screenshot.png
+

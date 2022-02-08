@@ -7,6 +7,11 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "deploy": "node deploy-commands.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "deploy": "node deploy-commands.js",
+    "remove": "node remove-Commands.js"
   },
   "devDependencies": {
     "eslint": "^7.32.0"
