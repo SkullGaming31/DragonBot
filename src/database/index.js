@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const config = require('../config');
 
+require('./ticket');
+
 const Username = config.MONGODB_USERNAME;
 const Password = config.MONGODB_PASSWORD;
 const Database = config.MONGODB_DATABASE;

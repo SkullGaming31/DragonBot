@@ -1,20 +1,31 @@
 {
   "name": "discord",
   "version": "0.0.2",
-  "description": "",
-  "main": "index.js",
+  "description": "Overlay Expert Discord bot for the Overlay Expert discord server!",
+  "author": "SkullGaming31",
+  "main": "src/index.js",
+  "license": "MIT",
+  "keywords": [],
+  "maintainers": [
+    "skullgaming31"
+  ],
+  "repository": {
+    "type": "Private",
+    "url": "https://github.com/SkullGaming31/overlayExpertDiscord"
+  },
+  "bugs": {
+    "url": "https://github.com/SkullGaming31/overlayExpertDiscord/issues"
+  },
+  "homepage": "https://github.com/SkullGaming31/overlayExpertDiscord",
+  "readme": "./README.md",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
     "deploy": "node deploy-commands.js"
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "deploy": "node deploy-commands.js",
-    "remove": "node remove-Commands.js"
   },
   "devDependencies": {
-    "eslint": "^7.32.0"
+    "eslint": "^7.32.0",
+    "nodemon": "^2.0.15"
   },
   "dependencies": {
     "@discordjs/builders": "^0.7.0",
@@ -25,7 +36,7 @@
     "combined-stream": "^1.0.8",
     "delayed-stream": "^1.0.0",
     "discord-api-types": "^0.20.2",
-    "discord.js": "^13.2.0",
+    "discord.js": "^13.6.0",
     "dot-prop": "^6.0.1",
     "dotenv": "^10.0.0",
     "is-obj": "^2.0.0",
@@ -41,8 +52,5 @@
     "type-fest": "^1.4.0",
     "vali-date": "^1.0.0",
     "ws": "^7.5.4"
-  },
-  "keywords": [],
-  "author": "SkullGaming31",
-  "license": "MIT"
+  }
 }

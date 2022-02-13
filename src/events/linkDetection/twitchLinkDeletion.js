@@ -1,5 +1,5 @@
 const { MessageEmbed, Message } = require('discord.js');
-const config = require('../config');
+const config = require('../../config');
 
 module.exports = {
 	name: 'messageCreate',
@@ -18,7 +18,6 @@ module.exports = {
 			'https://tiktok.com/', 'tiktok.com/',
 			'https://github.com/', 'github.com/',
 		];
-		const linkWhitelist = ['https://twitch.tv/', 'twitch.tv/', 'https://twitter.com/', 'twitter.com/', 'https://instagram.com/', 'instagram.com/', 'https://tiktok.com/', 'tiktok.com/'];
 		const targetChannel = message.guild.channels.cache.find(channel => channel.id === logsChannel);// Logs Channel
 		let foundInText = false;
 		const guildName = message.guild.name;

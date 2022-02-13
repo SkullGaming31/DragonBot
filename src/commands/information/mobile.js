@@ -36,9 +36,5 @@ module.exports = {
 			mobileEmbed.setTitle(`${target.tag}`);
 			await interaction.reply({ content: `${target}`, embeds: [mobileEmbed] });
 		}
-		else {
-			mobileEmbed.setTitle('Overlay Expert');
-			await interaction.reply({ embeds: [mobileEmbed] });
-		}
 	},
 };

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { Client, CommandInteraction, GuildMember, MessageEmbed } = require('discord.js');
+const { CommandInteraction, MessageEmbed } = require('discord.js');
 
 module.exports = {
 	name: 'ban',
@@ -10,10 +10,7 @@ module.exports = {
 			.setDescription('the user you want to ban')
 			.setRequired(true)),
 	/**
-	* 
-  * @param {Client} client
 	* @param {CommandInteraction} interaction
-  * @param {String[]} args
   * @returns
 	*/
 	async execute(interaction) {
@@ -27,12 +24,12 @@ module.exports = {
 		}
 		const bannedEmbed = new MessageEmbed()
 			.setTitle(`${guildName}`)
-			.setDescription('')
 			.addField('Banned from: ', `${guildName}`, true)
-			.addField('Reason: ', `${reason}`, true);
+			.addField('Reason: ', `${reason}`, true)
+			.setFooter({ text: `${guildName}` });
 		await target.send({ embeds: [bannedEmbed] });
 		target.ban({ reason: reason });
 
-		interaction.followUp({ content: `kicked ${interaction.user.tag} Successfully, Reason: ${reason}` });
+		interaction.editReply({ content: `kicked ${interaction.user.tag} Successfully, Reason: ${reason}` });
 	},
 };

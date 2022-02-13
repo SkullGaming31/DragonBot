@@ -1,11 +1,10 @@
 const { MessageEmbed, Message } = require('discord.js');
-const config = require('../config');
+const config = require('../../config');
 
 module.exports = {
 	name: 'messageCreate',
 	/**
-	 * @param {Message} message 
-	 * @returns 
+	 * @param {Message} message
 	 */
 
 	async execute(message) {

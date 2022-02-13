@@ -9,17 +9,11 @@ module.exports = {
 	/**
 	* 
 	* @param {CommandInteraction} interaction
-	* @returns
 	*/
 	async execute(interaction) {
 		const Bot = interaction.client.user.username;
 
 		await interaction.deferReply();
 		interaction.editReply({ content: `${Bot}'s ping is **${interaction.client.ws.ping}ms**` });
-		const guildName = interaction.guild.name;
-		const Bot = interaction.client.user.username;
-
-		await interaction.reply(`${Bot}'s ping is ${interaction.client.ws.ping}`);
-		// await interaction.reply({ content: 'Pong!' });
 	},
 };

@@ -14,7 +14,6 @@ module.exports = {
 			subCommand.setName('server')
 				.setDescription('Get info about the server')),
 	/**
-	* 
 	* @param {CommandInteraction} interaction 
 	*/
 	async execute(interaction) {
@@ -24,28 +23,18 @@ module.exports = {
 			if (user) {
 				const targetEmbed = new MessageEmbed()
 					.setTitle(`${user.tag}`)
-					.setDescription('')
 					.setColor('DARK_RED')
 					.addField('Your Id: ', `${user.id}`, true)
 					.addField('Your Username: ', `${user.username}`, true)
 					.addField('Your Tag: ', `${user.tag}`, true)
 					.addField('Warnings: ', '0', true)
 					.setThumbnail(user.displayAvatarURL())
-					.setFooter(`${guildName}`);
+					.setFooter({ text: `${guildName}` });
 				await interaction.deferReply();
 				interaction.editReply({ embeds: [targetEmbed] });
-					.addField('**Your Id:** ', `${user.id}`, true)
-					.addField('**Your Username:** ', `${user.username}`, true)
-					.addField('**Your Tag:** ', `${user.tag}`, true)
-					.addField('**Warnings:** ', '0', true)
-					.addField('**Your Roles:** ', 'WIP', true)
-					.setThumbnail(user.displayAvatarURL())
-					.setFooter(`${guildName}`);
-				await interaction.reply({ embeds: [targetEmbed] });
 			} else {
 				const userEmbed = new MessageEmbed()
 					.setTitle(`${interaction.user.tag}`)
-					.setDescription('')
 					.setColor('DARK_RED')
 					.addField('_Your id:_ ', `${interaction.user.id}`, true)
 					.addField('_Your Username:_ ', `${interaction.user.username}`, true)
@@ -54,30 +43,18 @@ module.exports = {
 					.addField('_Warnings:_ ', '0', true)
 					.addField('_Joined:_ ', `${interaction.guild.joinedAt}`, true)
 					.setThumbnail(interaction.user.displayAvatarURL())
-					.setFooter(`${guildName}`);
+					.setFooter({ text: `${guildName}` });
 				await interaction.deferReply();
 				interaction.editReply({ embeds: [userEmbed] });
-					.addField('**Your id:** ', `${interaction.user.id}`, true)
-					.addField('**Your Username:** ', `${interaction.user.username}`, true)
-					.addField('**Your Tag:** ', `${interaction.user.tag}`, true)
-					.addField('**Warnings:** ', '0', true)
-					.addField('**Your Roles:** ', 'WIP', true)
-					.setThumbnail(interaction.user.displayAvatarURL())
-					.setFooter(`${guildName}`);
-				await interaction.reply({ embeds: [userEmbed] });
 			}
 		}
 		else if (interaction.options.getSubcommand() === 'server') {
 			const serverEmbed = new MessageEmbed()
 				.setTitle(`${guildName}`)
-				.setDescription('')
-				.setFooter(`${guildName}`)
 				.addField('Server Name: ', `${guildName}`, true)
-				.addField('Total Members: ', `${interaction.guild.memberCount}`, true);
+				.addField('Total Members: ', `${interaction.guild.memberCount}`, true)
+				.setFooter({ text: `${guildName}` });
 			await interaction.deferReply();
-			interaction.editReply({ embeds: [serverEmbed] });
-				.addField('Server Name: ', `**${guildName}**`, true)
-				.addField('Total Members: ', `**${interaction.guild.memberCount}**`, true);
 			await interaction.reply({ embeds: [serverEmbed] });
 		}
 	},

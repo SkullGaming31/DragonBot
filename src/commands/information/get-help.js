@@ -14,7 +14,6 @@ module.exports = {
 			.setRequired(false)),
 	/**
 	* @param {CommandInteraction} interaction
-	* @returns
 	*/
 	async execute(interaction) {
 		const guildName = interaction.guild.name;
@@ -27,7 +26,7 @@ module.exports = {
 			.addField('2.', 'open your PC web browser or mobile web browser in **desktop mode**', false)
 			.addField('3.', 'navigate to your Twitch channel (i.e. `https://twitch.tv/YOUR_USERNAME`)', false)
 			.addField('4.', 'take a screenshot and upload it here (screenshots of your extension configuration screen or builder may also be helpful) If you or your viewers are **watching from the Twitch mobile app** or other device, please type `/mobile`.', false)
-			.setFooter(`${guildName}`);
+			.setFooter({ text: `${guildName}` });
 		if (user) {
 			await interaction.deferReply();
 			helpEmbed.setTitle(`**_${user.username}_**`);
@@ -39,10 +38,6 @@ module.exports = {
 			interaction.editReply({ embeds: [helpEmbed] });
 			helpEmbed.setTitle(`**_${user.username}_**`);
 			await interaction.reply({ content: `${user}`, embeds: [helpEmbed] });
-		}
-		else {
-			helpEmbed.setTitle(`${interaction.user.username}`);
-			await interaction.reply({ embeds: [helpEmbed] });
 		}
 	},
 };

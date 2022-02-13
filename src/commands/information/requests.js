@@ -20,12 +20,12 @@ module.exports = {
 		const requestEmbed = new MessageEmbed()
 			.setDescription('For a list of currently tracked bugs and features requests, see <https://github.com/overlay-expert/help-desk/issues>. ')
 			.setColor('PURPLE')
-			.setFooter(`${guildName}`);
+			.setFooter({ text: `${guildName}` });
 
 		const bugsFeatures = new MessageEmbed()
 			.setDescription('To report a new bug or request a new feature not listed above, see <https://github.com/overlay-expert/help-desk/issues/1#user-content-report>.')
 			.setColor('PURPLE')
-			.setFooter(`${guildName}`);
+			.setFooter({ text: `${guildName}` });
 
 		if (target) {// only sending the bugsFeature embed
 			await interaction.deferReply();
@@ -40,17 +40,6 @@ module.exports = {
 			interaction.editReply({ embeds: [requestEmbed] });
 			bugsFeatures.setTitle('Report Bugs/Request New Features!');
 			interaction.followUp({ embeds: [bugsFeatures] });
-			.setDescription('For a list of currently tracked bugs and features requests, see <https://github.com/overlay-expert/help-desk/issues>. To report a new bug or request a new feature not listed above, see <https://github.com/overlay-expert/help-desk/issues/1#user-content-report>.')
-			.setColor('PURPLE')
-			.setFooter(`${guildName}`);
-
-		if (target) {
-			requestEmbed.setTitle(`${target.tag}`);
-			await interaction.reply({ content: `${target}`, embeds: [requestEmbed] });
-		}
-		else {
-			requestEmbed.setTitle(`${guildName}`);
-			await interaction.reply({ embeds: [requestEmbed] });
 		}
 	},
 };

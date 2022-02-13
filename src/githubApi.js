@@ -3,8 +3,6 @@ const fetch = import('node-fetch');
 
 const token = config.GITHUB_TOKEN;
 
-const fetch = require('node-fetch');
-
 async function getIssues() {
 	const baseUrl = 'https://api.github.com';
 	const headers = {
