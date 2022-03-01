@@ -125,7 +125,6 @@ if you have installed nodemon you can use the dev script aswell, which will auto
 ```sh
 npm run start 'starts the bot'
 npm run dev 'starts the bot but will restart the bot any time any saving is done or a file is added/removed'
-npm run deploy 'to register commands to the guild'
 ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
