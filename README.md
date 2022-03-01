@@ -24,7 +24,7 @@
   <p align="center">
     Discord bot for Overlay Experts
     <br />
-    <a href="https://github.com/skullgaming31/overlayExpertDiscord"><strong>Explore the docs »</strong></a>
+<!--     <a href="https://github.com/skullgaming31/overlayExpertDiscord"><strong>Explore the docs »</strong></a> -->
     <br />
     ·
     <a href="https://github.com/skullgaming31/overlayExpertDiscord/issues">Report Bug</a>
