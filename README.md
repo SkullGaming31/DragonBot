@@ -140,7 +140,7 @@ npm run dev 'starts the bot but will restart the bot any time any saving is done
 * [ ] Ticket System
 * [ ] Warning System
 * [ ] Github Integration
-* [ ] detect tweets by Overlay Expert and send them to announcments with everyone tag!
+* [ ] detect tweets by Overlay Expert and send them to announcments with @everyone tag!
 
 ## Bugs
 
