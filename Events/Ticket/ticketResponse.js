@@ -12,7 +12,7 @@ module.exports = {
 	async execute(interaction) {
 		if (!interaction.isButton()) return;
 		const { guild, customId, channel, member } = interaction;
-		if (!member.permissions.has('MANAGE_MESSAGE')) return interaction.reply({ content: 'the buttons are for admins/moderators only', ephemeral: true });
+		if (!member.permissions.has('MANAGE_MESSAGES')) return interaction.reply({ content: 'the buttons are for admins/moderators only', ephemeral: true });
 		if(!['close','lock','unlock','claim'].includes(customId)) return;
 		
 		const embed = new MessageEmbed().setColor('BLUE');
@@ -25,7 +25,7 @@ module.exports = {
 				case 'lock':
 					if (docs.locked == true) return interaction.reply({ content: 'this ticket is already closed', ephemeral: true });
 					await DB.updateOne({ChannelID: channel.id }, { Locked: true });
-					embed.setDescription('🔒 | this channel is now locked for review');
+					embed.setDescription('🔒 | this channel is now locked Pending Review');
 					channel.permissionOverwrites.edit(docs.MembersID, {
 						SEND_MESSAGES: false,
 					});
@@ -60,7 +60,7 @@ module.exports = {
 				}
 			});
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 		}
 	}
 };
