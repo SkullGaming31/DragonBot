@@ -19,7 +19,8 @@ module.exports = {
 			.addField('ID', `${target.user.id}`, true)
 			.addField('Roles', `${target.roles.cache.map(r => r).join(' ').replace('@everyone', '') || 'None'}`)
 			.addField('Member Since', `<t:${parseInt(target.joinedTimestamp / 1000)}:R>`, true)
-			.addField('Discord User Since', `<t:${parseInt(target.user.createdTimestamp / 1000)}:R>`, true);
+			.addField('Discord User Since', `<t:${parseInt(target.user.createdTimestamp / 1000)}:R>`, true)
+			.addField('Warnings', '0', true);
 
 		interaction.reply({ embeds: [response], ephemeral: true });
 	}

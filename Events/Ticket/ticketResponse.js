@@ -27,9 +27,10 @@ module.exports = {
 					await DB.updateOne({ChannelID: channel.id }, { Locked: true });
 					embed.setDescription('🔒 | this channel is now locked Pending Review');
 					channel.permissionOverwrites.edit(docs.MembersID, {
-						SEND_MESSAGES: false,
+						SEND_MESSAGES: false
 					});
-					return interaction.reply({ embeds: [embed] });
+					interaction.reply({ embeds: [embed] });
+					break;
 				case 'unlock':
 					if (docs.locked == false) return interaction.reply({ content: 'this ticket is already unlocked', ephemeral: true });
 					await DB.updateOne({ChannelID: channel.id }, { Locked: false });
@@ -37,8 +38,10 @@ module.exports = {
 					channel.permissionOverwrites.edit(docs.MembersID, {
 						SEND_MESSAGES: true,
 					});
-					return interaction.reply({ embeds: [embed] });
+					interaction.reply({ embeds: [embed] });
+					break;
 				case 'close':
+					// await interaction.deferReply();
 					if (docs.Closed) return interaction.reply({ content: 'Ticket is already closed, please wait for it to be automatically deleted', ephemeral: true });
 					const attachments = await discordTranscripts.createTranscript(channel, {
 						limit: -1,
@@ -46,10 +49,10 @@ module.exports = {
 						fileName: `${docs.Type} - ${docs.TicketID}.html`,
 					});
 					await DB.updateOne({ ChannelID: channel.id }, { Closed: true });
-					interaction.reply({ content: 'The channel will delete in 10 seconds.' });
+					interaction.reply({ content: 'The channel will deleted in 10 seconds.' });
 					const MEMBER = guild.members.cache.get(docs.MembersID);
-					const Message = await guild.channels.cache.get(config.DISCORD_TRANSCRIPT_ID).send({ embeds: [ embed.setTitle(`Transcript Type: ${docs.Type}\nID: ${docs.TicketID}`)], files: [attachments] });
-					interaction.editReply({ embeds: [embed.setDescription(`the transcript is now saved [TRANSCRIPT](${Message.url})`)] });
+					const Message = await guild.channels.cache.get(config.DISCORD_TRANSCRIPT_ID).send({ embeds: [embed.setTitle(`Transcript Type: ${docs.Type}\nID: ${docs.TicketID}`)], files: [attachments] });
+					interaction.followUp({ embeds: [embed.setDescription(`the transcript is now saved [TRANSCRIPT](${Message.url})`)] });
 	
 					setTimeout(() => {
 						channel.delete();

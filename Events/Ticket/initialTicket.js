@@ -59,10 +59,10 @@ module.exports = {
 						new MessageButton().setCustomId('unlock').setLabel('Unlock').setStyle('SUCCESS').setEmoji('🔓'),
 						new MessageButton().setCustomId('claim').setLabel('Claim').setStyle('PRIMARY').setEmoji('🛄')
 					);
-					channel.send({ embeds: [embed], components: [Buttons] });
+					await channel.send({ embeds: [embed], components: [Buttons] });
 					await channel.send({ content: `${member} here is your ticket` }).then((m) => {
 						setTimeout(() => {
-							m.delete().catch(() => {});
+							m.delete().catch((err) => { console.error(err); });
 						}, 1 * 5000);
 					});
 					interaction.reply({ content: `${member} your ticket has been created: ${channel}`, ephemeral: true });
