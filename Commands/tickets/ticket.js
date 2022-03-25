@@ -50,7 +50,8 @@ module.exports = {
 				channel.permissionOverwrites.edit(Member.id, {
 					SEND_MESSAGES: true,
 					VIEW_CHANNEL: true,
-					READ_MESSAGE_HISTORY: true
+					READ_MESSAGE_HISTORY: true,
+					ATTACH_FILES: true
 				});
 				interaction.reply({ content: `${Member}`, embeds: [embed.setColor('GREEN').setDescription(`✅ | ${Member} has been added to the ticket`)] });
 				docs.save();

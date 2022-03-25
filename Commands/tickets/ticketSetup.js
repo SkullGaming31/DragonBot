@@ -13,16 +13,16 @@ module.exports = {
 		const embed = new MessageEmbed()
 			.setColor('BLUE')
 			.setAuthor({ name: `${guild.name} | Ticket System`, iconURL: interaction.guild.iconURL({ dynamic: true }) })
-			.setDescription('Open a ticket to report a user, \nget support (after you have checked the FAQ) or \nreport a bug in overlay expert');
+			.setDescription('Open a ticket to report a Member, \nget support (``after you have checked the FAQ``) \nreport a bug in overlay expert');
 		const Buttons = new MessageActionRow();
 		Buttons.addComponents(
 			new MessageButton().setCustomId('player').setLabel('Member Report').setStyle('PRIMARY').setEmoji('🧧'),
-			new MessageButton().setCustomId('bug').setLabel('Bug Report').setStyle('SECONDARY').setEmoji('🐛'),
-			new MessageButton().setCustomId('support').setLabel('Support').setStyle('SUCCESS').setEmoji('✅')
+			new MessageButton().setCustomId('support').setLabel('Support').setStyle('SUCCESS').setEmoji('✅'),
+			new MessageButton().setCustomId('bug').setLabel('Bug Report').setStyle('SECONDARY').setEmoji('🐛')
 		);
 		try {
 			await channel.send({ embeds: [embed], components: [Buttons] });
-			interaction.reply({ content: 'done', ephemeral: true });
+			return interaction.reply({ content: 'done', ephemeral: true });
 		} catch (error) {
 			console.error(error);
 		}

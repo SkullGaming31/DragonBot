@@ -7,5 +7,7 @@ module.exports = model('ticket', new Schema({
 	TicketID: String,
 	Closed: Boolean,
 	Locked: Boolean,
-	Type: String
+	Type: String,
+	Claimed: Boolean,
+	ClaimedBy: String
 }));

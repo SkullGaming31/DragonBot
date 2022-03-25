@@ -16,7 +16,6 @@ module.exports = {
 
 		const ID = Math.floor(Math.random() * 90000) + 10000;
 
-		const everyoneRole = interaction.guild.roles.cache.get(interaction.guild.id);
 		try {
 			if (guild.available)
 				await guild.channels.create(`${customId + '-' + ID}`, {
@@ -25,10 +24,10 @@ module.exports = {
 					permissionOverwrites: [
 						{
 							id: member.id,
-							allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'READ_MESSAGE_HISTORY'],
+							allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'READ_MESSAGE_HISTORY', 'ATTACH_FILES', 'EMBED_LINKS'], 
 						},
 						{
-							id: everyoneRole,
+							id: config.DISCORD_EVERYONE_ROLE_ID,
 							deny: ['VIEW_CHANNEL']
 						},
 						{
@@ -57,7 +56,7 @@ module.exports = {
 						new MessageButton().setCustomId('close').setLabel('Save And Close Ticket').setStyle('PRIMARY').setEmoji('💾'),
 						new MessageButton().setCustomId('lock').setLabel('Lock').setStyle('SECONDARY').setEmoji('🔒'),
 						new MessageButton().setCustomId('unlock').setLabel('Unlock').setStyle('SUCCESS').setEmoji('🔓'),
-						new MessageButton().setCustomId('claim').setLabel('Claim').setStyle('PRIMARY').setEmoji('🛄')
+						// new MessageButton().setCustomId('claim').setLabel('Claim').setStyle('PRIMARY').setEmoji('🛄')
 					);
 					await channel.send({ embeds: [embed], components: [Buttons] });
 					await channel.send({ content: `${member} here is your ticket` }).then((m) => {
@@ -65,7 +64,7 @@ module.exports = {
 							m.delete().catch((err) => { console.error(err); });
 						}, 1 * 5000);
 					});
-					interaction.reply({ content: `${member} your ticket has been created: ${channel}`, ephemeral: true });
+					await interaction.reply({ content: `${member} your ticket has been created: ${channel}`, ephemeral: true });
 				});	
 		} catch (error) {
 			console.error(error);
