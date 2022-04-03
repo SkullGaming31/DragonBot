@@ -1,31 +1,31 @@
-const { MessageEmbed, CommandInteraction, Permissions } = require('discord.js');
+const { MessageEmbed, CommandInteraction } = require('discord.js');
 const DB = require('../../Structures/Schemas/Ticket');
 
 module.exports = {
 	name: 'ticket',
 	description: 'Ticket Actions',
-	permission: 'ADMINISTRATOR',
+	permission: 'MANAGE_MESSAGES',
 	options: [
 		{
 			name: 'action',
-			type: 'STRING',
 			description: 'add or remove a member from the ticket',
+			type: 'STRING',
 			required: true,
 			choices: [
 				{
-					name: 'add',
+					name: 'Add',
 					value: 'add'
 				},
 				{
-					name: 'remove',
+					name: 'Remove',
 					value: 'remove'
 				}
 			]
 		},
 		{
 			name: 'member',
-			type: 'USER',
 			description: 'add a member to the ticket',
+			type: 'USER',
 			required: true
 		}
 	],

@@ -1,6 +1,6 @@
-const { ButtonInteraction, MessageEmbed, MessageActionRow, MessageButton, Permissions } = require('discord.js');
+const { ButtonInteraction, MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
 const db = require('../../Structures/Schemas/Ticket');
-const config = require('../../Structures/config');
+const TicketSetupData = require('../../Structures/Schemas/TicketSetup');
 
 module.exports = {
 	name: 'interactionCreate',
@@ -12,7 +12,11 @@ module.exports = {
 	async execute(interaction) {
 		if (!interaction.isButton) return;
 		const {  guild, member, customId } = interaction;
-		if (!['player','bug','support'].includes(customId)) return;
+
+		const Data = await TicketSetupData.findOne({ GuildID: guild.id });
+		if (!Data) return;
+
+		if (!Data.Buttons.includes(customId)) return;
 
 		const ID = Math.floor(Math.random() * 90000) + 10000;
 
@@ -20,18 +24,18 @@ module.exports = {
 			if (guild.available)
 				await guild.channels.create(`${customId + '-' + ID}`, {
 					type: 'GUILD_TEXT',
-					parent: config.DISCORD_TICKET_SYSTEM_ID,
+					parent: Data.Category,
 					permissionOverwrites: [
 						{
 							id: member.id,
 							allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'READ_MESSAGE_HISTORY', 'ATTACH_FILES', 'EMBED_LINKS'], 
 						},
 						{
-							id: config.DISCORD_EVERYONE_ROLE_ID,
+							id: Data.Everyone,
 							deny: ['VIEW_CHANNEL']
 						},
 						{
-							id: config.DISCORD_BOT_ROLE_ID,
+							id: Data.BotRole,
 							allow: ['SEND_MESSAGES', 'EMBED_LINKS', 'VIEW_CHANNEL', 'READ_MESSAGE_HISTORY'],
 						}
 					]
@@ -54,17 +58,17 @@ module.exports = {
 					const Buttons = new MessageActionRow();
 					Buttons.addComponents(
 						new MessageButton().setCustomId('close').setLabel('Save And Close Ticket').setStyle('PRIMARY').setEmoji('💾'),
-						new MessageButton().setCustomId('lock').setLabel('Lock').setStyle('SECONDARY').setEmoji('🔒'),
+						new MessageButton().setCustomId('lock').setLabel('Lock').setStyle('DANGER').setEmoji('🔒'),
 						new MessageButton().setCustomId('unlock').setLabel('Unlock').setStyle('SUCCESS').setEmoji('🔓'),
 						// new MessageButton().setCustomId('claim').setLabel('Claim').setStyle('PRIMARY').setEmoji('🛄')
 					);
-					await channel.send({ embeds: [embed], components: [Buttons] });
+					channel.send({ embeds: [embed], components: [Buttons] });
 					await channel.send({ content: `${member} here is your ticket` }).then((m) => {
 						setTimeout(() => {
 							m.delete().catch((err) => { console.error(err); });
 						}, 1 * 5000);
 					});
-					await interaction.reply({ content: `${member} your ticket has been created: ${channel}`, ephemeral: true });
+					interaction.reply({ content: `${member} your ticket has been created: ${channel}`, ephemeral: true });
 				});	
 		} catch (error) {
 			console.error(error);

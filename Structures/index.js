@@ -16,6 +16,13 @@ const client = new Client({
 	] 
 });
 client.commands = new Collection();
+client.buttons = new Collection();
+client.filters = new Collection();
+client.filtersLog = new Collection();
+
+/* ['ChatFilterSys', 'LockdownSys'].forEach((system) => {
+	require(`../Structures/Systems/${system}`)(client);
+}); */
 
 ['Events', 'Commands'].forEach(handler => {
 	require(`../handlers/${handler}`)(client, PG, Ascii);

@@ -137,9 +137,8 @@ npm run dev 'starts the bot but will restart the bot any time any saving is done
 * [x] link detect and delete(if not in correct channel)
 * [x] discord nitro .gift scam links automatically removed
 * [x] all discord invite links deleted when posted
-* [ ] Ticket System
-* [ ] Warning System
-* [ ] Github Integration
+* [x] Ticket System
+* [x] Warning System
 * [ ] detect tweets by Overlay Expert and send them to announcments with @everyone tag!
 
 ## Bugs

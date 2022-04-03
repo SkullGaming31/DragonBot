@@ -24,7 +24,8 @@
     "fs": "^0.0.1-security",
     "glob": "^7.2.0",
     "mongoose": "^6.2.1",
-    "ms": "^2.1.3"
+    "ms": "^2.1.3",
+    "sourcebin": "^4.3.5"
   },
   "devDependencies": {
     "eslint": "^8.5.0",
@@ -32,10 +33,10 @@
   },
   "repository": {
     "directory": "",
-    "type": "public",
-    "url": "https://github.com/SkullGaming31/SkulledBot"
+    "type": "private",
+    "url": "https://github.com/SkullGaming31/overlayExpertDiscord"
   },
   "bugs": {
-    "url": "https://github.com/SkullGaming31/SkulledBot/issues"
+    "url": "https://github.com/SkullGaming31/overlayExpertDiscord/issues"
   }
 }

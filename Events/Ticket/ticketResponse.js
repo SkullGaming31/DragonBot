@@ -1,7 +1,8 @@
-const { ButtonInteraction, MessageEmbed, Permissions, PermissionOverwrites } = require('discord.js');
+const { ButtonInteraction, MessageEmbed } = require('discord.js');
 const discordTranscripts = require('discord-html-transcripts');
 const DB = require('../../Structures/Schemas/Ticket');
-const config = require('../../Structures/config');
+const TicketSetupData = require('../../Structures/Schemas/TicketSetup');
+// const config = require('../../Structures/config');
 
 module.exports = {
 	name: 'interactionCreate',
@@ -13,14 +14,17 @@ module.exports = {
 		if (!interaction.isButton()) return;
 		const { guild, customId, channel, member } = interaction;
 		if(!['close','lock','unlock'].includes(customId)) return;
-		if (!member.permissions.has('MANAGE_MESSAGES')) return interaction.reply({ content: 'the buttons are for admins/moderators only', ephemeral: true });
+
+		const TicketSetup = await TicketSetupData.findOne({ GuildID: guild.id });
+		if (!TicketSetup) return interaction.reply({ content: 'the data for this system is outdated' });
+		if (!member.roles.cache.find((r) => r.id === TicketSetup.Handlers)) return interaction.reply({ content: `you must have the <@&${TicketSetup.Handlers}> role to close a ticket`, ephemeral: true });
 		
 		const embed = new MessageEmbed()
 			.setColor('BLUE');
 		
 		DB.findOne({ ChannelID: channel.id }, async(err, docs) => {
 			if (err) throw err;
-			if (!docs) interaction.reply({ content: 'no data was found related to this ticket, please delete it manually', ephemeral: true });
+			if (!docs) return interaction.reply({ content: 'no data was found related to this ticket, please delete it manually', ephemeral: true });
 			switch(customId) {
 			case 'lock':
 				if (docs.locked == true) return interaction.reply({ content: 'this ticket is already Locked', ephemeral: true });
@@ -50,7 +54,6 @@ module.exports = {
 				interaction.reply({ embeds: [embed] });	
 				break;
 			case 'close':
-				// await interaction.deferReply();
 				if (docs.Closed) return interaction.reply({ content: 'Ticket is already closed, please wait for it to be automatically deleted', ephemeral: true });
 				const attachments = await discordTranscripts.createTranscript(channel, {
 					limit: -1,
@@ -58,9 +61,9 @@ module.exports = {
 					fileName: `${docs.Type} - ${docs.TicketID}.html`,
 				});
 				await DB.updateOne({ ChannelID: channel.id }, { Closed: true });
-				interaction.reply({ content: 'The channel will deleted in 10 seconds.' });
-				const Message = await guild.channels.cache.get(config.DISCORD_TRANSCRIPT_ID).send({ embeds: [embed.setTitle(`Transcript Type: ${docs.Type}\nID: ${docs.TicketID}`)], files: [attachments] });
-				interaction.followUp({ embeds: [embed.setDescription(`the transcript is now saved [TRANSCRIPT](${Message.url})`)] });
+				// interaction.reply({ content: 'The channel will deleted in 10 seconds.' });
+				const Message = await guild.channels.cache.get(TicketSetup.Transcripts).send({ embeds: [embed.setTitle(`Transcript Type: ${docs.Type}\nID: ${docs.TicketID}`)], files: [attachments] });
+				interaction.reply({ content: 'The channel will deleted in 10 seconds.', embeds: [embed.setDescription(`the transcript is now saved [TRANSCRIPT](${Message.url})`)] });
 		
 				setTimeout(() => {
 					channel.delete();

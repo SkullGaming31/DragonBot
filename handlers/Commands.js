@@ -1,6 +1,5 @@
 const { Perms } = require('../Structures/validation/Permissions');
 const { Client } = require('discord.js');
-const { DISCORD_GUILD_ID } = require('../Structures/config');
 
 /**
  * 
@@ -37,27 +36,29 @@ module.exports = async (client, PG, Ascii) => {
 
 	// Permissions Check //
 	client.on('ready', async () => {
-		const MainGuild = await client.guilds.cache.get(DISCORD_GUILD_ID);
+		// const MainGuild = await client.guilds.cache.get(config.DISCORD_GUILD_ID);
 
-		MainGuild.commands.set(CommandsArray).then(async (command) => {
-			const Roles = (commandName) => {
-				const cmdPerms = CommandsArray.find((c) => c.name === commandName).permission;
-				if (!cmdPerms) return null;
-
-				return MainGuild.roles.cache.filter((r) => r.permissions.has(cmdPerms));
-			};
-
-			const fullPermissions = command.reduce((accumulator, r) => {
-				const roles = Roles(r.name);
-				if (!roles) return accumulator;
-
-				const permissions = roles.reduce((a, r) => {
-					return [...a, {id: r.id, type: 'ROLE', permission: true}];
+		client.guilds.cache.forEach((g) => {
+			g.commands.set(CommandsArray).then(async (command) => {
+				const Roles = (commandName) => {
+					const cmdPerms = CommandsArray.find((c) => c.name === commandName).permission;
+					if (!cmdPerms) return null;
+	
+					return g.roles.cache.filter((r) => r.permissions.has(cmdPerms));
+				};
+	
+				const fullPermissions = command.reduce((accumulator, r) => {
+					const roles = Roles(r.name);
+					if (!roles) return accumulator;
+	
+					const permissions = roles.reduce((a, r) => {
+						return [...a, {id: r.id, type: 'ROLE', permission: true}];
+					}, []);
+					return [...accumulator, {id: r.id, permissions }];
 				}, []);
-				return [...accumulator, {id: r.id, permissions }];
-			}, []);
-
-			await MainGuild.commands.permissions.set({ fullPermissions });
-		});
+	
+				await g.commands.permissions.set({ fullPermissions });
+			});
+		})
 	});
 };

@@ -19,22 +19,22 @@ module.exports = {
 
 		const adminRole = message.guild.roles.cache.get(config.DISCORD_ADMIN_ROLE_ID); // Admin Role ID
 		const modRole = message.guild.roles.cache.get(config.DISCORD_MOD_ROLE_ID); // Moderator Role ID
+		const communitySupport = message.guild.channels.cache.get(config.DISCORD_SUPPORT_CHANNEL_ID);
 
 		if (mentionedMember) { // Anti-Ping System
 			if (mentionedMember.roles.cache.has(adminRole.id) || mentionedMember.roles.cache.has(modRole.id)) {
 				const warning = new MessageEmbed()
 					.setTitle('WARNING')
-					.setDescription('**Please do not ping a Moderator or Admin**')
+					.setDescription(`**Please do not ping a Moderator or Admin**, Leave your question in ${communitySupport} and we will get to it as soon as possible`)
 					.setColor('RED')
 					.setFooter({ text: `${guildName}` })
 					.setThumbnail(message.author.avatarURL({dynamic: true}));
-				await message.reply({ content: `${message.author.tag}`, embeds: [warning] });
-				message.delete();
+				await message.reply({ embeds: [warning], allowedMentions: ['users'] });
+				(await message.fetch(true)).id
+				setTimeout(() => {
+					message.delete();
+				}, 1 * 5000);
 			}
-		}
-		const OEChannelID = message.guild.channels.cache.get('837015934174625802');// TODO: Timer to stop messages going off everytime a discord member says overlay expert or help
-		if (message.content.includes('overlay expert') && message.guild.channels !== OEChannelID) {
-			await message.reply({ content: `Please use ${OEChannelID} for questions about Overlay Expert` });
 		}
 	},
 };
