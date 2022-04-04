@@ -22,26 +22,26 @@ module.exports = {
 		const Target = options.getUser('target');
 
 		try {
-			const requestEmbed = new MessageEmbed()
-				.setDescription('For a list of currently tracked bugs and features requests, see <https://github.com/overlay-expert/help-desk/issues>. ')
+			const infoEmbed = new MessageEmbed()
+				// .setDescription('For a list of currently tracked bugs and features requests, see <https://github.com/overlay-expert/help-desk/issues>. ')
 				.setColor('PURPLE')
+				.addFields([
+					{
+						name: 'Current List of Bugs&Features',
+						value: 'For a list of currently tracked bugs and features requests, see <https://github.com/overlay-expert/help-desk/issues>.'
+					},
+					{
+						name: 'Report Bugs/Request New Features!',
+						value: 'To report a new bug or request a new feature not listed above, see <https://github.com/overlay-expert/help-desk/issues/1#user-content-report>.'
+					}
+				])
 				.setFooter({ text: `${guild.name}` });
 
-			const bugsFeatures = new MessageEmbed()
-				.setDescription('To report a new bug or request a new feature not listed above, see <https://github.com/overlay-expert/help-desk/issues/1#user-content-report>.')
-				.setColor('PURPLE')
-				.setFooter({ text: `${guild.name}` });
-
-			if (Target) {// only sending the bugsFeature embed
-				await interaction.deferReply();
-				requestEmbed.setTitle(`${Target.tag}`);
-				interaction.editReply({ content: `${Target}`, embeds: [bugsFeatures, requestEmbed] });
+			if (Target) {
+				return await interaction.reply({ content: `${Target}`, embeds: [infoEmbed] });
 			}
 			else {
-				await interaction.deferReply();
-				requestEmbed.setTitle('Current List of Bugs&Features');
-				bugsFeatures.setTitle('Report Bugs/Request New Features!');
-				interaction.editReply({ embeds: [bugsFeatures, requestEmbed] });
+				return await interaction.reply({ embeds: [infoEmbed] });
 			}
 		} catch (error) {
 			console.error(error);

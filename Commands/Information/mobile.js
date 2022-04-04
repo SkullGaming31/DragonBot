@@ -1,4 +1,5 @@
 const { CommandInteraction, MessageEmbed } = require('discord.js');
+const { parse } = require('dotenv');
 
 module.exports = {
 	name: 'mobile',
@@ -21,7 +22,6 @@ module.exports = {
 		const Target = options.getUser('target');
 
 		try {
-
 			const mobileEmbed = new MessageEmbed()
 				.setTitle('Mobile Help')
 				.setColor('BLUE')
@@ -41,9 +41,9 @@ module.exports = {
 				.setTimestamp();
 
 			if (Target) {
-				await interaction.reply({ content: `@${Target.tag}`, embeds: [mobileEmbed] });
+				return await interaction.reply({ content: `${Target}`, embeds: [mobileEmbed] });
 			} else {
-				await interaction.reply({ embeds: [mobileEmbed] });
+				return await interaction.reply({ embeds: [mobileEmbed] });
 			}
 		} catch (error) {
 			console.error(error);

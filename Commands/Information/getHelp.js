@@ -33,14 +33,13 @@ module.exports = {
 				.setFooter({ text: `${guild.name}` });
 
 			if (Target) {// only sending the bugsFeature embed
-				await interaction.deferReply();
-				helpEmbed.setAuthor({ name: `**_${Target.username}_**`, iconURL: `${Target.displayAvatarURL({ dynamic: true })}`});
-				interaction.editReply({ content: `${Target.tag}`, embeds: [helpEmbed] });
+				helpEmbed.setAuthor({ name: `${Target.tag}`, iconURL: `${Target.displayAvatarURL({ dynamic: true })}` });
+				helpEmbed.setThumbnail(`${Target.displayAvatarURL({ dynamic: true, size: 512 })}`)
+				return await interaction.reply({ content: `${Target}`, embeds: [helpEmbed] });
 			}
 			else {
-				await interaction.deferReply();
-				helpEmbed.setAuthor({ name: `${user.username}`, iconURL: `${user.displayAvatarURL({ dynamic: true })}`});
-				interaction.editReply({ embeds: [helpEmbed] });
+				helpEmbed.setAuthor({ name: `${user.username}`, iconURL: `${user.displayAvatarURL({ dynamic: true })}` });
+				return await interaction.reply({ embeds: [helpEmbed] });
 			}
 		} catch (error) {
 			console.error(error);
