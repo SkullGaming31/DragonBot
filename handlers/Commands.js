@@ -43,20 +43,20 @@ module.exports = async (client, PG, Ascii) => {
 				const Roles = (commandName) => {
 					const cmdPerms = CommandsArray.find((c) => c.name === commandName).permission;
 					if (!cmdPerms) return null;
-	
-					return g.roles.cache.filter((r) => r.permissions.has(cmdPerms));
+
+					return g.roles.cache.filter((r) => r.permissions.has(cmdPerms) && !r.managed).first(10);
 				};
-	
+
 				const fullPermissions = command.reduce((accumulator, r) => {
 					const roles = Roles(r.name);
 					if (!roles) return accumulator;
-	
+
 					const permissions = roles.reduce((a, r) => {
-						return [...a, {id: r.id, type: 'ROLE', permission: true}];
+						return [...a, { id: r.id, type: 'ROLE', permission: true }];
 					}, []);
-					return [...accumulator, {id: r.id, permissions }];
+					return [...accumulator, { id: r.id, permissions }];
 				}, []);
-	
+
 				await g.commands.permissions.set({ fullPermissions });
 			});
 		})

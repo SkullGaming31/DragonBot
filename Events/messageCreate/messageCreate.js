@@ -1,13 +1,14 @@
 const { MessageEmbed, Message } = require('discord.js');
-const config = require('../../Structures/config');
+const DB = require('../../Structures/Schemas/settingsDB');
 
 module.exports = {
 	name: 'messageCreate',
 	/**
-	 * @param {Message} message
+	 * 
+	 * @param {Message} message 
 	 * @returns 
 	 */
-	async execute (message) {
+	async execute(message) {
 		const channel = (await message.guild.channels.fetch(message.channel.id)).name;
 		// const mentioned = (await message.guild.members.fetch(message.author.id)).displayName;
 		console.log(`${message.author.tag} Said: ${message.content} in #${channel}`);
@@ -17,9 +18,11 @@ module.exports = {
 		const guildName = message.guild.name;
 		const mentionedMember = message.mentions.members.first();
 
-		const adminRole = message.guild.roles.cache.get(config.DISCORD_ADMIN_ROLE_ID); // Admin Role ID
-		const modRole = message.guild.roles.cache.get(config.DISCORD_MOD_ROLE_ID); // Moderator Role ID
-		const communitySupport = message.guild.channels.cache.get(config.DISCORD_SUPPORT_CHANNEL_ID);
+		const Data = await DB.findOne({ GuildID: message.guild.id });
+
+		const adminRole = message.guild.roles.cache.get(Data.AdministratorRole); // Admin Role ID
+		const modRole = message.guild.roles.cache.get(Data.ModeratorRole); // Moderator Role ID
+		const communitySupport = message.guild.channels.cache.get(Data.SupportChannel);
 
 		if (mentionedMember) { // Anti-Ping System
 			if (mentionedMember.roles.cache.has(adminRole.id) || mentionedMember.roles.cache.has(modRole.id)) {
@@ -28,9 +31,8 @@ module.exports = {
 					.setDescription(`**Please do not ping a Moderator or Admin**, Leave your question in ${communitySupport} and we will get to it as soon as possible`)
 					.setColor('RED')
 					.setFooter({ text: `${guildName}` })
-					.setThumbnail(message.author.avatarURL({dynamic: true}));
+					.setThumbnail(message.author.avatarURL({ dynamic: true }));
 				await message.reply({ embeds: [warning], allowedMentions: ['users'] });
-				(await message.fetch(true)).id
 				setTimeout(() => {
 					message.delete();
 				}, 1 * 5000);

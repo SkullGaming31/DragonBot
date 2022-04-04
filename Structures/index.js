@@ -8,12 +8,12 @@ const config = require('./config');
 
 require('../database/index');
 
-const client = new Client({ 
-	intents: [ 
+const client = new Client({
+	intents: [
 		Intents.FLAGS.GUILDS,
 		Intents.FLAGS.GUILD_MESSAGES,
-		Intents.FLAGS.GUILD_MEMBERS 
-	] 
+		Intents.FLAGS.GUILD_MEMBERS
+	]
 });
 client.commands = new Collection();
 client.buttons = new Collection();

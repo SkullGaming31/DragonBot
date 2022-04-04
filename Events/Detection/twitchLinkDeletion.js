@@ -1,5 +1,5 @@
-const { MessageEmbed, Message, TextChannel } = require('discord.js');
-require('dotenv').config();
+const { MessageEmbed, Message } = require('discord.js');
+const DB = require('../../Structures/Schemas/settingsDB');
 
 module.exports = {
 	name: 'messageCreate',
@@ -10,8 +10,10 @@ module.exports = {
 	 * @returns 
 	 */
 	async execute(message) {
-		const nowLive = process.env.DISCORD_PROMOTE_CHANNEL_ID;
-		const logsChannel = process.env.DISCORD_LOGS_CHANNEL_ID;
+		const { guild } = message;
+		// const nowLive = process.env.DISCORD_PROMOTE_CHANNEL_ID;
+		// const logsChannel = process.env.DISCORD_LOGS_CHANNEL_ID;
+		const Data = await DB.findOne({ GuildID: guild.id });
 		const linkWhitelist = [
 			'https://twitch.tv/', 'twitch.tv/',
 			'https://twitter.com/', 'twitter.com/',
@@ -20,11 +22,10 @@ module.exports = {
 			'https://github.com/', 'github.com/',
 		];
 		// if (message.member.permissions.has('MANAGE_MESSAGES')) return;
-		const targetChannel = message.guild.channels.cache.find(channel => channel.id === logsChannel);// Logs Channel
+		const logsChannel = guild.channels.cache.get(Data.LoggingChannel);// Logs Channel
 		let foundInText = false;
-		const guildName = message.guild.name;
 
-		const nowlive = message.guild.channels.cache.get(nowLive); // now-live ChannelID
+		const nowLive = guild.channels.cache.get(Data.PromotionChannel); // now-live ChannelID
 		for (const link in linkWhitelist) {
 			if (message.author.bot) return;
 			if (message.content.toLowerCase().includes(linkWhitelist[link].toLowerCase())) { foundInText = true; }
@@ -32,22 +33,35 @@ module.exports = {
 				try {
 					const linkDetection = new MessageEmbed()
 						.setTitle('Link Detected')
-						.setDescription(`:x: ${message.author} **Links should only be posted in ${nowlive}**`)
+						.setDescription(`:x: ${message.author} **Links should only be posted in ${nowLive}**`)
 						.setColor('RED')
-						.setFooter({ text: `${guildName}`})
+						.setFooter({ text: `${guild.name}` })
 						.setThumbnail(message.author.avatarURL())
 						.setTimestamp(Date.now());
-						
+
 					await message.channel.send({ embeds: [linkDetection] });
 					message.delete().catch((e) => { console.error(e); });
 					foundInText = false;
 
 					const logsEmbed = new MessageEmbed()
 						.setTitle('Automated Message Deletion')
-						.setDescription(`${message.author.username} posted ${message.content} in ${message.channel}`)
+						.addFields([
+							{
+								name: 'User',
+								value: `${message.author.username}`
+							},
+							{
+								name: 'Message',
+								value: `${message.content}`
+							},
+							{
+								name: 'Channel',
+								value: `${message.channel}`
+							}
+						])
 						.setColor('PURPLE')
 						.setTimestamp(Date.now());
-					if (targetChannel.isText()) await targetChannel.send({ embeds: [logsEmbed] });
+					if (logsChannel.isText()) await logsChannel.send({ embeds: [logsEmbed] });
 					if (!foundInText) break;
 				}
 				catch (e) {
