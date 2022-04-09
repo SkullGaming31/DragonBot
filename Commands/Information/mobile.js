@@ -1,5 +1,4 @@
 const { CommandInteraction, MessageEmbed } = require('discord.js');
-const { parse } = require('dotenv');
 
 module.exports = {
 	name: 'mobile',
@@ -17,7 +16,7 @@ module.exports = {
 	 * @param {CommandInteraction} interaction 
 	 */
 	async execute(interaction) {
-		const { options, guild } = interaction;
+		const { options, guild, member } = interaction;
 
 		const Target = options.getUser('target');
 
@@ -40,7 +39,7 @@ module.exports = {
 				.setFooter({ text: `${guild.name}` })
 				.setTimestamp();
 
-			if (Target) {
+			if (Target && member.permissions.has('MANAGE_MESSAGES')) {
 				return await interaction.reply({ content: `${Target}`, embeds: [mobileEmbed] });
 			} else {
 				return await interaction.reply({ embeds: [mobileEmbed] });

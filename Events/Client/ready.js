@@ -9,9 +9,9 @@ module.exports = {
 	/**
 	 * @param {Client} client 
 	 */
-	async execute (client) {
+	async execute(client) {
 		console.log(`Logged in as ${client.user.tag}`);
-		client.user.setActivity('JavaScript', { type: 'WATCHING' });
+		client.user.setActivity('Overlay Experts', { type: 'WATCHING' });
 		// client.guilds.cache.get(config.DISCORD_GUILD_ID).commands.set([]); // remove ALL commands
 		await mongoConnect();
 		require('../../Structures/Systems/ChatFilterSys')(client);

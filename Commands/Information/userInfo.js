@@ -17,11 +17,11 @@ module.exports = {
 	 * @param {CommandInteraction} interaction 
 	 */
 	async execute(interaction) {
-		const { guild, user, options } = interaction;
+		const { guild, user, options, member } = interaction;
 
 		const Target = options.getUser('target');
 
-		
+
 		try {
 			const joined = await Target.fetch(true);
 			const userInfoEmbed = new MessageEmbed()
@@ -29,7 +29,7 @@ module.exports = {
 				.setDescription('User Info: ')
 				.setAuthor({ name: `${Target}`, iconURL: `${Target.displayAvatarURL({ dynamic: true, size: 512 })}` })
 				.setColor('WHITE')
-				.setThumbnail(Target.displayAvatarURL({ dynamic: true, size: 512}))
+				.setThumbnail(Target.displayAvatarURL({ dynamic: true, size: 512 }))
 				.addFields([
 					{
 						name: 'ID: ',
@@ -59,7 +59,7 @@ module.exports = {
 				])
 				.setFooter({ text: `${guild.name}` });
 
-			if (Target) {
+			if (Target && member.permissions.has('MANAGE_MESSAGES')) {
 				interaction.reply({ embeds: [userInfoEmbed], ephemeral: true });
 				// console.log('tag working');
 			}

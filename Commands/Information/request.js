@@ -17,7 +17,7 @@ module.exports = {
 	 * @param {CommandInteraction} interaction 
 	 */
 	async execute(interaction) {
-		const { guild, options } = interaction;
+		const { guild, options, member } = interaction;
 
 		const Target = options.getUser('target');
 
@@ -37,7 +37,7 @@ module.exports = {
 				])
 				.setFooter({ text: `${guild.name}` });
 
-			if (Target) {
+			if (Target && member.permissions.has('MANAGE_MESSAGES')) {
 				return await interaction.reply({ content: `${Target}`, embeds: [infoEmbed] });
 			}
 			else {

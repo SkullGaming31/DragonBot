@@ -1,5 +1,4 @@
 const { Client, Intents, Collection } = require('discord.js');
-const fs = require('fs');
 const { promisify } = require('util');
 const glob = require('glob');
 const PG = promisify(glob);
@@ -19,6 +18,8 @@ client.commands = new Collection();
 client.buttons = new Collection();
 client.filters = new Collection();
 client.filtersLog = new Collection();
+
+require('../handlers/Anit-Crash')(client);
 
 /* ['ChatFilterSys', 'LockdownSys'].forEach((system) => {
 	require(`../Structures/Systems/${system}`)(client);

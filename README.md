@@ -139,6 +139,7 @@ npm run dev 'starts the bot but will restart the bot any time any saving is done
 * [x] all discord invite links deleted when posted
 * [x] Ticket System
 * [x] Warning System
+* [ ] Error logger and a note on which guild the warning comes from.
 * [ ] detect tweets by Overlay Expert and send them to announcments with @everyone tag!
 
 ## Bugs

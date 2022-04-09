@@ -9,6 +9,7 @@ module.exports = {
 	 */
 	async execute(message) {
 		if (message.author.bot) return;
+		const { guild } = message;
 
 		const log = new MessageEmbed()
 			.setColor('GREEN')
@@ -17,9 +18,19 @@ module.exports = {
 		if (message.attachments.size >= 1) {
 			log.addField('Attachments:', `${message.attachments.map(a => a.url)}`, true);
 		}
-		new WebhookClient({ url: 'https://discord.com/api/webhooks/960533765111812156/m1T7GKMpBvi4daJDTwMrrh3XkrnWC21BNN2-RC8xLDKwtikFfgpuOP3lMAmVEQnCl7DQ' }
-		).send({ embeds: [log] }).catch((err) => {
-			console.error(err);
-		});
+		if (guild.id === '183961840928292865') { // Overlay Expert
+			new WebhookClient({
+				id: '961128335281356810',
+				token: 'VM0x1nO83xzEu3_UQp1ETFmJhECfnJocyETx7AnQODr34zdpAkLu1CCFUtZ1HHiz4q6R'
+			}
+			).send({ embeds: [log] }).catch((err) => {
+				console.error(err);
+			});
+		} else { // OE Test Server
+			new WebhookClient({ id: '961130182087958528', token: 'RQ9OmL1KMc3ZTFnmZGl7WU-tXvCN7uEqZK-6iggjsW4jBDOCjnFMNPieDa11LxS45-Kq' }
+			).send({ embeds: [log] }).catch((err) => {
+				console.error(err);
+			});
+		}
 	}
 };

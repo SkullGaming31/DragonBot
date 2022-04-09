@@ -1,7 +1,7 @@
 module.exports = {
-  id: 'bye',
-  // permission: 'ADMINISTRATOR',
-  execute (interaction) {
-    interaction.reply({ content: 'Im working here' });
-  }
-}
+	id: 'bye',
+	permission: 'MANAGE_MESSAGES',
+	execute(interaction) {
+		interaction.reply({ content: 'Im working here' });
+	},
+};

@@ -3,12 +3,12 @@ const { CommandInteraction, MessageEmbed } = require('discord.js');
 module.exports = {
 	name: 'ping',
 	description: 'Returns Pong',
-	permission: 'ADMINISTRATOR',
+	permission: 'MANAGE_GUILD',
 
 	/**
-	* @param {CommandInteraction} interaction
-	* @returns
-	*/
+	 * @param {CommandInteraction} interaction
+	 * @returns
+	 */
 	async execute(interaction) {
 		const { user } = interaction;
 		// const memberPermissions = member.permissions.toArray();
@@ -22,6 +22,6 @@ module.exports = {
 			.addField('**Ping**: ', `\`${interaction.client.ws.ping}ms\``, true)
 			.setColor('GREEN');
 		await interaction.deferReply();
-		interaction.editReply({	embeds: [pingEmbed] });
-	}
+		interaction.editReply({ embeds: [pingEmbed] });
+	},
 };

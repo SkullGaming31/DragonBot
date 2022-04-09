@@ -3,7 +3,7 @@ const { CommandInteraction, MessageEmbed } = require('discord.js');
 module.exports = {
 	name: 'get-help',
 	description: 'get help for an issue your having with overlay expert',
-	permission: 'SEND_MESSAGES',
+	permission: 'MANAGE_MESSAGES',
 	options: [
 		{
 			name: 'target',
@@ -17,7 +17,7 @@ module.exports = {
 	 * @param {CommandInteraction} interaction 
 	 */
 	async execute(interaction) {
-		const { guild, user, options } = interaction;
+		const { guild, user, options, member } = interaction;
 
 		const Target = options.getUser('target');
 
@@ -32,9 +32,9 @@ module.exports = {
 				.addField('4.', 'take a screenshot and upload it here (screenshots of your extension configuration screen or builder may also be helpful) If you or your viewers are **watching from the Twitch mobile app** or Console, please type `/mobile`.', false)
 				.setFooter({ text: `${guild.name}` });
 
-			if (Target) {// only sending the bugsFeature embed
+			if (Target && member.permissions.has('MANAGE_MESSAGES')) {
 				helpEmbed.setAuthor({ name: `${Target.tag}`, iconURL: `${Target.displayAvatarURL({ dynamic: true })}` });
-				helpEmbed.setThumbnail(`${Target.displayAvatarURL({ dynamic: true, size: 512 })}`)
+				helpEmbed.setThumbnail(`${Target.displayAvatarURL({ dynamic: true, size: 512 })}`);
 				return await interaction.reply({ content: `${Target}`, embeds: [helpEmbed] });
 			}
 			else {

@@ -59,6 +59,6 @@ module.exports = async (client, PG, Ascii) => {
 
 				await g.commands.permissions.set({ fullPermissions });
 			});
-		})
+		});
 	});
 };
