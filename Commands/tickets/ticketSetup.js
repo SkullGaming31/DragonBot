@@ -52,7 +52,7 @@ module.exports = {
 		},
 		{
 			name: 'description',
-			description: 'Set the description of the ticket creation channel',
+			description: 'Set the description of the ticket embed',
 			type: 'STRING',
 			required: true,
 		},

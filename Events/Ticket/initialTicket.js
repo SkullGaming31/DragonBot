@@ -1,9 +1,4 @@
-const {
-	ButtonInteraction,
-	MessageEmbed,
-	MessageActionRow,
-	MessageButton,
-} = require('discord.js');
+const { ButtonInteraction, MessageEmbed, MessageActionRow, MessageButton, } = require('discord.js');
 const db = require('../../Structures/Schemas/Ticket');
 const TicketSetupData = require('../../Structures/Schemas/TicketSetup');
 
@@ -34,13 +29,7 @@ module.exports = {
 						permissionOverwrites: [
 							{
 								id: member.id,
-								allow: [
-									'SEND_MESSAGES',
-									'VIEW_CHANNEL',
-									'READ_MESSAGE_HISTORY',
-									'ATTACH_FILES',
-									'EMBED_LINKS',
-								],
+								allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'READ_MESSAGE_HISTORY', 'ATTACH_FILES', 'EMBED_LINKS'],
 							},
 							{
 								id: Data.Everyone,
@@ -64,9 +53,7 @@ module.exports = {
 						});
 						const embed = new MessageEmbed()
 							.setAuthor({ name: `${guild.name} | Ticket: ${ID}` })
-							.setDescription(
-								`Please wait patiently for a response from the staff team, in the mean time, please Describe your issue in as much detail as possible`
-							)
+							.setDescription('Please wait patiently for a response from the staff team, in the mean time, please Describe your issue in as much detail as possible')
 							.setColor('BLUE')
 							.setFooter({ text: 'the buttons below are staff only buttons' });
 
@@ -89,24 +76,15 @@ module.exports = {
 								.setEmoji('🔓')
 							// new MessageButton().setCustomId('claim').setLabel('Claim').setStyle('PRIMARY').setEmoji('🛄')
 						);
-						channel.send({
-							content: `<@&${Data.Handlers}>`,
-							embeds: [embed],
-							components: [Buttons],
+						channel.send({ content: `<@&${Data.Handlers}>`, embeds: [embed], components: [Buttons], });
+						await channel.send({ content: `${member} here is your ticket` }).then((m) => { 
+							setTimeout(() => {
+								m.delete().catch((err) => {
+									console.error(err);
+								});
+							}, 1 * 5000);
 						});
-						await channel
-							.send({ content: `${member} here is your ticket` })
-							.then((m) => {
-								setTimeout(() => {
-									m.delete().catch((err) => {
-										console.error(err);
-									});
-								}, 1 * 5000);
-							});
-						interaction.reply({
-							content: `${member} your ticket has been created: ${channel}`,
-							ephemeral: true,
-						});
+						interaction.reply({ content: `${member} your ticket has been created: ${channel}`, ephemeral: true, });
 					});
 		} catch (error) {
 			console.error(error);

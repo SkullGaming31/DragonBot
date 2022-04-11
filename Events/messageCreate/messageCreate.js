@@ -4,14 +4,17 @@ const DB = require('../../Structures/Schemas/settingsDB');
 module.exports = {
 	name: 'messageCreate',
 	/**
-	 * 
-	 * @param {Message} message 
-	 * @returns 
+	 *
+	 * @param {Message} message
+	 * @returns
 	 */
 	async execute(message) {
-		const channel = (await message.guild.channels.fetch(message.channel.id)).name;
+		const channel = (await message.guild.channels.fetch(message.channel.id))
+			.name;
 		// const mentioned = (await message.guild.members.fetch(message.author.id)).displayName;
-		console.log(`${message.author.tag} Said: ${message.content} in #${channel}`);
+		console.log(
+			`${message.author.tag} Said: ${message.content} in #${channel}`
+		);
 
 		if (message.author.bot) return;
 		if (message.member.permissions.has('MANAGE_MESSAGES')) return; // if they have the manage messages permission ignore wat ever they type.
@@ -22,9 +25,11 @@ module.exports = {
 
 		const adminRole = message.guild.roles.cache.get(Data.AdministratorRole); // Admin Role ID
 		const modRole = message.guild.roles.cache.get(Data.ModeratorRole); // Moderator Role ID
-		const communitySupport = message.guild.channels.cache.get(Data.SupportChannel);
+		const communitySupport = message.guild.channels.cache.get(
+			Data.SupportChannel
+		);
 
-		if (mentionedMember) { // Anti-Ping System
+		/* if (mentionedMember) { // Anti-Ping System
 			if (mentionedMember.roles.cache.has(adminRole.id) || mentionedMember.roles.cache.has(modRole.id)) {
 				const warning = new MessageEmbed()
 					.setTitle('WARNING')
@@ -37,6 +42,6 @@ module.exports = {
 					message.delete();
 				}, 1 * 5000);
 			}
-		}
+		} */
 	},
 };

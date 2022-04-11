@@ -1,9 +1,13 @@
-const { CommandInteraction, MessageEmbed, WebhookClient } = require('discord.js');
+const {
+	CommandInteraction,
+	MessageEmbed,
+	WebhookClient,
+} = require('discord.js');
 const DB = require('../../Structures/Schemas/SuggestDB');
 
 module.exports = {
 	name: 'suggestion',
-	description: 'A way to suggest new features for the discord Bot',
+	description: 'A way to send a suggestion to me for new features',
 	permission: 'MANAGE_WEBHOOKS',
 	options: [
 		{
@@ -15,20 +19,20 @@ module.exports = {
 				{ name: 'Event', value: 'Event' },
 				{ name: 'System', value: 'System' },
 				{ name: 'Command', value: 'Command' },
-				{ name: 'Other', value: 'Other' }
-			]
+				{ name: 'Other', value: 'Other' },
+			],
 		},
 		{
 			name: 'suggestion',
 			description: 'describe your suggestion in 4096 characters or less',
 			type: 'STRING',
-			required: true
-		}
+			required: true,
+		},
 	],
 
 	/**
-	 * 
-	 * @param {CommandInteraction} interaction 
+	 *
+	 * @param {CommandInteraction} interaction
 	 */
 	async execute(interaction) {
 		const { options, guild, guildId, member, user } = interaction;
@@ -38,7 +42,10 @@ module.exports = {
 
 		const Response = new MessageEmbed()
 			.setColor('PURPLE')
-			.setAuthor({ name: `${user.username}`, iconURL: `${user.displayAvatarURL({ dynamic: true })}` })
+			.setAuthor({
+				name: `${user.username}`,
+				iconURL: `${user.displayAvatarURL({ dynamic: true })}`,
+			})
 			.addFields(
 				{ name: 'Suggestion: ', value: Suggestion, inline: false },
 				{ name: 'Type: ', value: Type, inline: true },
@@ -49,25 +56,31 @@ module.exports = {
 			.setTimestamp();
 
 		try {
-			await interaction.reply({ content: 'Sent, Thank you for your Suggestion', ephemeral: true });
+			await interaction.reply({
+				content: 'Sent, Thank you for your Suggestion',
+				ephemeral: true,
+			});
 			await DB.create({
-				GuildID: guildId, Details: [
+				GuildID: guildId,
+				Details: [
 					{
 						MemberID: member.id,
 						Type: Type,
-						Suggestion: Suggestion
-					}
-				]
+						Suggestion: Suggestion,
+					},
+				],
 			});
 			new WebhookClient({
 				id: '961195913311838208',
-				token: 'HLBMu6HpnSNMVIDW5Mx1cBK3BOMfnMOub4z6UcTxIs0exl81Vr02t2mnKJweJHfXhadm'
-			}
-			).send({ embeds: [Response] }).catch((err) => {
-				console.error(err);
-			});
+				token:
+					'HLBMu6HpnSNMVIDW5Mx1cBK3BOMfnMOub4z6UcTxIs0exl81Vr02t2mnKJweJHfXhadm',
+			})
+				.send({ embeds: [Response] })
+				.catch((err) => {
+					console.error(err);
+				});
 		} catch (error) {
 			console.log(error);
 		}
-	}
-}
+	},
+};
