@@ -19,6 +19,8 @@ module.exports = {
 		await client.user.fetch();
 		await client.application.fetch();
 
+		await interaction.deferReply({ ephemeral: true });
+
 		const getChannelTypeSize = (type) => client.channels.cache.filter((channel) => type.includes(channel.type)).size;
 
 		const status = [
@@ -55,6 +57,6 @@ module.exports = {
 			)
 			.setFooter({ text: 'Last Checked' })
 			.setTimestamp();
-		interaction.reply({ embeds: [embed], ephemeral: true });
+		interaction.editReply({ embeds: [embed] });
 	}
 };

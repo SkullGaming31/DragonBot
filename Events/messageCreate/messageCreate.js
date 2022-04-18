@@ -17,7 +17,8 @@ module.exports = {
 		);
 
 		if (message.author.bot) return;
-		if (message.member.permissions.has('MANAGE_MESSAGES')) return; // if they have the manage messages permission ignore wat ever they type.
+		const { author, guild } = message;
+		// if (message.member.permissions.has('MANAGE_MESSAGES')) return; // if they have the manage messages permission ignore wat ever they type.
 		const guildName = message.guild.name;
 		const mentionedMember = message.mentions.members.first();
 
@@ -28,6 +29,17 @@ module.exports = {
 		const communitySupport = message.guild.channels.cache.get(
 			Data.SupportChannel
 		);
+
+		if (message.content.includes('help') && message.content.endsWith('?')) {
+			const response = new MessageEmbed()
+				.setColor('RANDOM')
+				.setAuthor({ name: `${author.username}`, iconURL: `${author.displayAvatarURL({ dynamic: true })}` })
+				.setDescription(`Someone will be with you as soon as they are free remember we have lives just like you, 
+													to help us out please provide as much information as you can about your issue`)
+				.setFooter({ text: `${guild.name}` })
+				.setTimestamp();
+			message.reply({ embeds: [response] });
+		}
 
 		/* if (mentionedMember) { // Anti-Ping System
 			if (mentionedMember.roles.cache.has(adminRole.id) || mentionedMember.roles.cache.has(modRole.id)) {

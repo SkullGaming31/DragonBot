@@ -1,6 +1,6 @@
 const chalk = require('chalk');
 
-module.exports = async (client) => {
+/* module.exports = async (client) => {
 	process.on('unhandledRejection', (reason, p) => {
 		console.log(chalk.green('unhandledRejection') + ' ' + chalk.blue('Anti Crash Ignoring It') + chalk.red('!!'));
 		console.log(reason, p);
@@ -17,17 +17,15 @@ module.exports = async (client) => {
 		console.log(chalk.green('multipleResolves') + ' ' + chalk.blue('Anti Crash Ignoring It') + chalk.red('!!'));
 		console.log(type, promise, reason);
 	});
-};
+}; */
 
-/* const chalk = require('chalk'); // Importing Chalk from Chalk
-const config = require('../Structures/config');
 const { MessageEmbed, WebhookClient, Guild } = require('discord.js'); // Importing MessageEmbed from Discord.js
 const { inspect } = require('util');
+const config = require('../Structures/config');
 const s = new WebhookClient({
 	id: config.DISCORD_ERR_WEBHOOK_ID,
 	token: config.DISCORD_ERR_WEBHOOK_TOKEN,
 });
-
 
 module.exports = (client) => {
 	client.on('error', err => {
@@ -44,10 +42,7 @@ module.exports = (client) => {
 	});
 	process.on('unhandledRejection', (reason, p) => {
 		// const b = client.channels.cache.get(config.ERROR_LOG_CHANNEL)
-		console.log(
-			chalk.yellow('——————————[Unhandled Rejection/Catch]——————————\n'),
-			reason, p
-		);
+		console.log(reason, p);
 		const unhandledRejectionEmbed = new MessageEmbed()
 			.setTitle('**🟥 There was an Unhandled Rejection/Catch 🟥**')
 			.setURL('https://nodejs.org/api/process.html#event-unhandledrejection')
@@ -115,4 +110,4 @@ module.exports = (client) => {
 		return s.send({ embeds: [warningEmbed] });
 	});
 
-}; */
+};

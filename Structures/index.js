@@ -4,6 +4,7 @@ const glob = require('glob');
 const PG = promisify(glob);
 const Ascii = require('ascii-table');
 const config = require('./config');
+const { getRepos } = require('../github/index');
 
 require('../database/index');
 

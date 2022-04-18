@@ -28,6 +28,12 @@ module.exports = {
 			description: 'Describe how it should work',
 			type: 'STRING',
 			required: true
+		},
+		{
+			name: 'everyone',
+			description: 'Should everyone be tagged in this poll',
+			type: 'BOOLEAN',
+			required: true
 		}
 	],
 	/**
@@ -35,19 +41,26 @@ module.exports = {
 	 * @param {CommandInteraction} interaction 
 	 */
 	async execute(interaction) {
-		const { options, member } = interaction;
+		const { guildId, options, member } = interaction;
 
 		const type = options.getString('type');
+		const Everyone = options.getBoolean('everyone');
 		const name = options.getString('name');
 		const funcs = options.getString('functionality');
 
 		const Response = new MessageEmbed()
-			.setColor('BLUE')
-			.setDescription(`${member} has suggested a ${type}.`)
-			.addField('Name', `${name}`, true)
-			.addField('Functionality', `${funcs}`, true);
-		const message = await interaction.reply({ embeds: [Response], fetchReply: true });
-		message.react('✅');
-		message.react('❎');
+			.setColor('RANDOM')
+			.setDescription(`${member} has created a poll`)
+			.addField('Name', `${name}`, false)
+			.addField('Functionality', `${funcs}`, false);
+		if (Everyone) {
+			const message = await interaction.reply({ content: '<@&959693430227894292>', embeds: [Response], fetchReply: true, allowedMentions: ['ROLES'] });
+			message.react('✅');
+			message.react('❎');
+		} else {
+			const message = await interaction.reply({ embeds: [Response], fetchReply: true });
+			message.react('✅');
+			message.react('❎');
+		}
 	}
 };

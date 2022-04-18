@@ -28,7 +28,7 @@ module.exports = {
 		let foundInText = false;
 
 		const nowLive = guild.channels.cache.get(Data.PromotionChannel); // now-live ChannelID
-		// if (member.permissions.has('MANAGE_MESSAGES') ? true : null) return;
+		if (member.permissions.has('MANAGE_MESSAGES') ? true : null) return;
 		
 		for (const link in linkWhitelist) {
 			if (message.content.toLowerCase().includes('https://overlay.expert') || message.content.toLowerCase().includes('overlay.expert')) return;

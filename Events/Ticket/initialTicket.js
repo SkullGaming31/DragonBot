@@ -38,7 +38,7 @@ module.exports = {
 							{
 								id: Data.BotRole,
 								allow: ['VIEW_CHANNEL', 'SEND_MESSAGES'],
-							},
+							}
 						],
 					})
 					.then(async (channel) => {
@@ -50,6 +50,7 @@ module.exports = {
 							Closed: false,
 							Locked: false,
 							Type: customId,
+							Claimed: false,
 						});
 						const embed = new MessageEmbed()
 							.setAuthor({ name: `${guild.name} | Ticket: ${ID}` })
@@ -73,17 +74,19 @@ module.exports = {
 								.setCustomId('unlock')
 								.setLabel('Unlock')
 								.setStyle('SUCCESS')
-								.setEmoji('🔓')
-							// new MessageButton().setCustomId('claim').setLabel('Claim').setStyle('PRIMARY').setEmoji('🛄')
+								.setEmoji('🔓'),
+							new MessageButton()
+								.setCustomId('claim')
+								.setLabel('Claim')
+								.setStyle('PRIMARY')
+								.setEmoji('🛄')
 						);
 						channel.send({ content: `<@&${Data.Handlers}>`, embeds: [embed], components: [Buttons], });
-						await channel.send({ content: `${member} here is your ticket` }).then((m) => { 
+						await channel.send({ content: `${member} here is your ticket` }).then((m) => {
 							setTimeout(() => {
-								m.delete().catch((err) => {
-									console.error(err);
-								});
-							}, 1 * 5000);
-						});
+								m.delete().catch((err) => { console.error(err); });
+							}, 5000);
+						}).catch((err) => { console.error(err); });
 						interaction.reply({ content: `${member} your ticket has been created: ${channel}`, ephemeral: true, });
 					});
 		} catch (error) {
