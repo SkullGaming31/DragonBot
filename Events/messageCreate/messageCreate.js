@@ -12,9 +12,7 @@ module.exports = {
 		const channel = (await message.guild.channels.fetch(message.channel.id))
 			.name;
 		// const mentioned = (await message.guild.members.fetch(message.author.id)).displayName;
-		console.log(
-			`${message.author.tag} Said: ${message.content} in #${channel}`
-		);
+		console.log(`${message.author.tag} Said: ${message.content} in #${channel}`);
 
 		if (message.author.bot) return;
 		const { author, guild } = message;
@@ -26,9 +24,7 @@ module.exports = {
 
 		const adminRole = message.guild.roles.cache.get(Data.AdministratorRole); // Admin Role ID
 		const modRole = message.guild.roles.cache.get(Data.ModeratorRole); // Moderator Role ID
-		const communitySupport = message.guild.channels.cache.get(
-			Data.SupportChannel
-		);
+		const communitySupport = message.guild.channels.cache.get(Data.SupportChannel);
 
 		if (message.content.includes('help') && message.content.endsWith('?')) {
 			const response = new MessageEmbed()
