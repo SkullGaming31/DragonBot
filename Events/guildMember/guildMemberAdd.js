@@ -16,7 +16,7 @@ module.exports = {
 
 		switch (guild.id) {
 		case '959693430227894292':// My Guild ID
-			member.roles.add('959693430227894293');
+			member.roles.add('969294917388103700');
 			break;
 		}
 		const Welcome = new MessageEmbed()

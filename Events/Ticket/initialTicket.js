@@ -85,7 +85,7 @@ module.exports = {
 						await channel.send({ content: `${member} here is your ticket` }).then((m) => {
 							setTimeout(() => {
 								m.delete().catch((err) => { console.error(err); });
-							}, 5000);
+							}, 5000); // 1000ms = 1 second
 						}).catch((err) => { console.error(err); });
 						interaction.reply({ content: `${member} your ticket has been created: ${channel}`, ephemeral: true, });
 					});

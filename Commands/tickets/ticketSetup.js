@@ -77,6 +77,12 @@ module.exports = {
 			type: 'STRING',
 			required: true,
 		},
+		{
+			name: 'color',
+			description: 'left side of the embeds color',
+			type: 'STRING',
+			required: false
+		}
 	],
 	/**
 	 * @param {CommandInteraction} interaction
@@ -95,6 +101,8 @@ module.exports = {
 
 			const Description = options.getString('description');
 
+			let Color = options.getString('color');
+
 			const FirstButton = options.getString('firstbutton').split(',');
 			const SecondButton = options.getString('secondbutton').split(',');
 			const ThirdButton = options.getString('thirdbutton').split(',');
@@ -103,6 +111,7 @@ module.exports = {
 			const SecondEmoji = SecondButton[1];
 			const ThirdEmoji = ThirdButton[1];
 
+			if (!Color) Color = 'WHITE';
 			await DB.findOneAndUpdate(
 				{ GuildID: guild.id },
 				{
@@ -113,6 +122,7 @@ module.exports = {
 					Everyone: Everyone.id,
 					BotRole: BotRole.id,
 					Description: Description,
+					Color: Color,
 					Buttons: [FirstButton[0], SecondButton[0], ThirdButton[0]],
 				},
 				{
@@ -140,16 +150,11 @@ module.exports = {
 					.setEmoji(ThirdEmoji)
 			);
 			const embed = new MessageEmbed()
-				.setColor('BLUE')
-				.setAuthor({
-					name: `${guild.name} | Ticket System`,
-					iconURL: guild.iconURL({ dynamic: true }),
-				})
+				.setColor(Color.toUpperCase())
+				.setAuthor({ name: `${guild.name} | Ticket System`, iconURL: guild.iconURL({ dynamic: true }) })
 				.setDescription(Description);
 
-			await guild.channels.cache
-				.get(Channel.id)
-				.send({ embeds: [embed], components: [Buttons] });
+			await guild.channels.cache.get(Channel.id).send({ embeds: [embed], components: [Buttons] });
 
 			interaction.reply({ content: 'done', ephemeral: true });
 		} catch (error) {
@@ -160,7 +165,7 @@ module.exports = {
 			3. Make sure your button names do not exceed 200 characters.
 			4. Make sure your button emojis are actually emojis, not ids.`);
 			console.error(error);
-			interaction.reply({ embeds: [errEmbed] });
+			interaction.reply({ embeds: [errEmbed], ephemeral: true });
 		}
 	},
 };

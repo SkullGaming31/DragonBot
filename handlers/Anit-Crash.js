@@ -1,4 +1,4 @@
-const chalk = require('chalk');
+// const chalk = require('chalk');
 
 /* module.exports = async (client) => {
 	process.on('unhandledRejection', (reason, p) => {
@@ -19,7 +19,7 @@ const chalk = require('chalk');
 	});
 }; */
 
-const { MessageEmbed, WebhookClient, Guild } = require('discord.js'); // Importing MessageEmbed from Discord.js
+const { MessageEmbed, WebhookClient, Guild, Client } = require('discord.js'); // Importing MessageEmbed from Discord.js
 const { inspect } = require('util');
 const config = require('../Structures/config');
 const s = new WebhookClient({
@@ -27,6 +27,11 @@ const s = new WebhookClient({
 	token: config.DISCORD_ERR_WEBHOOK_TOKEN,
 });
 
+/**
+ * 
+ * @param {Client} client
+ * @param {Guild} guild
+ */
 module.exports = (client) => {
 	client.on('error', err => {
 		// const a = client.channels.cache.get(config.ERROR_LOG_CHANNEL)
@@ -36,7 +41,7 @@ module.exports = (client) => {
 			.setURL('https://discordjs.guide/popular-topics/errors.html#api-errors')
 			.setColor('#2F3136')
 			.setDescription(`\`\`\`${inspect(err, { depth: 0 })}\`\`\``)
-			.setFooter({ text: `${Guild.name}` })
+			// .setFooter({ text: `${guild.name}` })
 			.setTimestamp();
 		return s.send({ embeds: [ErrorEmbed] });
 	});
@@ -49,7 +54,7 @@ module.exports = (client) => {
 			.setColor('RED')
 			.addField('Reason', `\`\`\`${inspect(reason, { depth: 0 })}\`\`\``.substring(0, 1000))
 			.addField('Promise', `\`\`\`${inspect(p, { depth: 0 })}\`\`\``.substring(0, 1000))
-			.setFooter({ text: `${Guild.name}` })
+			// .setFooter({ text: `${guild.name}` })
 			.setTimestamp();
 		return s.send({ embeds: [unhandledRejectionEmbed] });
 	});
@@ -63,7 +68,7 @@ module.exports = (client) => {
 			.setURL('https://nodejs.org/api/process.html#event-uncaughtexception')
 			.addField('Error', `\`\`\`${inspect(err, { depth: 0 })}\`\`\``.substring(0, 1000))
 			.addField('Origin', `\`\`\`${inspect(origin, { depth: 0 })}\`\`\``.substring(0, 1000))
-			.setFooter({ text: `${Guild.name}` })
+			// .setFooter({ text: `${guild.name}` })
 			.setTimestamp();
 		return s.send({ embeds: [uncaughtExceptionEmbed] });
 	});
@@ -77,7 +82,7 @@ module.exports = (client) => {
 			.setURL('https://nodejs.org/api/process.html#event-uncaughtexceptionmonitor')
 			.addField('Error', `\`\`\`${inspect(err, { depth: 0 })}\`\`\``.substring(0, 1000))
 			.addField('Origin', `\`\`\`${inspect(origin, { depth: 0 })}\`\`\``.substring(0, 1000))
-			.setFooter({ text: `${Guild.name}` })
+			// .setFooter({ text: `${guild.name}` })
 			.setTimestamp();
 		return s.send({ embeds: [uncaughtExceptionMonitorEmbed] });
 	});
@@ -92,7 +97,7 @@ module.exports = (client) => {
 			.addField('Type', `\`\`\`${inspect(type, { depth: 0 })}\`\`\``.substring(0, 1000))
 			.addField('Promise', `\`\`\`${inspect(promise, { depth: 0 })}\`\`\``.substring(0, 1000))
 			.addField('Reason', `\`\`\`${inspect(reason, { depth: 0 })}\`\`\``.substring(0, 1000))
-			.setFooter({ text: `${Guild.name}` })
+			// .setFooter({ text: `${guild.name}` })
 			.setTimestamp();
 		return s.send({ embeds: [multipleResolvesEmbed] });
 	});
@@ -105,9 +110,8 @@ module.exports = (client) => {
 			.setColor('RED')
 			.setURL('https://nodejs.org/api/process.html#event-warning')
 			.addField('Warn', `\`\`\`${inspect(warn, { depth: 0 })}\`\`\``.substring(0, 1000))
-			.setFooter({ text: `${Guild.name}` })
+			// .setFooter({ text: `${guild.name}` })
 			.setTimestamp();
 		return s.send({ embeds: [warningEmbed] });
 	});
-
 };

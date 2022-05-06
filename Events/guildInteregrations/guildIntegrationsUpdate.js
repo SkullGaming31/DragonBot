@@ -8,8 +8,8 @@ module.exports = {
 
 	async execute(interaction) {
 		const { guild } = interaction;
-		await guild.fetchIntegrations();
+		const tbd = await guild.fetchIntegrations();
 		
-		console.log('Testing');
+		console.log(tbd);
 	}
 };

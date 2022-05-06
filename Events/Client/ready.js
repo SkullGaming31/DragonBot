@@ -7,12 +7,12 @@ module.exports = {
 	name: 'ready',
 	once: true,
 	/**
-	 * @param {Client} client 
+	 * @param {Client} client
 	 */
 	async execute(client) {
 		console.log(`Logged in as ${client.user.tag}`);
-		client.user.setActivity('Overlay Experts', { type: 'WATCHING' });
-		// client.guilds.cache.get(config.DISCORD_GUILD_ID).commands.set([]); // remove ALL commands
+		const tbd = await client.guilds.fetch();
+		client.user.setActivity(`over ${tbd.size} guilds`, { type: 'WATCHING' });
 		await mongoConnect();
 		require('../../Structures/Systems/ChatFilterSys')(client);
 		require('../../Structures/Systems/LockdownSys')(client);
