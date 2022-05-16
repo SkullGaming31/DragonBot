@@ -1,8 +1,8 @@
 apiRequest
 apiResponse
-applicationCommandCreateD
-applicationCommandDeleteD
-applicationCommandUpdateD
+applicationCommandCreate(D)
+applicationCommandDelete(D)
+applicationCommandUpdate(D)
 channelCreate
 channelDelete
 channelPinsUpdate
@@ -35,7 +35,7 @@ invalidated
 invalidRequestWarning
 inviteCreate
 inviteDelete
-messageD
+message(D)
 messageCreate
 messageDelete
 messageDeleteBulk

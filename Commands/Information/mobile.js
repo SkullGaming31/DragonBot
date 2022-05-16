@@ -34,15 +34,20 @@ module.exports = {
 						name: 'Voting For Twitch to Improve: ',
 						value: 'You can also: Vote for this Twitch suggestion https://twitch.uservoice.com/forums/904711-extensions/suggestions/40301335 Contact Twitch Support https://help.twitch.tv/s/contactsupport and request better extension support on mobile For more information, see https://github.com/overlay-expert/help-desk/issues/97.',
 						inline: false
+					},
+					{
+						name: 'TwitchStatus Update on UserVoice',
+						value: 'a status update on the userVoice has been posted regarding letting mobile viewers see overlays here: https://twitch.uservoice.com/forums/904711-extensions/suggestions/40301335',
+						inline: false
 					}
 				])
 				.setFooter({ text: `${guild.name}` })
 				.setTimestamp();
 
 			if (Target && member.permissions.has('MANAGE_MESSAGES')) {
-				return await interaction.reply({ content: `${Target}`, embeds: [mobileEmbed] });
+				await interaction.reply({ content: `${Target}`, embeds: [mobileEmbed] });
 			} else {
-				return await interaction.reply({ embeds: [mobileEmbed] });
+				await interaction.reply({ embeds: [mobileEmbed] });
 			}
 		} catch (error) {
 			console.error(error);

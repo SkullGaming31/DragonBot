@@ -36,7 +36,6 @@ module.exports = async (client, PG, Ascii) => {
 
 	// Permissions Check //
 	client.on('ready', async () => {
-
 		client.guilds.cache.forEach((g) => {
 			g.commands.set(CommandsArray);
 		});

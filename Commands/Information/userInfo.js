@@ -38,7 +38,7 @@ module.exports = {
 					},
 					{
 						name: 'Roles: ',
-						value: /* `${Target.user.roles.cache.map(r => r).join(' ').replace('@everyone', '') || 'None'}` */ 'WIP',
+						value: `${Target.user.roles.cache.map(r => r).join(' ').replace('@everyone', '') || 'None'}` /* 'WIP' */,
 						inline: true
 					},
 					{
