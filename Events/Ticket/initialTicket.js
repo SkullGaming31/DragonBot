@@ -81,7 +81,7 @@ module.exports = {
 								.setStyle('PRIMARY')
 								.setEmoji('🛄')
 						);
-						channel.send({ content: `<@&${Data.Handlers}>`, embeds: [embed], components: [Buttons], });
+						channel.send({ embeds: [embed], components: [Buttons], });
 						await channel.send({ content: `${member} here is your ticket` }).then((m) => {
 							setTimeout(() => {
 								m.delete().catch((err) => { console.error(err); });
