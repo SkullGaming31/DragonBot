@@ -16,7 +16,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/skullgaming31/overlayExpertDiscord">
-    <img src="./assets/images/skulledbot.png" alt="Logo" width="80" height="80">
+    <img src="./assets/images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Overylay Expert</h3>
