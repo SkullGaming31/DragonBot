@@ -4,6 +4,7 @@ module.exports = {
 	name: 'requests',
 	description: 'information about submiting a bug report or requesting a feature to be added to Overlay Expert',
 	permission: 'SEND_MESSAGES',
+	public: true,
 	options: [
 		{
 			name: 'target',

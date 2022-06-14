@@ -5,6 +5,7 @@ module.exports = {
 	name: 'twitch',
 	description: 'Shows users Twitch Stats',
 	permission: 'SEND_MESSAGES',
+	public: true,
 	options: [
 		{
 			name: 'user',
@@ -23,7 +24,7 @@ module.exports = {
 		interaction.deferReply({ ephemeral: true });
 
 		try {
-			const Response = await  superagent.get(`https://api.crunchprank.net/twitch/followcount/${channelName.toLowerCase()}`);
+			const Response = await superagent.get(`https://api.crunchprank.net/twitch/followcount/${channelName.toLowerCase()}`);
 			const upTime = await superagent.get(`https://api.crunchprank.net/twitch/uptime/${channelName.toLowerCase()}`);
 			const accountage = await superagent.get(`https://api.crunchprank.net/twitch/creation/${channelName.toLowerCase()}`);
 			const lastGame = await superagent.get(`https://api.crunchprank.net/twitch/game/${channelName.toLowerCase()}`);
@@ -63,7 +64,7 @@ module.exports = {
 				.setThumbnail('https://pngimg.com/uploads/twitch/twitch_PNG27.png')
 				// .setThumbnail(`https://api.crunchprank.net/twitch/avatar/${channelName.toLowerCase()} || 'https://pngimg.com/uploads/twitch/twitch_PNG27.png'`)
 				.setURL(`https://twitch.tv/${channelName}`)
-				.setFooter({ text: `Requested by ${member.user.tag}`, iconURL: member.user.displayAvatarURL()})
+				.setFooter({ text: `Requested by ${member.user.tag}`, iconURL: member.user.displayAvatarURL() })
 				.setTimestamp();
 			interaction.editReply({ embeds: [embed] });
 
@@ -73,7 +74,7 @@ module.exports = {
 			if (viewerCount.text === `${channelName} is offline`) {
 				viewerCount.text = 'Offline';
 			}
-            
+
 		} catch (error) {
 			console.error(error);
 			return interaction.editReply({ content: 'An error occured while fetching Twitch stats.' });

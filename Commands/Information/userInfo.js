@@ -4,6 +4,7 @@ module.exports = {
 	name: 'userinfo',
 	description: 'Display User info',
 	permission: 'MANAGE_MESSAGES',
+	public: true,
 	options: [
 		{
 			name: 'target',

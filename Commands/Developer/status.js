@@ -11,10 +11,11 @@ module.exports = {
 	name: 'status',
 	description: 'Displays the status of the client and database.',
 	permission: 'MANAGE_MESSAGES',
+	public: true,
 	/**
-     * @param {CommandInteraction} interaction 
-     * @param {Client} client 
-     */
+		 * @param {CommandInteraction} interaction 
+		 * @param {Client} client 
+		 */
 	async execute(interaction, client) {
 		await client.user.fetch();
 		await client.application.fetch();
@@ -29,7 +30,7 @@ module.exports = {
 			'Connecting',
 			'Disconnecting'
 		];
-        
+
 		const embed = new MessageEmbed()
 			.setColor('RANDOM')
 			.setTitle(`🍞 ${client.user.username} Status`)

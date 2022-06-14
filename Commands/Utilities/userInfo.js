@@ -5,6 +5,7 @@ module.exports = {
 	name: 'userinfo',
 	type: 'USER',
 	context: true,
+	public: true,
 	permission: 'MANAGE_MESSAGES',
 	/**
 	 *
@@ -18,7 +19,7 @@ module.exports = {
 		const response = new MessageEmbed()
 			.setTitle(`${guild.name}`)
 			.setColor('BLUE')
-			.setAuthor({ name: `${target.displayName}`, iconURL: `${target.displayAvatarURL({ dynamic: true })}`})
+			.setAuthor({ name: `${target.displayName}`, iconURL: `${target.displayAvatarURL({ dynamic: true })}` })
 			.setThumbnail(target.user.displayAvatarURL({ dynamic: true, size: 512 }))
 			.addField('UserID', `${target.user.id}`, true)
 			.addField('Roles', `${target.roles.cache.map((r) => r).join(' ').replace('@everyone', '') || 'None'}`)

@@ -12,11 +12,10 @@ module.exports = {
 	async execute(message) {
 		const { guild, member, channel } = message;
 		const Data = await DB.findOne({ GuildID: guild.id }); // settings database
-		// const ticketData = await tickets.findOne({ GuildID: guild.id, ChannelID: channel.id });
-		if (!Data/*  || !ticketData */) return;
+		if (!Data) return;
 		if (message.author.bot) return;
 
-		const linkWhitelist = [
+		const linkWhitelist = [// links that will be aloud to be sent in a promo channel
 			'https://twitch.tv/', 'twitch.tv/',
 			'https://api.twitch.tv/', 'api.twitch.tv',
 			'https://twitter.com/', 'twitter.com/',
@@ -24,12 +23,15 @@ module.exports = {
 			'https://tiktok.com/', 'tiktok.com/',
 			'https://github.com/', 'github.com/',
 		];
-		const logsChannel = guild.channels.cache.get(Data.LoggingChannel); // Logs Channel
+		const logsChannel = guild.channels.cache.get(Data.LoggingChannel); // Logs Channel, remove Data.LoggingChannel if you dont have your logs channel saved in a db and replace it with 'Your Channel ID'
 		let foundInText = false;
 
 		const nowLive = guild.channels.cache.get(Data.PromotionChannel); // now-live ChannelID
-		if (member.permissions.has('MANAGE_MESSAGES') ? true : null) return;
-		
+		if (member.permissions.has('MANAGE_MESSAGES') ? true : null) return;// if they have the manage messages permission ignore them
+		if (channel.id === '713791344803577868' || channel.id === '959693430647308292') return;// added these cause the bot was deleting messages in the moderator chat
+		/* havnt figure out the new permission system yet for dening the bot moderating messages */
+		if (channel.parentId === '694243745717288971' || channel.parentId === '959693430647308289') return; // parent channel id for ticket system if you have one, if not delete this line
+
 		for (const link in linkWhitelist) {
 			if (message.content.toLowerCase().includes('https://overlay.expert') || message.content.toLowerCase().includes('overlay.expert')) return;
 			if (message.content.toLowerCase().includes(linkWhitelist[link].toLowerCase())) { foundInText = true; }
@@ -43,14 +45,9 @@ module.exports = {
 						.setThumbnail(message.author.avatarURL({ dynamic: true }))
 						.setTimestamp(Date.now());
 
-					//FIXME bot deleting links in ticket channel
-					// if (message.channelId !== ticketData.ChannelID) {
 					await message.reply({ embeds: [linkDetection] });
 					message.delete().catch((e) => { console.error(e); });
 					foundInText = false;
-					/* } else {
-						return;
-					} */
 
 					const logsEmbed = new MessageEmbed()
 						.setTitle('Automated Message Deletion')

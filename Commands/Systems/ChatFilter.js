@@ -7,6 +7,7 @@ module.exports = {
 	name: 'filter',
 	description: 'A simple chat filter system',
 	permission: 'MANAGE_MESSAGES',
+	public: true,
 	options: [
 		{
 			name: 'help',

@@ -4,6 +4,7 @@ module.exports = {
 	name: 'get-help',
 	description: 'get help for an issue your having with overlay expert',
 	permission: 'MANAGE_MESSAGES',
+	public: true,
 	options: [
 		{
 			name: 'target',

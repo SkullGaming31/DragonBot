@@ -5,6 +5,7 @@ module.exports = {
 	name: 'warnings',
 	description: 'Shows user warnings',
 	permission: 'KICK_MEMBERS',
+	public: true,
 	options: [
 		{
 			name: 'add',

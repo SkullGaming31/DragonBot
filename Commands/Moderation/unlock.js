@@ -5,6 +5,7 @@ module.exports = {
   name: 'unlock',
   description: 'unlock this channel',
   permission: 'MANAGE_CHANNELS',
+  public: true,
   /**
    * 
    * @param {CommandInteraction} interaction 

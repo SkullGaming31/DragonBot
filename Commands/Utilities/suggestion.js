@@ -5,6 +5,7 @@ module.exports = {
 	name: 'suggestion',
 	description: 'A way to send a suggestion to me for new features',
 	permission: 'SEND_MESSAGES',
+	public: true,
 	options: [
 		{
 			name: 'type',

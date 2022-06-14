@@ -4,6 +4,7 @@ module.exports = {
 	name: 'poll',
 	description: 'create a poll for everyone to vote on',
 	permission: 'MANAGE_MESSAGES',
+	public: true,
 	options: [
 		{
 			name: 'type',

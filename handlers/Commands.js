@@ -2,8 +2,8 @@ const { Perms } = require('../Structures/validation/Permissions');
 const { Client } = require('discord.js');
 
 /**
- * 
- * @param {Client} client 
+	*
+	* @param {Client} client
  */
 
 module.exports = async (client, PG, Ascii) => {
@@ -20,12 +20,12 @@ module.exports = async (client, PG, Ascii) => {
 		if (!command.context && !command.description)
 			return Table.addRow(command.name, '🔸 FAILED', 'Missing a description');
 
-		if (!command.permission) {
+		/* if (!command.permission) {
 			if (Perms.includes(command.permission))
 				command.defaultPermission = false;
 			else
 				return Table.addRow(command.name, '🔸 FAILED', 'Permission is invalid');
-		}
+		} */
 
 		client.commands.set(command.name, command);
 		CommandsArray.push(command);

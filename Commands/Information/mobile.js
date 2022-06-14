@@ -4,6 +4,7 @@ module.exports = {
 	name: 'mobile',
 	description: 'information about why twitch extensions dont work on Mobile',
 	permission: 'SEND_MESSAGES',
+	public: true,
 	options: [
 		{
 			name: 'target',

@@ -10,6 +10,7 @@ module.exports = {
 	name: 'settings',
 	description: 'guild settings for some channels',
 	permission: 'MANAGE_GUILD',
+	public: true,
 	options: [
 		{
 			name: 'logging',

@@ -4,6 +4,7 @@ module.exports = {
 	name: 'clear',
 	description: 'Clears Messages from the channel',
 	permission: 'MANAGE_MESSAGES',
+	public: true,
 	options: [
 		{
 			name: 'amount',
@@ -19,9 +20,9 @@ module.exports = {
 		}
 	],
 	/**
-   * 
-   * @param {CommandInteraction} interaction 
-   */
+	 * 
+	 * @param {CommandInteraction} interaction 
+	 */
 	async execute(interaction) {
 		const { channel, options } = interaction;
 
@@ -51,7 +52,7 @@ module.exports = {
 			await channel.bulkDelete(Amount, true).then(messages => {
 				response.setDescription(`🧹 ${interaction.user.username} Cleared ${messages.size} messages from the channel`)
 					.setColor('RED');
-				interaction.reply({ embeds: [response]});
+				interaction.reply({ embeds: [response] });
 			});
 		}
 	}

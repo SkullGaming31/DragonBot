@@ -5,6 +5,7 @@ module.exports = {
 	name: 'timeout',
 	description: 'Timeout a user from sending messages or joining a voice channel',
 	permission: 'MANAGE_MESSAGES', // permissions error, Missing Permissions
+	public: true,
 	options: [
 		{
 			name: 'target',
@@ -26,16 +27,16 @@ module.exports = {
 		}
 	],
 	/**
-   * 
-   * @param {CommandInteraction} interaction 
-   */
+	 * 
+	 * @param {CommandInteraction} interaction 
+	 */
 	async execute(interaction) {
 		const { channel, options } = interaction;
 
 		const Target = options.getMember('target');
 		const Length = options.getString('length');
 		let reason = options.getString('reason');
-		
+
 		const timeInMs = ms(Length) / 1000;
 
 		try {

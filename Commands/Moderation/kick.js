@@ -4,6 +4,7 @@ module.exports = {
 	name: 'kick',
 	description: 'kick a member from the server',
 	permission: 'KICK_MEMBERS',
+	public: true,
 	options: [
 		{
 			name: 'target',

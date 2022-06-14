@@ -12,7 +12,7 @@ module.exports = {
 	async execute(client) {
 		console.log(`Logged in as ${client.user.tag}`);
 		const tbd = await client.guilds.fetch();
-		client.user.setActivity(`over ${tbd.size} guilds`, { type: 'WATCHING' });
+		client.user.setActivity('/get-help', { type: 'WATCHING' });
 		await mongoConnect();
 		require('../../Structures/Systems/ChatFilterSys')(client);
 		require('../../Structures/Systems/LockdownSys')(client);

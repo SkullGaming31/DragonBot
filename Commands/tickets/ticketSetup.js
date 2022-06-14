@@ -10,6 +10,7 @@ module.exports = {
 	name: 'ticketsetup',
 	description: 'Initial Ticket Setup',
 	permission: 'MANAGE_CHANNELS',
+	public: true,
 	options: [
 		{
 			name: 'channel',
