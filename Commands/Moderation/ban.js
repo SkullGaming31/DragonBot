@@ -4,7 +4,6 @@ module.exports = {
 	name: 'ban',
 	description: 'ban a member from the server',
 	permission: 'BAN_MEMBERS',
-	public: true,
 	options: [
 		{
 			name: 'target',
@@ -41,22 +40,19 @@ module.exports = {
 		await interaction.deferReply();
 		// check permissions so mods cant ban admins.
 
-		if (!Days) Days = 7;
-		if (!reason) reason = 'No Reason Provided';
 		const bannedEmbed = new MessageEmbed()
 			.setTitle(`${guild.name}`)
+			.setDescription('')
 			.setColor('RED')
 			.addField('Banned from: ', `${guild.name}`, true)
-			.addField('Reason: ', `${reason}`, true)
-			.setTimestamp();
+			.addField('Reason: ', `${reason}`, true);
 
 		try {
+			if (!Days) Days = 7;
+			if (!reason) reason = 'No Reason Provided';
 			await User.send({ embeds: [bannedEmbed] });
 			Target.ban({ reason, days: Days });
-			interaction.followUp({ embeds: [bannedEmbed] });
-		} catch (error) {
-			console.error(error);
-			return;
-		}
+			interaction.editReply({ content: `**${Target.displayName}** has been banned from the guild for **${reason}**, cleared ${Days} days of messages` });
+		} catch (error) { console.error(error); }
 	}
 };

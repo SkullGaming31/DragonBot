@@ -1,0 +1,1 @@
+pm2 restart Structures/index.js --cron-restart="0 */4 * * *"

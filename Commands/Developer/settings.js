@@ -1,9 +1,4 @@
-const {
-	CommandInteraction,
-	MessageEmbed,
-	MessageActionRow,
-	MessageButton,
-} = require('discord.js');
+const { CommandInteraction, MessageEmbed, MessageActionRow, MessageButton, } = require('discord.js');
 const DB = require('../../Structures/Schemas/settingsDB');
 
 module.exports = {
@@ -74,7 +69,6 @@ module.exports = {
 					upsert: true,
 				}
 			);
-
 			interaction.reply({ content: 'Updated', ephemeral: true });
 		} catch (error) {
 			console.error(error);
