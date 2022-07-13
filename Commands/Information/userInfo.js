@@ -18,28 +18,29 @@ module.exports = {
 	 * @param {CommandInteraction} interaction 
 	 */
 	async execute(interaction) {
-		const { guild, user, options, member } = interaction;
+		const { guild, options, member } = interaction;
 
 		const Target = options.getUser('target');
+		const targetUser = guild.members.cache.get(Target.id);
+		const joined = await Target.fetch(true);
 
 
 		try {
-			const joined = await Target.fetch(true);
 			const userInfoEmbed = new MessageEmbed()
 				.setTitle('Overlay Expert')
 				.setDescription('User Info: ')
-				.setAuthor({ name: `${Target}`, iconURL: `${Target.displayAvatarURL({ dynamic: true, size: 512 })}` })
+				.setAuthor({ name: `${targetUser}`, iconURL: `${targetUser.displayAvatarURL({ dynamic: true })}` })
 				.setColor('WHITE')
-				.setThumbnail(Target.displayAvatarURL({ dynamic: true, size: 512 }))
+				.setThumbnail(`${targetUser.displayAvatarURL({ dynamic: true, size: 512 })}`)
 				.addFields([
 					{
 						name: 'ID: ',
-						value: `${Target.id}`,
+						value: `${targetUser.id}`,
 						inline: true
 					},
 					{
 						name: 'Roles: ',
-						value: `${Target.user.roles.cache.map(r => r).join(' ').replace('@everyone', '') || 'None'}` /* 'WIP' */,
+						value: `${targetUser.user.roles.cache.map((r) => r).join(' ').replace('@everyone', '') || 'None'}` /* 'WIP' */,
 						inline: true
 					},
 					{
@@ -48,19 +49,15 @@ module.exports = {
 						inline: true
 					},
 					{
+
 						name: 'Discord User Since: ',
-						value: `<t:${parseInt(Target.createdTimestamp / 1000)}:R>`,
-						inline: true
-					},
-					{
-						name: 'Warnings: ',
-						value: '0',
+						value: `<t:${parseInt(targetUser.createdTimestamp / 1000)}:R>`,
 						inline: true
 					}
 				])
 				.setFooter({ text: `${guild.name}` });
 
-			if (Target && member.permissions.has('MANAGE_MESSAGES')) {
+			if (targetUser && member.permissions.has('MANAGE_MESSAGES')) {
 				interaction.reply({ embeds: [userInfoEmbed], ephemeral: true });
 				// console.log('tag working');
 			}
