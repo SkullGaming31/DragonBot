@@ -12,6 +12,7 @@ module.exports = {
 	 * @param {ContextMenuInteraction} interaction
 	 */
 	async execute(interaction) {
+		if (!interaction.isContextMenu()) return;
 		const { guild } = interaction;
 		// console.log(interaction.user);
 		const target = await guild.members.fetch(interaction.targetId);
@@ -19,8 +20,8 @@ module.exports = {
 		const response = new MessageEmbed()
 			.setTitle(`${guild.name}`)
 			.setColor('BLUE')
-			.setAuthor({ name: `${target.displayName}`, iconURL: `${target.displayAvatarURL({ dynamic: true })}` })
-			.setThumbnail(target.user.displayAvatarURL({ dynamic: true, size: 512 }))
+			.setAuthor({ name: `${target.displayName}`/* , iconURL: `${target.displayAvatarURL}` */ })
+			// .setThumbnail(target.user.displayAvatarURL({ dynamic: true, size: 512 }))
 			.addField('UserID', `${target.user.id}`, true)
 			.addField('Roles', `${target.roles.cache.map((r) => r).join(' ').replace('@everyone', '') || 'None'}`)
 			.addField('Member Since', `<t:${parseInt(target.joinedTimestamp / 1000)}:R>`, true)

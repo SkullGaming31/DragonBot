@@ -40,7 +40,7 @@ module.exports = {
 					},
 					{
 						name: 'Roles: ',
-						value: `${targetUser.user.roles.cache.map((r) => r).join(' ').replace('@everyone', '') || 'None'}` /* 'WIP' */,
+						value: `${targetUser.roles.cache.map((r) => r).join(' ').replace('@everyone', '') || 'None'}` /* 'WIP' */,
 						inline: true
 					},
 					{
