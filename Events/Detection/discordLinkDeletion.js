@@ -10,7 +10,7 @@ module.exports = {
 	 * @returns 
 	 */
 	async execute(message) {
-		const { guild, channel } = message;
+		const { guild, channel, author } = message;
 		const Data = await DB.findOne({ GuildID: guild.id });
 		let sentInText = false;
 
@@ -34,6 +34,7 @@ module.exports = {
 
 				sentInText = false;
 
+				if (guild.ownerId === author.id) return;
 				if (channel.id === '713791344803577868' || channel.id === '959693430647308292') {// channel(s) you dont want the bot to delete discord links from
 					return;
 				} else {

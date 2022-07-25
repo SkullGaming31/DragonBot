@@ -26,9 +26,12 @@ require('../handlers/Anit-Crash')(client);
 	require(`../Structures/Systems/${system}`)(client);
 }); */
 
-['Events', 'Commands'].forEach(handler => {
+['Events', 'Commands'].forEach((handler) => {
 	require(`../handlers/${handler}`)(client, PG, Ascii);
 });
 
-
-client.login(config.DISCORD_BOT_TOKEN);
+if (process.env.NODE_ENV === 'development') {
+	client.login(process.env.DEV_DISCORD_BOT_TOKEN);
+} else {
+	client.login(config.DISCORD_BOT_TOKEN);
+}
