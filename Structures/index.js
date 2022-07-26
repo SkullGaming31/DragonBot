@@ -6,7 +6,7 @@ const PG = promisify(glob);
 const Ascii = require('ascii-table');
 
 const config = require('./config');
-const { mongoConnect } = require('../Database');
+const { mongoConnect } = require('../Database/index');
 
 const { Channel, GuildMember, GuildScheduledEvent, Message, Reaction, ThreadMember, User } = Partials;
 
