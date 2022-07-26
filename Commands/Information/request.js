@@ -1,31 +1,31 @@
-const { CommandInteraction, MessageEmbed } = require('discord.js');
+const { ChatInputCommandInteraction, EmbedBuilder, ApplicationCommandOptionType, Colors, PermissionFlagsBits, PermissionsBitField } = require('discord.js');
 
 module.exports = {
 	name: 'requests',
 	description: 'information about submiting a bug report or requesting a feature to be added to Overlay Expert',
-	permission: 'SEND_MESSAGES',
-	public: true,
+	UserPerms: ['SendMessages'],
+	BotPerms: ['SendMessages'],
 	options: [
 		{
 			name: 'target',
 			description: 'Who do you want to tag in the message',
-			type: 'USER',
+			type: ApplicationCommandOptionType.User,
 			required: false
 		}
 	],
 	/**
 	 * 
-	 * @param {CommandInteraction} interaction 
+	 * @param {ChatInputCommandInteraction} interaction 
 	 */
 	async execute(interaction) {
 		const { guild, options, member } = interaction;
 
 		const Target = options.getUser('target');
+		const targetUser = guild.channels.cache.get(Target.id);
 
 		try {
-			const infoEmbed = new MessageEmbed()
-				// .setDescription('For a list of currently tracked bugs and features requests, see <https://github.com/overlay-expert/help-desk/issues>. ')
-				.setColor('PURPLE')
+			const infoEmbed = new EmbedBuilder()
+				.setColor(Colors.Purple)
 				.addFields([
 					{
 						name: 'Current List of Bugs&Features',
@@ -38,8 +38,8 @@ module.exports = {
 				])
 				.setFooter({ text: `${guild.name}` });
 
-			if (Target && member.permissions.has('MANAGE_MESSAGES')) {
-				return await interaction.reply({ content: `${Target}`, embeds: [infoEmbed] });
+			if (Target && member.permissions.has([PermissionFlagsBits.ManageMessages, PermissionFlagsBits.Administrator])) {
+				return await interaction.reply({ content: `${targetUser}`, embeds: [infoEmbed] });
 			}
 			else {
 				return await interaction.reply({ embeds: [infoEmbed] });

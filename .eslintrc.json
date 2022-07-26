@@ -9,14 +9,22 @@
         "ecmaVersion": "latest"
     },
     "rules": {
-        "indent": ["warn", "tab"],
-        "linebreak-style": ["error", "windows"],
-        "quotes": ["error", "single"],
-        "no-case-declarations": "off",
-        "semi": [ "error", "always" ],
-        "no-undef": "off",
-        "no-unused-vars": "off",
-        "no-inner-declarations": "off",
-        "arrow-parens": "warn"
+        "indent": [
+            "error",
+            "tab"
+        ],
+        "linebreak-style": [
+            "error",
+            "windows"
+        ],
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "semi": [
+            "error",
+            "always"
+        ],
+        "no-unused-vars":"off"
     }
 }

@@ -1,34 +1,43 @@
-const { Client, Intents, Collection } = require('discord.js');
+const { Client, Partials, GatewayIntentBits, Collection } = require('discord.js');
+const ms = require('ms');
 const { promisify } = require('util');
 const glob = require('glob');
 const PG = promisify(glob);
 const Ascii = require('ascii-table');
-const config = require('./config');
-const { getRepos } = require('../github/index');
 
-require('../database/index');
+const config = require('./config');
+const { mongoConnect } = require('../Database');
+
+const { Channel, GuildMember, GuildScheduledEvent, Message, Reaction, ThreadMember, User } = Partials;
 
 const client = new Client({
 	intents: [
-		Intents.FLAGS.GUILDS,
-		Intents.FLAGS.GUILD_MESSAGES,
-		Intents.FLAGS.GUILD_MEMBERS
-	]
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.GuildMembers
+	],
+	partials: [
+		Channel, GuildMember,
+		GuildScheduledEvent, Message,
+		Reaction, ThreadMember,
+		User
+	],
+	allowedMentions: { parse: ['everyone', 'roles', 'users'] },
+	rest: { timeout: ms('1m') }
 });
+
+client.events = new Collection();
 client.commands = new Collection();
-client.buttons = new Collection();
-client.filters = new Collection();
-client.filtersLog = new Collection();
 
-require('../handlers/Anit-Crash')(client);
-
-/* ['ChatFilterSys', 'LockdownSys'].forEach((system) => {
-	require(`../Structures/Systems/${system}`)(client);
-}); */
-
-['Events', 'Commands'].forEach(handler => {
-	require(`../handlers/${handler}`)(client, PG, Ascii);
+const Handlers = ['Events', 'Commands', 'Errors'];
+Handlers.forEach(handler => {
+	require(`./Handlers/${handler}`)(client, PG, Ascii);
 });
+mongoConnect();
+module.exports = client;
 
-
-client.login(config.DISCORD_BOT_TOKEN);
+if (process.env.NODE_ENV === 'development') {
+	client.login(config.DEV_DISCORD_BOT_TOKEN);
+} else {
+	client.login(config.DISCORD_BOT_TOKEN);
+}

@@ -1,29 +1,26 @@
-const { MessageEmbed, GuildMember, WebhookClient } = require('discord.js');
+/* eslint-disable indent */
+const { GuildMember, WebhookClient, Colors, EmbedBuilder, ChannelType, Client } = require('discord.js');
+const config = require('../../Structures/config');
 
 module.exports = {
 	name: 'guildMemberAdd',
 	/**
-   * 
-   * @param {GuildMember} member 
-   */
-	async execute(member) {
+	 * @param {GuildMember} member
+	 * @param {Client} client 
+	 */
+	async execute(member, client) {
 		const Welcomer = new WebhookClient({
-			id: '961178781903650836',
-			token: 'UgCN44PfPUpy6c4feK5sTTPrzU4g8yABtx3LPyekw4ARwOIBspANb51sDf-ACuM0bT-5'
+			id: config.DISCORD_WELCOME_WEBHOOK_ID,
+			token: config.DISCORD_WELCOME_WEBHOOK_TOKEN
 		});
 		const { user, guild } = member;
-		await member.user.fetch();
 
-		switch (guild.id) {
-		case '959693430227894292':// My Guild ID
-			member.roles.add('969294917388103700');
-			break;
-		}
-		const Welcome = new MessageEmbed()
-			.setColor(member.user.accentColor ? `#${member.user.accentColor.toString(16)}` : 'RANDOM')
+
+		const Welcome = new EmbedBuilder()
+			.setColor(Colors.LightGrey)
 			.setAuthor({ name: user.tag, iconURL: user.avatarURL({ dynamic: true }) })
-			.setThumbnail(`${user.displayAvatarURL({ dynamic: true })}`)
-			.setDescription(`Welcome \`${member.displayName}\` to the **${guild.name}**`)
+			.setThumbnail(user.displayAvatarURL({ dynamic: true }))
+			.setDescription(`Welcome \`${member.displayName}\` to **${guild.name}**`)
 			.addFields([
 				{
 					name: 'Account Created: ',
@@ -31,18 +28,20 @@ module.exports = {
 					inline: true
 				},
 				{
-					name: 'Banner: ',
-					value: member.user.bannerURL() ? '** **' : 'None',
+					name: 'Latest Member Count: ',
+					value: `${guild.memberCount}`,
 					inline: true
 				}
 			])
-			.setFooter({ text: `Latest Member Count: ${guild.memberCount}`, iconURL: `${guild.iconURL({ dynamic: true }) || ''}` });
+			.setFooter({ text: `||ID: ${user.id}||`, iconURL: guild.iconURL({ dynamic: true }) });
+
 		switch (guild.id) {
-		case '959693430227894292':
-			Welcomer.send({ content: `${member}`, embeds: [Welcome] });
-			break;
-		case '183961840928292865':
-			break;
+			case '959693430227894292':// Test Guild ID
+				// await guild.channels.cache.get('989115791418994708').setName(`Members: ${guild.memberCount}`);
+
+
+				Welcomer.send({ content: `${member}`, embeds: [Welcome] });
+				break;
 		}
 	},
 };

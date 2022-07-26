@@ -1,20 +1,20 @@
-const { CommandInteraction, MessageEmbed } = require('discord.js');
+const { ChatInputCommandInteraction, EmbedBuilder, ApplicationCommandOptionType, Colors, PermissionFlagsBits, PermissionsBitField } = require('discord.js');
 
 module.exports = {
 	name: 'mobile',
 	description: 'information about why twitch extensions dont work on Mobile',
-	permission: 'SEND_MESSAGES',
-	public: true,
+	UserPerms: ['SendMessages'],
+	BotPerms: ['SendMessages'],
 	options: [
 		{
 			name: 'target',
 			description: 'Who do you want to tag in the message',
-			type: 'USER',
+			type: ApplicationCommandOptionType.User,
 			required: false
 		}
 	],
 	/**
-	 * @param {CommandInteraction} interaction 
+	 * @param {ChatInputCommandInteraction} interaction 
 	 */
 	async execute(interaction) {
 		const { options, guild, member } = interaction;
@@ -22,20 +22,20 @@ module.exports = {
 		const Target = options.getUser('target');
 
 		try {
-			const mobileEmbed = new MessageEmbed()
+			const mobileEmbed = new EmbedBuilder()
 				.setTitle('Mobile Help')
-				.setColor('BLUE')
+				.setColor(Colors.Blue)
 				.addFields([
 					{
 						name: '**READ**',
 						value: 'No Twitch Extension can overlay the video on mobile; this is a limitation of the Twitch Extension Platform itself and not of Overlay Expert. Until Twitch improves the Extension Platform and allows extensions to overlay the video on mobile, you can use the **mobile chat view** that when activated will appear below your video and show alerts over your chat or ask your community to view your stream from a **mobile browser in "desktop mode"**.',
 						inline: false
 					},
-					{
-						name: 'Voting For Twitch to Improve: ',
-						value: 'You can also: Vote for this Twitch suggestion https://twitch.uservoice.com/forums/904711-extensions/suggestions/40301335 Contact Twitch Support https://help.twitch.tv/s/contactsupport and request better extension support on mobile For more information, see https://github.com/overlay-expert/help-desk/issues/97.',
-						inline: false
-					},
+					// {
+					// 	name: 'Voting For Twitch to Improve: ',
+					// 	value: 'You can also: Vote for this Twitch suggestion https://twitch.uservoice.com/forums/904711-extensions/suggestions/40301335 Contact Twitch Support https://help.twitch.tv/s/contactsupport and request better extension support on mobile For more information, see https://github.com/overlay-expert/help-desk/issues/97.',
+					// 	inline: false
+					// },
 					{
 						name: 'TwitchStatus Update on UserVoice',
 						value: 'a status update on the userVoice has been posted regarding letting mobile viewers see overlays here: https://twitch.uservoice.com/forums/904711-extensions/suggestions/40301335',
@@ -45,7 +45,7 @@ module.exports = {
 				.setFooter({ text: `${guild.name}` })
 				.setTimestamp();
 
-			if (Target && member.permissions.has('MANAGE_MESSAGES')) {
+			if (Target && member.permissions.has([PermissionFlagsBits.ManageMessages, PermissionFlagsBits.Administrator])) {
 				await interaction.reply({ content: `${Target}`, embeds: [mobileEmbed] });
 			} else {
 				await interaction.reply({ embeds: [mobileEmbed] });

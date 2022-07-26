@@ -1,92 +1,78 @@
-const {
-	CommandInteraction,
-	MessageEmbed,
-	MessageActionRow,
-	MessageButton,
-} = require('discord.js');
+const { ChatInputCommandInteraction, EmbedBuilder, ButtonBuilder, Colors, ApplicationCommandOptionType, ChannelType, ActionRowBuilder, ButtonStyle } = require('discord.js');
 const DB = require('../../Structures/Schemas/TicketSetup');
 
 module.exports = {
 	name: 'ticketsetup',
 	description: 'Initial Ticket Setup',
-	permission: 'MANAGE_CHANNELS',
-	public: true,
+	UserPerms: ['ManageChannels'],
+	BotPerms: ['ManageChannels'],
 	options: [
 		{
 			name: 'channel',
 			description: 'Select the Ticket creation channel',
-			type: 'CHANNEL',
+			type: ApplicationCommandOptionType.Channel,
 			required: true,
-			channelTypes: ['GUILD_TEXT'],
+			channelTypes: [ChannelType.GuildText],
 		},
 		{
 			name: 'category',
 			description: 'Select the channel category where tickets will be created',
-			type: 'CHANNEL',
+			type: ApplicationCommandOptionType.Channel,
 			required: true,
-			channelTypes: ['GUILD_CATEGORY'],
+			channelTypes: [ChannelType.GuildCategory],
 		},
 		{
 			name: 'transcripts',
 			description: 'Select the transcripts channel.',
-			type: 'CHANNEL',
+			type: ApplicationCommandOptionType.Channel,
 			required: true,
-			channelType: ['GUILD_TEXT'],
+			channelType: [ChannelType.GuildText],
 		},
 		{
 			name: 'handlers',
 			description: 'Select the role that will handle tickets',
-			type: 'ROLE',
+			type: ApplicationCommandOptionType.Role,
 			required: true,
 		},
 		{
 			name: 'everyone',
 			description: 'Provide the @everyone Role, Its Important',
-			type: 'ROLE',
+			type: ApplicationCommandOptionType.Role,
 			required: true,
 		},
 		{
 			name: 'botrole',
 			description: 'Provide your bots role',
-			type: 'ROLE',
+			type: ApplicationCommandOptionType.Role,
 			required: true,
 		},
 		{
 			name: 'description',
 			description: 'Set the description of the ticket embed',
-			type: 'STRING',
+			type: ApplicationCommandOptionType.String,
 			required: true,
 		},
 		{
 			name: 'firstbutton',
-			description:
-				'give your first button a name followed by a comma then the emoji',
-			type: 'STRING',
+			description: 'give your first button a name followed by a comma then the emoji',
+			type: ApplicationCommandOptionType.String,
 			required: true,
 		},
 		{
 			name: 'secondbutton',
-			description:
-				'give your second button a name followed by a comma then the emoji',
-			type: 'STRING',
+			description: 'give your second button a name followed by a comma then the emoji',
+			type: ApplicationCommandOptionType.String,
 			required: true,
 		},
 		{
 			name: 'thirdbutton',
-			description:
-				'give your third button a name followed by a comma then the emoji',
-			type: 'STRING',
+			description: 'give your third button a name followed by a comma then the emoji',
+			type: ApplicationCommandOptionType.String,
 			required: true,
-		},
-		{
-			name: 'color',
-			description: 'left side of the embeds color',
-			type: 'STRING',
-			required: false
 		}
 	],
 	/**
-	 * @param {CommandInteraction} interaction
+	 * @param {ChatInputCommandInteraction} interaction
 	 */
 	async execute(interaction) {
 		const { guild, options } = interaction;
@@ -102,7 +88,6 @@ module.exports = {
 
 			const Description = options.getString('description');
 
-			let Color = options.getString('color');
 
 			const FirstButton = options.getString('firstbutton').split(',');
 			const SecondButton = options.getString('secondbutton').split(',');
@@ -112,7 +97,6 @@ module.exports = {
 			const SecondEmoji = SecondButton[1];
 			const ThirdEmoji = ThirdButton[1];
 
-			if (!Color) Color = 'WHITE';
 			await DB.findOneAndUpdate(
 				{ GuildID: guild.id },
 				{
@@ -123,7 +107,6 @@ module.exports = {
 					Everyone: Everyone.id,
 					BotRole: BotRole.id,
 					Description: Description,
-					Color: Color,
 					Buttons: [FirstButton[0], SecondButton[0], ThirdButton[0]],
 				},
 				{
@@ -132,26 +115,26 @@ module.exports = {
 				}
 			);
 
-			const Buttons = new MessageActionRow();
+			const Buttons = new ActionRowBuilder();
 			Buttons.addComponents(
-				new MessageButton()
+				new ButtonBuilder()
 					.setCustomId(FirstButton[0])
 					.setLabel(FirstButton[0])
-					.setStyle('PRIMARY')
+					.setStyle(ButtonStyle.Primary)
 					.setEmoji(FirstEmoji),
-				new MessageButton()
+				new ButtonBuilder()
 					.setCustomId(SecondButton[0])
 					.setLabel(SecondButton[0])
-					.setStyle('SUCCESS')
+					.setStyle(ButtonStyle.Success)
 					.setEmoji(SecondEmoji),
-				new MessageButton()
+				new ButtonBuilder()
 					.setCustomId(ThirdButton[0])
 					.setLabel(ThirdButton[0])
-					.setStyle('SECONDARY')
+					.setStyle(ButtonStyle.Secondary)
 					.setEmoji(ThirdEmoji)
 			);
-			const embed = new MessageEmbed()
-				.setColor(Color.toUpperCase())
+			const embed = new EmbedBuilder()
+				.setColor(Colors.DarkPurple)
 				.setAuthor({ name: `${guild.name} | Ticket System`, iconURL: guild.iconURL({ dynamic: true }) })
 				.setDescription(Description);
 
@@ -159,7 +142,7 @@ module.exports = {
 
 			interaction.reply({ content: 'done', ephemeral: true });
 		} catch (error) {
-			const errEmbed = new MessageEmbed().setColor('RED')
+			const errEmbed = new EmbedBuilder().setColor(Colors.Red)
 				.setDescription(`⛔ | An Error occured while setting up your ticket system\n **What to make sure of?**
 			1. Make sure none of your buttons names are duplacated.
 			2. Make sure to use this format for your buttons => Name,Emoji.

@@ -1,21 +1,21 @@
-const { CommandInteraction, MessageEmbed } = require('discord.js');
+const { ChatInputCommandInteraction, EmbedBuilder, ApplicationCommandOptionType, Colors, PermissionsBitField } = require('discord.js');
 const superagent = require('node-superfetch');
 
 module.exports = {
 	name: 'twitch',
 	description: 'Shows users Twitch Stats',
-	permission: 'SEND_MESSAGES',
-	public: true,
+	UserPerms: ['SendMessages'],
+	BotPerms: ['ManageMessages'],
 	options: [
 		{
-			name: 'user',
-			description: 'User to get twitch info from',
-			type: 'STRING',
+			name: 'channel',
+			description: 'Channel to get twitch info for',
+			type: ApplicationCommandOptionType.String,
 			required: true
 		}
 	],
 	/**
-	 * @param {CommandInteraction} interaction 
+	 * @param {ChatInputCommandInteraction} interaction 
 	 * @returns 
 	 */
 	async execute(interaction) {
@@ -24,21 +24,26 @@ module.exports = {
 		interaction.deferReply({ ephemeral: true });
 
 		try {
-			const Response = await superagent.get(`https://api.crunchprank.net/twitch/followcount/${channelName.toLowerCase()}`);
+			const Followers = await superagent.get(`https://api.crunchprank.net/twitch/followcount/${channelName.toLowerCase()}`);
+			// const Subscribers = await superagent.get(`https://api.crunchprank.net/twitch/subcount/${channelName.toLowerCase()}`);
 			const upTime = await superagent.get(`https://api.crunchprank.net/twitch/uptime/${channelName.toLowerCase()}`);
 			const accountage = await superagent.get(`https://api.crunchprank.net/twitch/creation/${channelName.toLowerCase()}`);
 			const lastGame = await superagent.get(`https://api.crunchprank.net/twitch/game/${channelName.toLowerCase()}`);
 			const viewerCount = await superagent.get(`https://api.crunchprank.net/twitch/viewercount/${channelName.toLowerCase()}`);
 
 
-			const embed = new MessageEmbed()
+			const embed = new EmbedBuilder()
 				.setTitle(`${channelName}'s Twitch Stats`)
-				.setColor('PURPLE')
+				.setColor(Colors.Purple)
 				.addFields([
 					{
 						name: '❣️ **Followers**:',
-						value: `${Response.text}`
+						value: `${Followers.text}`
 					},
+					/* {
+						name: '**Subscribers**:',
+						value: `${Subscribers.text}`
+					}, */
 					{
 						name: '⬆ **Uptime**:',
 						value: `${upTime.text}`

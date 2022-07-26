@@ -1,27 +1,27 @@
-const { CommandInteraction, MessageEmbed } = require('discord.js');
+const { ChatInputCommandInteraction, EmbedBuilder, Colors, ApplicationCommandOptionType } = require('discord.js');
 
 module.exports = {
 	name: 'clear',
 	description: 'Clears Messages from the channel',
-	permission: 'MANAGE_MESSAGES',
-	public: true,
+	UserPerms: ['ManageMessages'],
+	BotPerms: ['ManageMessages'],
 	options: [
 		{
 			name: 'amount',
 			description: 'the ammount of messages you wanna clear from the channel',
-			type: 'NUMBER',
+			type: ApplicationCommandOptionType.Number,
 			required: true
 		},
 		{
 			name: 'target',
 			description: 'the member you want to clear the messages for',
-			type: 'USER',
+			type: ApplicationCommandOptionType.User,
 			required: false
 		}
 	],
 	/**
 	 * 
-	 * @param {CommandInteraction} interaction 
+	 * @param {ChatInputCommandInteraction} interaction 
 	 */
 	async execute(interaction) {
 		const { channel, options } = interaction;
@@ -31,8 +31,7 @@ module.exports = {
 
 		const Messages = await channel.messages.fetch();
 
-		const response = new MessageEmbed()
-			.setColor('NOT_QUITE_BLACK');
+		const response = new EmbedBuilder().setColor(Colors.NotQuiteBlack);
 
 		if (Target) {
 			let i = 0;
@@ -45,13 +44,13 @@ module.exports = {
 			});
 			await channel.bulkDelete(filtered, true).then(messages => {
 				response.setDescription(`🧹 ${interaction.user.username} Cleared ${messages.size} messages from ${Target}`)
-					.setColor('RED');
+					.setColor(Colors.Red);
 				interaction.reply({ embeds: [response] });
 			});
 		} else {
 			await channel.bulkDelete(Amount, true).then(messages => {
 				response.setDescription(`🧹 ${interaction.user.username} Cleared ${messages.size} messages from the channel`)
-					.setColor('RED');
+					.setColor(Colors.Red);
 				interaction.reply({ embeds: [response] });
 			});
 		}

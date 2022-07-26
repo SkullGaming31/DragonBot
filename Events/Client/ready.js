@@ -1,20 +1,24 @@
-const { Client } = require('discord.js');
-// const mongoose = require('mongoose');
-// const config = require('../../Structures/config');
-const { mongoConnect } = require('../../database/index');
-
+const { Client, ActivityType } = require('discord.js');
+const { MONGO_URL } = require('../../Structures/config');
+const mongoose = require('mongoose');
+const ms = require('ms');
 module.exports = {
 	name: 'ready',
 	once: true,
 	/**
-	 * @param {Client} client
-	 */
+ * 
+ * @param {Client} client 
+ */
 	async execute(client) {
-		console.log(`Logged in as ${client.user.tag}`);
-		const tbd = await client.guilds.fetch();
-		client.user.setActivity('/get-help', { type: 'WATCHING' });
-		await mongoConnect();
-		require('../../Structures/Systems/ChatFilterSys')(client);
-		require('../../Structures/Systems/LockdownSys')(client);
-	},
+		const { user } = client;
+		console.log(`${client.user.tag} is online!`);
+		user.setActivity({ name: ' /get-help', type: ActivityType.Watching });
+
+		// if (!MONGO_URL) return;
+		// mongoose.connect(MONGO_URL, {
+		// 	useNewUrlParser: true,
+		// 	useUnifiedTopology: true
+		// }).then(() => { console.log('Connected to the Database'); })
+		// 	.catch((err) => console.log(err));
+	}
 };
