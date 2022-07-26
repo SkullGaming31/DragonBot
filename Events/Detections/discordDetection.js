@@ -10,7 +10,7 @@ module.exports = {
 	 * @returns 
 	 */
 	async execute(message) {
-		const { guild, channel } = message;
+		const { guild, channel, author } = message;
 		const Data = await DB.findOne({ GuildID: guild.id });
 		let sentInText = false;
 
