@@ -11,11 +11,10 @@ module.exports = {
 	 */
 	async execute(message, client) {
 		const channels = (await message.guild.channels.fetch(message.channel.id)).name;
-		// const mentioned = (await message.guild.members.fetch(message.author.id)).displayName;
-
-		console.log(`${message.author.tag} Said: ${message.content} in #${channels}`);
-		const { author, guild, member, channel } = message;
+		const { author, guild, member, channel, content } = message;
 		const { user } = client;
+
+		console.log(`${author.username} Said: ${content} in #${channels}`);
 
 		if (message.author.bot || channel.type === ChannelType.DM) return;
 		if (member.permissions.has(['Administrator', 'ManageMessages'])) return;
@@ -25,7 +24,7 @@ module.exports = {
 				.setColor(Colors.NotQuiteBlack)
 				.setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ dynamic: true }) })
 				.setDescription(`Mention ${user.username} for help`)
-				.setFooter({ text: `||GuildID: ${guild.id}, UserID: ${author.id}||` })
+				.setFooter({ text: `GuildID: ${guild.id}, UserID: ${author.id}` })
 				.setTimestamp();
 			message.reply({ embeds: [response] });
 		}

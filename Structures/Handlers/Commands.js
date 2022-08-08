@@ -29,7 +29,6 @@ module.exports = async (client, PG, Ascii) => {
 
 		client.commands.set(command.name, command);
 		CommandsArray.push(command);
-		// console.log('Commands' + CommandsArray);
 
 		await Table.addRow(command.name, '🔹 SUCCESSFUL');
 	});
@@ -37,9 +36,7 @@ module.exports = async (client, PG, Ascii) => {
 
 	// Enabling Commands for all Guilds //
 	client.on('ready', async () => {
-		setInterval(() => {
-			client.guilds.cache.forEach((g) =>
-				g.commands.set(CommandsArray));
-		});
-	}, ms('10m'));
+		client.guilds.cache.forEach((g) =>
+			g.commands.set(CommandsArray));
+	});
 };

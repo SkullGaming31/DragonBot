@@ -6,7 +6,6 @@ const PG = promisify(glob);
 const Ascii = require('ascii-table');
 
 const config = require('./config');
-const { mongoConnect } = require('../Database/index');
 
 const { Channel, GuildMember, GuildScheduledEvent, Message, Reaction, ThreadMember, User } = Partials;
 
@@ -29,11 +28,11 @@ const client = new Client({
 client.events = new Collection();
 client.commands = new Collection();
 
-const Handlers = ['Events', 'Commands', 'Errors'];
+const Handlers = ['Events', 'Commands', /* 'Errors' */];
 Handlers.forEach(handler => {
 	require(`./Handlers/${handler}`)(client, PG, Ascii);
 });
-mongoConnect();
+
 module.exports = client;
 
 if (process.env.NODE_ENV === 'development') {

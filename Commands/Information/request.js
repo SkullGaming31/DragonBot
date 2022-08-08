@@ -39,7 +39,7 @@ module.exports = {
 				.setFooter({ text: `${guild.name}` });
 
 			if (Target && member.permissions.has([PermissionFlagsBits.ManageMessages, PermissionFlagsBits.Administrator])) {
-				return await interaction.reply({ content: `${targetUser}`, embeds: [infoEmbed] });
+				return await interaction.reply({ content: `${Target}`, embeds: [infoEmbed] });
 			}
 			else {
 				return await interaction.reply({ embeds: [infoEmbed] });
