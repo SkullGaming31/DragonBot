@@ -8,7 +8,7 @@ module.exports = {
  * @param {Message} newMessage 
  */
 	async execute(oldMessage, newMessage) {
-		if (oldMessage.author.bot) return;
+		if (newMessage.author.bot) return;
 
 		if (oldMessage.content === newMessage.content) return;
 
@@ -19,11 +19,11 @@ module.exports = {
 
 		const log = new EmbedBuilder()
 			.setColor(Colors.Yellow)
-			.setDescription(`📘 A [message](${newMessage.url}) by ${newMessage.author} was **edited** in ${newMessage.channel}.\n
-		**Original**:\n ${Original} \n**Edited**: \n ${Edited}`)
+			.setDescription(`📘 A [message](${newMessage.url} by ${newMessage.author} was **edited** in ${newMessage.channel}.\n
+				**Original**:\n ${Original} \n**Edited**: \n ${Edited}`)
 			.setFooter({ text: `||Member: ${newMessage.author.tag} | ID: ${newMessage.author.id}||` });
 
-		if (oldMessage.guild.id === '183961840928292865') { // Discord Bot Test Server
+		if (newMessage.guild.id === '183961840928292865') { // Discord Bot Test Server
 			const logsChannel = newMessage.guild.channels.cache.get('959693430647308295');
 			try {
 				await logsChannel.send({ embeds: [log] });

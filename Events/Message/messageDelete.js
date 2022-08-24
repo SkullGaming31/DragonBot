@@ -8,8 +8,8 @@ module.exports = {
 	 * @param {Message} message 
 	 */
 	async execute(message) {
-		if (message.author.bot) return;
 		const { guild } = message;
+		if (message.author.bot) return;
 
 		const log = new EmbedBuilder()
 			.setColor(Colors.Green)
