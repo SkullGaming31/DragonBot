@@ -1,7 +1,7 @@
 const { Client, ActivityType } = require('discord.js');
 const { MONGO_DATABASE, MONGO_PASSWORD, MONGO_USERNAME, MONGO_DATABASE_URI } = require('../../Structures/config');
 const mongoose = require('mongoose');
-const ms = require('ms');
+
 module.exports = {
 	name: 'ready',
 	once: true,

@@ -1,4 +1,4 @@
-const { CommandInteraction, EmbedBuilder, ApplicationCommandOptionType, Colors, PermissionFlagsBits } = require('discord.js');
+const { ChatInputCommandInteraction, EmbedBuilder, ApplicationCommandOptionType, Colors, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
 	name: 'get-help',
@@ -15,7 +15,7 @@ module.exports = {
 	],
 	/**
 	 * 
-	 * @param {CommandInteraction} interaction 
+	 * @param {ChatInputCommandInteraction} interaction 
 	 */
 	async execute(interaction) {
 		const { guild, user, options, member } = interaction;
@@ -27,19 +27,19 @@ module.exports = {
 				.setTitle('Overlay Expert')
 				.setDescription('To begin helping you, please: ')
 				.setColor(Colors.White)
-				.addField('1.', 'go live on Twitch', false)
-				.addField('2.', 'open your PC web browser or mobile web browser in **desktop mode**', false)
-				.addField('3.', 'navigate to your Twitch channel (i.e. `https://twitch.tv/YOUR_USERNAME`)', false)
-				.addField('4.', 'take a screenshot and upload it here (screenshots of your extension configuration screen or builder may also be helpful) If you or your viewers are **watching from the Twitch mobile app** or Console, please type `/mobile`.', false)
+				.addFields({ name: '1.', value: 'go live on Twitch', inline: false })
+				.addFields({ name: '2.', value: 'open your PC web browser or mobile web browser in **desktop mode**', inline: false })
+				.addFields({ name: '3.', value: 'navigate to your Twitch channel (i.e. `https://twitch.tv/YOUR_USERNAME`)', inline: false })
+				.addFields({ name: '4.', value: 'take a screenshot and upload it here (screenshots of your extension configuration screen or builder may also be helpful) If you or your viewers are **watching from the Twitch mobile app** or Console, please type `/mobile`.', inline: false })
 				.setFooter({ text: `${guild.name}` });
 
-			if (Target && member.permissions.has([PermissionFlagsBits.ManageMessages])) {
-				helpEmbed.setAuthor({ name: `${Target.tag}`, iconURL: `${Target.displayAvatarURL({ dynamic: true })}` });
-				helpEmbed.setThumbnail(`${Target.displayAvatarURL({ dynamic: true, size: 512 })}`);
+			if (Target) {
+				helpEmbed.setAuthor({ name: `${Target.tag}`, iconURL: `${Target.displayAvatarURL({ size: 512 })}` });
+				helpEmbed.setThumbnail(`${Target.displayAvatarURL({ size: 512 })}`);
 				return await interaction.reply({ content: `${Target}`, embeds: [helpEmbed] });
 			}
 			else {
-				helpEmbed.setAuthor({ name: `${user.username}`, iconURL: `${user.displayAvatarURL({ dynamic: true })}` });
+				helpEmbed.setAuthor({ name: `${user.username}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` });
 				return await interaction.reply({ embeds: [helpEmbed] });
 			}
 		} catch (error) {

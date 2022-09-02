@@ -48,10 +48,10 @@ module.exports = {
 					});
 					docs.MembersID.push(Member.id);
 					channel.permissionOverwrites.edit(Member.id, {
-						SEND_MESSAGES: true,
-						VIEW_CHANNEL: true,
-						READ_MESSAGE_HISTORY: true,
-						ATTACH_FILES: true
+						SendMessages: true,
+						ViewChannel: true,
+						ReadMessageHistory: true,
+						AttachFiles: true
 					});
 					interaction.reply({
 						content: `${Member}`, embeds: [embed.setColor(Colors.Green).setDescription(`✅ | ${Member} has been added to the ticket`)]
@@ -70,7 +70,7 @@ module.exports = {
 					});
 					docs.MembersID.remove(Member.id);
 					channel.permissionOverwrites.edit(Member.id, {
-						VIEW_CHANNEL: false,
+						ViewChannel: false,
 					});
 					interaction.reply({
 						embeds: [embed.setColor(Colors.Green).setDescription(`✅ | ${Member} has been removed from the ticket`)]

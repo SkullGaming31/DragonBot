@@ -36,7 +36,10 @@ module.exports = async (client, PG, Ascii) => {
 
 	// Enabling Commands for all Guilds //
 	client.on('ready', async () => {
-		client.guilds.cache.forEach((g) =>
-			g.commands.set(CommandsArray));
+		setInterval(() => {
+			client.guilds.cache.forEach((g) =>
+				g.commands.set(CommandsArray));
+			console.log('Commands Reloaded');
+		}, ms('3h'));
 	});
 };

@@ -1,4 +1,4 @@
-const { Message, EmbedBuilder, Colors } = require('discord.js');
+const { Message, EmbedBuilder, Colors, ChannelType } = require('discord.js');
 
 module.exports = {
 	name: 'messageDelete',
@@ -8,20 +8,21 @@ module.exports = {
 	 * @param {Message} message 
 	 */
 	async execute(message) {
-		const { guild } = message;
-		if (message.author.bot) return;
+		const { guild, channel } = message;
 
 		const log = new EmbedBuilder()
 			.setColor(Colors.Green)
 			.setDescription(`🚨 a [message](${message.url}) by ${message.author.tag} was **deleted**.\n **Deleted Message:**\n ${message.content ? message.content : 'None'}`.slice(0, 4096));
 
 		if (message.attachments.size >= 1) {
-			log.addField('Attachments:', `${message.attachments.map((a) => a.url)}`, true);
+			log.addFields({ name: 'Attachments:', value: `${message.attachments.map((a) => a.url)}`, inline: true });
 		}
 		if (guild.id === '183961840928292865') { // Overlay Expert
 			const logsChannel = message.guild.channels.cache.get('765920602287636481');
 			try {
-				await logsChannel.send({ embeds: [log] });
+				if (channel.type === ChannelType.GuildText) {
+					await logsChannel.send({ embeds: [log] });
+				}
 			} catch (error) {
 				console.error(error);
 				return;

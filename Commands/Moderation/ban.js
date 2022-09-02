@@ -25,9 +25,8 @@ module.exports = {
   /**
    * 
    * @param {ChatInputCommandInteraction} interaction 
-   * @param {Client} client
    */
-  async execute(interaction, client) {
+  async execute(interaction) {
     await interaction.deferReply({ ephemeral: true });
 
     const { options, user, guild } = interaction;

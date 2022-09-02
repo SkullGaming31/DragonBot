@@ -8,7 +8,6 @@ module.exports = {
  * @param {Message} newMessage 
  */
 	async execute(oldMessage, newMessage) {
-		if (newMessage.author.bot) return;
 
 		if (oldMessage.content === newMessage.content) return;
 
