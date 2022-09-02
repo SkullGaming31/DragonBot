@@ -10,11 +10,11 @@ module.exports = {
 	 * @returns
 	 */
 	async execute(message, client) {
-		const channels = (await message.guild.channels.fetch(message.channel.id)).name;
+		// const channels = (await message.guild.channels.fetch(message.channel.id)).name;
 		const { author, guild, member, channel, content } = message;
 		const { user } = client;
 
-		console.log(`${author.username} Said: ${content} in #${channels}`);
+		// console.log(`${author.username} Said: ${content} in #${channels}`);
 
 		if (message.author.bot || channel.type === ChannelType.DM) return;
 		if (member.permissions.has(['Administrator', 'ManageMessages'])) return;
