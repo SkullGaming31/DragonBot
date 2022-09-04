@@ -3,6 +3,7 @@ require('dotenv').config();
 /**
  * @typedef EnvironmentConfiguration
  * @prop {string} DISCORD_BOT_TOKEN your discord bots Token
+ * @prop {string} DEV_DISCORD_BOT_TOKEN Discord Development Bot Token
  * @prop {string} DISCORD_CLIENT_ID not used for anything atm
  * @prop {string} DISCORD_CLIENT_SECRET not used for anything atm
  * @prop {string} DISCORD_GUILD_ID ID of your discord server

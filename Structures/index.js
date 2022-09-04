@@ -1,4 +1,4 @@
-const { Client, Partials, GatewayIntentBits, Collection } = require('discord.js');
+const { Client, Partials, Collection, GatewayIntentBits } = require('discord.js');
 const ms = require('ms');
 const { promisify } = require('util');
 const glob = require('glob');
@@ -13,7 +13,8 @@ const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
 		GatewayIntentBits.GuildMessages,
-		GatewayIntentBits.GuildMembers
+		GatewayIntentBits.GuildMembers,
+		GatewayIntentBits.MessageContent
 	],
 	partials: [
 		Channel, GuildMember,

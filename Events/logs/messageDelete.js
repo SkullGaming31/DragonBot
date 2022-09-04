@@ -9,10 +9,11 @@ module.exports = {
 	 */
 	async execute(message) {
 		const { guild, channel } = message;
+		// console.log(message);
 
 		const log = new EmbedBuilder()
 			.setColor(Colors.Green)
-			.setDescription(`🚨 a [message](${message.url}) by ${message.author.tag} was **deleted**.\n **Deleted Message:**\n ${message.content ? message.content : 'None'}`.slice(0, 4096));
+			.setDescription(`🚨 a [message](${message.url}) by ${message.author.tag} was **deleted**.\n **Deleted Message:**\n \`${message.content ? message.content : 'None'}\``.slice(0, 4096));
 
 		if (message.attachments.size >= 1) {
 			log.addFields({ name: 'Attachments:', value: `${message.attachments.map((a) => a.url)}`, inline: true });
