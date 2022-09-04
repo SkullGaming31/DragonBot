@@ -1,6 +1,4 @@
 const { Guild, User, EmbedBuilder, Colors } = require('discord.js');
-const DB = require('../../Structures/Schemas/LogsChannel');
-const SwitchDB = require('../../Structures/Schemas/GeneralLogs');
 
 module.exports = {
 	name: 'guildBanAdd',

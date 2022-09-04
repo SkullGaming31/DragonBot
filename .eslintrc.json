@@ -10,10 +10,7 @@
         "sourceType": "module"
     },
     "rules": {
-        "indent": [
-            "error",
-            "tab"
-        ],
+        "indent": ["error", "tab"],
         "linebreak-style": [
             "error",
             "windows"
@@ -26,6 +23,7 @@
             "error",
             "always"
         ],
-        "no-unused-vars":"off"
+        "no-unused-vars":"off",
+        "no-case-declarations": "off"
     }
 }
