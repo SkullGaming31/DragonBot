@@ -38,8 +38,8 @@ guilds
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/skullgaming31/skulledbot">
-    <img src="./assets/images/skulledbot.png" alt="Project Logo" width="80" height="80">
+  <a href="https://github.com/skullgaming31/overlayexpertDiscord">
+    <img src="./assets/images/logo.png" alt="Project Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Skulled Bot V2</h3>

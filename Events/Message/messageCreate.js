@@ -16,6 +16,7 @@ module.exports = {
 
 		// console.log(`${author.username} Said: ${content} in #${channels}`);
 
+
 		if (message.author.bot || channel.type === ChannelType.DM) return;
 		if (member.permissions.has(['Administrator', 'ManageMessages'])) return;
 

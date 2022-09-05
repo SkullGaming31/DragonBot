@@ -8,6 +8,7 @@ module.exports = {
 	/**
  * 
  * @param {Client} client 
+ * @returns
  */
 	async execute(client) {
 		const { user } = client;

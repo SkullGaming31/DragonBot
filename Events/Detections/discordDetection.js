@@ -1,4 +1,4 @@
-const { Message, ChannelType, EmbedBuilder, Colors } = require('discord.js');
+const { Client, Message, ChannelType, EmbedBuilder, Colors } = require('discord.js');
 const DB = require('../../Structures/Schemas/settingsDB');
 
 module.exports = {
@@ -6,20 +6,18 @@ module.exports = {
 	/**
 	 * 
 	 * @param {Message} message 
-	 * @param {CommandInteraction} interaction
+	 * @param {Client} interaction
 	 * @returns 
 	 */
-	async execute(message) {
+	async execute(message, client) {
 		const { guild, channel, author } = message;
 		const Data = await DB.findOne({ GuildID: guild.id });
 		let sentInText = false;
 
-		const logsChannel = guild.channels.cache.get(Data.LoggingChannel);
-		const admin = guild.roles.cache.get(Data.AdministratorRole);
-		const mod = guild.roles.cache.get(Data.ModeratorRole);
+		const logsChannel = client.channels.cache.get(Data.LoggingChannel);
 		const discordInviteList = [
-			'discord.com/invite/', 'discord.com/', 'discord.gg/',
-			'https://discord.com/invite/', 'https://discord.com/', 'https://discord.gg/',
+			'discord.com/', 'discord.gg/',
+			'https://discord.com/', 'https://discord.gg/',
 			'.gift'
 		];
 
@@ -32,42 +30,17 @@ module.exports = {
 					.setColor(Colors.Red)
 					.setThumbnail(message.author.avatarURL())
 					.setFooter({ text: `${guild.name}` })
-					.setTimestamp(Date.now());
+					.setTimestamp();
 
-				sentInText = false;
-				if (guild.ownerId === message.author.id) return;
-				if (admin || mod) return;
+				if (guild.ownerId === message.author.id || message.author.id === '353674019943219204' || message.author.id === '557517338438664223') return;
+				// if (admin || mod) return;
 				if (channel.id === '713791344803577868' || channel.id === '959693430647308292') {// channel(s) you dont want the bot to delete discord links from
 					return;
 				} else {
-					await channel.send({ embeds: [discordLinkDetection] }); // send this warning embed to the channel the link was detected in
-					message.delete().catch((error) => { console.error(error); return; });
+					channel.send({ embeds: [discordLinkDetection] }); // send this warning embed to the channel the link was detected in
+					await message.delete().catch((error) => { console.error(error); return; });
+					sentInText = false;
 				}
-
-				const logsEmbed = new EmbedBuilder()// embed to be sent to the logs channel
-					.setTitle('Automated Message Deletion')
-					.setDescription(`${message.author.username} posted ${message.content} in ${message.channel}`)
-					.setColor(Colors.Purple)
-					.addFields([
-						{
-							name: 'Username:',
-							value: `${message.author.username}`,
-							inline: false
-						},
-						{
-							name: 'Message Content:',
-							value: `\`${message.content}\``,
-							inline: false
-						},
-						{
-							name: 'Channel',
-							value: `${message.channel}`,
-							inline: false
-						},
-					])
-					.setTimestamp();
-
-				if (channel.type === ChannelType.GuildText) await logsChannel.send({ embeds: [logsEmbed] });
 			}
 		}
 	},

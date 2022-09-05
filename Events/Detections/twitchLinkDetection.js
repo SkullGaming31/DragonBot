@@ -1,4 +1,4 @@
-const { EmbedBuilder, Message, ChannelType, Colors } = require('discord.js');
+const { Client, EmbedBuilder, Message, ChannelType, Colors } = require('discord.js');
 const DB = require('../../Structures/Schemas/settingsDB');
 // const tickets = require('../../Structures/Schemas/Ticket');
 
@@ -7,10 +7,12 @@ module.exports = {
 	/**
 	 *
 	 * @param {Message} message
+	 * @param {Client} client
 	 * @returns
 	 */
-	async execute(message) {
+	async execute(message, client) {
 		const { guild, member, channel } = message;
+		const { channels } = client;
 		const Data = await DB.findOne({ GuildID: guild.id }); // settings database
 		if (!Data) return;
 		if (message.author.bot) return;
@@ -23,11 +25,11 @@ module.exports = {
 			'https://tiktok.com/', 'tiktok.com/',
 			'https://github.com/', 'github.com/',
 		];
-		const logsChannel = guild.channels.cache.get(Data.LoggingChannel); // Logs Channel, remove Data.LoggingChannel if you dont have your logs channel saved in a db and replace it with 'Your Channel ID'
+		const logsChannel = channels.cache.get(Data.LoggingChannel); // Logs Channel, remove Data.LoggingChannel if you dont have your logs channel saved in a db and replace it with 'Your Channel ID'
 		let foundInText = false;
 
-		const nowLive = guild.channels.cache.get(Data.PromotionChannel); // now-live ChannelID
-		// if (member.permissions.has('ManageMessages') ? true : null) return;// if they have the manage messages permission ignore them
+		const nowLive = channels.cache.get(Data.PromotionChannel); // now-live ChannelID
+		if (member.permissions.has('ManageMessages') ? true : null) return;// if they have the manage messages permission ignore them
 		// if (channel.id === '713791344803577868' || channel.id === '959693430647308292') return;// added these cause the bot was deleting messages in the moderator channel
 		/* havnt figure out the new permission system yet for dening the bot moderating messages */
 		if (channel.parentId === '694243745717288971' || channel.parentId === '959693430647308289') return; // parent channel id for ticket system if you have one, if not delete this line
@@ -45,7 +47,7 @@ module.exports = {
 						.setThumbnail(message.author.avatarURL({ dynamic: true }))
 						.setTimestamp();
 
-					if (member.permissions.has('ManageMessages') ? true : null) return;// if they have the manage messages permission ignore them
+					// if (member.permissions.has('ManageMessages') ? true : null) return;// if they have the manage messages permission ignore them
 					if (channel.id === '713791344803577868' || channel.id === '959693430647308292') return;// added these cause the bot was deleting messages in the moderator channel
 
 					await message.reply({ embeds: [linkDetection] });

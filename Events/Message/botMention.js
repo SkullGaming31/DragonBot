@@ -29,7 +29,11 @@ module.exports = {
 			new ButtonBuilder()
 				.setStyle(ButtonStyle.Link)
 				.setURL('https://overlay.expert')
-				.setLabel('OverlayExpert Website')
+				.setLabel('OverlayExpert Website'),
+			new ButtonBuilder()
+				.setStyle(ButtonStyle.Link)
+				.setURL('https://overlay.expert/w/overlayexpertreview')
+				.setLabel('Overlay Expert Review Channel')
 		);
 
 		return message.reply({ embeds: [embed], components: [row] }).then(msg =>

@@ -36,7 +36,7 @@ Handlers.forEach(handler => {
 
 module.exports = client;
 
-if (process.env.NODE_ENV !== 'development') {
+if (process.env.NODE_ENV === 'development') {
 	client.login(config.DEV_DISCORD_BOT_TOKEN);
 } else {
 	client.login(config.DISCORD_BOT_TOKEN);

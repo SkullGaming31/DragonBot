@@ -46,23 +46,5 @@ module.exports = {
 				}
 				break;
 		}
-
-		if (newMessage.guild.id === '959693430227894292') { // Discord Bot Test Server
-			const logsChannel = client.channels.cache.get('959693430647308295');
-			try {
-				await logsChannel.send({ embeds: [log] });
-			} catch (error) {
-				console.error(error);
-				return;
-			}
-		} else { // Overlay Expert Server
-			const logsChannel = client.channels.cache.get('765920602287636481');
-			try {
-				await logsChannel.send({ embeds: [log] });
-			} catch (error) {
-				console.error(error);
-				return;
-			}
-		}
 	}
 };
