@@ -106,13 +106,21 @@ where i created the discord bot in Javascript, i am attempting to convert it to 
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
+Requirements
+* [Discord.js v14](https://discord.js.org/)
+* discord.js
   ```sh
-  npm install npm@latest -g
+  npm install discord.js
   ```
 *  Typescript<br>
   [Typescript](https://www.typescriptlang.org/)
+  ```sh
+  npm i -D typescript
+  ```
+* ts-node<br>
+  ```sh
+  npm i -D ts-node
+  ```
 * node<br>
   [Node](https://nodejs.org)
   
