@@ -107,8 +107,8 @@ This is an example of how to list things you need to use the software and how to
   ```sh
   npm install npm@latest -g
   ```
-  Typescript<br>
-* [Typescript](https://google.ca)
+*  Typescript<br>
+  [Typescript](https://www.typescriptlang.org/)
 * node<br>
   [Node](https://nodejs.org)
   
