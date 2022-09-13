@@ -23,8 +23,8 @@ module.exports = {
 		if (message.content.includes('help') && message.content.endsWith('?')) {
 			const response = new EmbedBuilder()
 				.setColor(Colors.NotQuiteBlack)
-				.setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ dynamic: true }) })
-				.setDescription(`Mention ${user.username} for help`)
+				.setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ size: 512 }) })
+				.setDescription(`Hello ${message.author}, please leave a brief description of the issue you are having, you can also use the \`/get-help\` which will help us debug your issue alittle faster, if your viewers are watching on mobile, please use the \`/mobile\``)
 				.setFooter({ text: `GuildID: ${guild.id}, UserID: ${author.id}` })
 				.setTimestamp();
 			message.reply({ embeds: [response] });

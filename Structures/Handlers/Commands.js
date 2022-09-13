@@ -39,7 +39,6 @@ module.exports = async (client, PG, Ascii) => {
 		setInterval(() => {
 			client.guilds.cache.forEach((g) =>
 				g.commands.set(CommandsArray));
-			console.log('Commands Reloaded');
-		}, ms('3h'));
+		}, ms('5s'));
 	});
 };

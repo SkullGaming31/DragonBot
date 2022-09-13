@@ -3,9 +3,9 @@ const DB = require('../../Structures/Schemas/settingsDB');
 
 module.exports = {
 	name: 'settings',
-	description: 'guild settings for some channels',
-	UserPerms: ['ManageGuild'],
-	BotPerms: ['ManageGuild'],
+	description: 'Guild settings for some channels',
+	UserPerms: ['ManageChannels'],
+	BotPerms: ['ManageChannels'],
 	options: [
 		{
 			name: 'logging',
@@ -27,18 +27,24 @@ module.exports = {
 			required: true
 		},
 		{
-			name: 'nowlive',
-			description: 'Select the Now Live channel',
-			type: ApplicationCommandOptionType.Channel,
-			required: false,
-			channelType: [ChannelType.GuildText]
+			name: 'welcome',
+			description: 'Enable or Disable the Welcome Message when someone joins the server',
+			type: ApplicationCommandOptionType.Boolean,
+			required: true
 		},
 		{
-			name: 'suggestions',
-			description: 'Choose your suggestion channel for all suggestions to be posted too',
+			name: 'welcomechan',
+			description: 'Welcome Channel',
 			type: ApplicationCommandOptionType.Channel,
-			required: false,
-			channelType: [ChannelType.GuildText]
+			required: true,
+			channelTypes: [ChannelType.GuildText]
+		},
+		{
+			name: 'live',
+			description: 'The Now Live channel',
+			type: ApplicationCommandOptionType.Channel,
+			required: true,
+			channelTypes: [ChannelType.GuildText]
 		}
 	],
 	/**
@@ -50,19 +56,22 @@ module.exports = {
 
 		try {
 			const Logging = options.getChannel('logging');
-			const NowLive = options.getChannel('nowlive');
-			const Suggestion = options.getChannel('suggestions');
+			// const Suggestion = options.getChannel('suggestions');
+			const Welcome = options.getBoolean('welcome');
+			const Welcomechan = options.getChannel('welcomechan');
+			const NowLive = options.getChannel('live');
 
 			const Administrator = options.getRole('admin');
 			const Moderator = options.getRole('moderator');
 
 
-			await DB.findOneAndUpdate(
+			const Data = await DB.findOneAndUpdate(
 				{ GuildID: guild.id },
 				{
 					LoggingChannel: Logging.id,
+					Welcome: Welcome,
+					WelcomeChannel: Welcomechan.id,
 					PromotionChannel: NowLive.id,
-					SuggestionsChannel: Suggestion.id,
 					AdministratorRole: Administrator.id,
 					ModeratorRole: Moderator.id
 				},

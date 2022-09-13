@@ -16,7 +16,7 @@ module.exports = {
 		const log = new EmbedBuilder()
 			.setTitle('MESSAGE DELETED')
 			.setColor(Colors.Green)
-			.setAuthor({ name: `${message.author.tag}` })
+			.setAuthor({ name: `${message.author?.tag || 'No User Detected'}` })
 			// .setDescription(`🚨 **Deleted Message:**\n \`${message.content ? message.content : 'None'}\``.slice(0, 4096))
 			.addFields({ name: '🚨 | Deleted Message: ', value: `\`${message.content ? message.content : 'None'}\``.slice(0, 4096) })
 			.addFields({ name: 'Channel', value: `<#${channel.id}>` })
@@ -29,7 +29,7 @@ module.exports = {
 			case '183961840928292865':// Overlay Expert
 				const overlaylogsChannel = channels.cache.get('765920602287636481');
 				try {
-					if (channel.type === ChannelType.GuildText) {
+					if (channel.type === ChannelType.GuildText && channel.type !== ChannelType.GuildPublicThread) {
 						await overlaylogsChannel.send({ embeds: [log] });
 					}
 				} catch (error) {
