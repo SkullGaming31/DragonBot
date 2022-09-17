@@ -13,24 +13,37 @@ module.exports = {
 		const { guild, channel } = message;
 		const { channels } = client;
 
-		const log = new EmbedBuilder()
-			.setTitle('MESSAGE DELETED')
-			.setColor(Colors.Green)
+		// const log = new EmbedBuilder()
+		// 	.setTitle('MESSAGE DELETED')
+		// 	.setColor(Colors.Green)
+		// 	.setAuthor({ name: `${message.author?.tag || 'No User Detected'}` })
+		// 	// .setDescription(`🚨 **Deleted Message:**\n \`${message.content ? message.content : 'None'}\``.slice(0, 4096))
+		// 	.addFields({ name: '🚨 | Deleted Message: ', value: `\`${message.content ? message.content : 'None'}\``.slice(0, 4096) })
+		// 	.addFields({ name: 'Channel', value: `<#${channel.id}>` })
+		// 	.setURL(`${message.url}`);
+
+		const logsEmbed = new EmbedBuilder()
+			.setTitle('Automated Message Deletion')
 			.setAuthor({ name: `${message.author?.tag || 'No User Detected'}` })
-			// .setDescription(`🚨 **Deleted Message:**\n \`${message.content ? message.content : 'None'}\``.slice(0, 4096))
-			.addFields({ name: '🚨 | Deleted Message: ', value: `\`${message.content ? message.content : 'None'}\``.slice(0, 4096) })
-			.addFields({ name: 'Channel', value: `<#${channel.id}>` })
-			.setURL(`${message.url}`);
+			.setColor(Colors.Red)
+			.addFields([
+				{ name: 'User', value: `${message.author.username}` },
+				{ name: '🚨 | Deleted Message: ', value: `\`${message.content ? message.content : 'None'}\``.slice(0, 4096) },
+				{ name: 'Channel', value: `${message.channel}` }
+			])
+			.setURL(`${message.url}`)
+			.setFooter({ text: `UserID: ${message.author.id}` })
+			.setTimestamp();
 
 		if (message.attachments.size >= 1) {
-			log.addFields({ name: 'Attachments:', value: `${message.attachments.map((a) => a.url)}`, inline: true });
+			logsEmbed.addFields({ name: 'Attachments:', value: `${message.attachments.map((a) => a.url)}`, inline: true });
 		}
 		switch (guild.id) {
 			case '183961840928292865':// Overlay Expert
 				const overlaylogsChannel = channels.cache.get('765920602287636481');
 				try {
 					if (channel.type === ChannelType.GuildText && channel.type !== ChannelType.GuildPublicThread) {
-						await overlaylogsChannel.send({ embeds: [log] });
+						await overlaylogsChannel.send({ embeds: [logsEmbed] });
 					}
 				} catch (error) {
 					console.error(error);
@@ -40,7 +53,7 @@ module.exports = {
 			case '959693430227894292':// Overlay Expert Test Server
 				const logsChannel = channels.cache.get('959693430647308295');
 				try {
-					await logsChannel.send({ embeds: [log] });
+					await logsChannel.send({ embeds: [logsEmbed] });
 				} catch (error) {
 					console.error(error);
 					return;

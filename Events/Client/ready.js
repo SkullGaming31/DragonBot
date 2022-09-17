@@ -1,6 +1,7 @@
 const { Client, ActivityType } = require('discord.js');
 const { MONGO_DATABASE, MONGO_PASSWORD, MONGO_USERNAME, MONGO_DATABASE_URI } = require('../../Structures/config');
 const mongoose = require('mongoose');
+const ms = require('ms');
 
 module.exports = {
 	name: 'ready',
@@ -11,9 +12,14 @@ module.exports = {
  * @returns
  */
 	async execute(client) {
-		const { user } = client;
+		const { user, ws } = client;
 		console.log(`${client.user.tag} is online!`);
-		user.setActivity({ name: ' /get-help', type: ActivityType.Watching });
+		setInterval(() => {
+			const ping = ws.ping;
+
+			user.setActivity({ name: ` Ping: ${ping}ms`, type: ActivityType.Watching });
+
+		}, ms('1m'));
 
 		if (!MONGO_DATABASE_URI) return;
 		await mongoose.connect(MONGO_DATABASE_URI, {

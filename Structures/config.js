@@ -14,8 +14,8 @@ require('dotenv').config();
  * @prop {string} MONGO_URL Full Url for Mongo DB
  * @prop {string} MODLOGS_CHANNEL Channel ID for your Logs
  * @prop {string} ERROR_LOGS_CHANNEL Channel ID for Development ERROR Logs
- * @prop {string} DISCORD_WELCOME_WEBHOOK_ID Webbhook ID for the Welcome Channel
- * @prop {string} DISCORD_WELCOME_WEBHOOK_TOKEN Webhook Token for the Welcome Channel
+ * @prop {string} DISCORD_ERR_WEBHOOK_ID Webhook ID for Error Logs
+ * @prop {string} DISCORD_ERR_WEBHOOK_TOKEN Webhook Token for Error Logs
  * @prop {string} NEW_GUILD_ADDED_WEBHOOK Webhook for New Guilds Added
  */
 

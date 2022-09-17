@@ -1,5 +1,5 @@
-const { Client, EmbedBuilder, Colors } = require('discord.js');
-const { ERROR_LOGS_CHANNEL } = require('../config');
+const { Client, EmbedBuilder, Colors, WebhookClient } = require('discord.js');
+const { ERROR_LOGS_CHANNEL, DISCORD_ERR_WEBHOOK_ID, DISCORD_ERR_WEBHOOK_TOKEN } = require('../config');
 
 /**
  * @param {Client} client
@@ -11,12 +11,14 @@ module.exports = async (client) => {
 		.setFooter({ text: 'Anti-Crash by DragoLuca' })
 		.setTimestamp();
 
+	const errorHook = new WebhookClient({ id: DISCORD_ERR_WEBHOOK_ID, token: DISCORD_ERR_WEBHOOK_TOKEN });
+
 	process.on('unhandledRejection', (reason, p) => {
 		console.log(reason, p);
 		const Channel = client.channels.cache.get(ERROR_LOGS_CHANNEL);
 		if (!Channel) return;
 
-		Channel.send({ embeds: [Embed.setDescription('**Unhandled Rejection/Catch: \n\n** ```' + reason + '```')] });
+		errorHook.send({ embeds: [Embed.setDescription('**Unhandled Rejection/Catch: \n\n** ```' + reason + '```')] });
 		return;
 	});
 	process.on('uncaughtException', (err, orgin) => {
@@ -24,7 +26,7 @@ module.exports = async (client) => {
 		const Channel = client.channels.cache.get(ERROR_LOGS_CHANNEL);
 		if (!Channel) return;
 
-		Channel.send({ embeds: [Embed.setDescription('**Uncaught Exception/Catch:\n\n** ```' + err + '\n\n' + orgin.toString() + '```')] });
+		errorHook.send({ embeds: [Embed.setDescription('**Uncaught Exception/Catch:\n\n** ```' + err + '\n\n' + orgin.toString() + '```')] });
 		return;
 	});
 	process.on('uncaughtException', (err, orgin) => {
@@ -32,7 +34,7 @@ module.exports = async (client) => {
 		const Channel = client.channels.cache.get(ERROR_LOGS_CHANNEL);
 		if (!Channel) return;
 
-		Channel.send({ embeds: [Embed.setDescription('**Uncaught Exception/Catch: (MONITOR)\n\n** ```' + err + '\n\n' + orgin.toString() + '```')] });
+		errorHook.send({ embeds: [Embed.setDescription('**Uncaught Exception/Catch: (MONITOR)\n\n** ```' + err + '\n\n' + orgin.toString() + '```')] });
 		return;
 	});
 };

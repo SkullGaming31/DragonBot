@@ -34,14 +34,14 @@ module.exports = {
 		},
 		{
 			name: 'welcomechan',
-			description: 'Welcome Channel',
+			description: 'The channel were your welcome messages will be posted when they join the server',
 			type: ApplicationCommandOptionType.Channel,
 			required: true,
 			channelTypes: [ChannelType.GuildText]
 		},
 		{
 			name: 'live',
-			description: 'The Now Live channel',
+			description: 'The channel were your members will post there going live links',
 			type: ApplicationCommandOptionType.Channel,
 			required: true,
 			channelTypes: [ChannelType.GuildText]

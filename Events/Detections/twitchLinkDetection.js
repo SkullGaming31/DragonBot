@@ -10,7 +10,7 @@ module.exports = {
 	 * @param {Client} client
 	 * @returns
 	 */
-	async execute(message, client) {
+	async execute(message) {
 		const { guild, member, channel } = message;
 		const Data = await DB.findOne({ GuildID: guild.id }); // settings database
 		if (!Data) return;
@@ -28,7 +28,6 @@ module.exports = {
 		let foundInText = false;
 
 		const nowLive = guild.channels.cache.get(Data.PromotionChannel); // now-live ChannelID
-		// console.log(Data.GuildID + ' ' + Data.PromotionChannel + '\n');// Debug channel ids are correct in database
 		if (member.permissions.has('ManageMessages') ? true : null) return;// if they have the manage messages permission ignore them
 		/* havnt figure out the new permission system yet for dening the bot moderating messages */
 		if (channel.parentId === '694243745717288971' || channel.parentId === '959693430647308289') return; // parent channel id for ticket system if you have one, if not delete this line
@@ -43,38 +42,17 @@ module.exports = {
 						.setDescription(`:x: ${message.author} **Links should only be posted in ${nowLive}**`)
 						.setColor(Colors.Red)
 						.setFooter({ text: `${guild.name}` })
-						.setThumbnail(message.author.avatarURL({ dynamic: true }))
+						.setThumbnail(message.author.avatarURL({ size: 512 }))
 						.setTimestamp();
-
 
 					if (channel.id === '713791344803577868' || channel.id === '959693430647308292') return;// added these cause the bot was deleting messages in the moderator channel
 
 					await message.reply({ embeds: [linkDetection] });
-					message.delete().catch((e) => { console.error(e); });
+					message.delete().catch((e) => { console.error(e); return; });
 					foundInText = false;
-
-					const logsEmbed = new EmbedBuilder()
-						.setTitle('Automated Message Deletion')
-						.addFields([
-							{
-								name: 'User',
-								value: `${message.author.username}`,
-							},
-							{
-								name: 'Message',
-								value: `${message.content}`,
-							},
-							{
-								name: 'Channel',
-								value: `${message.channel}`,
-							},
-						])
-						.setColor(Colors.Purple)
-						.setTimestamp();
-					if (channel.type === ChannelType.GuildText) await logsChannel.send({ embeds: [logsEmbed] });
 					if (!foundInText) break;
 				} catch (e) {
-					console.log(e);
+					console.error(e);
 					return;
 				}
 			}
