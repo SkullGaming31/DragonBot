@@ -1,7 +1,7 @@
 import { Colors, EmbedBuilder, Message } from "discord.js";
-import { Event } from 'src/Structures/Event';
+import { Event } from '../../../src/Structures/Event';
 
-import DB from '../Structures/Schemas/settingsDB.ts';
+import DB from '../../../src/Structures/Schemas/settingsDB.js';
 
 export default new Event('messageCreate', async (message: Message) => {
 	if (message.author.bot) return;
