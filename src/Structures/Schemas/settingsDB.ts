@@ -1,4 +1,4 @@
-const { model, Schema } = require('mongoose');
+import { model, Schema } from 'mongoose';
 
 export default model('settings', new Schema({
 	GuildID: String,

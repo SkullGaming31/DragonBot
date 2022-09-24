@@ -1,4 +1,4 @@
-import { Colors, EmbedBuilder, Message } from "discord.js";
+import { ChannelType, Colors, EmbedBuilder, Message } from "discord.js";
 import { Event } from '../../../src/Structures/Event';
 
 import DB from '../../../src/Structures/Schemas/settingsDB.js';
@@ -62,7 +62,7 @@ export default new Event('messageCreate', async (message: Message) => {
 					])
 					.setColor(Colors.Purple)
 					.setTimestamp();
-				await logsChannel?.send({ embeds: [logsEmbed] });
+				if (logsChannel?.type === ChannelType.GuildText) await logsChannel?.send({ embeds: [logsEmbed] });
 				if (!foundInText) break;
 			} catch (e) {
 				console.log(e);

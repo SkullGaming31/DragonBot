@@ -1,11 +1,11 @@
 import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, IntentsBitField, Partials } from "discord.js";
 import ms from "ms";
-import { CommandType } from "src/Typings/Command";
+import { CommandType } from "../../src/Typings/Command";
 import glob from 'glob';
 import { promisify } from 'util';
 
 const PG = promisify(glob);
-import { RegisterCommandOptions } from "src/Typings/client";
+import { RegisterCommandOptions } from "../../src/Typings/client";
 // import 'dotenv/config';
 import { Event } from "./Event";
 
