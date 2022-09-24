@@ -34,7 +34,7 @@ export default new Command({
 			if (Target) {
 				helpEmbed.setAuthor({ name: `${Target.tag}`, iconURL: Target.displayAvatarURL({ size: 512 }) })
 				helpEmbed.setThumbnail(`${Target.displayAvatarURL({ size: 512 })}`)
-				return await interaction.reply({ content: `${Target}`, embeds: [helpEmbed] })
+				return await interaction.reply({ content: `${Target}`, embeds: [helpEmbed] });
 			} else {
 				helpEmbed.setAuthor({ name: `${user.username}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` })
 				return await interaction.reply({ embeds: [helpEmbed] })
