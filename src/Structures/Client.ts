@@ -31,7 +31,7 @@ export class ExtendedClient extends Client {
 			allowedMentions: {
 				parse: ['everyone', 'roles', 'users']
 			},
-			rest: { timeout: ms('5m') }
+			rest: { timeout: 30000 }
 		});
 	}
 	start() {
@@ -68,7 +68,7 @@ export class ExtendedClient extends Client {
 		});
 
 		//Event
-		const eventFiles = await PG(`${__dirname}../Events/*/*{.ts,.js}`);
+		const eventFiles = await PG(`${__dirname}/../Events/*/*{.ts,.js}`);
 		// console.log({ eventFiles });
 
 		eventFiles.forEach(async (filePath) => {
