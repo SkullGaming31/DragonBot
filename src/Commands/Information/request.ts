@@ -15,7 +15,7 @@ export default new Command({
 			required: false
 		}
 	],
-	run: async ({ interaction, client }) => {
+	run: async ({ interaction }) => {
 		const { guild, user, options } = interaction;
 
 		const Target = options.getUser('target');

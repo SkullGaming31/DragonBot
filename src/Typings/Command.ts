@@ -1,4 +1,4 @@
-import { ChatInputApplicationCommandData, ChatInputCommandInteraction, CommandInteractionOptionResolver, GuildMember, PermissionResolvable } from "discord.js";
+import { ActionRowData, ChatInputApplicationCommandData, ChatInputCommandInteraction, CommandInteractionOptionResolver, GuildMember, PermissionResolvable } from "discord.js";
 import { ExtendedClient } from "../../src/Structures/Client";
 
 /**

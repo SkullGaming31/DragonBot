@@ -105,7 +105,7 @@ export default new Command({
       required: false
     }
   ],
-  run: async ({ interaction, client }) => {
+  run: async ({ interaction }) => {
     const { options, guild } = interaction;
 
     const Options = options.getString('option');

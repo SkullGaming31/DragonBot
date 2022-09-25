@@ -25,10 +25,12 @@ export default new Command({
 				.setTitle('Overlay Expert')
 				.setDescription('To begin helping you, please: ')
 				.setColor(Colors.White)
-				.addFields({ name: '1.', value: 'go live on Twitch', inline: false })
-				.addFields({ name: '2.', value: 'open your PC web browser or mobile web browser in **desktop mode**', inline: false })
-				.addFields({ name: '3.', value: 'navigate to your Twitch channel (i.e. `https://twitch.tv/YOUR_USERNAME`)', inline: false })
-				.addFields({ name: '4.', value: 'take a screenshot and upload it here (screenshots of your extension configuration screen or builder may also be helpful) If you or your viewers are **watching from the Twitch mobile app** or Console, please type `/mobile`.', inline: false })
+				.addFields(
+					{ name: '1.', value: 'go live on Twitch', inline: false },
+					{ name: '2.', value: 'open your PC web browser or mobile web browser in **desktop mode**', inline: false },
+					{ name: '3.', value: 'navigate to your Twitch channel (i.e. `https://twitch.tv/YOUR_USERNAME`)', inline: false },
+					{ name: '4.', value: 'take a screenshot and upload it here (screenshots of your extension configuration screen or builder may also be helpful) If you or your viewers are **watching from the Twitch mobile app** or Console, please type `/mobile`.', inline: true }
+				)
 				.setFooter({ text: `${guild?.name}` });
 
 			if (Target) {
