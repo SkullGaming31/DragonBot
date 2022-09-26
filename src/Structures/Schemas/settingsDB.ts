@@ -2,12 +2,12 @@ import { model, Schema } from 'mongoose';
 
 interface Settings {
 	GuildID: string,
-	LoggingChannel: string,
-	AdministratorRole: string,
-	ModeratorRole: string,
-	Welcome: boolean,
-	WelcomeChannel: string,
-	PromotionChannel: string
+	LoggingChannel?: string,
+	AdministratorRole?: string,
+	ModeratorRole?: string,
+	Welcome?: boolean,
+	WelcomeChannel?: string,
+	PromotionChannel?: string
 }
 
 const settingsSchema = new Schema<Settings>({

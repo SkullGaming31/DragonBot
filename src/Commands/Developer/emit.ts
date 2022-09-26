@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType } from "discord.js";
+import { ApplicationCommandOptionType, ApplicationCommandType, TextBasedChannel } from "discord.js";
 import { Command } from "../../../src/Structures/Command";
 
 export default new Command({
@@ -30,7 +30,7 @@ export default new Command({
     }
   ],
   run: async ({ interaction, client }) => {
-    const { options, member } = interaction;
+    const { options, member, channel, guild } = interaction;
 
     const choices = options.getString('member');
 
@@ -42,9 +42,6 @@ export default new Command({
       case 'guildMemberRemove':
         client.emit('guildMemberRemove', member);
         interaction.reply({ content: 'Emitted the event!', ephemeral: true });
-        break;
-      case 'channelCreate':
-        interaction.reply({ content: '``WIP``', ephemeral: true });
         break;
     }
   }

@@ -104,6 +104,12 @@ To get a local copy up and running follow these simple example steps.
 This is not a Overlay Expert Official Project, this project is based on the Overlay Expert Discord
 where i created the discord bot in Javascript, i am attempting to convert it to use ``Typescript`` instead.
 
+<!-- 
+Twitch Link Detection needs to be tested abit more(Events/customMessages/twitchDetection)
+Ticket system needs to be tested, ticket response mostly(closing a ticket)
+kick command does not have any role protection so a mod can kick an admin.
+-->
+
 ### Prerequisites
 
 Requirements

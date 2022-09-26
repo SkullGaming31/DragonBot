@@ -31,12 +31,16 @@ export class ExtendedClient extends Client {
 			allowedMentions: {
 				parse: ['everyone', 'roles', 'users']
 			},
-			rest: { timeout: 30000 }
+			rest: { timeout: 60000 }
 		});
 	}
 	start() {
 		this.registerModules();
-		this.login(process.env.DEV_DISCORD_BOT_TOKEN);
+		if (process.env.NODE_ENV === 'dev') {
+			this.login(process.env.DEV_DISCORD_BOT_TOKEN);
+		} else {
+			this.login(process.env.DISCORD_BOT_TOKEN);
+		}
 	}
 
 	async importFile(filePath: string) {

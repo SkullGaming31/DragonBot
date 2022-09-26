@@ -17,10 +17,10 @@ export default new Event('messageCreate', async (message: Message) => {
 		'https://tiktok.com/', 'tiktok.com/',
 		'https://github.com/', 'github.com/',
 	];
-	const logsChannel = guild?.channels.cache.get(Data.LoggingChannel);// Logs ChannelID 959693430647308295, remove Data.LoggingChannel if you dont have your logs channel saved in a db and replace it with 'Your Channel ID'
+	const logsChannel = guild?.channels.cache.get('959693430647308295');// Logs ChannelID 959693430647308295, remove Data.LoggingChannel if you dont have your logs channel saved in a db and replace it with 'Your Channel ID'
 	let foundInText: Boolean = false;
 
-	const nowLive = guild?.channels.cache.get(Data.PromotionChannel); // now-live ChannelID
+	const nowLive = guild?.channels.cache.get('959693430244642818'); // now-live 959693430244642818  ChannelID Data.PromotionChannel
 	if (member?.permissions.has('ManageMessages') ? true : null) return;// if they have the manage messages permission ignore them
 	/* havnt figure out the new permission system yet for dening the bot moderating messages */
 	// if (channel.parentId === '694243745717288971' || channel.parentId === '959693430647308289') return; // ticket system not implemented yet

@@ -4,7 +4,7 @@ declare global {
       DISCORD_BOT_TOKEN: string;
       DEV_DISCORD_BOT_TOKEN: string;
       DEV_GUILD_ID: string;
-      envirment: 'dev' | 'prod' | 'debug';
+      Enviroment: 'dev' | 'prod' | 'debug';
       DISCORD_CLIENT_ID: string;
       DISCORD_CLIENT_SECRET: string;
       DEV_DISCORD_CLIENT_ID: string;
