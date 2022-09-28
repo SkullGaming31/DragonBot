@@ -1,5 +1,6 @@
-import { EmbedBuilder, Colors, GuildMember, GuildChannel, ChannelType } from "discord.js";
+import { EmbedBuilder, Colors, GuildMember, ChannelType } from "discord.js";
 import { Event } from "../../../src/Structures/Event";
+import settings from '../../Structures/Schemas/settingsDB';
 import ticket from '../../Structures/Schemas/ticketSetupDB';
 import DB from '../../Structures/Schemas/ticketDB';
 
@@ -13,10 +14,15 @@ export default new Event('interactionCreate', async (interaction) => {
   const TicketSetup = await ticket.findOne({ GuildID: guild.id });
   if (!TicketSetup)
     return interaction.reply({ content: 'the data for this system is outdated' });
-  // const adminRole = '959693430244642816';// test server
-  // const moderatorRole = '959693430227894300';// test server
-  const adminRole = '186117711611428866';// mainServer
-  const moderatorRole = '708768425388015728';// mainServer
+
+  /* TODO:
+  grab Admin/mod RoleID from database
+  const settingsData = await settings.findOne({ Guild: guild.id });
+  if (!settingsData) return; */
+  const adminRole = '959693430244642816';// test server
+  const moderatorRole = '959693430227894300';// test server
+  // const adminRole = '186117711611428866';// mainServer
+  // const moderatorRole = '708768425388015728';// mainServer
   if (!member.permissions.has(adminRole) || !member.permissions.has(moderatorRole))
     return interaction.reply({ content: `you must have the <@&${adminRole}> or <@&${moderatorRole}> role to interact with these buttons`, ephemeral: true });
 
@@ -27,36 +33,37 @@ export default new Event('interactionCreate', async (interaction) => {
     if (!docs)
       return interaction.reply({ content: 'no data was found related to this ticket, please delete it manually', ephemeral: true });
     switch (customId) {
-      // case 'lock':
-      // 	if (docs.locked == true)
-      // 		return interaction.reply({ content: 'this ticket is already Locked', ephemeral: true });
-      // 	await DB.updateOne({ ChannelID: channel?.id }, { Locked: true });
-      // 	embed.setDescription('🔒 | this channel is now locked Pending Review');
+      case 'lock':
+        if (docs.locked == true)
+          return interaction.reply({ content: 'this ticket is already Locked', ephemeral: true });
+        await DB.updateOne({ ChannelID: channel?.id }, { Locked: true });
+        embed.setDescription('🔒 | this channel is now locked Pending Review');
 
-      //   if (channel.type === ChannelType.GuildText)
-      // 	docs.MembersID.forEach((m: any) => {
-      // 		channel?.permissionOverwrites.edit(m, {
-      // 			SendMessages: false,
-      // 			EmbedLinks: false,
-      // 			AttachFiles: false,
-      // 		});
-      // 	});
-      // 	interaction.reply({ embeds: [embed] });
-      // 	break;
-      // case 'unlock':
-      // 	if (docs.locked == false)
-      // 		return interaction.reply({ content: 'this ticket is already unlocked', ephemeral: true });
-      // 	await DB.updateOne({ ChannelID: channel?.id }, { Locked: false });
-      // 	embed.setDescription('🔓 | this channel has been unlocked');
-      // 	docs.MembersID.forEach((m: GuildMember) => {
-      // 		channel?.permissionOverwrites.edit(m, {
-      // 			SendMessages: true,
-      // 			EmbedLinks: true,
-      // 			AttachFiles: true,
-      // 		});
-      // 	});
-      // 	interaction.reply({ embeds: [embed] });
-      // 	break;
+        if (channel?.type === ChannelType.GuildText)
+          docs.MembersID.forEach((m: any) => {
+            channel?.permissionOverwrites.edit(m, {
+              SendMessages: false,
+              EmbedLinks: false,
+              AttachFiles: false,
+            });
+          });
+        interaction.reply({ embeds: [embed] });
+        break;
+      case 'unlock':
+        if (docs.locked == false)
+          return interaction.reply({ content: 'this ticket is already unlocked', ephemeral: true });
+        await DB.updateOne({ ChannelID: channel?.id }, { Locked: false });
+        embed.setDescription('🔓 | this channel has been unlocked');
+        if (channel?.type === ChannelType.GuildText)
+          docs.MembersID.forEach((m: GuildMember) => {
+            channel?.permissionOverwrites.edit(m, {
+              SendMessages: true,
+              EmbedLinks: true,
+              AttachFiles: true,
+            });
+          });
+        interaction.reply({ embeds: [embed] });
+        break;
       case 'close':
         if (docs.Closed)
           return interaction.reply({ content: 'Ticket is already closed, please wait for it to be automatically deleted', ephemeral: true });

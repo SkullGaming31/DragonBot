@@ -92,6 +92,8 @@ export default new Command({
       const SecondButton = options.getString('secondbutton');
       const ThirdButton = options.getString('thirdbutton');
 
+      if (FirstButton === null || SecondButton === null || ThirdButton === null) return;
+
       await ticket.findOneAndUpdate(
         { GuildID: guild?.id },
         {
@@ -113,16 +115,16 @@ export default new Command({
       const Buttons = new ActionRowBuilder<ButtonBuilder>();
       Buttons.addComponents(
         new ButtonBuilder()
-          .setCustomId(FirstButton!)
-          .setLabel(FirstButton!)
+          .setCustomId(FirstButton)
+          .setLabel(FirstButton)
           .setStyle(ButtonStyle.Primary),
         new ButtonBuilder()
-          .setCustomId(SecondButton!)
-          .setLabel(SecondButton!)
+          .setCustomId(SecondButton)
+          .setLabel(SecondButton)
           .setStyle(ButtonStyle.Success),
         new ButtonBuilder()
-          .setCustomId(ThirdButton!)
-          .setLabel(ThirdButton!)
+          .setCustomId(ThirdButton)
+          .setLabel(ThirdButton)
           .setStyle(ButtonStyle.Secondary)
       );
       const embed = new EmbedBuilder()

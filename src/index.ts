@@ -8,4 +8,4 @@ export const client = new ExtendedClient();
 config();
 client.start();
 
-// startApi();
+startApi();

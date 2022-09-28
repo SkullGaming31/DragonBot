@@ -26,5 +26,5 @@ const ticketSchema = new Schema<Tickets>({
 	Buttons: { type: [String], required: false }
 });
 
-const tickets = model<Tickets>('tickets', ticketSchema);
-export default tickets;
+const ticketSetup = model<Tickets>('tickets', ticketSchema);
+export default ticketSetup;

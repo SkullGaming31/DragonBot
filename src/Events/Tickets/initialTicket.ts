@@ -1,13 +1,14 @@
 import { EmbedBuilder, Colors, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType } from "discord.js";
 import { Event } from "../../../src/Structures/Event";
-import ticket from '../../Structures/Schemas/ticketSetupDB';
+import DB from '../../Structures/Schemas/ticketDB';
+import TicketSetup from '../../Structures/Schemas/ticketSetupDB';
 
 export default new Event('interactionCreate', async (interaction) => {
   if (!interaction.isButton()) return;
   if (!interaction.inCachedGuild()) return;
   const { guild, member, customId } = interaction;
 
-  const Data = await ticket.findOne({ GuildID: guild?.id });
+  const Data = await TicketSetup.findOne({ GuildID: guild?.id });
   if (!Data) return;
 
   if (!Data.Buttons.includes(customId)) return;
@@ -36,7 +37,7 @@ export default new Event('interactionCreate', async (interaction) => {
         ]
       })
       .then(async (channel) => {
-        await ticket.create({
+        await DB.create({
           GuildID: guild.id,
           MembersID: member?.id,
           TicketID: ID,
