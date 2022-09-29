@@ -1,11 +1,11 @@
-import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, GatewayIntentBits, Partials } from "discord.js";
+import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, GatewayIntentBits, Partials } from 'discord.js';
 import glob from 'glob';
 import { promisify } from 'util';
 const PG = promisify(glob);
 
 import { CommandType } from '../Typings/Command';
 import { RegisterCommandOptions } from '../Typings/client';
-import { Event } from "./Event";
+import { Event } from './Event';
 
 export class ExtendedClient extends Client {
 	commands: Collection<string, CommandType> = new Collection();

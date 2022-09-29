@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType, ApplicationCommandType } from "discord.js";
-import { Command } from "../../../src/Structures/Command";
+import { ApplicationCommandType } from 'discord.js';
+import { Command } from '../../../src/Structures/Command';
 
 export default new Command({
 	name: 'ping',

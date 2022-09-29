@@ -1,5 +1,5 @@
-import { ActivityType, Client } from "discord.js";
-import { Event } from "../../../src/Structures/Event";
+import { ActivityType, Client } from 'discord.js';
+import { Event } from '../../../src/Structures/Event';
 import mongoose from 'mongoose';
 
 export default new Event('ready', async (client: Client) => {

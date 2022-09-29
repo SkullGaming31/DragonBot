@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, Colors, EmbedBuilder } from "discord.js";
-import { Command } from "../../../src/Structures/Command";
+import { ApplicationCommandOptionType, ApplicationCommandType, Colors, EmbedBuilder } from 'discord.js';
+import { Command } from '../../../src/Structures/Command';
 
 export default new Command({
 	name: 'requests',
@@ -16,7 +16,7 @@ export default new Command({
 		}
 	],
 	run: async ({ interaction }) => {
-		const { guild, user, options } = interaction;
+		const { guild, options } = interaction;
 
 		const Target = options.getUser('target');
 

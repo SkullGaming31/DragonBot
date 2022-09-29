@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, Colors, EmbedBuilder } from "discord.js";
-import { Command } from "../../../src/Structures/Command";
+import { ApplicationCommandOptionType, ApplicationCommandType, Colors, EmbedBuilder } from 'discord.js';
+import { Command } from '../../../src/Structures/Command';
 
 export default new Command({
 	name: 'get-help',
@@ -15,7 +15,7 @@ export default new Command({
 			required: false
 		}
 	],
-	run: async ({ interaction, client }) => {
+	run: async ({ interaction }) => {
 		const { guild, user, options } = interaction;
 
 		const Target = options.getUser('target');
@@ -34,12 +34,12 @@ export default new Command({
 				.setFooter({ text: `${guild?.name}` });
 
 			if (Target) {
-				helpEmbed.setAuthor({ name: `${Target.tag}`, iconURL: Target.displayAvatarURL({ size: 512 }) })
-				helpEmbed.setThumbnail(`${Target.displayAvatarURL({ size: 512 })}`)
+				helpEmbed.setAuthor({ name: `${Target.tag}`, iconURL: Target.displayAvatarURL({ size: 512 }) });
+				helpEmbed.setThumbnail(`${Target.displayAvatarURL({ size: 512 })}`);
 				return await interaction.reply({ content: `${Target}`, embeds: [helpEmbed] });
 			} else {
-				helpEmbed.setAuthor({ name: `${user.username}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` })
-				return await interaction.reply({ embeds: [helpEmbed] })
+				helpEmbed.setAuthor({ name: `${user.username}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` });
+				return await interaction.reply({ embeds: [helpEmbed] });
 			}
 		} catch (error) {
 			console.error(error);
