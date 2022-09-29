@@ -38,7 +38,7 @@ guilds
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/skullgaming31/overlayexpertTS">
+  <a href="https://github.com/skullgaming31/overlayexpertDiscord">
     <img src="./assets/images/logo.png" alt="Project Logo" width="80" height="80">
   </a>
 
@@ -47,9 +47,9 @@ guilds
   <p align="center">
     Overlay Expert Discord Bot<br>
     ·
-    <a href="https://github.com/skullgaming31/OverlayExpertTS/issues">Report Bug</a>
+    <a href="https://github.com/skullgaming31/overlayexpertDiscord/issues">Report Bug</a>
     ·
-    <a href="https://github.com/skullgaming31/OverlayExpertTS/issues">Request Feature</a>
+    <a href="https://github.com/skullgaming31/overlayexpertDiscord/issues">Request Feature</a>
   </p>
 </div>
 
@@ -113,7 +113,7 @@ kick command does not have any role protection so a mod can kick an admin.
 ### Prerequisites
 
 Requirements
-* [Discord.js v14](https://discord.js.org/)
+* [Discord.js v14.5.1](https://discord.js.org/)
 * discord.js
   ```sh
   npm install discord.js
@@ -139,7 +139,7 @@ Requirements
 1. Create a Discord Developer Application [Discord Developer Application](https://discord.com/developers/applications)
 2. Clone the repo
    ```sh
-   git clone https://github.com/skullgaming31/OverlayExpertTS.git
+   git clone https://github.com/skullgaming31/overlayexpertDiscord.git
    ```
 3. Install NPM packages
    ```sh
@@ -158,13 +158,13 @@ Requirements
 ## Roadmap
 
 
-* [ ] link detect and delete(if not in correct channel)
+* [x] link detect and delete(if not in correct channel)
 * [ ] discord nitro .gift scam links automatically removed
 * [ ] all discord invite links deleted when posted
-* [ ] Ticket System
+* [x] Ticket System
 * [ ] Warning System
 
-See the [open issues](https://github.com/skullgaming31/OverlayExpertTS/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/skullgaming31/overlayexpertDiscord/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -196,7 +196,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 Corey - [@skullgaming31](https://twitter.com/skullgaming31) - skullgaming8461@gmail.com
 
-Project Link: [Overlay Expert in Typescript](https://github.com/skullgaming31/OverlayExpertTS)
+Project Link: [Overlay Expert in Typescript](https://github.com/skullgaming31/overlayexpertDiscord)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -211,14 +211,14 @@ Project Link: [Overlay Expert in Typescript](https://github.com/skullgaming31/Ov
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/SkullGaming31/OverlayExpertTS.svg?style=for-the-badge
-[contributors-url]: https://github.com/SkullGaming31/OverlayExpertTS/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/SkullGaming31/OverlayExpertTS.svg?style=for-the-badge
-[forks-url]: https://github.com/SkullGaming31/OverlayExpertTS/network/members
-[stars-shield]: https://img.shields.io/github/stars/SkullGaming31/OverlayExpertTS.svg?style=for-the-badge
-[stars-url]: https://github.com/SkullGaming31/OverlayExpertTS/stargazers
-[issues-shield]: https://img.shields.io/github/issues/SkullGaming31/OverlayExpertTS.svg?style=for-the-badge
-[issues-url]: https://github.com/SkullGaming31/OverlayExpertTS/issues
-[license-shield]: https://img.shields.io/github/license/SkullGaming31/OverlayExpertTS.svg?style=for-the-badge
-[license-url]: https://github.com/SkullGaming31/OverlayExpertTS/blob/main/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/SkullGaming31/overlayexpertDiscord.svg?style=for-the-badge
+[contributors-url]: https://github.com/SkullGaming31/overlayexpertDiscord/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/SkullGaming31/overlayexpertDiscord.svg?style=for-the-badge
+[forks-url]: https://github.com/SkullGaming31/overlayexpertDiscord/network/members
+[stars-shield]: https://img.shields.io/github/stars/SkullGaming31/overlayexpertDiscord.svg?style=for-the-badge
+[stars-url]: https://github.com/SkullGaming31/overlayexpertDiscord/stargazers
+[issues-shield]: https://img.shields.io/github/issues/SkullGaming31/overlayexpertDiscord.svg?style=for-the-badge
+[issues-url]: https://github.com/SkullGaming31/overlayexpertDiscord/issues
+[license-shield]: https://img.shields.io/github/license/SkullGaming31/overlayexpertDiscord.svg?style=for-the-badge
+[license-url]: https://github.com/SkullGaming31/overlayexpertDiscord/blob/main/LICENSE
 [product-screenshot]: images/screenshot.png
