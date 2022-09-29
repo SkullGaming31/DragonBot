@@ -1,12 +1,10 @@
-import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, IntentsBitField, Partials } from "discord.js";
-import ms from "ms";
-import { CommandType } from "../../src/Typings/Command";
+import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, GatewayIntentBits, Partials } from "discord.js";
 import glob from 'glob';
 import { promisify } from 'util';
-
 const PG = promisify(glob);
-import { RegisterCommandOptions } from "../../src/Typings/client";
-// import 'dotenv/config';
+
+import { CommandType } from '../Typings/Command';
+import { RegisterCommandOptions } from '../Typings/client';
 import { Event } from "./Event";
 
 export class ExtendedClient extends Client {
@@ -15,9 +13,9 @@ export class ExtendedClient extends Client {
 	constructor() {
 		super({
 			intents: [
-				IntentsBitField.Flags.Guilds,
-				IntentsBitField.Flags.GuildMessages,
-				IntentsBitField.Flags.MessageContent
+				GatewayIntentBits.Guilds,
+				GatewayIntentBits.GuildMessages,
+				GatewayIntentBits.MessageContent
 			],
 			partials: [
 				Partials.Channel,
@@ -47,7 +45,7 @@ export class ExtendedClient extends Client {
 		return (await import(filePath))?.default;
 	}
 
-	async registerCommands({ commands, guildId }: RegisterCommandOptions) {
+	async registerCommands({ commands, guildId }: RegisterCommandOptions): Promise<void> {
 		if (guildId) {
 			this.guilds.cache.get(guildId)?.commands.set(commands);
 			console.log(`Registering commands to ${guildId}`);
@@ -56,9 +54,10 @@ export class ExtendedClient extends Client {
 			console.log('Registering Global commands');
 		}
 	}
+
 	async registerModules() {
 		//Commands
-		const slashCommands: ApplicationCommandDataResolvable[] = []
+		const slashCommands: ApplicationCommandDataResolvable[] = [];
 		const commandFiles = await PG(`${__dirname}/../Commands/*/*{.ts,.js}`);
 		// console.log({ commandFiles });
 
