@@ -1,4 +1,5 @@
 import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, GatewayIntentBits, Partials } from 'discord.js';
+import { Agent } from 'undici';
 import glob from 'glob';
 import { promisify } from 'util';
 const PG = promisify(glob);
@@ -33,8 +34,15 @@ export class ExtendedClient extends Client {
 		});
 	}
 	start() {
+		const agent = new Agent({
+			connect: {
+				timeout: 60000
+			}
+		});
+
+		this.rest.setAgent(agent);
 		this.registerModules();
-		if (process.env.NODE_ENV === 'dev') {
+		if (process.env.Enviroment === 'dev') {
 			this.login(process.env.DEV_DISCORD_BOT_TOKEN);
 		} else {
 			this.login(process.env.DISCORD_BOT_TOKEN);
@@ -68,6 +76,13 @@ export class ExtendedClient extends Client {
 
 			this.commands.set(command.name, command);
 			slashCommands.push(command);
+		});
+
+		this.on('ready', () => {
+			this.registerCommands({
+				commands: slashCommands,
+				guildId: process.env.DEV_GUILD_ID
+			});
 		});
 
 		//Event

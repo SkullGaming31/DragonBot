@@ -1,15 +1,16 @@
 declare global {
 	namespace NodeJS {
 		interface ProcessEnv {
+			DISCORD_GUILD_ID: string;
 			DISCORD_BOT_TOKEN: string;
-			DEV_DISCORD_BOT_TOKEN: string;
-			DEV_GUILD_ID: string;
-			Enviroment: 'dev' | 'prod' | 'debug';
 			DISCORD_CLIENT_ID: string;
 			DISCORD_CLIENT_SECRET: string;
+			DEV_GUILD_ID: string;
+			DEV_DISCORD_BOT_TOKEN: string;
 			DEV_DISCORD_CLIENT_ID: string;
 			DEV_DISCORD_CLIENT_SECRET: string;
-			DISCORD_GUILD_ID: string;
+			DEV_DISCORD_REDIRECT_URL: string;
+			Enviroment: 'dev' | 'prod' | 'debug';
 			MONGO_USERNAME: string;
 			MONGO_PASSWORD: string;
 			MONGODB_DATABASE: string;

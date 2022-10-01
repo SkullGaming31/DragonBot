@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType, ApplicationCommandType, Colors, EmbedBuil
 import { Command } from '../../../src/Structures/Command';
 
 export default new Command({
-	name: 'get-help',
+	name: 'faq',
 	description: 'get help for an issue your having with overlay expert',
 	UserPerms: ['SendMessages'],
 	BotPerms: ['SendMessages'],

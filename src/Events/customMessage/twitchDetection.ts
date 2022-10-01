@@ -1,4 +1,4 @@
-import { ChannelType, Colors, EmbedBuilder, Message } from 'discord.js';
+import { Colors, EmbedBuilder, Message } from 'discord.js';
 import { Event } from '../../../src/Structures/Event';
 
 import settings from '../../Structures/Schemas/settingsDB';
@@ -17,7 +17,7 @@ export default new Event('messageCreate', async (message: Message) => {
 		'https://tiktok.com/', 'tiktok.com/',
 		'https://github.com/', 'github.com/',
 	];
-	const logsChannel = guild?.channels.cache.get('959693430647308295');// Logs ChannelID 959693430647308295, remove Data.LoggingChannel if you dont have your logs channel saved in a db and replace it with 'Your Channel ID'
+	// const logsChannel = guild?.channels.cache.get('959693430647308295');// Logs ChannelID 959693430647308295, remove Data.LoggingChannel if you dont have your logs channel saved in a db and replace it with 'Your Channel ID'
 	let foundInText = false;
 
 	const nowLive = guild?.channels.cache.get('959693430244642818'); // now-live 959693430244642818  ChannelID Data.PromotionChannel
@@ -44,25 +44,25 @@ export default new Event('messageCreate', async (message: Message) => {
 				message.delete().catch((e) => { console.error(e); });
 				foundInText = false;
 
-				const logsEmbed = new EmbedBuilder()
-					.setTitle('Automated Message Deletion')
-					.addFields([
-						{
-							name: 'User',
-							value: `${message.author.username}`,
-						},
-						{
-							name: 'Message',
-							value: `${message.content}`,
-						},
-						{
-							name: 'Channel',
-							value: `${message.channel}`,
-						},
-					])
-					.setColor(Colors.Purple)
-					.setTimestamp();
-				if (logsChannel?.type === ChannelType.GuildText) await logsChannel?.send({ embeds: [logsEmbed] });
+				// const logsEmbed = new EmbedBuilder()
+				// 	.setTitle('Automated Message Deletion')
+				// 	.addFields([
+				// 		{
+				// 			name: 'User',
+				// 			value: `${message.author.username}`,
+				// 		},
+				// 		{
+				// 			name: 'Message',
+				// 			value: `${message.content}`,
+				// 		},
+				// 		{
+				// 			name: 'Channel',
+				// 			value: `${message.channel}`,
+				// 		},
+				// 	])
+				// 	.setColor(Colors.Purple)
+				// 	.setTimestamp();
+				// if (logsChannel?.type === ChannelType.GuildText) await logsChannel?.send({ embeds: [logsEmbed] });
 				if (!foundInText) break;
 			} catch (e) {
 				console.error(e);
