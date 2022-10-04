@@ -10,6 +10,7 @@ declare global {
 			DEV_DISCORD_CLIENT_ID: string;
 			DEV_DISCORD_CLIENT_SECRET: string;
 			DEV_DISCORD_REDIRECT_URL: string;
+			DBD_LICENCE: string;
 			Enviroment: 'dev' | 'prod' | 'debug';
 			MONGO_USERNAME: string;
 			MONGO_PASSWORD: string;

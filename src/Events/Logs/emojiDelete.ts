@@ -1,7 +1,7 @@
 import { ChannelType, Colors, EmbedBuilder, Emoji } from 'discord.js';
 import { Event } from '../../../src/Structures/Event';
-// import ChanLogger from '../../Structures/Schemas/LogsChannelDB';// DB
-// import GenLogs from '../../Structures/Schemas/GeneralLogsDB'; //SwitchDB
+import DB from '../../Structures/Schemas/LogsChannelDB';// DB
+import SwitchDB from '../../Structures/Schemas/GeneralLogsDB'; //SwitchDB
 
 export default new Event('emojiDelete', async (emoji: Emoji) => {
 	const { id, client } = emoji;

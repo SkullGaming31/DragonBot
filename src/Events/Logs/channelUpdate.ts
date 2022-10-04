@@ -1,13 +1,20 @@
 import { DMChannel, NonThreadGuildBasedChannel } from 'discord.js';
 import { Event } from '../../../src/Structures/Event';
-// import ChanLogger from '../../Structures/Schemas/LogsChannelDB';// DB
-// import GenLogs from '../../Structures/Schemas/GeneralLogsDB'; //SwitchDB
+// import DB from '../../Structures/Schemas/LogsChannelDB';// DB
+// import SwitchDB from '../../Structures/Schemas/GeneralLogsDB'; //SwitchDB
 
 export default new Event('channelUpdate', async (oldChannel: DMChannel | NonThreadGuildBasedChannel, newChannel: DMChannel | NonThreadGuildBasedChannel) => {
 	if (newChannel.isDMBased()) return;
 	// const { guild, name } = newChannel;
 
-	// const logsChannel = '959693430647308295';
+	// const data = await DB.findOne({ Guild: guild.id }).catch((err) => { console.error(err); });
+	// const Data = await SwitchDB.findOne({ Guild: guild.id }).catch((err) => { console.error(err); });
+
+	// if (!Data) return;
+	// if (Data.ChannelStatus === false) return;
+	// if (!data) return;
+
+	// const logsChannel = data.Channel;
 	// const Channel = guild.channels.cache.get(logsChannel);
 	// if (!Channel) return;
 

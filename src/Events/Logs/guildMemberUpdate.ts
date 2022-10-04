@@ -1,13 +1,19 @@
 import { ChannelType, Colors, EmbedBuilder, GuildMember, PartialGuildMember } from 'discord.js';
 import { Event } from '../../../src/Structures/Event';
-// import ChanLogger from '../../Structures/Schemas/LogsChannelDB';// DB
-// import GenLogs from '../../Structures/Schemas/GeneralLogsDB'; //SwitchDB
+import DB from '../../Structures/Schemas/LogsChannelDB';// DB
+import SwitchDB from '../../Structures/Schemas/GeneralLogsDB'; //SwitchDB
 
 export default new Event('guildMemberUpdate', async (oldMember: GuildMember | PartialGuildMember, newMember: GuildMember) => {
 	const { guild, user } = newMember;
 
+	const data = await DB.findOne({ Guild: guild.id }).catch((err) => { console.error(err); });
+	const Data = await SwitchDB.findOne({ Guild: guild.id }).catch((err) => { console.error(err); });
 
-	const logsChannel = '765920602287636481';
+	if (!Data) return;
+	if (Data.ChannelStatus === false) return;
+	if (!data) return;
+
+	const logsChannel = data.Channel;
 	const Channel = guild.channels.cache.get(logsChannel);
 	if (!Channel) return;
 

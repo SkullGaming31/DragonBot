@@ -1,7 +1,7 @@
 import { ChannelType, Colors, EmbedBuilder, Message, PartialMessage } from 'discord.js';
 import { Event } from '../../../src/Structures/Event';
-// import ChanLogger from '../../Structures/Schemas/LogsChannelDB';// DB
-// import GenLogs from '../../Structures/Schemas/GeneralLogsDB'; //SwitchDB
+import DB from '../../Structures/Schemas/LogsChannelDB';// DB
+import SwitchDB from '../../Structures/Schemas/GeneralLogsDB'; //SwitchDB
 
 export default new Event('messageUpdate', async (oldMessage: Message | PartialMessage, newMessage: Message | PartialMessage) => {
 	if (!oldMessage.inGuild()) return;
@@ -9,7 +9,14 @@ export default new Event('messageUpdate', async (oldMessage: Message | PartialMe
 	const { author, channel, guild } = newMessage;
 	if (author?.bot) return;
 
-	const logsChannel = '959693430647308295';
+	const data = await DB.findOne({ Guild: guild.id }).catch((err) => { console.error(err); });
+	const Data = await SwitchDB.findOne({ Guild: guild.id }).catch((err) => { console.error(err); });
+
+	if (!Data) return;
+	if (Data.ChannelStatus === false) return;
+	if (!data) return;
+
+	const logsChannel = data.Channel;
 	const Channel = guild.channels.cache.get(logsChannel);
 	if (!Channel) return;
 

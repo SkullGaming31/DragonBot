@@ -1,20 +1,23 @@
 import { ChannelType, Colors, EmbedBuilder, Message, PartialMessage } from 'discord.js';
 import { Event } from '../../../src/Structures/Event';
-import ChanLogger from '../../Structures/Schemas/settingsDB';// DB
-// import GenLogs from '../../Structures/Schemas/GeneralLogsDB'; //SwitchDB
+import DB from '../../Structures/Schemas/LogsChannelDB';// DB
+import SwitchDB from '../../Structures/Schemas/GeneralLogsDB'; //SwitchDB
 
 export default new Event('messageDelete', async (message: Message | PartialMessage) => {
 	if (!message.inGuild()) return;
 	const { guild, author, channel } = message;
 
-	const Logger = await ChanLogger.findOne({ GuildID: guild.id });
+	const data = await DB.findOne({ Guild: guild.id }).catch((err) => { console.error(err); });
+	const Data = await SwitchDB.findOne({ Guild: guild.id }).catch((err) => { console.error(err); });
 
-	const logsChannel = Logger?.LoggingChannel;// '959693430647308295'
-	if (logsChannel === undefined) return;
-	const Channel = guild?.channels.cache.get(logsChannel);
+	if (!Data) return;
+	if (Data.ChannelStatus === false) return;
+	if (!data) return;
+
+	const logsChannel = data.Channel;
+	const Channel = guild.channels.cache.get(logsChannel);
 	if (!Channel) return;
 
-	if (Logger?.ChannelStatus === false) return;
 	const logsEmbed = new EmbedBuilder()
 		.setTitle('Automated Message Deletion')
 		.setAuthor({ name: `${author?.tag ? author.tag : 'Thread Message Deleted'}` })

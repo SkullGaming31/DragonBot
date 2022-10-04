@@ -1,12 +1,11 @@
 import { ChannelType, Colors, EmbedBuilder, GuildMember, PartialGuildMember } from 'discord.js';
 import { Event } from '../../../src/Structures/Event';
 import settings from '../../Structures/Schemas/settingsDB';
-// import ChanLogger from '../../Structures/Schemas/LogsChannelDB';// DB
-// import GenLogs from '../../Structures/Schemas/GeneralLogsDB'; //SwitchDB
 
 export default new Event('guildMemberAdd', async (member: GuildMember | PartialGuildMember) => {
 	try {
 		const { guild, user } = member;
+
 		const Data = await settings.findOne({ GuildID: guild.id });
 		if (Data?.WelcomeChannel === undefined) return;
 		const Channel = guild.channels.cache.get(Data?.WelcomeChannel);
