@@ -11,6 +11,7 @@ export default new Event('messageCreate', async (message: Message) => {
 
 	const linkWhitelist = [// links that will be aloud to be sent in a promo channel
 		'https://twitch.tv/', 'twitch.tv/',
+		'https://fb.gg/', 'fb.gg/',
 		'https://api.twitch.tv/', 'api.twitch.tv',
 		'https://twitter.com/', 'twitter.com/',
 		'https://instagram.com/', 'instagram.com/',

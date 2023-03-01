@@ -6,7 +6,7 @@ export default new Event('ready', async (client: Client) => {
 	console.log(`${client.user?.tag} is online`);
 	client.user?.setActivity({ name: ' /get-help', type: ActivityType.Watching });
 
-	if (!process.env.MONGO_DATABASE_URI) return;
+	if (!process.env.MONGO_DATABASE_URI) return console.log('You have not set a URI for your Mongo Database');
 	await mongoose.connect(process.env.MONGO_DATABASE_URI, {
 		connectTimeoutMS: 10000
 	}).then(() => {
