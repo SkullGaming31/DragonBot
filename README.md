@@ -1,11 +1,10 @@
 # Overlay Experts
 <div id="top"></div>
 <!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Don't forget to give the project a star!
-*** Thanks again! Now go create something AMAZING! :D
+
+NOTEs:
+
+
 -->
 
 <!-- PROJECT SHIELDS -->
@@ -42,10 +41,10 @@ guilds
     <img src="./assets/images/logo.png" alt="Project Logo" width="80" height="80">
   </a>
 
-<h3 align="center">Skulled Bot V2</h3>
+<h3 align="center">Overlay Expert DiscordBot in Typescript</h3>
 
   <p align="center">
-    Overlay Expert Bot<br>
+    Overlay Expert Discord Bot<br>
     ·
     <a href="https://github.com/skullgaming31/overlayexpertDiscord/issues">Report Bug</a>
     ·
@@ -84,7 +83,7 @@ guilds
 
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
-a personal Discord Bot for my Discord Server, will make it usable on other channels as i can, only a <strong>beginner</strong> coder as i learn how to do stuff i will add it to the bot!
+This is a Discord Bot for the Discord Server Overlay Expert, a twitch extension that overlays your custom overlay over your stream.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -96,17 +95,27 @@ a personal Discord Bot for my Discord Server, will make it usable on other chann
 
 <!-- GETTING STARTED -->
 ## Getting Started
+check out <div href="#setup"> to learn to get a copy of the project
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+
+## NOTES
+This is not a Overlay Expert Official Project, this project is based on the Overlay Expert Discord
+where i created the discord bot in Javascript, i am attempting to convert it to use ``Typescript`` instead.
+
+<!-- 
+
+kick command does not have any role protection so a mod can kick an admin.
+-->
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+Requirements
+* Discord
+  [Discord.js v14.5.1](https://discord.js.org/)
+
+* Typescript<br>
+  [Typescript](https://www.typescriptlang.org/)
+ 
 * node<br>
   [Node](https://nodejs.org)
   
@@ -114,7 +123,7 @@ This is an example of how to list things you need to use the software and how to
   [VS Code](https://code.visualstudio.com)<br>
   [Atom](https://atom.io)<br>
 
-### Installation
+### Installation<a id="setup">
 
 1. Create a Discord Developer Application [Discord Developer Application](https://discord.com/developers/applications)
 2. Clone the repo
@@ -139,10 +148,10 @@ This is an example of how to list things you need to use the software and how to
 
 
 * [x] link detect and delete(if not in correct channel)
-* [x] discord nitro .gift scam links automatically removed
-* [x] all discord invite links deleted when posted
+* [ ] discord nitro .gift scam links automatically removed
+* [ ] all discord invite links deleted when posted
 * [x] Ticket System
-* [x] Warning System
+* [ ] Warning System
 
 See the [open issues](https://github.com/skullgaming31/overlayexpertDiscord/issues) for a full list of proposed features (and known issues).
 
@@ -167,7 +176,7 @@ Don't forget to give the project a star! Thanks again!
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the MIT License.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -176,7 +185,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 Corey - [@skullgaming31](https://twitter.com/skullgaming31) - skullgaming8461@gmail.com
 
-Project Link: [Overlay Expert](https://github.com/skullgaming31/overlayexpertDiscord)
+Project Link: [Overlay Expert in Typescript](https://github.com/skullgaming31/overlayexpertDiscord)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
