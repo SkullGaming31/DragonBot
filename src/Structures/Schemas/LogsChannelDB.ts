@@ -2,11 +2,13 @@ import { model, Schema } from 'mongoose';
 
 interface Logs {
 	Guild: string,
-	Channel: string
+	enableLogs: boolean,
+	Channel: string,
 }
 
 const logsSchema = new Schema<Logs>({
 	Guild: { type: String, required: true },
+	enableLogs: { type: Boolean, required: false },
 	Channel: { type: String, required: false },
 });
 

@@ -17,6 +17,13 @@ export default new Command({
 			channelTypes: [ChannelType.GuildText],
 		},
 		{
+			name: 'rchannel',
+			description: 'Select the Member Report creation channel',
+			type: ApplicationCommandOptionType.Channel,
+			required: true,
+			channelTypes: [ChannelType.GuildText],
+		},
+		{
 			name: 'category',
 			description: 'Select the channel category where tickets will be created',
 			type: ApplicationCommandOptionType.Channel,
@@ -55,6 +62,12 @@ export default new Command({
 			required: true,
 		},
 		{
+			name: 'reportdescription',
+			description: 'Set the description of the Member Report embed',
+			type: ApplicationCommandOptionType.String,
+			required: true
+		},
+		{
 			name: 'firstbutton',
 			description: 'give your first button a name followed by a comma then the emoji',
 			type: ApplicationCommandOptionType.String,
@@ -78,6 +91,7 @@ export default new Command({
 
 		try {
 			const Channel = options.getChannel('channel');
+			const RChannel = options.getChannel('rchannel');
 			const Category = options.getChannel('category');
 			const Transcripts = options.getChannel('transcripts');
 
@@ -85,7 +99,8 @@ export default new Command({
 			const Everyone = options.getRole('everyone');
 			const BotRole = options.getRole('botrole');
 
-			const Description = options.getString('description');
+			const supportDescription = options.getString('description');
+			const reportDescription = options.getString('reportdescription')
 
 
 			const FirstButton = options.getString('firstbutton');
@@ -98,12 +113,14 @@ export default new Command({
 				{ GuildID: guild?.id },
 				{
 					Channel: Channel?.id,
+					RChannel: RChannel?.id,
 					Category: Category?.id,
 					Transcripts: Transcripts?.id,
 					Handlers: Handlers?.id,
 					Everyone: Everyone?.id,
 					BotRole: BotRole?.id,
-					Description: Description,
+					Description: supportDescription,
+					reportDescription: reportDescription,
 					Buttons: [FirstButton, SecondButton, ThirdButton],
 				},
 				{
@@ -122,19 +139,30 @@ export default new Command({
 					.setCustomId(SecondButton)
 					.setLabel(SecondButton)
 					.setStyle(ButtonStyle.Success),
+			);
+			const memberButton = new ActionRowBuilder<ButtonBuilder>();
+			memberButton.addComponents(
 				new ButtonBuilder()
 					.setCustomId(ThirdButton)
 					.setLabel(ThirdButton)
 					.setStyle(ButtonStyle.Secondary)
-			);
-			const embed = new EmbedBuilder()
+			)
+
+			const supportEmbed = new EmbedBuilder()
 				.setColor(Colors.DarkPurple)
 				.setAuthor({ name: `${guild?.name} | Ticket System`, iconURL: guild?.iconURL({ size: 512 }) ?? undefined })
-				.setDescription(Description);
+				.setDescription(supportDescription);
+			const reportEmbed = new EmbedBuilder()
+				.setColor('Red')
+				.setAuthor({ name: `${guild?.name} | Report System`, iconURL: guild?.iconURL({ size: 512 }) ?? undefined })
+				.setDescription(reportDescription)
 
 			let ticketChannel;
+			let reportChannel;
 			if (Channel?.id !== undefined) ticketChannel = guild?.channels.cache.get(Channel?.id);
-			if (ticketChannel?.type === ChannelType.GuildText) ticketChannel.send({ embeds: [embed], components: [Buttons] });
+			if (RChannel?.id !== undefined) reportChannel = guild?.channels.cache.get(RChannel?.id)
+			if (ticketChannel?.type === ChannelType.GuildText) await ticketChannel.send({ embeds: [supportEmbed], components: [Buttons] });
+			if (reportChannel?.type === ChannelType.GuildText) await reportChannel.send({ embeds: [reportEmbed], components: [memberButton] });
 
 			interaction.reply({ content: 'done', ephemeral: true });
 		} catch (error) {

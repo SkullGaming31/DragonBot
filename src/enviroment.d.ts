@@ -12,6 +12,7 @@ declare global {
 			DEV_DISCORD_REDIRECT_URL: string;
 			DBD_LICENCE: string;
 			Enviroment: 'dev' | 'prod' | 'debug';
+			PORT: number;
 			MONGO_USERNAME: string;
 			MONGO_PASSWORD: string;
 			MONGODB_DATABASE: string;

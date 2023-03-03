@@ -10,13 +10,6 @@ export default new Command({
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{
-			name: 'logging',
-			description: 'Select the logging channel',
-			type: ApplicationCommandOptionType.Channel,
-			required: true,
-			channelTypes: [ChannelType.GuildText]
-		},
-		{
 			name: 'admin',
 			description: 'Select your administrator role',
 			type: ApplicationCommandOptionType.Role,
@@ -55,11 +48,10 @@ export default new Command({
 		const { guild, options } = interaction;
 
 		try {
-			const Logging = options.getChannel('logging');
 			// const Suggestion = options.getChannel('suggestions');
 			const Welcome = options.getBoolean('welcome');
-			const Welcomechan = options.getChannel('welcomechan');
-			const NowLive = options.getChannel('live');
+			const Welcomechan = options.getChannel('welcomechan') || null;
+			const NowLive = options.getChannel('live') || null;
 
 			const Administrator = options.getRole('admin');
 			const Moderator = options.getRole('moderator');
@@ -69,7 +61,6 @@ export default new Command({
 				if (!data) {
 					data = new settings({
 						GuildID: guild.id,
-						LoggingChannel: Logging?.id,
 						Welcome: Welcome,
 						WelcomeChannel: Welcomechan?.id,
 						PromotionChannel: NowLive?.id,
@@ -80,7 +71,6 @@ export default new Command({
 					await settings.findOneAndUpdate(
 						{ GuildID: guild.id },
 						{
-							LoggingChannel: Logging?.id,
 							Welcome: Welcome,
 							WelcomeChannel: Welcomechan?.id,
 							PromotionChannel: NowLive?.id,

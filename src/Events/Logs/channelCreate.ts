@@ -1,16 +1,14 @@
 import { ChannelType, Colors, EmbedBuilder, GuildChannel } from 'discord.js';
 import { Event } from '../../../src/Structures/Event';
 import DB from '../../Structures/Schemas/LogsChannelDB';// DB
-import SwitchDB from '../../Structures/Schemas/GeneralLogsDB'; //SwitchDB
 
 export default new Event('channelCreate', async (channel: GuildChannel) => {
 	const { guild, name } = channel;
 
 	const data = await DB.findOne({ Guild: guild.id }).catch((err) => { console.error(err); });
-	const Data = await SwitchDB.findOne({ Guild: guild.id }).catch((err) => { console.error(err); });
 
-	if (!Data) return;
-	if (Data.ChannelStatus === false) return;
+	if (!data) return;
+	if (data.enableLogs === false) return;
 	if (!data) return;
 
 	const logsChannel = data.Channel;

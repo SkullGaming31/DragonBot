@@ -18,6 +18,7 @@ export default new Event('messageCreate', async (message: Message) => {
 		'https://discord.com/', 'https://discord.gg/',
 		'.gift'
 	];
+	if (author.id === '353674019943219204') return;
 
 	try {
 		for (const dInvite in discordInviteList) {// discord link detection
@@ -55,7 +56,7 @@ export default new Event('messageCreate', async (message: Message) => {
 
 				// if (guild?.ownerId === author.id || author.id === '353674019943219204' || author.id === '557517338438664223') return;
 				// if (admin || mod) return;
-				if (channel.id === '713791344803577868' || channel.id === '959693430647308292') {// channel(s) you dont want the bot to delete discord links from
+				if (channel.id === '959693430647308292') {// channel(s) you dont want the bot to delete discord links from
 					return;
 				} else {
 					await message.reply({ content: `${author}`, embeds: [discordLinkDetection] }); // send this warning embed to the channel the link was detected in

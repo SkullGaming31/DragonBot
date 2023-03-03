@@ -33,6 +33,7 @@ export default new Command({
 				)
 				.setFooter({ text: `${guild?.name}` });
 
+			if (guild?.id !== '183961840928292865') return interaction.reply({ content: 'you must run this command in the Overlay Expert Official Discord' });
 			if (Target) {
 				helpEmbed.setAuthor({ name: `${Target.tag}`, iconURL: Target.displayAvatarURL({ size: 512 }) });
 				helpEmbed.setThumbnail(`${Target.displayAvatarURL({ size: 512 })}`);
