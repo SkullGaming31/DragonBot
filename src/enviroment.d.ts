@@ -10,7 +10,9 @@ declare global {
 			DEV_DISCORD_CLIENT_ID: string;
 			DEV_DISCORD_CLIENT_SECRET: string;
 			DEV_DISCORD_REDIRECT_URL: string;
-			DBD_LICENCE: string;
+			DEV_ERROR_LOGS_CHANNEL: string;
+			DEV_DISCORD_ERR_WEBHOOK_ID: string;
+			DEV_DISCORD_ERR_WEBHOOK_TOKEN: string
 			Enviroment: 'dev' | 'prod' | 'debug';
 			PORT: number;
 			MONGO_USERNAME: string;

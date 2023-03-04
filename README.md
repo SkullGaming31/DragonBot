@@ -41,7 +41,7 @@ guilds
     <img src="./assets/images/logo.png" alt="Project Logo" width="80" height="80">
   </a>
 
-<h3 align="center">Overlay Expert DiscordBot in Typescript</h3>
+<h3 align="center">Overlay Expert DiscordBot</h3>
 
   <p align="center">
     Overlay Expert Discord Bot<br>
@@ -90,6 +90,8 @@ This is a Discord Bot for the Discord Server Overlay Expert, a twitch extension 
 ### Built With
 
 * [Discord.js v14](https://discord.js.org/)
+* [TypeScript](https://www.typescriptlang.org/)
+* [Mongoose](https://mongodb.com)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -101,11 +103,6 @@ check out <div href="#setup"> to learn to get a copy of the project
 ## NOTES
 This is not a Overlay Expert Official Project, this project is based on the Overlay Expert Discord
 where i created the discord bot in Javascript, i am attempting to convert it to use ``Typescript`` instead.
-
-<!-- 
-
-kick command does not have any role protection so a mod can kick an admin.
--->
 
 ### Prerequisites
 

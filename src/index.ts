@@ -1,13 +1,16 @@
 import startApi from './Api';
 import { ExtendedClient } from './Structures/Client';
 import { config } from 'dotenv';
-
-import './Api/Server';
+import errorHandler from './Structures/errorHandler';
 
 config();
 
 export const client = new ExtendedClient();
-
 client.start();
 
-startApi();
+async function main() {
+    await errorHandler(client);
+    await startApi();
+};
+
+main();

@@ -10,7 +10,7 @@ export default new Command({
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{
-			name: 'member',
+			name: 'suggestion',
 			description: 'describe your suggestion',
 			type: ApplicationCommandOptionType.String,
 			required: true
@@ -29,7 +29,7 @@ export default new Command({
 		const { options, guildId, channel, guild, member, user } = interaction;
 		// await interaction.deferReply();
 
-		const Suggestion = options.getString('member');
+		const Suggestion = options.getString('suggestion');
 		const Type = options.getString('type');
 
 		const Response = new EmbedBuilder()
@@ -55,8 +55,8 @@ export default new Command({
 
 		try {
 			const M = await interaction.reply({ embeds: [Response], components: [Buttons], fetchReply: true });
-			M.react('✅');
-			M.react('❌');
+			// M.react('✅');
+			// M.react('❌');
 
 			await DB.create({
 				GuildID: guildId, MessageID: M.id,
@@ -69,7 +69,7 @@ export default new Command({
 				]
 			});
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 		}
 	}
 
