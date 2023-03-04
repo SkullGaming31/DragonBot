@@ -30,10 +30,13 @@ export default new Command({
 		const member = options.getMember('user');
 		const reason = options.getString('reason') || 'No Reason Provided';
 
+		if (guild.members.me === null) return;
+		if (member?.roles.highest.position === undefined) return;
+
 		if (member?.id === user.id) return interaction.editReply({ content: '❌ | You can not kick yourself from the guild' });
 		if (guild?.ownerId === member?.id) return interaction.editReply({ content: '❌ | Someones on a Power Tripping Session, you cant kick the owner, the guild would be deleted.' });
-		// if (guild?.members.me.roles.highest.position <= member?.roles.highest.position) return interaction.editReply({ content: '❌ | you cant kick a member of your level or higher');
-		// if (member?.roles.highest.position <= member?.roles.highest.position) return interaction.editReply({ content: '❌ | you cant kick a member of your level or higher');
+		if (guild.members.me.roles.highest.position <= member?.roles.highest.position) return interaction.editReply({ content: '❌ | you cant kick a member of your level or higher' });
+		if (member?.roles.highest.position <= member?.roles.highest.position) return interaction.editReply({ content: '❌ | you cant kick a member of your level or higher' });
 
 		const kickEmbed = new EmbedBuilder().setColor(Colors.Blue);
 		const row = new ActionRowBuilder<ButtonBuilder>();
@@ -55,28 +58,28 @@ export default new Command({
 			if (i.user.id !== user.id) return;
 			switch (i.customId) {
 				case 'kick-yes':
-					member?.kick(reason);
+					// member?.kick(reason);
 					interaction.editReply({
 						embeds: [
 							kickEmbed.setDescription(`✔ | ${member} **has been kicked for : ${reason}**`)
 						],
 						components: []
 					});
-					member?.send({
-						embeds: [
-							new EmbedBuilder()
-								.setColor(Colors.Red)
-								.addFields([
-									{
-										name: 'Reason',
-										value: `you were kicked from ${guild} for ${reason}`,
-										inline: true
-									}
-								])
-						]
-					}).catch((err: any) => {
-						if (err.code !== 50007) return console.error('Users Dm\'s are turned off', err);
-					});
+					// member?.send({
+					// 	embeds: [
+					// 		new EmbedBuilder()
+					// 			.setColor(Colors.Red)
+					// 			.addFields([
+					// 				{
+					// 					name: 'Reason',
+					// 					value: `you were kicked from ${guild} for ${reason}`,
+					// 					inline: true
+					// 				}
+					// 			])
+					// 	]
+					// }).catch((err: any) => {
+					// 	if (err.code !== 50007) return console.error('Users Dm\'s are turned off', err);
+					// });
 					break;
 				case 'kick-no':
 					interaction.editReply({
