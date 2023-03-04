@@ -58,31 +58,31 @@ export default new Command({
 			if (i.user.id !== user.id) return;
 			switch (i.customId) {
 				case 'kick-yes':
-					// member?.kick(reason);
+					await member?.kick(reason);
 					interaction.editReply({
 						embeds: [
 							kickEmbed.setDescription(`✔ | ${member} **has been kicked for : ${reason}**`)
 						],
 						components: []
 					});
-					// member?.send({
-					// 	embeds: [
-					// 		new EmbedBuilder()
-					// 			.setColor(Colors.Red)
-					// 			.addFields([
-					// 				{
-					// 					name: 'Reason',
-					// 					value: `you were kicked from ${guild} for ${reason}`,
-					// 					inline: true
-					// 				}
-					// 			])
-					// 	]
-					// }).catch((err: any) => {
-					// 	if (err.code !== 50007) return console.error('Users Dm\'s are turned off', err);
-					// });
+					await member?.send({
+						embeds: [
+							new EmbedBuilder()
+								.setColor(Colors.Red)
+								.addFields([
+									{
+										name: 'Reason',
+										value: `you were kicked from ${guild} for ${reason}`,
+										inline: true
+									}
+								])
+						]
+					}).catch((err: any) => {
+						if (err.code !== 50007) return console.error('Users Dm\'s are turned off', err);
+					});
 					break;
 				case 'kick-no':
-					interaction.editReply({
+					await interaction.editReply({
 						embeds: [
 							kickEmbed.setDescription('✅ | Kick Request Canceled')
 						],
