@@ -69,7 +69,7 @@ guilds
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
+    <!-- <li><a href="#usage">Usage</a></li> -->
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -83,7 +83,8 @@ guilds
 
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
-This is a Discord Bot for the Discord Server Overlay Expert, a twitch extension that overlays your custom overlay over your stream.
+This is a Discord Bot for the Discord Server Overlay Expert, a twitch extension that overlays your custom overlay over your stream without a pc.<br />
+[Overlay Expert](https://overlay.expert)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -97,7 +98,7 @@ This is a Discord Bot for the Discord Server Overlay Expert, a twitch extension 
 
 <!-- GETTING STARTED -->
 ## Getting Started
-check out <div href="#setup"> to learn to get a copy of the project
+check out <a href="#setup"></a> to learn to get a copy of the project
 
 
 ## NOTES
@@ -107,36 +108,41 @@ where i created the discord bot in Javascript, i am attempting to convert it to 
 ### Prerequisites
 
 Requirements
-* Discord
+* Discord<br />
   [Discord.js v14.5.1](https://discord.js.org/)
 
-* Typescript<br>
+* Typescript<br />
   [Typescript](https://www.typescriptlang.org/)
  
-* node<br>
+* node<br />
   [Node](https://nodejs.org)
   
-* Code Editor[Optional Choices] <strong>NOTE: i do not know how to setup the project with Atom so everything is based on VS Code</strong><br>
-  [VS Code](https://code.visualstudio.com)<br>
-  [Atom](https://atom.io)<br>
+* Code Editor[Optional Choices] <b>NOTE: i do not know how to setup the project with Atom so everything is based on VS Code</b><br />
+  [VS Code](https://code.visualstudio.com)<br />
+  [Atom](https://atom.io)<br />
 
 ### Installation<a id="setup">
 
 1. Create a Discord Developer Application [Discord Developer Application](https://discord.com/developers/applications)
 2. Clone the repo
    ```sh
-   git clone https://github.com/skullgaming31/overlayexpertDiscord.git
+   git clone https://github.com/skullgaming31/overlayExpert.git
    ```
 3. Install NPM packages
    ```sh
    npm install
    ```
 4. Fill out the .env with all nessasary Information, check .env.example for whats needed
+5. build:
+  ```sh
+    npm run build
+  ```
+  --all your javascript files will be in a folder called dist host that on your discord bot host.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- USAGE EXAMPLES -->
-## Usage
+<!-- ## Usage -->
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -145,8 +151,6 @@ Requirements
 
 
 * [x] link detect and delete(if not in correct channel)
-* [ ] discord nitro .gift scam links automatically removed
-* [ ] all discord invite links deleted when posted
 * [x] Ticket System
 * [ ] Warning System
 
@@ -173,7 +177,7 @@ Don't forget to give the project a star! Thanks again!
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License.
+Distributed under the MIT License. checkout LICENSE.md
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

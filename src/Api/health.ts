@@ -1,4 +1,6 @@
+import connectDatabase from '../Database';
 import http from 'http';
+import mongoose from 'mongoose';
 
 const healthListener: http.RequestListener = async (_req, res) => {
   /**
@@ -7,6 +9,19 @@ const healthListener: http.RequestListener = async (_req, res) => {
    * @todo check other ...
    */
   const isOK = true;
+
+  // MongoDB Connection
+  mongoose.connection.on('disconnected', () => {
+    console.log('MongoDB Disconnected');
+    //reconnect to Database
+    connectDatabase();
+  });
+  mongoose.connection.on('disconnecting', () => {
+    console.log('Database Disconnecting');
+    // Reconnect to the database
+    connectDatabase();
+  });
+  // End MongoDB
 
   res.writeHead(isOK ? 200 : 500);
   res.end();

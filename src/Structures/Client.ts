@@ -57,10 +57,10 @@ export class ExtendedClient extends Client {
 	async registerCommands({ commands, guildId }: RegisterCommandOptions): Promise<void> {
 		if (guildId) {
 			this.guilds.cache.get(guildId)?.commands.set(commands);
-			console.log(`Registering commands to ${guildId}`);
+			console.time(`Registering commands to ${guildId}`);
 		} else {
 			this.application?.commands.set(commands);
-			console.log('Registering Global commands');
+			console.time('Registering Global commands');
 		}
 	}
 

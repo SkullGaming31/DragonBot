@@ -5,7 +5,11 @@ async function errorHandler(client: ExtendedClient) {
     const errorLogs = process.env.DEV_ERROR_LOGS_CHANNEL;
     const WebHookID = process.env.DISCORD_ERR_WEBHOOK_ID;
     const WebHookToken = process.env.DISCORD_ERR_WEBHOOK_TOKEN;
-    console.log('Error Handler Ready!');
+	if (process.env.Enviroment === 'debug') {
+		console.time('Error Handler Ready!');
+	} else {
+		console.log('Error Handler Ready');
+	}
 
 	const Embed = new EmbedBuilder()
 		.setColor(Colors.Blue)
