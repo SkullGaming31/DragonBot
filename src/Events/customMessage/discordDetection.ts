@@ -6,7 +6,7 @@ export default new Event('messageCreate', async (message: Message) => {
 	const { guild, channel, author } = message;
 	if (author.bot) return;
 
-	let sentInText: Boolean = false;
+	let sentInText = false;
 	let warning = 0;
 
 	/*
@@ -34,23 +34,23 @@ export default new Event('messageCreate', async (message: Message) => {
 					.setTimestamp();
 
 				switch (warning) {
-					case 1:// first warning
-						discordLinkDetection.setDescription('This is your first warning Please do not post discord links in this server.');
-						discordLinkDetection.addFields({ name: 'Warnings', value: `${warning}` });
-						console.log('First Warning');
-						break;
-					case 2:// 2nd warning
-						// message.member.timeout(ms('5m'), 'Posted Discord Link');
-						discordLinkDetection.setDescription('Member has been timedout for 5 minutes for posting discord links in the server');
-						discordLinkDetection.addFields({ name: 'Warnings', value: `${warning}` });
-						console.log('Member has been Timed Out');
-						break;
-					case 3:// final warning
-						// message.member.ban({ deleteMessageDays: 7, reason: 'Posted Discord Link more then 3 times' });
-						discordLinkDetection.setDescription('Member has been banned for posting discord links in the server');
-						discordLinkDetection.addFields({ name: 'Warnings', value: `${warning}` });
-						console.log('Member has been banned for posting discord links');
-						break;
+				case 1:// first warning
+					discordLinkDetection.setDescription('This is your first warning Please do not post discord links in this server.');
+					discordLinkDetection.addFields({ name: 'Warnings', value: `${warning}` });
+					console.log('First Warning');
+					break;
+				case 2:// 2nd warning
+					// message.member.timeout(ms('5m'), 'Posted Discord Link');
+					discordLinkDetection.setDescription('Member has been timedout for 5 minutes for posting discord links in the server');
+					discordLinkDetection.addFields({ name: 'Warnings', value: `${warning}` });
+					console.log('Member has been Timed Out');
+					break;
+				case 3:// final warning
+					// message.member.ban({ deleteMessageDays: 7, reason: 'Posted Discord Link more then 3 times' });
+					discordLinkDetection.setDescription('Member has been banned for posting discord links in the server');
+					discordLinkDetection.addFields({ name: 'Warnings', value: `${warning}` });
+					console.log('Member has been banned for posting discord links');
+					break;
 				}
 
 

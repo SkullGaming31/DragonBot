@@ -100,7 +100,7 @@ export default new Command({
 			const BotRole = options.getRole('botrole');
 
 			const supportDescription = options.getString('description');
-			const reportDescription = options.getString('reportdescription')
+			const reportDescription = options.getString('reportdescription');
 
 
 			const FirstButton = options.getString('firstbutton');
@@ -146,7 +146,7 @@ export default new Command({
 					.setCustomId(ThirdButton)
 					.setLabel(ThirdButton)
 					.setStyle(ButtonStyle.Secondary)
-			)
+			);
 
 			const supportEmbed = new EmbedBuilder()
 				.setColor(Colors.DarkPurple)
@@ -155,12 +155,12 @@ export default new Command({
 			const reportEmbed = new EmbedBuilder()
 				.setColor('Red')
 				.setAuthor({ name: `${guild?.name} | Report System`, iconURL: guild?.iconURL({ size: 512 }) ?? undefined })
-				.setDescription(reportDescription)
+				.setDescription(reportDescription);
 
 			let ticketChannel;
 			let reportChannel;
 			if (Channel?.id !== undefined) ticketChannel = guild?.channels.cache.get(Channel?.id);
-			if (RChannel?.id !== undefined) reportChannel = guild?.channels.cache.get(RChannel?.id)
+			if (RChannel?.id !== undefined) reportChannel = guild?.channels.cache.get(RChannel?.id);
 			if (ticketChannel?.type === ChannelType.GuildText) await ticketChannel.send({ embeds: [supportEmbed], components: [Buttons] });
 			if (reportChannel?.type === ChannelType.GuildText) await reportChannel.send({ embeds: [reportEmbed], components: [memberButton] });
 

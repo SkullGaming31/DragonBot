@@ -152,9 +152,9 @@ Requirements
 
 * [x] link detect and delete(if not in correct channel)
 * [x] Ticket System
-* [ ] Warning System
+* [x] Warning System
 
-See the [open issues](https://github.com/skullgaming31/overlayexpertDiscord/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/skullgaming31/overlayExpert/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -186,7 +186,7 @@ Distributed under the MIT License. checkout LICENSE.md
 
 Corey - [@skullgaming31](https://twitter.com/skullgaming31) - skullgaming8461@gmail.com
 
-Project Link: [Overlay Expert in Typescript](https://github.com/skullgaming31/overlayexpertDiscord)
+Project Link: [Overlay Expert in Typescript](https://github.com/skullgaming31/overlayExpert)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

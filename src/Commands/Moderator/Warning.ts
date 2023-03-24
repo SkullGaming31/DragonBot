@@ -25,22 +25,22 @@ export default new Command({
 	run: async ({ interaction, client }) => {
 		if (!interaction.inCachedGuild()) return;
 
-		const { options } = interaction;
+		const { options, guild } = interaction;
 
 		const Target = options.getUser('target');
 		const Reason = options.getString('reason') || 'No Reason Provided';
 
 		//Check to see if the user is already in the warnings database
-		const existingWarning = await DB.findOne({ UserID: Target?.id });
+		const existingWarning = await DB.findOne({ GuildID: guild.id, UserID: Target?.id });
 
-		// if the user already has a warning, increment there warning count in the Database.
 		const existingWarningEmbed = new EmbedBuilder()
-		.setTitle('WARNING')
-		.setColor('Red')
-		.setAuthor({ name: `${Target?.tag}`, iconURL: `${Target?.displayAvatarURL({ size: 512 })}` })
-		.setDescription(`${Target?.username} has been warned, they now have ${existingWarning?.Warnings} warnings, Reason: ${Reason}`)
-		.setTimestamp();
-
+			.setTitle('WARNING')
+			.setColor('Red')
+			.setAuthor({ name: `${Target?.tag}`, iconURL: `${Target?.displayAvatarURL({ size: 512 })}` })
+			.setDescription(`${Target?.username} has been warned, they now have ${existingWarning?.Warnings} warnings, Reason: ${Reason}`)
+			.setTimestamp();
+		
+		// if the user already has a warning, increment there warning count in the Database.
 		if (existingWarning) {
 			existingWarning.Warnings += 1;
 			await existingWarning.save();
@@ -48,12 +48,13 @@ export default new Command({
 		} else {
 			// if the user does not have a warning create a new warning entry in the database
 			const newWarning = new DB({
+				GuildID: guild.id,
 				UserID: Target?.id,
 				Warnings: 1,
 				Reason: Reason,
 			});
 			await newWarning.save();
-			interaction.reply({ content: `${Target?.username} has been warned, they now have there first warning for Reason: ${Reason}` });
+			interaction.reply({ content: `${Target?.tag} has been warned, they now have there first warning for Reason: ${Reason}` });
 		}
 	}
 });

@@ -21,6 +21,11 @@ declare global {
 			MONGO_PASSWORD: string;
 			MONGODB_DATABASE: string;
 			MONGO_DATABASE_URI: string;
+			OAUTH_CLIENT_ID: string;
+			OAUTH_CLIENT_SECRET: string;
+			OAUTH_REDIRECT_URL: string;
+			DEV_DASHBOARD_DOMAIN: string;
+			DASHBOARD_DOMAIN: string;
 		}
 	}
 }

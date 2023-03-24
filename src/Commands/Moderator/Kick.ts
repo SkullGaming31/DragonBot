@@ -57,38 +57,38 @@ export default new Command({
 		col.on('collect', async i => {
 			if (i.user.id !== user.id) return;
 			switch (i.customId) {
-				case 'kick-yes':
-					await member?.kick(reason);
-					interaction.editReply({
-						embeds: [
-							kickEmbed.setDescription(`✔ | ${member} **has been kicked for : ${reason}**`)
-						],
-						components: []
-					});
-					await member?.send({
-						embeds: [
-							new EmbedBuilder()
-								.setColor(Colors.Red)
-								.addFields([
-									{
-										name: 'Reason',
-										value: `you were kicked from ${guild} for ${reason}`,
-										inline: true
-									}
-								])
-						]
-					}).catch((err: any) => {
-						if (err.code !== 50007) return console.error('Users Dm\'s are turned off', err);
-					});
-					break;
-				case 'kick-no':
-					await interaction.editReply({
-						embeds: [
-							kickEmbed.setDescription('✅ | Kick Request Canceled')
-						],
-						components: []
-					});
-					break;
+			case 'kick-yes':
+				await member?.kick(reason);
+				interaction.editReply({
+					embeds: [
+						kickEmbed.setDescription(`✔ | ${member} **has been kicked for : ${reason}**`)
+					],
+					components: []
+				});
+				await member?.send({
+					embeds: [
+						new EmbedBuilder()
+							.setColor(Colors.Red)
+							.addFields([
+								{
+									name: 'Reason',
+									value: `you were kicked from ${guild} for ${reason}`,
+									inline: true
+								}
+							])
+					]
+				}).catch((err: any) => {
+					if (err.code !== 50007) return console.error('Users Dm\'s are turned off', err);
+				});
+				break;
+			case 'kick-no':
+				await interaction.editReply({
+					embeds: [
+						kickEmbed.setDescription('✅ | Kick Request Canceled')
+					],
+					components: []
+				});
+				break;
 			}
 		});
 		col.on('end', (collected) => {

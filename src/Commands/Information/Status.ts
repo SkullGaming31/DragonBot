@@ -4,22 +4,22 @@ import os from 'os';
 import { Command } from '../../Structures/Command';
 
 export default new Command({
-    name: 'status',
-    description: 'Displays the status of the client and database.',
-    UserPerms: ['ManageMessages'],
+	name: 'status',
+	description: 'Displays the status of the client and database.',
+	UserPerms: ['ManageMessages'],
 	BotPerms: ['ManageMessages'],
 	type: ApplicationCommandType.ChatInput,
 
-    run: async ({ interaction, client }) => {
-        if (!interaction.inGuild()) return;
-        await client.user?.fetch();
+	run: async ({ interaction, client }) => {
+		if (!interaction.inGuild()) return;
+		await client.user?.fetch();
 		await client.application?.fetch();
 
 		await interaction.deferReply({ ephemeral: true });
 
 		const getChannelTypeSize = (type: any) => client.channels.cache.filter((channel) => type.includes(channel.type)).size;
 
-        const { user } = client;
+		const { user } = client;
 
 		const status = [
 			'Disconnected',
@@ -60,5 +60,5 @@ export default new Command({
 			.setFooter({ text: 'Last Checked' })
 			.setTimestamp();
 		interaction.editReply({ embeds: [embed] });
-    }
-})
+	}
+});

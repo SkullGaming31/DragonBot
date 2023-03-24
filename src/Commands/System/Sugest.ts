@@ -36,12 +36,12 @@ export default new Command({
 			.setTitle('NEW SUGGESTION')
 			.setColor(Colors.Blue)
 			.setAuthor({ name: `${user.tag}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` })
-            .addFields(
-                { name: 'Suggestion', value: `${Suggestion}` },
-                { name: 'Type', value: `${Type}` },
-                { name: 'Status', value: 'Pending...' }
-                )
-            .setTimestamp();
+			.addFields(
+				{ name: 'Suggestion', value: `${Suggestion}` },
+				{ name: 'Type', value: `${Type}` },
+				{ name: 'Status', value: 'Pending...' }
+			)
+			.setTimestamp();
 
 		const Buttons = new ActionRowBuilder<ButtonBuilder>();
 		Buttons.addComponents(
@@ -51,7 +51,7 @@ export default new Command({
 
 		const suggestionChannel = guild?.channels.cache.get('1080703340549242970');
 		if (channel?.id !== '1080703340549242970') return interaction.reply({ content: `❌ | you may only use this command in the suggestion channel ${suggestionChannel}` });
-        if (guild?.id !== '959693430227894292') return interaction.reply({ content: '❌ | you may only use this command in the Discord Bots Test Server' });
+		if (guild?.id !== '959693430227894292') return interaction.reply({ content: '❌ | you may only use this command in the Discord Bots Test Server' });
 
 		try {
 			const M = await interaction.reply({ embeds: [Response], components: [Buttons], fetchReply: true });

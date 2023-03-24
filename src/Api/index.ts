@@ -7,11 +7,11 @@ const port = Number(process.env.PORT || '8080');
 
 const requestListener: http.RequestListener = async (req, res) => {
 	switch (req.url) {
-		case '/health':
-			return healthListener(req, res);
-		default:
-			res.writeHead(404);
-			res.end();
+	case '/health':
+		return healthListener(req, res);
+	default:
+		res.writeHead(404);
+		res.end();
 	}
 };
 

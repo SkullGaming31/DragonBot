@@ -1,0 +1,14 @@
+
+* {
+margin: 0px;
+padding: 0px;
+}
+a:hover {
+  color: gold;
+}
+a:active {
+  color: green;
+}
+a {
+  color: blue;
+}

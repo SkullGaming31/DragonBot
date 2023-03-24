@@ -3,7 +3,7 @@ import { Event } from '../../Structures/Event';
 import DB from '../../Structures/Schemas/LogsChannelDB';// DB
 
 export default new Event('guildCreate', async (guild: Guild) => {
-    console.log(guild);
+	console.log(guild);
 	const { channels, name } = guild;
 
 	// const data = await DB.findOne({ Guild: guild.id }).catch((err: any) => { console.error(err); });
@@ -16,70 +16,70 @@ export default new Event('guildCreate', async (guild: Guild) => {
 	const Channel = channels.cache.get(logsChannel);
 	if (!Channel) return;
 
-  const gOwner = await guild.fetchOwner();
-  const welcome = await guild.fetchWelcomeScreen();
-  const audit = await guild.fetchAuditLogs({ limit: 50 });
-  const integrations = await guild.fetchIntegrations();
-  const bans = await guild.bans.fetch({ cache: true, limit: 20 })
+	const gOwner = await guild.fetchOwner();
+	const welcome = await guild.fetchWelcomeScreen();
+	const audit = await guild.fetchAuditLogs({ limit: 50 });
+	const integrations = await guild.fetchIntegrations();
+	const bans = await guild.bans.fetch({ cache: true, limit: 20 });
 
-  /**
+	/**
    * Need Help Converting this to text instead of a number!
    */
-  // switch (guild.defaultMessageNotifications) {
-  //   case '1':
-  //     guild.defaultMessageNotifications = 'Only @Mentions';
-  //     break;
-  //   default:
-  //     guild.defaultMessageNotifications = 'All Messages';
-  //     break;
-  // }
+	// switch (guild.defaultMessageNotifications) {
+	//   case '1':
+	//     guild.defaultMessageNotifications = 'Only @Mentions';
+	//     break;
+	//   default:
+	//     guild.defaultMessageNotifications = 'All Messages';
+	//     break;
+	// }
 
-  const embed = new EmbedBuilder()
-  .setTitle(guild.name)
-  .setAuthor({ name: gOwner.displayName, iconURL: gOwner.displayAvatarURL({ size: 512}) })
-  .setImage(guild.bannerURL({ size: 512 }))
-  .setColor('Green')
-  .setDescription(`The bot has joined a guild!`)
-  .addFields(
-    { 
-      name: 'Guild Description',
-      value: `${guild.description || 'No Description set'}`,
-      inline: false 
-    },
-    { 
-      name: 'Guild Created',
-      value: `<t:${guild.createdTimestamp / 1000}:R>`,
-      inline: false
-    },
-    {
-      name: 'MemberCount',
-      value: `${guild.memberCount}`,
-      inline: false
-    },
-    {
-      name: 'NSFW',
-      value: `${guild.explicitContentFilter}`,
-      inline: false
-    },
-    {
-      name: 'Ban Count',
-      value: `${bans.size || '0'}`,
-      inline: false
-    },
-    {
-      name: 'defaultMessageNotifications',
-      value: `${guild.defaultMessageNotifications}`,
-      inline: false
-    },
-    {
-      name: 'Verification Level',
-      value: `${guild.verificationLevel}`,
-      inline: false
-    }
-  ).setTimestamp();
+	const embed = new EmbedBuilder()
+		.setTitle(guild.name)
+		.setAuthor({ name: gOwner.displayName, iconURL: gOwner.displayAvatarURL({ size: 512}) })
+		.setImage(guild.bannerURL({ size: 512 }))
+		.setColor('Green')
+		.setDescription('The bot has joined a guild!')
+		.addFields(
+			{ 
+				name: 'Guild Description',
+				value: `${guild.description || 'No Description set'}`,
+				inline: false 
+			},
+			{ 
+				name: 'Guild Created',
+				value: `<t:${guild.createdTimestamp / 1000}:R>`,
+				inline: false
+			},
+			{
+				name: 'MemberCount',
+				value: `${guild.memberCount}`,
+				inline: false
+			},
+			{
+				name: 'NSFW',
+				value: `${guild.explicitContentFilter}`,
+				inline: false
+			},
+			{
+				name: 'Ban Count',
+				value: `${bans.size || '0'}`,
+				inline: false
+			},
+			{
+				name: 'defaultMessageNotifications',
+				value: `${guild.defaultMessageNotifications}`,
+				inline: false
+			},
+			{
+				name: 'Verification Level',
+				value: `${guild.verificationLevel}`,
+				inline: false
+			}
+		).setTimestamp();
 
 	if (Channel.type === ChannelType.GuildText) return Channel.send({ embeds: [embed] });
-    /*
+	/*
     <ref *2> Guild {
   id: '1068285177891131422',
   name: "CanadienDragon's server",

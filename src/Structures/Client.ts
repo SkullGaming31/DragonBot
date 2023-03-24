@@ -7,11 +7,12 @@ const PG = promisify(glob);
 import { CommandType } from '../Typings/Command';
 import { RegisterCommandOptions } from '../Typings/client';
 import { Event } from './Event';
+import { Dashboard } from '../dashboard/index';
 
 export class ExtendedClient extends Client {
 	commands: Collection<string, CommandType> = new Collection();
 
-	constructor() {
+	constructor () {
 		super({
 			intents: [
 				GatewayIntentBits.Guilds,
@@ -34,6 +35,7 @@ export class ExtendedClient extends Client {
 			rest: { timeout: 60000 }
 		});
 	}
+	dashboard = new Dashboard(this);
 	start() {
 		const agent = new Agent({
 			connect: {
@@ -44,7 +46,9 @@ export class ExtendedClient extends Client {
 		this.rest.setAgent(agent);
 		this.registerModules();
 		if (process.env.Enviroment === 'dev') {
-			this.login(process.env.DEV_DISCORD_BOT_TOKEN);
+			this.login(process.env.DEV_DISCORD_BOT_TOKEN).then(() => {
+				this.dashboard.init();
+			});
 		} else {
 			this.login(process.env.DISCORD_BOT_TOKEN);
 		}

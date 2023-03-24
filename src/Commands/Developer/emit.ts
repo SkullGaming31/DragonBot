@@ -35,14 +35,14 @@ export default new Command({
 		const choices = options.getString('member');
 
 		switch (choices) {
-			case 'guildMemberAdd':
-				client.emit('guildMemberAdd', member);
-				interaction.reply({ content: 'Emitted the event!', ephemeral: true });
-				break;
-			case 'guildMemberRemove':
-				client.emit('guildMemberRemove', member);
-				interaction.reply({ content: 'Emitted the event!', ephemeral: true });
-				break;
+		case 'guildMemberAdd':
+			client.emit('guildMemberAdd', member);
+			interaction.reply({ content: 'Emitted the event!', ephemeral: true });
+			break;
+		case 'guildMemberRemove':
+			client.emit('guildMemberRemove', member);
+			interaction.reply({ content: 'Emitted the event!', ephemeral: true });
+			break;
 		}
 	}
 });

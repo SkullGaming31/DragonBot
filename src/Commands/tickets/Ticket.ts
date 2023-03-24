@@ -38,49 +38,49 @@ export default new Command({
 		const embed = new EmbedBuilder();
 
 		switch (Action) {
-			case 'add':
-				DB.findOne({ GuildID: guildId, ChannelID: channel?.id }, async (err: any, docs: any) => {
-					if (err) throw err;
-					if (!docs) return interaction.reply({
-						embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], ephemeral: true
-					});
-					if (docs.MembersID.includes(Member?.id)) return interaction.reply({
-						embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this member is already added to this ticket')], ephemeral: true
-					});
-					docs.MembersID.push(Member?.id);
-					if (channel?.type === ChannelType.GuildText)
-						channel?.permissionOverwrites.edit(Member?.id, {
-							SendMessages: true,
-							ViewChannel: true,
-							ReadMessageHistory: true,
-							AttachFiles: true
-						});
-					interaction.reply({
-						content: `${Member}`, embeds: [embed.setColor(Colors.Green).setDescription(`✅ | ${Member} has been added to the ticket`)]
-					});
-					docs.save();
+		case 'add':
+			DB.findOne({ GuildID: guildId, ChannelID: channel?.id }, async (err: any, docs: any) => {
+				if (err) throw err;
+				if (!docs) return interaction.reply({
+					embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], ephemeral: true
 				});
-				break;
-			case 'remove':
-				DB.findOne({ GuildID: guildId, ChannelID: channel?.id }, async (err: any, docs: any) => {
-					if (err) throw err;
-					if (!docs) return interaction.reply({
-						embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], ephemeral: true
-					});
-					if (!docs.MembersID.includes(Member?.id)) return interaction.reply({
-						embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this member is not in this ticket')], ephemeral: true
-					});
-					docs.MembersID.remove(Member?.id);
-					if (channel?.type === ChannelType.GuildText)
-						channel?.permissionOverwrites.edit(Member?.id, {
-							ViewChannel: false,
-						});
-					interaction.reply({
-						embeds: [embed.setColor(Colors.Green).setDescription(`✅ | ${Member} has been removed from the ticket`)]
-					});
-					docs.save();
+				if (docs.MembersID.includes(Member?.id)) return interaction.reply({
+					embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this member is already added to this ticket')], ephemeral: true
 				});
-				break;
+				docs.MembersID.push(Member?.id);
+				if (channel?.type === ChannelType.GuildText)
+					channel?.permissionOverwrites.edit(Member?.id, {
+						SendMessages: true,
+						ViewChannel: true,
+						ReadMessageHistory: true,
+						AttachFiles: true
+					});
+				interaction.reply({
+					content: `${Member}`, embeds: [embed.setColor(Colors.Green).setDescription(`✅ | ${Member} has been added to the ticket`)]
+				});
+				docs.save();
+			});
+			break;
+		case 'remove':
+			DB.findOne({ GuildID: guildId, ChannelID: channel?.id }, async (err: any, docs: any) => {
+				if (err) throw err;
+				if (!docs) return interaction.reply({
+					embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], ephemeral: true
+				});
+				if (!docs.MembersID.includes(Member?.id)) return interaction.reply({
+					embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this member is not in this ticket')], ephemeral: true
+				});
+				docs.MembersID.remove(Member?.id);
+				if (channel?.type === ChannelType.GuildText)
+					channel?.permissionOverwrites.edit(Member?.id, {
+						ViewChannel: false,
+					});
+				interaction.reply({
+					embeds: [embed.setColor(Colors.Green).setDescription(`✅ | ${Member} has been removed from the ticket`)]
+				});
+				docs.save();
+			});
+			break;
 		}
 	}
 

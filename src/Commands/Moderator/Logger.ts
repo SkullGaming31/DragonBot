@@ -9,7 +9,7 @@ export default new Command({
 	BotPerms: ['ManageGuild'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
-        {
+		{
 			name: 'enablelogs',
 			description: 'Enable or Disable the Logger Channel',
 			type: ApplicationCommandOptionType.Boolean,

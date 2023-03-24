@@ -46,23 +46,23 @@ export default new Command({
 		col.on('collect', i => {
 			if (i.user.id !== user.id) return;
 			switch (i.customId) {
-				case 'unban-yes':
-					guild.members.unban(id);
-					interaction.editReply({
-						embeds: [
-							unbanEmbed.setDescription('**✔ | the user has been unbanned**')
-						],
-						components: []
-					});
-					break;
-				case 'unban-no':
-					interaction.editReply({
-						embeds: [
-							unbanEmbed.setDescription('✅ | unban Request Canceled')
-						],
-						components: []
-					});
-					break;
+			case 'unban-yes':
+				guild.members.unban(id);
+				interaction.editReply({
+					embeds: [
+						unbanEmbed.setDescription('**✔ | the user has been unbanned**')
+					],
+					components: []
+				});
+				break;
+			case 'unban-no':
+				interaction.editReply({
+					embeds: [
+						unbanEmbed.setDescription('✅ | unban Request Canceled')
+					],
+					components: []
+				});
+				break;
 			}
 		});
 		col.on('end', (collected) => {
