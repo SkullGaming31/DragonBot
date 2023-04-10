@@ -13,6 +13,7 @@ export default new Command({
 	description: 'Timeout a user from sending messages or joining any voice channel',
 	UserPerms: ['ModerateMembers'],
 	BotPerms: ['ModerateMembers'],
+	defaultMemberPermissions: ['ModerateMembers'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{

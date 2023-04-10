@@ -6,6 +6,7 @@ export default new Command({
 	description: 'Locks a channel so messages cant be sent',
 	UserPerms: ['ManageChannels'],
 	BotPerms: ['ManageChannels'],
+	defaultMemberPermissions: ['ManageChannels'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{
@@ -23,7 +24,7 @@ export default new Command({
 	],
 
 	// TEST: Needs testing to see if this reply with the function.
-	run: async ({ interaction, client }) => {
+	run: async ({ interaction }) => {
 		if (!interaction.inCachedGuild()) return;
 		const { user, guild } = interaction;
 		const owner = await guild?.fetchOwner();

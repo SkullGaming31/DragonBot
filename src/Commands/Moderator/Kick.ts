@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, Colors, ComponentType, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, Colors, ComponentType, DiscordAPIError, EmbedBuilder } from 'discord.js';
 import ms from 'ms';
 import { Command } from '../../../src/Structures/Command';
 
@@ -77,7 +77,7 @@ export default new Command({
 								}
 							])
 					]
-				}).catch((err: any) => {
+				}).catch((err: DiscordAPIError) => {
 					if (err.code !== 50007) return console.error('Users Dm\'s are turned off', err);
 				});
 				break;

@@ -1,12 +1,11 @@
 import routes from '../routes';
-import express, { NextFunction, Request, Response } from 'express';
-import axios from 'axios';
+import express from 'express';
 import cors from 'cors';
-import url, { URLSearchParams } from 'url';
-import { join } from 'path';
 import passport from 'passport';
 import session from 'express-session';
 import ms from 'ms';
+import store from 'connect-mongo';
+import path from 'path';
 
 import { logger } from '../middleware/Logger';
 import { discordStrategy } from '../../dashboard/routes/strategies/discord';
@@ -15,23 +14,27 @@ import { ExtendedClient } from '../../Structures/Client';
 export function createApp(client: ExtendedClient) {
 	discordStrategy(client);
 	const app = express();
-	const Port = 3001;
+	const Port = process.env.PORT;
+	const sessionSecret = process.env.SESSION_SECRET as string;
 
-	app.use(cors({ origin: [`${process.env.DEV_DASHBOARD_DOMAIN}:3001`], credentials: true }));
+	app.use(cors({ origin: [`${process.env.DEV_DASHBOARD_DOMAIN}:${Port}`], credentials: true }));
 	app.use(express.json());
 	app.use(express.urlencoded({ extended: true }));
-	app.use(express.static(join(__dirname, '../../../public')));
+	app.set('views', path.join(__dirname, '../views'));
+	app.use(express.static(path.join(__dirname, '../public')));
+	app.set('view engine', 'ejs');
 	app.use(session({
-		secret: 'hueihnvuhes',
+		secret: sessionSecret,
 		saveUninitialized: false,
 		resave: false,
 		cookie: {
 			maxAge: ms('15m')
-		}
+		},
+		store: store.create({ mongoUrl: process.env.MONGO_DATABASE_URI as string })
 	}));
 	app.use(passport.initialize());
 	app.use(session());
-	app.use('/', routes);
+	app.use('/api', routes);
 	app.use(logger);
 
 	return app;

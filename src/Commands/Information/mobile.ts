@@ -6,6 +6,7 @@ export default new Command({
 	description: 'get help for an issue your having with overlay expert',
 	UserPerms: ['SendMessages'],
 	BotPerms: ['SendMessages'],
+	defaultMemberPermissions: ['SendMessages'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{

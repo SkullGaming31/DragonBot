@@ -1,18 +1,18 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, Document } from 'mongoose';
 
-interface Tickets {
-	GuildID: string,
-	MembersID: [string],
-	ChannelID: string,
-	TicketID: string,
-	Closed: boolean,
-	Locked: boolean,
-	Type: string,
-	Claimed: boolean,
-	ClaimedBy: string
+interface Ticket extends Document {
+  GuildID: string;
+  MembersID?: string[];
+  ChannelID?: string;
+  TicketID?: string;
+  Closed?: boolean;
+  Locked?: boolean;
+  Type?: string;
+  Claimed?: boolean;
+  ClaimedBy?: string;
 }
 
-const ticketsSchema = new Schema<Tickets>({
+const ticketSchema = new Schema<Ticket>({
 	GuildID: { type: String, required: true },
 	MembersID: { type: [String], required: false },
 	ChannelID: { type: String, required: false },
@@ -24,5 +24,5 @@ const ticketsSchema = new Schema<Tickets>({
 	ClaimedBy: { type: String, required: false }
 });
 
-const DB = model<Tickets>('ticket', ticketsSchema);
-export default DB;
+const ticketModel = model<Ticket>('Ticket', ticketSchema);
+export default ticketModel;

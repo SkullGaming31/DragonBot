@@ -7,6 +7,7 @@ export default new Command({
 	description: 'Warns a user',
 	UserPerms: ['ManageMessages'],
 	BotPerms: ['ManageMessages'],
+	defaultMemberPermissions: ['ManageMessages'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{
@@ -22,7 +23,7 @@ export default new Command({
 			required: false
 		}
 	],
-	run: async ({ interaction, client }) => {
+	run: async ({ interaction }) => {
 		if (!interaction.inCachedGuild()) return;
 
 		const { options, guild } = interaction;

@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, ChannelType, Colors, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
 import { Command } from '../../../src/Structures/Command';
 import DB from '../../Structures/Schemas/SuggestDB';
 
@@ -7,6 +7,7 @@ export default new Command({
 	description: 'Suggest an improvment for the discord bot',
 	UserPerms: ['SendMessages'],
 	BotPerms: ['SendMessages'],
+	defaultMemberPermissions: ['SendMessages'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{
@@ -34,7 +35,7 @@ export default new Command({
 
 		const Response = new EmbedBuilder()
 			.setTitle('NEW SUGGESTION')
-			.setColor(Colors.Blue)
+			.setColor('Blue')
 			.setAuthor({ name: `${user.tag}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` })
 			.addFields(
 				{ name: 'Suggestion', value: `${Suggestion}` },

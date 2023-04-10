@@ -6,6 +6,7 @@ export default new Command({
 	description: 'Clears Messages from the channel',
 	UserPerms: ['ManageMessages'],
 	BotPerms: ['ManageMessages'],
+	defaultMemberPermissions: ['ManageMessages'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		// {

@@ -7,6 +7,7 @@ export default new Command({
 	description: 'Guild settings for some channels',
 	UserPerms: ['ManageChannels'],
 	BotPerms: ['ManageChannels'],
+	defaultMemberPermissions: ['ManageChannels'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{
@@ -63,6 +64,7 @@ export default new Command({
 			const Administrator = options.getRole('admin');
 			const Moderator = options.getRole('moderator');
 
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			settings.findOne({ GuildID: guild.id }, async (err: any, data: any) => {
 				if (err) throw err;
 				if (!data) {
@@ -133,7 +135,6 @@ export default new Command({
 			interaction.reply({ embeds: [embed], ephemeral: true });
 		} catch (error) {
 			console.error(error);
-			return;
 		}
 	}
 });

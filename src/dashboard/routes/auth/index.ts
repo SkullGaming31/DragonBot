@@ -7,8 +7,8 @@ discordAuthRouter.get('/discord', passport.authenticate('discord'), (req: Reques
 	res.sendStatus(200);
 });
 
-discordAuthRouter.get('/auth/discord/redirect', passport.authenticate('discord'), (req: Request, res: Response) => {
-	res.send('success, you can now close this page');
+discordAuthRouter.get('/discord/redirect', passport.authenticate('discord'), (req: Request, res: Response) => {
+	res.render('/account');
 });
 
 discordAuthRouter.get('/status', (req: Request, res: Response) => {

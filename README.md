@@ -150,9 +150,9 @@ Requirements
 ## Roadmap
 
 
-* [x] link detect and delete(if not in correct channel)
+* [ ] link detect and delete(if not in correct channel)
 * [x] Ticket System
-* [x] Warning System
+* [ ] Warning System
 
 See the [open issues](https://github.com/skullgaming31/overlayExpert/issues) for a full list of proposed features (and known issues).
 
@@ -184,7 +184,7 @@ Distributed under the MIT License. checkout LICENSE.md
 <!-- CONTACT -->
 ## Contact
 
-Corey - [@skullgaming31](https://twitter.com/skullgaming31) - skullgaming8461@gmail.com
+Corey - [@skullgaming31](https://twitter.com/canadiendragon) - skullgamingg31@gmail.com
 
 Project Link: [Overlay Expert in Typescript](https://github.com/skullgaming31/overlayExpert)
 
@@ -201,14 +201,14 @@ Project Link: [Overlay Expert in Typescript](https://github.com/skullgaming31/ov
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/SkullGaming31/overlayexpertDiscord.svg?style=for-the-badge
-[contributors-url]: https://github.com/SkullGaming31/overlayexpertDiscord/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/SkullGaming31/overlayexpertDiscord.svg?style=for-the-badge
-[forks-url]: https://github.com/SkullGaming31/overlayexpertDiscord/network/members
-[stars-shield]: https://img.shields.io/github/stars/SkullGaming31/overlayexpertDiscord.svg?style=for-the-badge
-[stars-url]: https://github.com/SkullGaming31/overlayexpertDiscord/stargazers
-[issues-shield]: https://img.shields.io/github/issues/SkullGaming31/overlayexpertDiscord.svg?style=for-the-badge
-[issues-url]: https://github.com/SkullGaming31/overlayexpertDiscord/issues
-[license-shield]: https://img.shields.io/github/license/SkullGaming31/overlayexpertDiscord.svg?style=for-the-badge
-[license-url]: https://github.com/SkullGaming31/overlayexpertDiscord/blob/main/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/SkullGaming31/DragonBot.svg?style=for-the-badge
+[contributors-url]: https://github.com/SkullGaming31/DragonBot/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/SkullGaming31/DragonBot.svg?style=for-the-badge
+[forks-url]: https://github.com/SkullGaming31/DragonBot/network/members
+[stars-shield]: https://img.shields.io/github/stars/SkullGaming31/DragonBot.svg?style=for-the-badge
+[stars-url]: https://github.com/SkullGaming31/DragonBot/stargazers
+[issues-shield]: https://img.shields.io/github/issues/SkullGaming31/DragonBot.svg?style=for-the-badge
+[issues-url]: https://github.com/SkullGaming31/DragonBot/issues
+[license-shield]: https://img.shields.io/github/license/SkullGaming31/DragonBot.svg?style=for-the-badge
+[license-url]: https://github.com/SkullGaming31/DragonBot/blob/main/LICENSE
 [product-screenshot]: images/screenshot.png

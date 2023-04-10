@@ -1,16 +1,16 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, Document } from 'mongoose';
 
-interface Suggest {
-	GuildID: string,
-	MessageID: string,
-	Details: Array<object>,
+export interface ISuggestion extends Document {
+  guildId: string;
+  messageId?: string;
+  details?: object[];
 }
 
-const suggestSchema = new Schema<Suggest>({
-	GuildID: { type: String, required: true },
-	MessageID: { type: String, required: false },
-	Details: { type: [Object], required: false },
+const suggestionSchema = new Schema<ISuggestion>({
+	guildId: { type: String, required: true },
+	messageId: { type: String, required: false },
+	details: { type: [Object], required: false },
 });
 
-const DB = model<Suggest>('SuggestDB', suggestSchema);
-export default DB;
+const SuggestionModel = model<ISuggestion>('Suggestion', suggestionSchema);
+export default SuggestionModel;

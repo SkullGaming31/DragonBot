@@ -10,15 +10,14 @@ export class Dashboard {
 	init() {
 		const initialize = () => {
 			try {
+				const port = process.env.PORT;
 				const app = createApp(this.client);
-				app.listen(3001, () => {
-					console.log('The Dashboard Has started');
+				app.listen(port, () => {
+					console.log(`The Dashboard Has started, http://localhost:${port}`);
 				});
-			} catch (error) {
-				console.error(error);
-			}
+			} catch (error) { console.error(error); }
 		};
-		if (!this.client.isReady()) this.client.once(Events.ClientReady, () =>
+		if (!this.client.isReady()) this.client.once(Events.ClientReady, () => 
 			initialize());
 		else initialize();
 	}

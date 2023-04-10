@@ -36,21 +36,27 @@ export class ExtendedClient extends Client {
 		});
 	}
 	dashboard = new Dashboard(this);
-	start() {
+	async start() {
 		const agent = new Agent({
 			connect: {
-				timeout: 60000
+				timeout: 300000
 			}
 		});
 
 		this.rest.setAgent(agent);
 		this.registerModules();
 		if (process.env.Enviroment === 'dev') {
-			this.login(process.env.DEV_DISCORD_BOT_TOKEN).then(() => {
+			await this.login(process.env.DEV_DISCORD_BOT_TOKEN).then(() => {
 				this.dashboard.init();
 			});
-		} else {
-			this.login(process.env.DISCORD_BOT_TOKEN);
+		}
+		else if (process.env.Enviroment === 'debug') {
+			await this.login(process.env.DEV_DISCORD_BOT_TOKEN).then(() => {
+				this.dashboard.init();
+			});
+		}
+		else {
+			await this.login(process.env.DISCORD_BOT_TOKEN);
 		}
 	}
 

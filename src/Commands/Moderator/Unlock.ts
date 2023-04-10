@@ -1,4 +1,4 @@
-import { ApplicationCommandType, ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandType, EmbedBuilder } from 'discord.js';
 import { Command } from '../../../src/Structures/Command';
 
 export default new Command({
@@ -6,9 +6,10 @@ export default new Command({
 	description: 'unLocks a channel so messages can be sent',
 	UserPerms: ['ManageChannels'],
 	BotPerms: ['ManageChannels'],
+	defaultMemberPermissions: ['ManageChannels'],
 	type: ApplicationCommandType.ChatInput,
 
-	run: async ({ interaction, client }) => {
+	run: async ({ interaction }) => {
 		if (!interaction.inCachedGuild()) return;
 		const { user, guild } = interaction;
 		const owner = await guild.fetchOwner();
@@ -30,16 +31,12 @@ export default new Command({
 
 		const Embed = new EmbedBuilder();
 
-		if (channel.permissionsFor(guild.id).has(['SendMessages'])) return interaction.reply({
-			embeds: [Embed.setColor(Colors.Red).setDescription('⛔ | this channel is already unlocked')], ephemeral: true
-		});
+		if (channel.permissionsFor(guild.id).has(['SendMessages'])) return interaction.reply({ embeds: [Embed.setColor(Colors.Red).setDescription('⛔ | this channel is already unlocked')], ephemeral: true });
 
 		channel.permissionOverwrites.edit(guild.id, { SendMessages: null });
 		await DB.deleteOne({ ChannelID: channel.id });
 
-		interaction.reply({
-			embeds: [Embed.setColor(Colors.Green).setDescription('🔓 | The lockdown has been lifted')]
-		});
+		interaction.reply({ embeds: [Embed.setColor(Colors.Green).setDescription('🔓 | The lockdown has been lifted')] });
          */
 	}
 });

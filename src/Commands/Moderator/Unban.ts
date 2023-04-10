@@ -6,6 +6,7 @@ export default new Command({
 	description: 'unban a member from the guild',
 	UserPerms: ['BanMembers'],
 	BotPerms: ['BanMembers'],
+	defaultMemberPermissions: ['BanMembers'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{

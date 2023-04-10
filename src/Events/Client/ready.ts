@@ -1,21 +1,7 @@
 import { ActivityType, Client } from 'discord.js';
 import { Event } from '../../../src/Structures/Event';
-import mongoose from 'mongoose';
 
-export default new Event('ready', async (client: Client) => {
+export default new Event<'ready'>('ready', async (client: Client) => {
 	console.log(`${client.user?.tag} is online`);
-	client.user?.setActivity({ name: ' /help', type: ActivityType.Watching });
-
-	if (!process.env.MONGO_DATABASE_URI) return console.error('You have not set a URI for your Mongo Database');
-	await mongoose.connect(process.env.MONGO_DATABASE_URI, {
-		connectTimeoutMS: 10000
-	}).then(() => {
-		if (process.env.Enviroment === 'debug') {
-			console.time('Database Connected');
-		} else {
-			console.log('Database Connected');
-		}
-	}).catch((err: any) => {
-		console.error(err);
-	});
+	client.user?.setActivity({ name: 'In Development', type: ActivityType.Listening });
 });

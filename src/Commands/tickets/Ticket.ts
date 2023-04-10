@@ -1,12 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, Colors, EmbedBuilder } from 'discord.js';
 import { Command } from '../../../src/Structures/Command';
 import DB from '../../Structures/Schemas/ticketDB';
+import { MongooseError } from 'mongoose';
 
 export default new Command({
 	name: 'ticket',
 	description: 'Ticket Actions',
 	UserPerms: ['ManageMessages'],
 	BotPerms: ['ManageMessages'],
+	defaultMemberPermissions: ['ManageMessages'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{
@@ -39,8 +42,8 @@ export default new Command({
 
 		switch (Action) {
 		case 'add':
-			DB.findOne({ GuildID: guildId, ChannelID: channel?.id }, async (err: any, docs: any) => {
-				if (err) throw err;
+			DB.findOne({ GuildID: guildId, ChannelID: channel?.id }, async (err: MongooseError, docs: { MembersID: string[]; save: () => void; }) => {
+				if (err) throw err.message;
 				if (!docs) return interaction.reply({
 					embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], ephemeral: true
 				});
@@ -62,7 +65,7 @@ export default new Command({
 			});
 			break;
 		case 'remove':
-			DB.findOne({ GuildID: guildId, ChannelID: channel?.id }, async (err: any, docs: any) => {
+			DB.findOne({ GuildID: guildId, ChannelID: channel?.id }, async (err: any, docs: { MembersID: { includes: (arg0: string) => any; remove: (arg0: string) => void; }; save: () => void; }) => {
 				if (err) throw err;
 				if (!docs) return interaction.reply({
 					embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], ephemeral: true

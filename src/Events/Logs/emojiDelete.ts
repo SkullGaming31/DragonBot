@@ -1,22 +1,25 @@
-import { ChannelType, Colors, EmbedBuilder, Emoji } from 'discord.js';
+import { ChannelType, EmbedBuilder, GuildEmoji, TextBasedChannel } from 'discord.js';
+import { MongooseError } from 'mongoose';
+
 import { Event } from '../../../src/Structures/Event';
-import DB from '../../Structures/Schemas/LogsChannelDB';// DB
+import ChanLogger from '../../Structures/Schemas/LogsChannelDB';
 
-export default new Event('emojiDelete', async (emoji: Emoji) => {
-	const { id, client } = emoji;
+export default new Event<'emojiDelete'>('emojiDelete', async (emoji: GuildEmoji) => {
+	const { id, guild } = emoji;
 
-	const logsChannel = '959693430647308295';
-	const Channel = client.channels.cache.get(logsChannel);
-	if (!Channel) return;
+	const data = await ChanLogger.findOne({ Guild: guild.id }).catch((err: MongooseError) => { console.error(err.message); });
+	if (!data || data.enableLogs === false) return;
 
-	if (Channel.type === ChannelType.GuildText)
-		return Channel.send({
-			embeds: [
-				new EmbedBuilder()
-					.setColor(Colors.Red)
-					.setTitle('Emoji Deleted')
-					.setDescription(`an emoji has been removed from the server: ${emoji}, \`${id}\``)
-					.setTimestamp()
-			]
-		});
+	const logsChannelID = data.Channel;
+	if (logsChannelID === undefined) return;
+	const logsChannelOBJ = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
+	if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
+
+	const embed = new EmbedBuilder()
+		.setColor('Red')
+		.setTitle('Emoji Deleted')
+		.setDescription(`An emoji has been removed from the server: ${emoji}, \`${id}\``)
+		.setTimestamp();
+
+	await logsChannelOBJ.send({ embeds: [embed] });
 });

@@ -1,9 +1,9 @@
-import { ChannelType, Colors, EmbedBuilder, Message } from 'discord.js';
+import { ChannelType, EmbedBuilder, Message } from 'discord.js';
 import { Event } from '../../../src/Structures/Event';
-import { ExtendedClient } from '../../Structures/Client';
 
-export default new Event('messageCreate', async (message: Message) => {
-	const { guild, channel, author } = message;
+export default new Event<'messageCreate'>('messageCreate', async (message: Message) => {
+	if (!message.inGuild()) return;
+	const { channel, author } = message;
 	if (author.bot) return;
 
 	let sentInText = false;
@@ -22,15 +22,15 @@ export default new Event('messageCreate', async (message: Message) => {
 
 	try {
 		for (const dInvite in discordInviteList) {// discord link detection
-			if (message.content.toLowerCase().includes(discordInviteList[dInvite].toLowerCase())) { sentInText = true; warning+= 1; }
+			if (message.content.toLowerCase().includes(discordInviteList[dInvite].toLowerCase())) { sentInText = true; }
 			if (sentInText) {
 				const discordLinkDetection = new EmbedBuilder()// sends to the channel the link was posted too.
 					.setTitle('Discord Link Detected')
 					.setDescription(`:x: ${author} **Do not post discord links in this server.**`)
-					.setColor(Colors.Red)
-					.setAuthor({ name: author.tag, iconURL: author.displayAvatarURL() })
+					.setColor('Red')
+					.setAuthor({ name: author.tag, iconURL: author.displayAvatarURL({ size: 512 }) })
 					.setThumbnail(author.displayAvatarURL())
-					.setFooter({ text: `UserID: ${author.id}`, iconURL: author.displayAvatarURL()} )
+					.setFooter({ text: `UserID: ${author.id}`, iconURL: author.displayAvatarURL({ size: 512 })} )
 					.setTimestamp();
 
 				switch (warning) {
@@ -52,22 +52,44 @@ export default new Event('messageCreate', async (message: Message) => {
 					console.log('Member has been banned for posting discord links');
 					break;
 				}
-
-
-				// if (guild?.ownerId === author.id || author.id === '353674019943219204' || author.id === '557517338438664223') return;
-				// if (admin || mod) return;
-				if (channel.id === '959693430647308292') {// channel(s) you dont want the bot to delete discord links from
-					return;
-				} else {
-					await message.reply({ content: `${author}`, embeds: [discordLinkDetection] }); // send this warning embed to the channel the link was detected in
-					await message.delete().catch((error) => { console.error(error); return; });
-					sentInText = false;
+				if (channel.id === '959693430647308292') { return; }// Moderator Channel
+				else {
+					if (channel.type === ChannelType.GuildText) {
+						await message.reply({ content: `${author}`, embeds: [discordLinkDetection] }); // send this warning embed to the channel the link was detected in
+						await message.delete().catch((error) => { console.error(error); return; });
+						warning += 1;
+						sentInText = false;
+					}
 				}
-				console.log('Warning: ' + warning);
+				// console.log('Warning: ' + warning);
+				// Get the channel object where the forum posts are located
+				// const forumChannel = guild?.channels.cache.get('1020536302388662303') as ThreadChannel | NewsChannel;// Channel Parent ID for the forums channel
+
+				// if (forumChannel.isThread()) {
+				// 	// Fetch the messages in the channel
+				// 	guild.channels.fetch();
+				// 	const messages = await forumChannel.messages.fetch();
+
+				// 	// Loop through the messages and check for Discord invite links
+				// 	messages.forEach(async (message) => {
+				// 		const inviteRegex = /(discord\.(gg|com|io|me|gift)\/.+|discordapp\.com\/invite\/.+)/g;
+				// 		const content = message.content.toLowerCase();
+				// 		if (inviteRegex.test(content)) {
+				// 		// Take the appropriate action if a Discord invite link is found
+				// 			console.log(`Message ${message.id} contains a Discord invite link`);
+				// 			if (forumChannel.type === ChannelType.PublicThread)
+				// 				await message.delete().catch((err: Error) => { console.error(err.message); });
+				// 			forumChannel.setLocked(true, 'Detected Discord Link');
+				// 			forumChannel.setArchived(true, 'Detected Discord Link');
+				// 			forumChannel.sendTyping();
+				// 			forumChannel.send({ embeds: [discordLinkDetection] });
+				// 		}
+				// 	});
+				// }
 			}
 		}
-	} catch (error) {
-		console.error(error);
-		return;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	} catch (error: any) {
+		console.error(error.message);
 	}
 });

@@ -1,18 +1,18 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, Document } from 'mongoose';
 
-interface Warn {
-	GuildID: string,
-	UserID: string,
-	Warnings: number,
-	Reason: string
+interface IWarn extends Document {
+  GuildID: string;
+  UserID: string;
+  Warnings: number;
+  Reason?: string;
 }
 
-const warningSchema = new Schema<Warn>({
+const warningSchema = new Schema<IWarn>({
 	GuildID: { type: String, required: true },
-	UserID: { type: String, required: false },
-	Warnings: { type: Number, required: false },
+	UserID: { type: String, required: true },
+	Warnings: { type: Number, required: true },
 	Reason: { type: String, required: false }
 });
 
-const DB = model<Warn>('WarningDB', warningSchema);
-export default DB;
+const WarningDB = model<IWarn>('WarningDB', warningSchema);
+export default WarningDB;

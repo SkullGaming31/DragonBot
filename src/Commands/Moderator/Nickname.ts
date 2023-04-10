@@ -6,6 +6,7 @@ export default new Command({
 	description: 'manage someones nickname in your server',
 	UserPerms: ['ManageNicknames'],
 	BotPerms: ['ManageNicknames'],
+	defaultMemberPermissions: ['ManageNicknames'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{

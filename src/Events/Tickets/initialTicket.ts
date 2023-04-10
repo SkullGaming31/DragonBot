@@ -1,11 +1,10 @@
-import { EmbedBuilder, Colors, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType } from 'discord.js';
+import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType } from 'discord.js';
 import { Event } from '../../../src/Structures/Event';
 import DB from '../../Structures/Schemas/ticketDB';
 import TicketSetup from '../../Structures/Schemas/ticketSetupDB';
 
 export default new Event('interactionCreate', async (interaction) => {
-	if (!interaction.isButton()) return;
-	if (!interaction.inCachedGuild()) return;
+	if (!interaction.isButton() || !interaction.inCachedGuild()) return;
 	const { guild, member, customId } = interaction;
 
 	const Data = await TicketSetup.findOne({ GuildID: guild?.id });
@@ -50,7 +49,7 @@ export default new Event('interactionCreate', async (interaction) => {
 				const embed = new EmbedBuilder()
 					.setAuthor({ name: `${guild.name} | Ticket: ${ID}` })
 					.setDescription('Please wait patiently for a response from the staff team, in the mean time, please Describe your issue in as much detail as possible')
-					.setColor(Colors.Blue)
+					.setColor('Blue')
 					.setFooter({ text: 'the buttons below are staff only buttons' });
 
 				const Buttons = new ActionRowBuilder<ButtonBuilder>();
@@ -79,9 +78,9 @@ export default new Event('interactionCreate', async (interaction) => {
 				channel.send({ embeds: [embed], components: [Buttons], });
 				await channel.send({ content: `${member} here is your ticket` }).then((m) => {
 					setTimeout(() => {
-						m.delete().catch((err: any) => { console.error(err); });
+						m.delete().catch((err: Error) => { console.error(err); });
 					}, 5000); // 1000ms = 1 second
-				}).catch((err: any) => { console.error(err); });
+				}).catch((err: Error) => { console.error(err); });
 				interaction.reply({ content: `${member} your ticket has been created: ${channel}`, ephemeral: true, });
 			});
 	} catch (error) {

@@ -8,6 +8,7 @@ export default new Command({
 	description: 'Displays the status of the client and database.',
 	UserPerms: ['ManageMessages'],
 	BotPerms: ['ManageMessages'],
+	defaultMemberPermissions: ['ManageMessages'],
 	type: ApplicationCommandType.ChatInput,
 
 	run: async ({ interaction, client }) => {
@@ -17,7 +18,7 @@ export default new Command({
 
 		await interaction.deferReply({ ephemeral: true });
 
-		const getChannelTypeSize = (type: any) => client.channels.cache.filter((channel) => type.includes(channel.type)).size;
+		const getChannelTypeSize = (type: ChannelType[]) => client.channels.cache.filter((channel) => type.includes(channel.type)).size;
 
 		const { user } = client;
 

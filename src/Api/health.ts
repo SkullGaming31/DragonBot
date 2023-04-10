@@ -1,6 +1,5 @@
-import connectDatabase from '../Database';
 import http from 'http';
-import mongoose from 'mongoose';
+import { ExtendedClient } from '../Structures/Client';
 
 const healthListener: http.RequestListener = async (_req, res) => {
 	/**
@@ -8,19 +7,21 @@ const healthListener: http.RequestListener = async (_req, res) => {
    * @todo check Discord connection
    * @todo check other ...
    */
-	const isOK = true;
+	let isOK = true;
 
-	//#region Mongo
-	mongoose.connection.on('disconnected', () => {
-		console.log('MongoDB Disconnected');
-		//reconnect to Database
-		connectDatabase();
-	});
-	mongoose.connection.on('disconnecting', () => {
-		console.log('Database Disconnecting');
-		// Reconnect to the database
-		connectDatabase();
-	});
+	//#region Discord API Check
+	const client = new ExtendedClient();
+	try {
+		await client.login(process.env.DEV_DISCORD_BOT_TOKEN);
+		if (!client.readyAt) {
+			isOK = false;
+		}
+	} catch (error) {
+		console.error(error);
+		isOK = false;
+	} finally {
+		client.destroy();
+	}
 	//#endregion
 
 	res.writeHead(isOK ? 200 : 500);

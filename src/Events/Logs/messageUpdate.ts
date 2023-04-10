@@ -1,35 +1,40 @@
-import { ChannelType, Colors, EmbedBuilder, Message, PartialMessage } from 'discord.js';
-import { Event } from '../../../src/Structures/Event';
-import DB from '../../Structures/Schemas/LogsChannelDB';// DB
+import { ChannelType, EmbedBuilder, Message, PartialMessage, TextBasedChannel } from 'discord.js';
+import { MongooseError } from 'mongoose';
 
-export default new Event('messageUpdate', async (oldMessage: Message | PartialMessage, newMessage: Message | PartialMessage) => {
-	if (!oldMessage.inGuild()) return;
+import { Event } from '../../../src/Structures/Event';
+import ChanLogger from '../../Structures/Schemas/LogsChannelDB';// DB
+
+export default new Event<'messageUpdate'>('messageUpdate', async (oldMessage: Message | PartialMessage, newMessage: Message | PartialMessage) => {
 	if (!newMessage.inGuild()) return;
 	const { author, channel, guild } = newMessage;
 	if (author?.bot) return;
 
-	const data = await DB.findOne({ Guild: guild.id }).catch((err) => { console.error(err); });
+	const data = await ChanLogger.findOne({ Guild: guild.id }).catch((err: MongooseError) => { console.error(err.message); });
 
-	if (!data) return;
-	if (data.enableLogs === false) return;
-	if (!data) return;
+	if (!data || data.enableLogs === false) return;
 
-	const logsChannel = data.Channel;
-	const Channel = guild.channels.cache.get(logsChannel);
-	if (!Channel) return;
+	const logsChannelID = data.Channel;
+	if (logsChannelID === undefined) return;
+	const logsChannelOBJ = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
+	if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
 
 	if (oldMessage.content === newMessage.content) return;
 
 	const Count = 1950;
 
-	const Original = oldMessage.content.slice(0, Count) + (oldMessage.content.length > Count ? ' ...' : '');
+	if (oldMessage.content?.length === undefined) return;
+	const Original = oldMessage.content?.slice(0, Count) + (oldMessage.content?.length > Count ? ' ...' : '');
 	const Edited = newMessage.content?.slice(0, Count) + (newMessage.content.length > Count ? ' ...' : '');
 
 	const log = new EmbedBuilder()
-		.setColor(Colors.Yellow)
+		.setColor('Yellow')
 		.setDescription(`📘 A [message](${newMessage.url} by ${author} was **edited** in ${channel}.\n
 				**Original**:\n ${Original} \n**Edited**: \n ${Edited}`)
 		.setFooter({ text: `Member: ${author?.tag} | ID: ${author?.id}` });
 
-	if (Channel.type === ChannelType.GuildText) return Channel.send({ embeds: [log] });
+	try {
+		await logsChannelOBJ.send({ embeds: [log] });
+	} catch (error) {
+		console.error(error);
+	}
 });

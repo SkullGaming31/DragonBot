@@ -1,25 +1,25 @@
-import { ChannelType, Colors, EmbedBuilder, Emoji } from 'discord.js';
+import { ChannelType, EmbedBuilder, GuildEmoji, TextBasedChannel } from 'discord.js';
 import { Event } from '../../../src/Structures/Event';
-// import DB from '../../Structures/Schemas/LogsChannelDB';// DB
+import ChanLogger from '../../Structures/Schemas/LogsChannelDB';
+import { MongooseError } from 'mongoose';
 
-export default new Event('emojiCreate', async (emoji: Emoji) => {
-	const { id, client } = emoji;
+export default new Event<'emojiCreate'>('emojiCreate', async (emoji: GuildEmoji) => {
+	const { id, client, guild } = emoji;
 
-	const g = await emoji.client.guilds.fetch();
-	console.log('Guild Count: ' + g.size);
+	const data = await ChanLogger.findOne({ Guild: guild.id }).catch((err: MongooseError) => { console.error(err.message); });
+	if (!data || data.enableLogs === false) return;
 
-	const logsChannel = '959693430647308295';
-	const Channel = client.channels.cache.get(logsChannel);
-	if (!Channel) return;
+	const logsChannelID = data.Channel;
+	if (logsChannelID === undefined) return;
+	const logsChannelOBJ = client.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
 
-	if (Channel.type === ChannelType.GuildText)
-		return Channel.send({
-			embeds: [
-				new EmbedBuilder()
-					.setColor(Colors.Green)
-					.setTitle('Emoji Created')
-					.setDescription(`an emoji has been added to the server: ${emoji}, \`${id}\``)
-					.setTimestamp()
-			]
-		});
+	if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
+
+	const embed = new EmbedBuilder()
+		.setColor('Green')
+		.setTitle('Emoji Created')
+		.setDescription(`An emoji has been added to the server: ${emoji}, \`${id}\``)
+		.setTimestamp();
+
+	await logsChannelOBJ.send({ embeds: [embed] });
 });

@@ -5,8 +5,9 @@ import ticket from '../../../src/Structures/Schemas/ticketSetupDB';
 export default new Command({
 	name: 'ticketsetup',
 	description: 'Creates the initial ticket Embed',
-	UserPerms: ['ManageMessages'],
-	BotPerms: ['ManageMessages'],
+	UserPerms: ['ManageChannels'],
+	BotPerms: ['ManageChannels'],
+	defaultMemberPermissions: ['ManageChannels'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{

@@ -1,5 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, Colors, EmbedBuilder } from 'discord.js';
-import interactionCreate from 'Events/Interaction/interactionCreate';
+import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder } from 'discord.js';
 import { Command } from '../../../src/Structures/Command';
 
 export default new Command({
@@ -7,6 +6,7 @@ export default new Command({
 	description: 'get help with using the discord bot',
 	UserPerms: ['SendMessages'],
 	BotPerms: ['SendMessages'],
+	defaultMemberPermissions: ['SendMessages'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{
