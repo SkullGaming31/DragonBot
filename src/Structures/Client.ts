@@ -1,13 +1,13 @@
 import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, GatewayIntentBits, Partials } from 'discord.js';
-import { Agent } from 'undici';
 import glob from 'glob';
+import { Agent } from 'undici';
 import { promisify } from 'util';
 const PG = promisify(glob);
 
 import { CommandType } from '../Typings/Command';
 import { RegisterCommandOptions } from '../Typings/client';
-import { Event } from './Event';
 import { Dashboard } from '../dashboard/index';
+import { Event } from './Event';
 
 export class ExtendedClient extends Client {
 	commands: Collection<string, CommandType> = new Collection();
@@ -67,10 +67,10 @@ export class ExtendedClient extends Client {
 	async registerCommands({ commands, guildId }: RegisterCommandOptions): Promise<void> {
 		if (guildId) {
 			this.guilds.cache.get(guildId)?.commands.set(commands);
-			console.time(`Registering commands to ${guildId}`);
+			console.log(`Registering commands to ${guildId}`);
 		} else {
 			this.application?.commands.set(commands);
-			console.time('Registering Global commands');
+			console.log('Registering Global commands');
 		}
 	}
 
@@ -90,10 +90,7 @@ export class ExtendedClient extends Client {
 		});
 
 		this.on('ready', () => {
-			this.registerCommands({
-				commands: slashCommands,
-				guildId: process.env.DEV_GUILD_ID
-			});
+			this.registerCommands({ commands: slashCommands, guildId: undefined });
 		});
 
 		//Event

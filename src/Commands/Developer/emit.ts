@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType } from 'discord.js';
 import { Command } from '../../../src/Structures/Command';
 
 export default new Command({
@@ -51,7 +51,7 @@ export default new Command({
 		}
 	],
 	run: async ({ interaction, client }) => {
-		const { options, member } = interaction;
+		const { options, member, guild } = interaction;
 
 		const choices = options.getString('event');
 
@@ -65,20 +65,51 @@ export default new Command({
 			interaction.reply({ content: 'Emitted the event!', ephemeral: true });
 			break;
 		case 'guildMemberUpdate':
-			// client.emit('guildMemberUpdate', member);
-			interaction.reply({ content: 'Event not added!', ephemeral: true });
+			client.emit('guildMemberUpdate', member, member);
+			interaction.reply({ content: 'Event Emitted!', ephemeral: true });
 			break;
 		case 'guildCreate':
-			// client.emit('guildCreate', guild);
-			interaction.reply({ content: 'Event not added!', ephemeral: true });
+			if (guild) {
+				client.emit('guildCreate', guild);
+				interaction.reply({ content: 'Event emitted!', ephemeral: true });
+			} else {
+				interaction.reply({ content: 'Cannot emit event. Guild is null.', ephemeral: true });
+			}
 			break;
 		case 'guildDelete':
-			// client.emit('guildCreate', guild);
-			interaction.reply({ content: 'Event Not Added!', ephemeral: true });
+			if (guild) {
+				client.emit('guildDelete', guild);
+				interaction.reply({ content: 'Event Emitted!', ephemeral: true });
+			} else {
+				interaction.reply({ content: 'Cannot emit event. Guild is null.', ephemeral: true });
+			}
 			break;
 		case 'channelCreate':
-			// client.emit('channelCreate', channel);
-			interaction.reply({ content: 'Event Not Added!', ephemeral: true });
+			if (interaction.channel && interaction.channel.type === ChannelType.GuildText) {
+				const channel = interaction.channel;
+				client.emit('channelCreate', channel);
+				interaction.reply({ content: 'Event emitted!', ephemeral: true });
+			} else {
+				interaction.reply({ content: 'Cannot emit event. Channel is null or not a text channel.', ephemeral: true });
+			}
+			break;
+		case 'channelUpdate':
+			if (interaction.channel && interaction.channel.type === ChannelType.GuildText) {
+				const channel = interaction.channel;
+				client.emit('channelUpdate', channel, channel);
+				interaction.reply({ content: 'Event emitted!', ephemeral: true });
+			} else {
+				interaction.reply({ content: 'Cannot emit event. Channel is null or not a text channel.', ephemeral: true });
+			}
+			break;
+		case 'channelDelete':
+			if (interaction.channel && interaction.channel.type === ChannelType.GuildText) {
+				const channel = interaction.channel;
+				client.emit('channelDelete', channel);
+				interaction.reply({ content: 'Event emitted!', ephemeral: true });
+			} else {
+				interaction.reply({ content: 'Cannot emit event. Channel is null or not a text channel.', ephemeral: true });
+			}
 			break;
 		}
 	}

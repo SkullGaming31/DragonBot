@@ -1,19 +1,17 @@
-import { model, Schema, Document } from 'mongoose';
+import { model, Schema, Document, Model } from 'mongoose';
 
-interface User extends Document {
+export interface IToken extends Document {
   discordId: string;
   accessToken?: string;
   refreshToken?: string;
   email?: string;
 }
 
-const userSchema = new Schema<User>({
+const tokenSchema = new Schema<IToken>({
 	discordId: { type: String, required: true, unique: true },
 	accessToken: { type: String },
 	refreshToken: { type: String },
 	email: { type: String },
 });
 
-const UserModel = model<User>('User', userSchema);
-
-export default UserModel;
+export const TokenModel: Model<IToken> = model<IToken>('Token', tokenSchema);

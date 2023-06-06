@@ -4,15 +4,17 @@ import { config } from 'dotenv';
 config();
 
 import { ExtendedClient } from '../../../Structures/Client';
-import users from '../../../Structures/Schemas/User';
+import { TokenModel } from '../../../Structures/Schemas/tokenModel';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function discordStrategy(client: ExtendedClient) {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	passport.serializeUser((user: any, done) => {
 		return done(null, user.id);
 	});
 	passport.deserializeUser(async (id, done) => {
 		try {
-			const user = await users.findOne({ _id: id });
+			const user = await TokenModel.findOne({ _id: id });
 			return user ? done(null, user) : done(null, null);
 		} catch (error) {
 			console.error(error);
@@ -27,9 +29,9 @@ export function discordStrategy(client: ExtendedClient) {
 	}, async (accessToken: string, refreshToken: string, profile: Profile, done) => {
 		const { id: discordId, email } = profile;
 		try {
-			const existingUser = await users.findOneAndUpdate({ id: discordId }, { accessToken, refreshToken }, { new: true });
+			const existingUser = await TokenModel.findOneAndUpdate({ id: discordId }, { accessToken, refreshToken }, { new: true });
 			if (existingUser) return done(null, existingUser);
-			const newUser = new users({ discordId, accessToken, refreshToken, email });
+			const newUser = new TokenModel({ discordId, accessToken, refreshToken, email });
 			const savedUser = await newUser.save();
 			return done(null, savedUser);
 		} catch (error) {

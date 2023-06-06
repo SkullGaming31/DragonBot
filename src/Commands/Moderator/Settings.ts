@@ -1,4 +1,4 @@
-import { ApplicationCommandType, ApplicationCommandOptionType, ChannelType, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, EmbedBuilder, channelMention, roleMention } from 'discord.js';
 import { Command } from '../../../src/Structures/Command';
 import settings from '../../Structures/Schemas/settingsDB';
 
@@ -48,6 +48,13 @@ export default new Command({
 			type: ApplicationCommandOptionType.Channel,
 			required: false,
 			channelTypes: [ChannelType.GuildText]
+		},
+		{
+			name: 'punishmentchan',
+			description: 'Channel your Punishment Logs are sent too',
+			type: ApplicationCommandOptionType.Channel,
+			required: false,
+			channelTypes: [ChannelType.GuildText]
 		}
 	],
 	run: async ({ interaction }) => {
@@ -57,12 +64,13 @@ export default new Command({
 
 		try {
 			const SuggestionChan = options.getChannel('sugestchan') || null;
+			const PunishmentChan = options.getChannel('punishmentchan') || null;
 			const Welcome = options.getBoolean('welcome');
 			const Welcomechan = options.getChannel('welcomechan') || null;
 			const NowLive = options.getChannel('live') || null;
 
 			const Administrator = options.getRole('admin');
-			const Moderator = options.getRole('moderator');
+			const Moderator = options.getRole('moderator') ?? null;
 
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			settings.findOne({ GuildID: guild.id }, async (err: any, data: any) => {
@@ -73,6 +81,7 @@ export default new Command({
 						Welcome: Welcome,
 						WelcomeChannel: Welcomechan?.id,
 						PromotionChannel: NowLive?.id,
+						PunishmentChan: PunishmentChan?.id,
 						AdministratorRole: Administrator?.id,
 						ModeratorRole: Moderator?.id,
 						SuggestChan: SuggestionChan?.id
@@ -84,6 +93,7 @@ export default new Command({
 							Welcome: Welcome,
 							WelcomeChannel: Welcomechan?.id,
 							PromotionChannel: NowLive?.id,
+							PunishmentChan: PunishmentChan?.id,
 							AdministratorRole: Administrator?.id,
 							ModeratorRole: Moderator?.id,
 							SuggestChan: SuggestionChan?.id
@@ -107,27 +117,32 @@ export default new Command({
 					},
 					{
 						name: 'Welcome Channel',
-						value: `${Welcomechan?.id}`,
+						value: Welcomechan ? channelMention(Welcomechan?.id) : 'None',
 						inline: true
 					},
 					{
 						name: 'Promotion Channel',
-						value: `${NowLive?.id}`,
+						value: NowLive ? channelMention(NowLive.id) : 'None',
 						inline: true
 					},
 					{
-						name: 'Admin Role ID',
-						value: `${Administrator?.id}`,
+						name: 'Admin Role',
+						value: Administrator ? roleMention(Administrator.id) : 'None',
 						inline: false
 					},
 					{
-						name: 'Moderator Role ID',
-						value: `${Moderator?.id}`,
+						name: 'Moderator Role',
+						value: Moderator ? roleMention(Moderator.id) : 'None',
 						inline: true
 					},
 					{
-						name: 'Suggestion Channel ID',
-						value: `${SuggestionChan?.id}`,
+						name: 'Suggestion Channel:',
+						value: SuggestionChan ? channelMention(SuggestionChan?.id) : 'None',
+						inline: true
+					},
+					{
+						name: 'Punishment Channel:',
+						value: PunishmentChan ? channelMention(PunishmentChan?.id) : 'None',
 						inline: true
 					}
 				)

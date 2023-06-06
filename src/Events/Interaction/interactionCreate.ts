@@ -1,13 +1,13 @@
 import { CommandInteractionOptionResolver } from 'discord.js';
+import { Event } from '../../../src/Structures/Event';
 import { ExtendedInteraction } from '../../../src/Typings/Command';
 import { client } from '../../index';
-import { Event } from '../../../src/Structures/Event';
 
 export default new Event<'interactionCreate'>('interactionCreate', async (interaction) => {
 	//chat input commands
 	if (interaction.isCommand()) {
 		const command = client.commands.get(interaction.commandName);
-		// console.log(command);
+		console.log(command);
 		if (!command) return interaction.reply({ content: 'You have used a non-existant command, please try another command', ephemeral: true });
 
 		command.run({

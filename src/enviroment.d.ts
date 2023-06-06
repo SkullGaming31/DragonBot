@@ -21,14 +21,19 @@ declare global {
       MONGO_PASSWORD: string;
       MONGODB_DATABASE: string;
       MONGO_DATABASE_URI: string;
+			DEV_MONGO_DATABASE_URI: string;
+			DEV_MONGO_DATABASE_USERNAME: string;
+			DEV_MONGO_DATABSE_PASSWORD: string;
+			DEV_MONGO_DATABSE_NAME: string;
       SESSION_SECRET: string;
       OAUTH_CLIENT_ID: string;
       OAUTH_CLIENT_SECRET: string;
       OAUTH_REDIRECT_URL: string;
       DEV_DASHBOARD_DOMAIN: string;
       DASHBOARD_DOMAIN: string;
+      GITHUB_PERSONAL_ACCESS_TOKEN: string;
     }
   }
 }
 
-export {}; 
+export { };

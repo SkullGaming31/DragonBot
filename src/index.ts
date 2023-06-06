@@ -1,17 +1,17 @@
-import startApi from './Api';
-import { ExtendedClient } from './Structures/Client';
-import { config } from 'dotenv';
-import errorHandler from './Structures/errorHandler';
-import { checkVariables } from './Structures/checkVariables';
-import { connectDatabase } from './Database';
 import { WebhookClient } from 'discord.js';
+import { config } from 'dotenv';
+import startApi from './Api';
+import { connectDatabase } from './Database';
+import { ExtendedClient } from './Structures/Client';
+import { checkVariables } from './Structures/checkVariables';
+import errorHandler from './Structures/errorHandler';
 
 config();
 
 export const client = new ExtendedClient();
-client.start();
 
 async function main() {
+	await client.start();
 	const WebHookID = process.env.DISCORD_ERR_WEBHOOK_ID as string;
 	const WebHookToken = process.env.DISCORD_ERR_WEBHOOK_TOKEN as string;
 

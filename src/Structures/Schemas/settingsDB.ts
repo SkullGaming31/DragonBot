@@ -7,6 +7,7 @@ interface ISettings extends Document {
   Welcome?: boolean;
   WelcomeChannel?: string;
   PromotionChannel?: string;
+  punishmentChannel?: string;
   SuggestChan: string;
 }
 
@@ -17,6 +18,7 @@ const settingsSchema = new Schema<ISettings>({
 	Welcome: { type: Boolean, default: false },
 	WelcomeChannel: { type: String },
 	PromotionChannel: { type: String },
+	punishmentChannel: { type: String },
 	SuggestChan: { type: String },
 });
 
