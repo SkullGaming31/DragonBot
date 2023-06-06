@@ -1,11 +1,6 @@
 # Overlay Experts
 <div id="top"></div>
-<!--
-
-NOTEs:
-
-
--->
+<!-- NOTEs: -->
 
 <!-- PROJECT SHIELDS -->
 <!--
@@ -37,18 +32,18 @@ guilds
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/skullgaming31/overlayexpertDiscord">
+  <a href="https://github.com/skullgaming31/DragonBot">
     <img src="./assets/images/logo.png" alt="Project Logo" width="80" height="80">
   </a>
 
-<h3 align="center">Overlay Expert DiscordBot</h3>
+<h3 align="center">Dragon DiscordBot</h3>
 
   <p align="center">
-    Overlay Expert Discord Bot<br>
+    Dragon Discord Bot<br>
     ·
-    <a href="https://github.com/skullgaming31/overlayexpertDiscord/issues">Report Bug</a>
+    <a href="https://github.com/skullgaming31/DragonBot/issues">Report Bug</a>
     ·
-    <a href="https://github.com/skullgaming31/overlayexpertDiscord/issues">Request Feature</a>
+    <a href="https://github.com/skullgaming31/DragonBot/issues">Request Feature</a>
   </p>
 </div>
 
