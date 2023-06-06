@@ -1,11 +1,6 @@
-# Overlay Experts
+# DragonBot
 <div id="top"></div>
-<!--
-
-NOTEs:
-
-
--->
+<!-- NOTEs: -->
 
 <!-- PROJECT SHIELDS -->
 <!--
@@ -37,18 +32,18 @@ guilds
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/skullgaming31/overlayexpertDiscord">
+  <a href="https://github.com/skullgaming31/DragonBot">
     <img src="./assets/images/logo.png" alt="Project Logo" width="80" height="80">
   </a>
 
-<h3 align="center">Overlay Expert DiscordBot</h3>
+<h3 align="center">Dragon DiscordBot</h3>
 
   <p align="center">
-    Overlay Expert Discord Bot<br>
+    Dragon Discord Bot<br>
     ·
-    <a href="https://github.com/skullgaming31/overlayexpertDiscord/issues">Report Bug</a>
+    <a href="https://github.com/skullgaming31/DragonBot/issues">Report Bug</a>
     ·
-    <a href="https://github.com/skullgaming31/overlayexpertDiscord/issues">Request Feature</a>
+    <a href="https://github.com/skullgaming31/DragonBot/issues">Request Feature</a>
   </p>
 </div>
 
@@ -69,7 +64,7 @@ guilds
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
+    <!-- <li><a href="#usage">Usage</a></li> -->
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -83,7 +78,8 @@ guilds
 
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
-This is a Discord Bot for the Discord Server Overlay Expert, a twitch extension that overlays your custom overlay over your stream.
+This is a Discord Bot for the Discord Server Overlay Expert, a twitch extension that overlays your custom overlay over your stream without a pc.<br />
+[Overlay Expert](https://overlay.expert)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -97,7 +93,7 @@ This is a Discord Bot for the Discord Server Overlay Expert, a twitch extension 
 
 <!-- GETTING STARTED -->
 ## Getting Started
-check out <div href="#setup"> to learn to get a copy of the project
+check out <a href="#setup"></a> to learn to get a copy of the project
 
 
 ## NOTES
@@ -107,36 +103,41 @@ where i created the discord bot in Javascript, i am attempting to convert it to 
 ### Prerequisites
 
 Requirements
-* Discord
+* Discord<br />
   [Discord.js v14.5.1](https://discord.js.org/)
 
-* Typescript<br>
+* Typescript<br />
   [Typescript](https://www.typescriptlang.org/)
  
-* node<br>
+* node<br />
   [Node](https://nodejs.org)
   
-* Code Editor[Optional Choices] <strong>NOTE: i do not know how to setup the project with Atom so everything is based on VS Code</strong><br>
-  [VS Code](https://code.visualstudio.com)<br>
-  [Atom](https://atom.io)<br>
+* Code Editor[Optional Choices] <b>NOTE: i do not know how to setup the project with Atom so everything is based on VS Code</b><br />
+  [VS Code](https://code.visualstudio.com)<br />
+  [Atom](https://atom.io)<br />
 
 ### Installation<a id="setup">
 
 1. Create a Discord Developer Application [Discord Developer Application](https://discord.com/developers/applications)
 2. Clone the repo
    ```sh
-   git clone https://github.com/skullgaming31/overlayexpertDiscord.git
+   git clone https://github.com/skullgaming31/overlayExpert.git
    ```
 3. Install NPM packages
    ```sh
    npm install
    ```
 4. Fill out the .env with all nessasary Information, check .env.example for whats needed
+5. build:
+  ```sh
+    npm run build
+  ```
+  --all your javascript files will be in a folder called dist host that on your discord bot host.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- USAGE EXAMPLES -->
-## Usage
+<!-- ## Usage -->
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -144,13 +145,11 @@ Requirements
 ## Roadmap
 
 
-* [x] link detect and delete(if not in correct channel)
-* [ ] discord nitro .gift scam links automatically removed
-* [ ] all discord invite links deleted when posted
+* [ ] link detect and delete(if not in correct channel)
 * [x] Ticket System
 * [ ] Warning System
 
-See the [open issues](https://github.com/skullgaming31/overlayexpertDiscord/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/skullgaming31/overlayExpert/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -173,16 +172,16 @@ Don't forget to give the project a star! Thanks again!
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License.
+Distributed under the MIT License. checkout LICENSE.md
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- CONTACT -->
 ## Contact
 
-Corey - [@skullgaming31](https://twitter.com/skullgaming31) - skullgaming8461@gmail.com
+Corey - [@skullgaming31](https://twitter.com/canadiendragon) - skullgamingg31@gmail.com
 
-Project Link: [Overlay Expert in Typescript](https://github.com/skullgaming31/overlayexpertDiscord)
+Project Link: [Overlay Expert in Typescript](https://github.com/skullgaming31/overlayExpert)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -197,14 +196,14 @@ Project Link: [Overlay Expert in Typescript](https://github.com/skullgaming31/ov
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/SkullGaming31/overlayexpertDiscord.svg?style=for-the-badge
-[contributors-url]: https://github.com/SkullGaming31/overlayexpertDiscord/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/SkullGaming31/overlayexpertDiscord.svg?style=for-the-badge
-[forks-url]: https://github.com/SkullGaming31/overlayexpertDiscord/network/members
-[stars-shield]: https://img.shields.io/github/stars/SkullGaming31/overlayexpertDiscord.svg?style=for-the-badge
-[stars-url]: https://github.com/SkullGaming31/overlayexpertDiscord/stargazers
-[issues-shield]: https://img.shields.io/github/issues/SkullGaming31/overlayexpertDiscord.svg?style=for-the-badge
-[issues-url]: https://github.com/SkullGaming31/overlayexpertDiscord/issues
-[license-shield]: https://img.shields.io/github/license/SkullGaming31/overlayexpertDiscord.svg?style=for-the-badge
-[license-url]: https://github.com/SkullGaming31/overlayexpertDiscord/blob/main/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/SkullGaming31/DragonBot.svg?style=for-the-badge
+[contributors-url]: https://github.com/SkullGaming31/DragonBot/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/SkullGaming31/DragonBot.svg?style=for-the-badge
+[forks-url]: https://github.com/SkullGaming31/DragonBot/network/members
+[stars-shield]: https://img.shields.io/github/stars/SkullGaming31/DragonBot.svg?style=for-the-badge
+[stars-url]: https://github.com/SkullGaming31/DragonBot/stargazers
+[issues-shield]: https://img.shields.io/github/issues/SkullGaming31/DragonBot.svg?style=for-the-badge
+[issues-url]: https://github.com/SkullGaming31/DragonBot/issues
+[license-shield]: https://img.shields.io/github/license/SkullGaming31/DragonBot.svg?style=for-the-badge
+[license-url]: https://github.com/SkullGaming31/DragonBot/blob/main/LICENSE
 [product-screenshot]: images/screenshot.png

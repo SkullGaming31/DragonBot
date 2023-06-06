@@ -6,6 +6,7 @@ export default new Command({
 	description: 'information about submiting a bug report or requesting a feature to be added to Overlay Expert',
 	UserPerms: ['SendMessages'],
 	BotPerms: ['SendMessages'],
+	defaultMemberPermissions: ['SendMessages'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{

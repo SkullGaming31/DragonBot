@@ -1,4 +1,4 @@
-import { ApplicationCommandType, ApplicationCommandOptionType, ChannelType } from 'discord.js';
+import { ApplicationCommandType, ApplicationCommandOptionType } from 'discord.js';
 import { Command } from '../../../src/Structures/Command';
 import DB from '../../Structures/Schemas/LogsChannelDB';// DB
 
@@ -7,9 +7,10 @@ export default new Command({
 	description: 'Enable and set the Logs Channel in your guild',
 	UserPerms: ['ManageGuild'],
 	BotPerms: ['ManageGuild'],
+	defaultMemberPermissions: ['ManageGuild'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
-        {
+		{
 			name: 'enablelogs',
 			description: 'Enable or Disable the Logger Channel',
 			type: ApplicationCommandOptionType.Boolean,
@@ -31,6 +32,7 @@ export default new Command({
 			const EnableLogs = options.getBoolean('enablelogs');
 			const Logger = options.getChannel('logger') || null;
 
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			DB.findOne({ GuildID: guild.id }, async (err: any, data: any) => {
 				if (err) throw err;
 				if (!data) {
@@ -44,7 +46,7 @@ export default new Command({
 						{ Guild: guild.id },
 						{
 							enableLogs: EnableLogs,
-						    Channel: Logger?.id,
+							Channel: Logger?.id,
 						},
 						{
 							new: true,

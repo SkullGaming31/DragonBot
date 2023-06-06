@@ -1,31 +1,32 @@
-import { ChannelType, Colors, DMChannel, EmbedBuilder, GuildChannel } from 'discord.js';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { ChannelType, DMChannel, EmbedBuilder, GuildChannel } from 'discord.js';
+import { MongooseError } from 'mongoose';
+
 import { Event } from '../../../src/Structures/Event';
-import DB from '../../Structures/Schemas/LogsChannelDB';// DB
+import ChanLogger from '../../Structures/Schemas/LogsChannelDB';
 
-export default new Event('channelUpdate', async (oldChannel: DMChannel | GuildChannel, newChannel: DMChannel | GuildChannel) => {
+export default new Event<'channelUpdate'>('channelUpdate', async (oldChannel: DMChannel | GuildChannel, newChannel: DMChannel | GuildChannel) => {
 	// if (newChannel.isDMBased()) return;
-	// const { guild, name } = newChannel;
 
-	// const data = await DB.findOne({ Guild: guild.id }).catch((err) => { console.error(err); });
+	// const data = await ChanLogger.findOne({ Guild: newChannel.guildId }).catch((err: MongooseError) => { console.error(err.message); });
 
-	// if (!data) return;
-	// if (data.enableLogs === false) return;
-	// if (!data) return;
+	// if (!data || data.enableLogs === false) return;
 
-	// const logsChannel = data.Channel;
-	// const Channel = guild.channels.cache.get(logsChannel);
-	// if (!Channel) return;
+	// const logsChannelID = data.Channel;
+	// if (logsChannelID === undefined) return;
+	// const logsChannelOBJ = newChannel.guild.channels.cache.get(logsChannelID);
 
-	// if (Channel.type === ChannelType.GuildText)
-	//   if (oldChannel.topic !== newChannel.topic) {
-	//     return Channel.send({
-	//       embeds: [
-	//         new EmbedBuilder()
-	//           .setColor(Colors.Red)
-	//           .setTitle(`${guild.name} | Topic Updated`)
-	//           .setDescription(`${newChannel}'s Topic has been changed from \`${oldChannel.topic}\` to \`${newChannel.topic}\``)
-	//           .setTimestamp()
-	//       ]
-	//     });
-	//   }
+	// if (!logsChannelOBJ || Channel.type !== ChannelType.GuildText) return;
+
+
+	// if (oldChannel.topic !== newChannel.topic) {
+	// 	const embed = new EmbedBuilder()
+	// 		.setColor('Red')
+	// 		.setTitle(`${newChannel.guild.name} | Topic Updated`)
+	// 		.setDescription(`${newChannel} topic has been changed from \`${oldChannel.topic}\` to \`${newChannel.topic}\``)
+	// 		.setTimestamp();
+
+	// 	return await logsChannelOBJ.send({ embeds: [embed] });
+	// }
+	return;
 });

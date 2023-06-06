@@ -6,6 +6,7 @@ export default new Command({
 	description: 'Returns Pong',
 	UserPerms: ['ManageMessages'],
 	BotPerms: ['ManageMessages'],
+	defaultMemberPermissions: ['ManageMessages'],
 	type: ApplicationCommandType.ChatInput,
 
 	run: async ({ interaction, client }) => {

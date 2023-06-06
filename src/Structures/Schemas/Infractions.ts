@@ -1,16 +1,17 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, Document, Model } from 'mongoose';
 
-interface User {
-	Guild: string,
-	UserID: string,
-	Infractions: object[]
+interface IUser extends Document {
+  Guild: string;
+  UserID?: string;
+  Infractions: object[];
 }
 
-const infractionsSchema = new Schema<User>({
+const infractionsSchema = new Schema<IUser>({
 	Guild: { type: String, required: true },
 	UserID: { type: String, required: false },
-	Infractions: { type: [Object], required: true }
+	Infractions: { type: [Object], required: true },
 });
 
-const infractionLogger = model<User>('infractions', infractionsSchema);
-export default infractionLogger;
+const InfractionLogger: Model<IUser> = model<IUser>('infractions', infractionsSchema);
+
+export default InfractionLogger;

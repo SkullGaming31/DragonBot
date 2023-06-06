@@ -1,24 +1,27 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, Document } from 'mongoose';
 
-interface Settings {
-	GuildID: string;
-	AdministratorRole?: string;
-	ModeratorRole?: string;
-	Welcome?: boolean;
-	WelcomeChannel?: string;
-	PromotionChannel?: string;
-	SuggestChan: string;
+interface ISettings extends Document {
+  GuildID: string;
+  AdministratorRole?: string;
+  ModeratorRole?: string;
+  Welcome?: boolean;
+  WelcomeChannel?: string;
+  PromotionChannel?: string;
+  punishmentChannel?: string;
+  SuggestChan: string;
 }
 
-const settingsSchema = new Schema<Settings>({
+const settingsSchema = new Schema<ISettings>({
 	GuildID: { type: String, required: true, unique: true },
-	AdministratorRole: { type: String, required: false },
-	ModeratorRole: { type: String, required: false },
-	Welcome: { type: Boolean, required: false, default: false },
-	WelcomeChannel: { type: String, required: false },
-	PromotionChannel: { type: String, required: false },
-	SuggestChan: { type: String, required: false }
+	AdministratorRole: { type: String },
+	ModeratorRole: { type: String },
+	Welcome: { type: Boolean, default: false },
+	WelcomeChannel: { type: String },
+	PromotionChannel: { type: String },
+	punishmentChannel: { type: String },
+	SuggestChan: { type: String },
 });
 
-const settings = model<Settings>('settings', settingsSchema);
-export default settings;
+const SettingsModel = model<ISettings>('Settings', settingsSchema);
+
+export default SettingsModel;

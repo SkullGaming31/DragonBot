@@ -1,17 +1,18 @@
 import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, GatewayIntentBits, Partials } from 'discord.js';
-import { Agent } from 'undici';
 import glob from 'glob';
+import { Agent } from 'undici';
 import { promisify } from 'util';
 const PG = promisify(glob);
 
 import { CommandType } from '../Typings/Command';
 import { RegisterCommandOptions } from '../Typings/client';
+import { Dashboard } from '../dashboard/index';
 import { Event } from './Event';
 
 export class ExtendedClient extends Client {
 	commands: Collection<string, CommandType> = new Collection();
 
-	constructor() {
+	constructor () {
 		super({
 			intents: [
 				GatewayIntentBits.Guilds,
@@ -34,19 +35,28 @@ export class ExtendedClient extends Client {
 			rest: { timeout: 60000 }
 		});
 	}
-	start() {
+	dashboard = new Dashboard(this);
+	async start() {
 		const agent = new Agent({
 			connect: {
-				timeout: 60000
+				timeout: 300000
 			}
 		});
 
 		this.rest.setAgent(agent);
 		this.registerModules();
 		if (process.env.Enviroment === 'dev') {
-			this.login(process.env.DEV_DISCORD_BOT_TOKEN);
-		} else {
-			this.login(process.env.DISCORD_BOT_TOKEN);
+			await this.login(process.env.DEV_DISCORD_BOT_TOKEN).then(() => {
+				this.dashboard.init();
+			});
+		}
+		else if (process.env.Enviroment === 'debug') {
+			await this.login(process.env.DEV_DISCORD_BOT_TOKEN).then(() => {
+				this.dashboard.init();
+			});
+		}
+		else {
+			await this.login(process.env.DISCORD_BOT_TOKEN);
 		}
 	}
 
@@ -80,10 +90,7 @@ export class ExtendedClient extends Client {
 		});
 
 		this.on('ready', () => {
-			this.registerCommands({
-				commands: slashCommands,
-				guildId: process.env.DEV_GUILD_ID
-			});
+			this.registerCommands({ commands: slashCommands, guildId: undefined });
 		});
 
 		//Event

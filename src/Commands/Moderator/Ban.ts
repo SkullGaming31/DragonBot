@@ -6,6 +6,7 @@ export default new Command({
 	description: 'bans a member from the guild',
 	UserPerms: ['BanMembers'],
 	BotPerms: ['BanMembers'],
+	defaultMemberPermissions: ['BanMembers'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{
@@ -58,38 +59,38 @@ export default new Command({
 		col.on('collect', i => {
 			if (i.user.id !== user.id) return;
 			switch (i.customId) {
-				case 'ban-yes':
-					if (member?.bannable) member.ban({ reason: reason });
-					interaction.editReply({
-						embeds: [
-							banEmbed.setDescription(`✔ | ${member} **has been banned for : ${reason}**`)
-						],
-						components: []
-					});
-					member?.send({
-						embeds: [
-							new EmbedBuilder()
-								.setColor(Colors.Red)
-								.addFields([
-									{
-										name: 'Reason',
-										value: `you were banned from ${guild} for ${reason}`,
-										inline: true
-									}
-								])
-						]
-					}).catch(err => {
-						if (err.code !== 50007) return console.error('Users Dm\'s are turned off', err);
-					});
-					break;
-				case 'ban-no':
-					interaction.editReply({
-						embeds: [
-							banEmbed.setDescription('✅ | ban Request Canceled')
-						],
-						components: []
-					});
-					break;
+			case 'ban-yes':
+				if (member?.bannable) member.ban({ reason: reason });
+				interaction.editReply({
+					embeds: [
+						banEmbed.setDescription(`✔ | ${member} **has been banned for : ${reason}**`)
+					],
+					components: []
+				});
+				member?.send({
+					embeds: [
+						new EmbedBuilder()
+							.setColor(Colors.Red)
+							.addFields([
+								{
+									name: 'Reason',
+									value: `you were banned from ${guild} for ${reason}`,
+									inline: true
+								}
+							])
+					]
+				}).catch(err => {
+					if (err.code !== 50007) return console.error('Users Dm\'s are turned off', err);
+				});
+				break;
+			case 'ban-no':
+				interaction.editReply({
+					embeds: [
+						banEmbed.setDescription('✅ | ban Request Canceled')
+					],
+					components: []
+				});
+				break;
 			}
 		});
 		col.on('end', (collected) => {

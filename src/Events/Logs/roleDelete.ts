@@ -1,29 +1,30 @@
-import { ChannelType, Colors, EmbedBuilder, Role } from 'discord.js';
-import { Event } from '../../../src/Structures/Event';
-import DB from '../../Structures/Schemas/LogsChannelDB';// DB
+import { ChannelType, EmbedBuilder, Role, TextBasedChannel } from 'discord.js';
+import { MongooseError } from 'mongoose';
 
-export default new Event('roleDelete', async (role: Role) => {
+import { Event } from '../../../src/Structures/Event';
+import ChanLogger from '../../Structures/Schemas/LogsChannelDB';// DB
+
+export default new Event<'roleDelete'>('roleDelete', async (role: Role) => {
 	const { guild, name } = role;
 
-	const data = await DB.findOne({ Guild: guild.id }).catch((err) => { console.error(err); });
+	const data = await ChanLogger.findOne({ Guild: guild.id }).catch((err: MongooseError) => { console.error(err.message); });
 
-	if (!data) return;
-	if (data.enableLogs === false) return;
-	if (!data) return;
+	if (!data || !data.enableLogs) return;
 
-	const logsChannel = data.Channel;
-	const Channel = guild.channels.cache.get(logsChannel);
-	if (!Channel) return;
+	const logsChannelID = data.Channel;
+	if (logsChannelID === undefined) return;
+	const logsChannelOBJ = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
+	if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
 
 	const Embed = new EmbedBuilder()
-		.setColor(Colors.Red)
+		.setColor('Red')
+		.setTitle(`${guild.name} | Role Deleted`)
+		.setDescription(`A role named: \`${name}\` has been deleted.`)
 		.setTimestamp();
 
-	if (Channel.type === ChannelType.GuildText)
-		return Channel.send({
-			embeds: [
-				Embed.setTitle(`${guild.name} | Role Deleted`),
-				Embed.setDescription(`a role has been Deleted named: ${role}, \`${name}\``)
-			]
-		});
+	try {
+		await logsChannelOBJ.send({ embeds: [Embed] });
+	} catch (error) {
+		console.error(error);
+	}
 });

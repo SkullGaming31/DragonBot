@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, ChannelType, Colors, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
 import { Command } from '../../../src/Structures/Command';
 import DB from '../../Structures/Schemas/SuggestDB';
 
@@ -7,6 +7,7 @@ export default new Command({
 	description: 'Suggest an improvment for the discord bot',
 	UserPerms: ['SendMessages'],
 	BotPerms: ['SendMessages'],
+	defaultMemberPermissions: ['SendMessages'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{
@@ -34,14 +35,14 @@ export default new Command({
 
 		const Response = new EmbedBuilder()
 			.setTitle('NEW SUGGESTION')
-			.setColor(Colors.Blue)
+			.setColor('Blue')
 			.setAuthor({ name: `${user.tag}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` })
-            .addFields(
-                { name: 'Suggestion', value: `${Suggestion}` },
-                { name: 'Type', value: `${Type}` },
-                { name: 'Status', value: 'Pending...' }
-                )
-            .setTimestamp();
+			.addFields(
+				{ name: 'Suggestion', value: `${Suggestion}` },
+				{ name: 'Type', value: `${Type}` },
+				{ name: 'Status', value: 'Pending...' }
+			)
+			.setTimestamp();
 
 		const Buttons = new ActionRowBuilder<ButtonBuilder>();
 		Buttons.addComponents(
@@ -51,7 +52,7 @@ export default new Command({
 
 		const suggestionChannel = guild?.channels.cache.get('1080703340549242970');
 		if (channel?.id !== '1080703340549242970') return interaction.reply({ content: `❌ | you may only use this command in the suggestion channel ${suggestionChannel}` });
-        if (guild?.id !== '959693430227894292') return interaction.reply({ content: '❌ | you may only use this command in the Discord Bots Test Server' });
+		if (guild?.id !== '959693430227894292') return interaction.reply({ content: '❌ | you may only use this command in the Discord Bots Test Server' });
 
 		try {
 			const M = await interaction.reply({ embeds: [Response], components: [Buttons], fetchReply: true });
