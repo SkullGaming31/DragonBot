@@ -1,7 +1,5 @@
 # DragonBot
 <div id="top"></div>
-<!-- NOTEs: -->
-
 <!-- PROJECT SHIELDS -->
 <!--
 *** I'm using markdown "reference style" links for readability.
@@ -78,8 +76,8 @@ guilds
 
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
-This is a Discord Bot for the Discord Server Overlay Expert, a twitch extension that overlays your custom overlay over your stream without a pc.<br />
-[Overlay Expert](https://overlay.expert)
+This is the Discord Bot for my personal Discord Server<br />
+[Level Up Legends Lounge](https://overlay.expert)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -94,11 +92,6 @@ This is a Discord Bot for the Discord Server Overlay Expert, a twitch extension 
 <!-- GETTING STARTED -->
 ## Getting Started
 check out <a href="#setup"></a> to learn to get a copy of the project
-
-
-## NOTES
-This is not a Overlay Expert Official Project, this project is based on the Overlay Expert Discord
-where i created the discord bot in Javascript, i am attempting to convert it to use ``Typescript`` instead.
 
 ### Prerequisites
 
@@ -121,7 +114,7 @@ Requirements
 1. Create a Discord Developer Application [Discord Developer Application](https://discord.com/developers/applications)
 2. Clone the repo
    ```sh
-   git clone https://github.com/skullgaming31/overlayExpert.git
+   git clone https://github.com/skullgaming31/dragonbot.git
    ```
 3. Install NPM packages
    ```sh
@@ -149,7 +142,7 @@ Requirements
 * [x] Ticket System
 * [ ] Warning System
 
-See the [open issues](https://github.com/skullgaming31/overlayExpert/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/skullgaming31/dragonbot/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -181,7 +174,7 @@ Distributed under the MIT License. checkout LICENSE.md
 
 Corey - [@skullgaming31](https://twitter.com/canadiendragon) - skullgamingg31@gmail.com
 
-Project Link: [Overlay Expert in Typescript](https://github.com/skullgaming31/overlayExpert)
+Project Link: [Level Up Legends Lounge in Typescript](https://github.com/skullgaming31/dragonbot)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
