@@ -39,7 +39,7 @@ guilds
   <p align="center">
     Dragon Discord Bot<br>
     ·
-    <a href="https://github.com/skullgaming31/DragonBot/issues">Report Bug</a>
+    <a href="https://github.com/skullgaming31/DragonBot/issues">Report Bugs</a>
     ·
     <a href="https://github.com/skullgaming31/DragonBot/issues">Request Feature</a>
   </p>
