@@ -34,10 +34,10 @@ guilds
     <img src="./assets/images/logo.png" alt="Project Logo" width="80" height="80">
   </a>
 
-<h3 align="center">Dragon DiscordBot</h3>
+<h3 align="center">DragonBot</h3>
 
   <p align="center">
-    Dragon Discord Bot<br>
+    DragonBot<br>
     ·
     <a href="https://github.com/skullgaming31/DragonBot/issues">Report Bugs</a>
     ·
@@ -77,7 +77,7 @@ guilds
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
 This is the Discord Bot for my personal Discord Server<br />
-[Level Up Legends Lounge](https://overlay.expert)
+[Level Up Legends Lounge](https://discord.com/invite/dHpehkD6M3)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
