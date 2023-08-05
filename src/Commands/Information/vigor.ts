@@ -1,5 +1,5 @@
 /* eslint-disable no-case-declarations */
-import { ApplicationCommandOptionType, ApplicationCommandType, ColorResolvable, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, AttachmentBuilder, ColorResolvable, EmbedBuilder } from 'discord.js';
 import * as fs from 'fs';
 import { Command } from '../../../src/Structures/Command';
 import { sleep } from '../../Utilities/util';
@@ -17,6 +17,7 @@ interface Weapon {
   weight: number;
   firemode: string[];
   Misc: string[];
+	folder: string;
 }
 
 interface Consumable {
@@ -27,6 +28,7 @@ interface Consumable {
 	stamina: number;
   weight: number;
 	carry: number;
+	folder: string;
 }
 
 interface Trap {
@@ -34,6 +36,7 @@ interface Trap {
 	description: string;
 	quality: string;
 	carry: number;
+	folder: string;
 }
 interface Melee {
 	name: string;
@@ -42,6 +45,7 @@ interface Melee {
   quality: string;
   basedamage: number;
   weight: number;
+	folder: string;
 }
 
 interface Tools {
@@ -49,6 +53,7 @@ interface Tools {
 	description: string;
 	quality: string;
 	carry: number;
+	folder: string;
 }
 
 interface Throwable {
@@ -56,6 +61,7 @@ interface Throwable {
 	description: string;
 	quality: string;
 	carry: number;
+	folder: string;
 }
 
 interface Item {
@@ -128,7 +134,12 @@ export default new Command({
 			switch(Choice) {
 			case 'about':
 				const vigorURL = 'https://vigorgame.com/about';
-				interaction.editReply({ content: `Outlive the apocalypse. Vigor is a free-to-play looter shooter set in post-war Norway. LOOT, SHOOT BUILD Shoot and loot in tense encounters Build your shelter and vital equipment Challenge others in various game modes Play on your own or fight together with 2 of your other friends, check out vigor here: ${vigorURL}` });
+				const vigorEmbed = new EmbedBuilder()
+					.setTitle('Vigor')
+					.setDescription('Outlive the apocalypse. Vigor is a free-to-play looter shooter set in post-war Norway. LOOT, SHOOT BUILD Shoot and loot in tense encounters Build your shelter and vital equipment Challenge others in various game modes Play on your own or fight together with 2 of your other friends')
+					.setURL(vigorURL)
+					.setTimestamp();
+				await interaction.editReply({ embeds: [vigorEmbed] });
 				break;
 			case 'lore':
 				interaction.editReply({ content: 'theres no written lore for the game, its all recorded on tapes in the game itself, i will eventually, listen to them and write out what i can do describe the lore of the game as twitch messages can only be a max of 500 characters.' });
@@ -155,6 +166,8 @@ export default new Command({
 				const melee = melees.find((m: Melee) => m.name.toLowerCase() === itemName.toLowerCase());
 				
 				if (consumable) {// TODO: add image for the item Selected
+					const imagePath = `../../../assets/images/${consumable.folder}/${consumable.name}.png`;
+					const imageAttachment = new AttachmentBuilder(imagePath);
 					const ConsumableEmbed = new EmbedBuilder()
 						.setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ size: 512 }) })
 						.setDescription(`Item stats for \`${consumable.name}\``)
@@ -180,6 +193,7 @@ export default new Command({
 								inline: false
 							}
 						)
+						.setImage(`attachment://${consumable.name}.png`) // Set the image for the embed
 						.setTimestamp();
 
 					const itemColor = getItemColor(consumable.quality);
@@ -187,8 +201,10 @@ export default new Command({
 				
 					await interaction.editReply({ content: `Hold on 1 second, I will check the data for ${consumable.name}` });
 					await sleep(1000);
-					await interaction.editReply({ content: `${user}`, embeds: [ConsumableEmbed] });
+					await interaction.editReply({ content: `${user}`, embeds: [ConsumableEmbed], files: [imageAttachment] });
 				} else if (melee) {
+					const imagePath = `../../../assets/images/${melee.folder}/${melee.name}.png`;
+					const imageAttachment = new AttachmentBuilder(imagePath);
 					const meleeEmbed = new EmbedBuilder()
 						.setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ size: 512 }) })
 						.setDescription(`Item stats for \`${melee.name}\``)
@@ -227,8 +243,10 @@ export default new Command({
 					const tbd = await interaction.editReply({ content: `Hold on 1 second, I will check the data for ${melee.name}` });
 					console.log(tbd.id);
 					await sleep(1000);
-					await interaction.editReply({ content: `${user}`, embeds: [meleeEmbed] });
+					await interaction.editReply({ content: `${user}`, embeds: [meleeEmbed], files: [imageAttachment] });
 				} else if (tool) {
+					const imagePath = `../../../assets/images/${tool.folder}/${tool.name}.png`;
+					const imageAttachment = new AttachmentBuilder(imagePath);
 					const toolEmbed = new EmbedBuilder()
 						.setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ size: 512 }) })
 						.setDescription(`Item stats for \`${tool.name}\``)
@@ -254,10 +272,13 @@ export default new Command({
 					const itemColor = getItemColor(tool.quality);
 					toolEmbed.setColor(itemColor);
 				
-					await interaction.editReply({ content: `Hold on 1 second, I will check the data for ${tool.name}` });
+					const tbd = await interaction.editReply({ content: `Hold on 1 second, I will check the data for ${tool.name}` });
 					await sleep(1000);
-					await interaction.editReply({ content: `${user}`, embeds: [toolEmbed] });
+					tbd.edit({ content: `${user}`, embeds: [toolEmbed], files: [imageAttachment] });
+					// await interaction.editReply({ content: `${user}`, embeds: [toolEmbed] });
 				} else if (trap) {
+					const imagePath = `../../../assets/images/${trap.folder}/${trap.name}.png`;
+					const imageAttachment = new AttachmentBuilder(imagePath);
 					const trapEmbed = new EmbedBuilder()
 						.setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ size: 512 }) })
 						.setDescription(`Item stats for \`${trap.name}\``)
@@ -287,8 +308,10 @@ export default new Command({
 					// await sleep(3000);
 					// await interaction.deleteReply();
 					await sleep(1000);
-					await interaction.editReply({ content: `${user}`, embeds: [trapEmbed] });
+					await interaction.editReply({ content: `${user}`, embeds: [trapEmbed], files: [imageAttachment] });
 				} else if (thrown) {
+					const imagePath = `../../../assets/images/${thrown.folder}/${thrown.name}.png`;
+					const imageAttachment = new AttachmentBuilder(imagePath);
 					const thrownEmbed = new EmbedBuilder()
 						.setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ size: 512 }) })
 						.setDescription(`Item stats for \`${thrown.name}\``)
@@ -316,7 +339,7 @@ export default new Command({
 				
 					await interaction.editReply({ content: `Hold on 1 second, I will check the data for ${thrown.name}`});
 					await sleep(1000);
-					await interaction.editReply({ content: `${user}` });
+					await interaction.editReply({ content: `${user}`, embeds: [thrownEmbed], files: [imageAttachment] });
 				} else if (weapon) {
 					const weaponEmbed = new EmbedBuilder()
 						.setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ size: 512 }) })
@@ -368,15 +391,19 @@ export default new Command({
 								inline: true
 							},
 						)
-						// .setImage('attachment://../../../../assets/images/Guns/a-km.png')
 						.setTimestamp();
 
 					const itemColor = getItemColor(weapon.quality);
 					weaponEmbed.setColor(itemColor);
 				
-					await interaction.editReply({ content: `Hold on 1 second, I will check the data for ${weapon.name}` });
+					const weaponsResponse = await interaction.editReply({ content: `Hold on 1 second, I will check the data for ${weapon.name}` });
 					await sleep(1000);
-					await interaction.editReply({ content: `${user}`, embeds: [weaponEmbed] });
+					if (weaponsResponse.editable) {
+						weaponsResponse.edit({ content: `${user}`, embeds: [weaponEmbed] });
+					} else {
+						await interaction.editReply({ content: 'there was an error editing the weapon response embed' });
+					}
+					// await interaction.editReply({ content: `${user}`, embeds: [weaponEmbed] });
 				} else {
 					await interaction.editReply({ content: `Sorry, I could not find an item named "${itemName}".` });
 				}

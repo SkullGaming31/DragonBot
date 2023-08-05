@@ -31,8 +31,7 @@ export class ExtendedClient extends Client {
 			],
 			allowedMentions: {
 				parse: ['everyone', 'roles', 'users']
-			},
-			rest: { timeout: 60000 }
+			}
 		});
 	}
 	dashboard = new Dashboard(this);
@@ -90,7 +89,13 @@ export class ExtendedClient extends Client {
 		});
 
 		this.on('ready', () => {
-			this.registerCommands({ commands: slashCommands, guildId: undefined });
+			if (process.env.Enviroment === 'dev') {
+				this.registerCommands({ commands: slashCommands, guildId: '959693430227894292' });
+			} else if (process.env.Enviroment === 'debug') {
+				this.registerCommands({ commands: slashCommands, guildId: '959693430227894292' });
+			} else {
+				this.registerCommands({ commands: slashCommands, guildId: undefined });
+			}
 		});
 
 		//Event

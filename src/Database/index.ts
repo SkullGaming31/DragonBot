@@ -1,8 +1,9 @@
-import mongoose, { MongooseError } from 'mongoose';
 import { config } from 'dotenv';
+import mongoose, { MongooseError } from 'mongoose';
 config();
 
 export const connectDatabase = async (): Promise<void> => {
+	mongoose.set('strictQuery', false);
 	const connectionString = process.env.MONGO_DATABASE_URI as string;
 	const Dev_ConnectionString = process.env.DEV_MONGO_DATABASE_URI as string;
 	try {

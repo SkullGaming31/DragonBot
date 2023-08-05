@@ -1,6 +1,6 @@
-import { ApplicationCommandType, ApplicationCommandOptionType } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType } from 'discord.js';
 import { Command } from '../../../src/Structures/Command';
-import DB from '../../Structures/Schemas/LogsChannelDB';// DB
+import DB from '../../Structures/Schemas/LogsChannelDB'; // DB
 
 export default new Command({
 	name: 'logger',
@@ -20,6 +20,7 @@ export default new Command({
 			name: 'logger',
 			description: 'Select your Logs Channel',
 			type: ApplicationCommandOptionType.Channel,
+			channelTypes: [ChannelType.GuildText],
 			required: false
 		}
 	],

@@ -10,6 +10,7 @@
       "muzzleSpeed": 445,
       "magsize": 6,
       "weight": 1.6,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["Staggers"]
     },
@@ -23,6 +24,7 @@
       "muzzleSpeed": 380,
       "magsize": 21,
       "weight": 1.2,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Burst"],
       "Misc": ["None"]
     },
@@ -36,6 +38,7 @@
       "muzzleSpeed": 200,
       "magsize": 7,
       "weight": 0.85,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["Supressed"]
     },
@@ -49,6 +52,7 @@
       "muzzleSpeed": 427,
       "magsize": 6,
       "weight": 1.1,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["Staggers"]
     },
@@ -62,6 +66,7 @@
       "muzzleSpeed": 250,
       "magsize": 9,
       "weight": 1.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["None"]
     },
@@ -75,6 +80,7 @@
       "muzzleSpeed": 350,
       "magsize": 9,
       "weight": 0.77,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["None"]
     },
@@ -88,6 +94,7 @@
       "muzzleSpeed": 315,
       "magsize": 9,
       "weight": 0.75,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["None"]
     },
@@ -101,6 +108,7 @@
       "muzzleSpeed": 285,
       "magsize": 31,
       "weight": 5.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -114,6 +122,7 @@
       "muzzleSpeed": 550,
       "magsize": 33,
       "weight": 3.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -127,6 +136,7 @@
       "muzzleSpeed": 715,
       "magsize": 51,
       "weight": 3.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["Scope"]
     },
@@ -140,6 +150,7 @@
       "muzzleSpeed": 285,
       "magsize": 31,
       "weight": 2.88,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["Supressed"]
     },
@@ -153,6 +164,7 @@
       "muzzleSpeed": 400,
       "magsize": 33,
       "weight": 3.6,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["Scope"]
     },
@@ -166,6 +178,7 @@
       "muzzleSpeed": 400,
       "magsize": 33,
       "weight": 3.1,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -179,6 +192,7 @@
       "muzzleSpeed": 488,
       "magsize": 71,
       "weight": 3.6,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -192,6 +206,7 @@
       "muzzleSpeed": 400,
       "magsize": 161,
       "weight": 3.1,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -205,6 +220,7 @@
       "muzzleSpeed": 320,
       "magsize": 21,
       "weight": 1.3,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -218,6 +234,7 @@
       "muzzleSpeed": 396,
       "magsize": 71,
       "weight": 7.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -231,6 +248,7 @@
       "muzzleSpeed": 280,
       "magsize": 31,
       "weight": 3.7,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -244,6 +262,7 @@
       "muzzleSpeed": 400,
       "magsize": 26,
       "weight": 2.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -257,6 +276,7 @@
       "muzzleSpeed": 940,
       "magsize": 31,
       "weight": 5.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["Scope"]
     },
@@ -270,6 +290,7 @@
       "muzzleSpeed": 905,
       "magsize": 31,
       "weight": 4.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -283,6 +304,7 @@
       "muzzleSpeed": 950,
       "magsize": 31,
       "weight": 4.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["Scope"]
     },
@@ -296,6 +318,7 @@
       "muzzleSpeed": 930,
       "magsize": 31,
       "weight": 4.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Burst", "Auto"],
       "Misc": ["None"]
     },
@@ -309,6 +332,7 @@
       "muzzleSpeed": 800,
       "magsize": 21,
       "weight": 4.5,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -322,6 +346,7 @@
       "muzzleSpeed": 880,
       "magsize": 31,
       "weight": 4.5,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Burst", "Auto"],
       "Misc": ["None"]
     },
@@ -335,6 +360,7 @@
       "muzzleSpeed": 880,
       "magsize": 31,
       "weight": 3.5,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -348,6 +374,7 @@
       "muzzleSpeed": 735,
       "magsize": 31,
       "weight": 3.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -361,6 +388,7 @@
       "muzzleSpeed": 715,
       "magsize": 31,
       "weight": 3.4,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -374,6 +402,7 @@
       "muzzleSpeed": 930,
       "magsize": 31,
       "weight": 4.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Burst"],
       "Misc": ["None"]
     },
@@ -387,6 +416,7 @@
       "muzzleSpeed": 705,
       "magsize": 31,
       "weight": 3.6,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -400,6 +430,7 @@
       "muzzleSpeed": 970,
       "magsize": 31,
       "weight": 7.7,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["Scope"]
     },
@@ -413,6 +444,7 @@
       "muzzleSpeed": 853,
       "magsize": 101,
       "weight": 11.0,
+      "folder": "Guns",
       "firemode": ["Auto"],
       "Misc": ["Heavy"]
     },
@@ -426,6 +458,7 @@
       "muzzleSpeed": 925,
       "magsize": 201,
       "weight": 7.1,
+      "folder": "Guns",
       "firemode": ["Auto"],
       "Misc": ["Heavy"]
     },
@@ -439,6 +472,7 @@
       "muzzleSpeed": 960,
       "magsize": 46,
       "weight": 5.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -452,6 +486,7 @@
       "muzzleSpeed": 830,
       "magsize": 51,
       "weight": 9.5,
+      "folder": "Guns",
       "firemode": ["Auto"],
       "Misc": ["Heavy"]
     },
@@ -465,6 +500,7 @@
       "muzzleSpeed": 730,
       "magsize": 101,
       "weight": 10.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["Heavy"]
     },
@@ -478,6 +514,7 @@
       "muzzleSpeed": 825,
       "magsize": 101,
       "weight": 10.0,
+      "folder": "Guns",
       "firemode": ["Auto"],
       "Misc": ["Heavy"]
     },
@@ -491,6 +528,7 @@
       "muzzleSpeed": 745,
       "magsize": 76,
       "weight": 7.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -504,6 +542,7 @@
       "muzzleSpeed": 745,
       "magsize": 41,
       "weight": 7.7,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -517,6 +556,7 @@
       "muzzleSpeed": 820,
       "magsize": 101,
       "weight": 13.0,
+      "folder": "Guns",
       "firemode": ["Auto"],
       "Misc": ["Heavy"]
     },
@@ -530,6 +570,7 @@
       "muzzleSpeed": 1000,
       "magsize": 5,
       "weight": 6.7,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["Scope", "Staggers"]
     },
@@ -543,6 +584,7 @@
       "muzzleSpeed": 840,
       "magsize": 5,
       "weight": 5.1,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["Scope", "Staggers"]
     },
@@ -556,6 +598,7 @@
       "muzzleSpeed": 830,
       "magsize": 11,
       "weight": 4.3,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["Scope"]
     },
@@ -569,6 +612,7 @@
       "muzzleSpeed": 830,
       "magsize": 11,
       "weight": 3.8,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["Scope", "Suppressed"]
     },
@@ -582,6 +626,7 @@
       "muzzleSpeed": 970,
       "magsize": 31,
       "weight": 4.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["Scope"]
     },
@@ -595,6 +640,7 @@
       "muzzleSpeed": 800,
       "magsize": 21,
       "weight": 6.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["Scope"]
     },
@@ -608,6 +654,7 @@
       "muzzleSpeed": 390,
       "magsize": 11,
       "weight": 2.8,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["Scope", "Suppressed"]
     },
@@ -621,6 +668,7 @@
       "muzzleSpeed": 700,
       "magsize": 11,
       "weight": 5.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["Scope"]
     },
@@ -634,6 +682,7 @@
       "muzzleSpeed": 830,
       "magsize": 11,
       "weight": 7.1,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["Scope"]
     },
@@ -647,6 +696,7 @@
       "muzzleSpeed": 980,
       "magsize": 5,
       "weight": 4.7,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["Scope", "Staggers"]
     },
@@ -660,6 +710,7 @@
       "muzzleSpeed": 735,
       "magsize": 11,
       "weight": 3.85,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["None"]
     },
@@ -673,6 +724,7 @@
       "muzzleSpeed": 760,
       "magsize": 11,
       "weight": 4.4,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["None"]
     },
@@ -686,6 +738,7 @@
       "muzzleSpeed": 607,
       "magsize": 31,
       "weight": 2.6,
+      "folder": "Guns",
       "firemode": ["Semi-Auto", "Auto"],
       "Misc": ["None"]
     },
@@ -699,6 +752,7 @@
       "muzzleSpeed": 800,
       "magsize": 5,
       "weight": 3.4,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["Staggers", "Bolt-Action"]
     },
@@ -712,6 +766,7 @@
       "muzzleSpeed": 450,
       "magsize": 8,
       "weight": 3.6,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["Staggers"]
     },
@@ -725,6 +780,7 @@
       "muzzleSpeed": 450,
       "magsize": 9,
       "weight": 4.4,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["Staggers"]
     },
@@ -738,6 +794,7 @@
       "muzzleSpeed": 450,
       "magsize": 4,
       "weight": 4.1,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["Staggers"]
     },
@@ -751,6 +808,7 @@
       "muzzleSpeed": 450,
       "magsize": 2,
       "weight": 2.7,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["Staggers"]
     },
@@ -764,6 +822,7 @@
       "muzzleSpeed": 450,
       "magsize": 2,
       "weight": 3.6,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["Staggers"]
     },
@@ -777,6 +836,7 @@
       "muzzleSpeed": 450,
       "magsize": 2,
       "weight": 3.4,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["Staggers"]
     },
@@ -790,6 +850,7 @@
       "muzzleSpeed": 100,
       "magsize": 1,
       "weight": 5.0,
+      "folder": "Guns",
       "firemode": ["Semi-Auto"],
       "Misc": ["Suppressed", "Staggers"]
     }
@@ -802,6 +863,7 @@
       "quality": "Special Issue",
       "basedamage": 35,
       "weight": 3.0,
+      "folder": "Melee",
       "firemode": ["None"],
       "Misc": ["None"]
     },
@@ -812,6 +874,7 @@
       "quality": "Rare",
       "basedamage": 25,
       "weight": 1,
+      "folder": "Melee",
       "firemode": ["None"],
       "Misc": ["None"]
     },
@@ -822,6 +885,7 @@
       "quality": "Rare",
       "basedamage": 25,
       "weight": 1,
+      "folder": "Melee",
       "firemode": ["None"],
       "Misc": ["None"]
     },
@@ -832,6 +896,7 @@
       "quality": "Uncommon",
       "basedamage": 25,
       "weight": 1,
+      "folder": "Melee",
       "firemode": ["None"],
       "Misc": ["None"]
     },
@@ -842,6 +907,7 @@
       "quality": "Uncommon",
       "basedamage": 30,
       "weight": 1,
+      "folder": "Melee",
       "firemode": ["None"],
       "Misc": ["None"]
     },
@@ -852,6 +918,7 @@
       "quality": "Uncommon",
       "basedamage": 30,
       "weight": 1,
+      "folder": "Melee",
       "firemode": ["None"],
       "Misc": ["None"]
     },
@@ -862,6 +929,7 @@
       "quality": "Uncommon",
       "basedamage": 25,
       "weight": 1,
+      "folder": "Melee",
       "firemode": ["None"],
       "Misc": ["None"]
     },
@@ -872,6 +940,7 @@
       "quality": "Common",
       "basedamage": 25,
       "weight": 1,
+      "folder": "Melee",
       "firemode": ["None"],
       "Misc": ["None"]
     },
@@ -882,6 +951,7 @@
       "quality": "Common",
       "basedamage": 25,
       "weight": 1,
+      "folder": "Melee",
       "firemode": ["None"],
       "Misc": ["None"]
     },
@@ -892,6 +962,7 @@
       "quality": "Common",
       "basedamage": 25,
       "weight": 1,
+      "folder": "Melee",
       "firemode": ["None"],
       "Misc": ["None"]
     }
@@ -902,47 +973,54 @@
       "description": "Restores Half of lost health",
       "quality": "Common",
       "health": 0.5,
-      "carry": 6
+      "carry": 6,
+      "folder": "Consumables"
     },
     {
       "name": "Disinfectant",
       "description": "Heals minor injuries",
       "quality": "Common",
       "health": 20,
-      "carry": 6
+      "carry": 6,
+      "folder": "Consumables"
     },
     {
       "name": "Antibiotics",
       "description": "Restores Health over time",
       "quality": "Rare",
       "health": 80,
-      "carry": 4
+      "carry": 4,
+      "folder": "Consumables"
     },
     {
       "name": "painkiller",
       "description": "Temporarily restores all health",
       "quality": "Uncommon",
       "health": 100,
-      "carry": 5
+      "carry": 5,
+      "folder": "Consumables"
     },
     {
       "name": "Caffeine",
       "description": "Replenishes stamina and temporarily stops its depletion",
       "quality": "Rare",
       "stamina": 100,
-      "carry": 4
+      "carry": 4,
+      "folder": "Consumables"
     },
     {
       "name": "Iodine",
       "description": "Temporarily stops maximum health reduction caused by radiation",
       "quality": "Military",
-      "carry": 3
+      "carry": 3,
+      "folder": "Consumables"
     },
     {
       "name": "Adrenaline Shot",
       "description": "Boosts Movement speed and lowers weight debuffs",
       "quality": "Military",
-      "carry": 3
+      "carry": 3,
+      "folder": "Consumables"
     }
   ],
   "Tools": [
@@ -950,55 +1028,64 @@
       "name": "Armor Plate",
       "description": "Protects your torso from damage, until it gets destroyed",
       "quality": "Special Issue",
-      "carry": 2
+      "carry": 2,
+      "folder": "Tools"
     },
     {
       "name": "Portable Signals Detector",
       "description": "A consumable tool that will locate the nearest radio signal it detects",
       "quality": "Special Issue",
-      "carry": 2
+      "carry": 2,
+      "folder": "Tools"
     },
     {
       "name": "Improvised Mine",
       "description": "Probably wont kill you, but the shockwave is enough to throw anybody off balance",
       "quality": "Special Issue",
-      "carry": 3
+      "carry": 3,
+      "folder": "Tools"
     },
     {
       "name": "Fireworks",
       "description": "Launch a volley of colorful fireworks into the sky",
       "quality": "Common",
-      "carry": 6
+      "carry": 6,
+      "folder": "Tools"
     },
     {
       "name": "Mortar Strike",
       "description": "Use it to call in a mortar strike on a targeted area",
       "quality": "Special Issue",
-      "carry": 2
+      "carry": 2,
+      "folder": "Tools"
     },
     {
       "name": "Jammer",
       "description": "Disrupts the signals of outlanders in its proximity",
       "quality": "Rare",
-      "carry": 4
+      "carry": 4,
+      "folder": "Tools"
     },
     {
       "name": "Transmitter",
       "description": "A placeable tool that sends out radio signals indistinguishable from actual outlanders",
       "quality": "Rare",
-      "carry": 4
+      "carry": 4,
+      "folder": "Tools"
     },
     {
       "name": "Decoy",
       "description": "Confuses your enemies with fake gun shots",
       "quality": "Uncommon",
-      "carry": 5
+      "carry": 5,
+      "folder": "Tools"
     },
     {
       "name": "Fake Glint",
       "description": "A placeable tool with mirrors attached, producing glints",
       "quality": "Common",
-      "carry": 6
+      "carry": 6,
+      "folder": "Tools"
     }
   ],
   "throwables": [
@@ -1006,19 +1093,22 @@
       "name": "M67 Frag Grenade",
       "description": "A Fragmentation Hand Gernade, which has seen active service across the globe",
       "quality": "Special Issue",
-      "carry": 2
+      "carry": 2,
+      "folder": "Thrown"
     },
     {
       "name": "M84 Flash Grenade",
       "description": "Blind and deafen your enemies for a considerable tatical advantage",
       "quality": "Military",
-      "carry": 3
+      "carry": 3,
+      "folder": "Thrown"
     },
     {
       "name": "Radiation Grenade",
       "description": "Explosively Spreads radioactive dust in a large area, decreasing the maximum health of anyone irradiated",
       "quality": "Special Issue",
-      "carry": 2
+      "carry": 2,
+      "folder": "Thrown"
     }
   ],
   "traps": [
@@ -1026,25 +1116,29 @@
       "name": "Bear Trap",
       "description": "A placeable trap that damages and slows outlanders down",
       "quality": "Uncommon",
-      "carry": 5
+      "carry": 5,
+      "folder": "Traps"
     },
     {
       "name": "Booby Trap",
       "description": "Upon usage, booby traps a lootable container that its aimed at",
       "quality": "Military",
-      "carry": 3
+      "carry": 3,
+      "folder": "Traps"
     },
     {
       "name": "Contact Bomb",
       "description": "A placeable proximity-activated explosive",
       "quality": "Military",
-      "carry": 3
+      "carry": 3,
+      "folder": "Traps"
     },
     {
       "name": "Alarm Trap",
       "description": "A placable trap that produces a loud noise when something is within its proximity",
       "quality": "Uncommon",
-      "carry": 5
+      "carry": 5,
+      "folder": "Traps"
     }
   ]
 }

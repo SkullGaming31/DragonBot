@@ -1,4 +1,4 @@
-import { ChannelType, EmbedBuilder, TextBasedChannel } from 'discord.js';
+import { ChannelType, EmbedBuilder, TextBasedChannel, channelMention } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
 import { Event } from '../../../src/Structures/Event';
@@ -18,7 +18,9 @@ export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member) => {
 	// } else {
 	// 	messageToSend = `Welcome to ${guild.name}'s server!`;
 	// }
-	const messageToSend = guild.rulesChannel ? `Welcome to ${guild.name}'s server! Please read the rules in <#${guild.rulesChannelId}>.` : `Welcome to ${guild.name}'s server!`;
+
+	const rulesChannel = channelMention(guild.rulesChannelId || '');
+	const messageToSend = guild.rulesChannel ? `Welcome to ${guild.name}'s server! Please read the rules in ${rulesChannel}.` : `Welcome to ${guild.name}'s server!`;
 
 	const embed = new EmbedBuilder()
 		.setTitle('New Member')

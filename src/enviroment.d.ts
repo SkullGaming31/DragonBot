@@ -32,6 +32,8 @@ declare global {
       DEV_DASHBOARD_DOMAIN: string;
       DASHBOARD_DOMAIN: string;
       GITHUB_PERSONAL_ACCESS_TOKEN: string;
+      OPEN_API_KEY: string;
+      CHATGPT_CHANNEL: string;
     }
   }
 }
