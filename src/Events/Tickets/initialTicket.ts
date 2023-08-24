@@ -1,7 +1,7 @@
-import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, EmbedBuilder } from 'discord.js';
 import { Event } from '../../../src/Structures/Event';
-import DB from '../../Structures/Schemas/ticketDB';
-import TicketSetup from '../../Structures/Schemas/ticketSetupDB';
+import DB from '../../Database/Schemas/ticketDB';
+import TicketSetup from '../../Database/Schemas/ticketSetupDB';
 
 export default new Event('interactionCreate', async (interaction) => {
 	if (!interaction.isButton() || !interaction.inCachedGuild()) return;

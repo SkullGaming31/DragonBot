@@ -1,8 +1,8 @@
-import { EmbedBuilder, Colors, GuildMember, ChannelType, BaseInteraction } from 'discord.js';
+import { BaseInteraction, ChannelType, Colors, EmbedBuilder, GuildMember } from 'discord.js';
 import { Event } from '../../../src/Structures/Event';
 // import settings from '../../Structures/Schemas/settingsDB';
-import ticket from '../../Structures/Schemas/ticketSetupDB';
-import DB from '../../Structures/Schemas/ticketDB';
+import DB from '../../Database/Schemas/ticketDB';
+import ticket from '../../Database/Schemas/ticketSetupDB';
 
 export default new Event('interactionCreate', async (interaction: BaseInteraction) => {
 	if (!interaction.isButton() || !interaction.inCachedGuild()) return;

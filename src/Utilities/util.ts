@@ -1,3 +1,40 @@
 export function sleep(ms: number): Promise<void> {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+export const localizations = {
+	'en-US': 'Ping',
+	'en-GB': 'Ping',
+	'bg': 'Пинг',
+	'zh-CN': 'Ping',
+	'zh-TW': 'Ping',
+	'hr': 'Ping',
+	'cs': 'Ping',
+	'da': 'Ping',
+	'nl': 'Ping',
+	'fi': 'Ping',
+	'fr': 'Ping',
+	'de': 'Ping',
+	'el': 'Ping',
+	'hi': 'पिंग',
+	'hu': 'Ping',
+	'it': 'Ping',
+	'ja': 'ピン',
+	'ko': '핑',
+	'lt': 'Ping',
+	'no': 'Ping',
+	'pl': 'Ping',
+	'pt-BR': 'Ping',
+	'ro': 'Ping',
+	'ru': 'Пинг',
+	'sk': 'Ping',
+	'sl': 'Ping',
+	'es-ES': 'Ping',
+	'es-MX': 'Ping',
+	'sv': 'Ping',
+	'th': 'ปิง',
+	'tr': 'Ping',
+	'uk': 'Ping',
+	'vi': 'Ping',
+	// Add more translations here
+};

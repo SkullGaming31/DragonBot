@@ -5,13 +5,8 @@ config();
 export const connectDatabase = async (): Promise<void> => {
 	mongoose.set('strictQuery', false);
 	const connectionString = process.env.MONGO_DATABASE_URI as string;
-	const Dev_ConnectionString = process.env.DEV_MONGO_DATABASE_URI as string;
 	try {
-		if (process.env.Environment === 'dev') {
-			await mongoose.connect(`${Dev_ConnectionString}`, { connectTimeoutMS: 10000 });
-		} else {
-			await mongoose.connect(`${connectionString}`, { connectTimeoutMS: 10000 });
-		}
+		await mongoose.connect(`${connectionString}`, { connectTimeoutMS: 10000 });
 		console.log('MongoDB connection established successfully');
 		const { connection: DB } = mongoose;
 

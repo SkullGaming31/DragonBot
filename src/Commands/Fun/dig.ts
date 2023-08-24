@@ -2,6 +2,7 @@ import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord.js
 import { Command } from '../../Structures/Command';
 // import { UserModel, IUser } from 'Structures/Schemas/userModel';
 import { randomInt } from 'node:crypto';
+
 export default new Command({
 	name: 'dig',
 	description: 'Dig up caches and earn points but watch out for the bombs',

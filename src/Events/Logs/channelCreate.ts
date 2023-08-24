@@ -2,7 +2,7 @@ import { ChannelType, EmbedBuilder, GuildChannel, TextBasedChannel } from 'disco
 import { MongooseError } from 'mongoose';
 
 import { Event } from '../../../src/Structures/Event';
-import ChanLogger from '../../Structures/Schemas/LogsChannelDB';
+import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 
 export default new Event<'channelCreate'>('channelCreate', async (channel: GuildChannel) => {
 	const { guild, name } = channel;

@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder } from 'discord.js';
-import { Command } from '../../../src/Structures/Command';
+import { Command } from '../../Structures/Command';
 
 export default new Command({
 	name: 'help',

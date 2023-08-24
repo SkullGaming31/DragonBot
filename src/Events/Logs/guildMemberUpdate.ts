@@ -2,7 +2,7 @@ import { ChannelType, EmbedBuilder, GuildMember, PartialGuildMember, TextBasedCh
 import { MongooseError } from 'mongoose';
 
 import { Event } from '../../../src/Structures/Event';
-import ChanLogger from '../../Structures/Schemas/LogsChannelDB';
+import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 
 export default new Event<'guildMemberUpdate'>('guildMemberUpdate', async (oldMember: GuildMember | PartialGuildMember, newMember: GuildMember) => {
 	const { guild, user } = newMember;

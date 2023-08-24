@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, ChannelType, Colors, EmbedBuilder } from 'discord.js';
-import { Command } from '../../../src/Structures/Command';
-import ticket from '../../../src/Structures/Schemas/ticketSetupDB';
+import ticket from '../../Database/Schemas/ticketSetupDB';
+import { Command } from '../../Structures/Command';
 
 export default new Command({
 	name: 'ticketsetup',

@@ -1,10 +1,10 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, EmbedBuilder, channelMention, roleMention } from 'discord.js';
-import { Command } from '../../../src/Structures/Command';
-import settings from '../../Structures/Schemas/settingsDB';
+import settings from '../../Database/Schemas/settingsDB';
+import { Command } from '../../Structures/Command';
 
 export default new Command({
 	name: 'settings',
-	description: 'Guild settings for some channels',
+	description: 'Discord Server Bot Settings',
 	UserPerms: ['ManageChannels'],
 	BotPerms: ['ManageChannels'],
 	defaultMemberPermissions: ['ManageChannels'],
@@ -69,7 +69,7 @@ export default new Command({
 			const Welcomechan = options.getChannel('welcomechan') || null;
 			const NowLive = options.getChannel('live') || null;
 
-			const Administrator = options.getRole('admin');
+			const Administrator = options.getRole('admin') ?? null;
 			const Moderator = options.getRole('moderator') ?? null;
 
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any

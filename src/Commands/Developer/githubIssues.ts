@@ -1,67 +1,67 @@
 import axios, { AxiosResponse } from 'axios';
 import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder } from 'discord.js';
-import { Command } from '../../../src/Structures/Command';
+import { Command } from '../../Structures/Command';
 
 interface Github {
-  url: string;
-  repository_url: string;
-  labels_url: string;
-  comments_url: string;
-  events_url: string;
-  html_url: string;
-  id: number;
-  node_id: string;
-  number: number;
-  title: string;
-  user: {
-    login: string;
-    id: number;
-    node_id: string;
-    avatar_url: string;
-    gravatar_id: string;
-    url: string;
-    html_url: string;
-    followers_url: string;
-    following_url: string;
-    gists_url: string;
-    starred_url: string;
-    subscriptions_url: string;
-    organizations_url: string;
-    repos_url: string;
-    events_url: string;
-    received_events_url: string;
-    type: string;
-    site_admin: boolean;
-  };
-  labels: string[];
-  state: string;
-  locked: boolean;
-  assignee: string | null;
-  assignees: string[];
-  milestone: string | number | null;
-  comments: number;
-  created_at: string;
-  updated_at: string;
-  closed_at: string | null;
-  author_association: string;
-  active_lock_reason: string | null;
-  body: string;
-  // closed_by: null;
-  reactions: {
-    url: string;
-    total_count: number;
-    '+1': number;
-    '-1': number;
-    laugh: number;
-    hooray: number;
-    confused: number;
-    heart: number;
-    rocket: number;
-    eyes: number;
-  };
-  timeline_url: string;
-  // performed_via_github_app: null;
-  state_reason: string[] | null;
+	url: string;
+	repository_url: string;
+	labels_url: string;
+	comments_url: string;
+	events_url: string;
+	html_url: string;
+	id: number;
+	node_id: string;
+	number: number;
+	title: string;
+	user: {
+		login: string;
+		id: number;
+		node_id: string;
+		avatar_url: string;
+		gravatar_id: string;
+		url: string;
+		html_url: string;
+		followers_url: string;
+		following_url: string;
+		gists_url: string;
+		starred_url: string;
+		subscriptions_url: string;
+		organizations_url: string;
+		repos_url: string;
+		events_url: string;
+		received_events_url: string;
+		type: string;
+		site_admin: boolean;
+	};
+	labels: string[];
+	state: string;
+	locked: boolean;
+	assignee: string | null;
+	assignees: string[];
+	milestone: string | number | null;
+	comments: number;
+	created_at: string;
+	updated_at: string;
+	closed_at: string | null;
+	author_association: string;
+	active_lock_reason: string | null;
+	body: string;
+	// closed_by: null;
+	reactions: {
+		url: string;
+		total_count: number;
+		'+1': number;
+		'-1': number;
+		laugh: number;
+		hooray: number;
+		confused: number;
+		heart: number;
+		rocket: number;
+		eyes: number;
+	};
+	timeline_url: string;
+	// performed_via_github_app: null;
+	state_reason: string[] | null;
 }
 
 export default new Command({
@@ -98,9 +98,9 @@ export default new Command({
 		}
 	],
 	run: async ({ interaction }) => {
-		const Title = interaction.options.getString('title');
-		const Body = interaction.options.getString('body');
-		const Labels = interaction.options.getString('labels') ? [interaction.options.getString('labels')] : [];
+		const Title = options.getString('title');
+		const Body = options.getString('body');
+		const Labels = options.getString('labels') ? [options.getString('labels')] : [];
 
 		// Modify the following variables according to your GitHub repository
 		const owner = 'SkullGaming31';
@@ -120,7 +120,7 @@ export default new Command({
 		};
 
 		try {
-			const response: AxiosResponse<Github>= await axios.post(apiUrl, data, { headers });
+			const response: AxiosResponse<Github> = await axios.post(apiUrl, data, { headers });
 
 			if (response.status === 201) {
 				console.log('Github Response: ', response.data);

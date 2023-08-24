@@ -421,6 +421,20 @@
       "Misc": ["None"]
     },
     {
+      "name": "FG 42",
+      "type": "Machine Gun",
+      "slot": "Primary",
+      "quality": "Special Issue",
+      "basedamage": 38,
+      "rateoffire": 480,
+      "muzzleSpeed": 740,
+      "magsize": 21,
+      "weight": 4.95,
+      "folder": "Guns",
+      "firemode": ["Semi-Auto", "Auto"],
+      "Misc": ["Scope"]
+    },
+    {
       "name": "l86a1 lsw",
       "type": "Machine Gun",
       "slot": "Primary",

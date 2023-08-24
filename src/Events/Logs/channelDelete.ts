@@ -2,7 +2,7 @@ import { ChannelType, DMChannel, EmbedBuilder, GuildChannel, TextBasedChannel } 
 import { MongooseError } from 'mongoose';
 
 import { Event } from '../../../src/Structures/Event';
-import ChanLogger from '../../Structures/Schemas/LogsChannelDB';
+import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 
 export default new Event<'channelDelete'>('channelDelete', async (channel: GuildChannel | DMChannel) => {
 	if (channel.isDMBased()) return;

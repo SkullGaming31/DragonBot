@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType } from 'discord.js';
-import { Command } from '../../../src/Structures/Command';
-import DB from '../../Structures/Schemas/LogsChannelDB'; // DB
+import DB from '../../Database/Schemas/LogsChannelDB'; // DB
+import { Command } from '../../Structures/Command';
 
 export default new Command({
 	name: 'logger',

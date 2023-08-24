@@ -1,6 +1,6 @@
 import { ChannelType, Colors, EmbedBuilder, Message } from 'discord.js';
 import { Event } from '../../../src/Structures/Event';
-import settings from '../../Structures/Schemas/settingsDB';
+import settings from '../../Database/Schemas/settingsDB';
 
 const linkWhitelist: RegExp[] = [
 	/^(https?:\/\/)?(www\.)?twitch\.tv\//i,

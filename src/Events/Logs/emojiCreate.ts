@@ -1,7 +1,7 @@
 import { ChannelType, EmbedBuilder, GuildEmoji, TextBasedChannel } from 'discord.js';
-import { Event } from '../../../src/Structures/Event';
-import ChanLogger from '../../Structures/Schemas/LogsChannelDB';
 import { MongooseError } from 'mongoose';
+import { Event } from '../../../src/Structures/Event';
+import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 
 export default new Event<'emojiCreate'>('emojiCreate', async (emoji: GuildEmoji) => {
 	const { id, client, guild } = emoji;

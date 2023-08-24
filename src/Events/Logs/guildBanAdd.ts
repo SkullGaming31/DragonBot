@@ -2,7 +2,7 @@ import { ChannelType, EmbedBuilder, GuildBan, TextBasedChannel } from 'discord.j
 import { MongooseError } from 'mongoose';
 
 import { Event } from '../../../src/Structures/Event';
-import ChanLogger from '../../Structures/Schemas/LogsChannelDB'; // DB
+import ChanLogger from '../../Database/Schemas/LogsChannelDB'; // DB
 
 export default new Event<'guildBanAdd'>('guildBanAdd', async (ban: GuildBan) => {
 	const { guild, user } = ban;

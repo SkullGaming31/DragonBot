@@ -2,7 +2,7 @@ import { ChannelType, EmbedBuilder, Message, PartialMessage, TextBasedChannel } 
 import { MongooseError } from 'mongoose';
 
 import { Event } from '../../../src/Structures/Event';
-import ChanLogger from '../../Structures/Schemas/LogsChannelDB';// DB
+import ChanLogger from '../../Database/Schemas/LogsChannelDB'; // DB
 
 export default new Event<'messageUpdate'>('messageUpdate', async (oldMessage: Message | PartialMessage, newMessage: Message | PartialMessage) => {
 	if (!newMessage.inGuild()) return;

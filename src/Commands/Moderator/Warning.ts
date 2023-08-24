@@ -1,6 +1,6 @@
-import { ApplicationCommandType, ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
-import { Command } from '../../../src/Structures/Command';
-import DB from '../../Structures/Schemas/WarnDB';
+import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder } from 'discord.js';
+import DB from '../../Database/Schemas/WarnDB';
+import { Command } from '../../Structures/Command';
 
 export default new Command({
 	name: 'warn',
@@ -40,7 +40,7 @@ export default new Command({
 			.setAuthor({ name: `${Target?.tag}`, iconURL: `${Target?.displayAvatarURL({ size: 512 })}` })
 			.setDescription(`${Target?.username} has been warned, they now have ${existingWarning?.Warnings} warnings, Reason: ${Reason}`)
 			.setTimestamp();
-		
+
 		// if the user already has a warning, increment there warning count in the Database.
 		if (existingWarning) {
 			existingWarning.Warnings += 1;

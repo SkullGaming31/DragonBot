@@ -1,7 +1,7 @@
-import http from 'http';
+import { Request, Response } from 'express';
 import { ExtendedClient } from '../Structures/Client';
 
-const healthListener: http.RequestListener = async (_req, res) => {
+const healthListener = async (_req: Request, res: Response) => {
 	/**
    * @todo check MongoDB connection
    * @todo check Discord connection
@@ -24,8 +24,7 @@ const healthListener: http.RequestListener = async (_req, res) => {
 	}
 	//#endregion
 
-	res.writeHead(isOK ? 200 : 500);
-	res.end();
+	res.status(isOK ? 200 : 500).end();
 };
 
 export default healthListener;

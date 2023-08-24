@@ -2,7 +2,7 @@ import { ChannelType, EmbedBuilder, ErrorEvent, Message, PartialMessage, TextBas
 import { MongooseError } from 'mongoose';
 
 import { Event } from '../../../src/Structures/Event';
-import ChanLogger from '../../Structures/Schemas/LogsChannelDB'; // DB
+import ChanLogger from '../../Database/Schemas/LogsChannelDB'; // DB
 
 export default new Event<'messageDelete'>('messageDelete', async (message: Message | PartialMessage) => {
 	if (!message.inGuild()) return;

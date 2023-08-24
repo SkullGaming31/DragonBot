@@ -1,9 +1,9 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, Colors, EmbedBuilder } from 'discord.js';
-import { Command } from '../../../src/Structures/Command';
+import { Command } from '../../Structures/Command';
 
 export default new Command({
 	name: 'get-help',
-	description: 'get help for an issue your having with overlay expert',
+	description: 'get help for an issue your having',
 	UserPerms: ['SendMessages'],
 	BotPerms: ['SendMessages'],
 	defaultMemberPermissions: ['SendMessages'],

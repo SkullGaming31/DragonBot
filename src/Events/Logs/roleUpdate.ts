@@ -2,7 +2,7 @@ import { ChannelType, EmbedBuilder, Role, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
 import { Event } from '../../../src/Structures/Event';
-import DB from '../../Structures/Schemas/LogsChannelDB';// DB
+import DB from '../../Database/Schemas/LogsChannelDB'; // DB
 
 export default new Event<'roleUpdate'>('roleUpdate', async (oldRole: Role, newRole: Role) => {
 	const { guild, name } = newRole;

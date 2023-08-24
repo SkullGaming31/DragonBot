@@ -2,7 +2,7 @@ import { ChannelType, EmbedBuilder, TextBasedChannel, channelMention } from 'dis
 import { MongooseError } from 'mongoose';
 
 import { Event } from '../../../src/Structures/Event';
-import settings from '../../Structures/Schemas/settingsDB';
+import settings from '../../Database/Schemas/settingsDB';
 
 export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member) => {
 	const { guild, user } = member;

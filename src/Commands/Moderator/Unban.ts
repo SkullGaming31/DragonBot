@@ -1,5 +1,5 @@
-import { ApplicationCommandType, ApplicationCommandOptionType, EmbedBuilder, Colors, ButtonBuilder, ActionRowBuilder, ButtonStyle, ComponentType } from 'discord.js';
-import { Command } from '../../../src/Structures/Command';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, Colors, ComponentType, EmbedBuilder } from 'discord.js';
+import { Command } from '../../Structures/Command';
 
 export default new Command({
 	name: 'unban',
@@ -47,23 +47,23 @@ export default new Command({
 		col.on('collect', i => {
 			if (i.user.id !== user.id) return;
 			switch (i.customId) {
-			case 'unban-yes':
-				guild.members.unban(id);
-				interaction.editReply({
-					embeds: [
-						unbanEmbed.setDescription('**✔ | the user has been unbanned**')
-					],
-					components: []
-				});
-				break;
-			case 'unban-no':
-				interaction.editReply({
-					embeds: [
-						unbanEmbed.setDescription('✅ | unban Request Canceled')
-					],
-					components: []
-				});
-				break;
+				case 'unban-yes':
+					guild.members.unban(id);
+					interaction.editReply({
+						embeds: [
+							unbanEmbed.setDescription('**✔ | the user has been unbanned**')
+						],
+						components: []
+					});
+					break;
+				case 'unban-no':
+					interaction.editReply({
+						embeds: [
+							unbanEmbed.setDescription('✅ | unban Request Canceled')
+						],
+						components: []
+					});
+					break;
 			}
 		});
 		col.on('end', (collected) => {

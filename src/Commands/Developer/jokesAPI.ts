@@ -1,8 +1,8 @@
 // https://official-joke-api.appspot.com/random_joke
 import axios from 'axios';
 import { ApplicationCommandType, EmbedBuilder } from 'discord.js';
-import { Command } from '../../../src/Structures/Command';
 import { IjokeAPI } from '../../Interfaces/jokesInterface';
+import { Command } from '../../Structures/Command';
 axios.defaults;
 
 export default new Command({
@@ -39,7 +39,7 @@ export default new Command({
 				}
 			])
 			.setFooter({ text: `JokeID: ${jokeAPI.data.id}` });
-		
+
 		if (jokeAPI.data.type === 'general') { embed.setColor('Red'); }
 		if (jokeAPI.data.type === 'programming') { embed.setColor('Green'); }
 		if (jokeAPI.data.type === 'knock-knock') { embed.setColor('Blue'); }
@@ -54,4 +54,3 @@ export default new Command({
 		}, 2000);
 	}
 });
-

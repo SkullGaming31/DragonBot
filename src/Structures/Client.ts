@@ -6,13 +6,12 @@ const PG = promisify(glob);
 
 import { CommandType } from '../Typings/Command';
 import { RegisterCommandOptions } from '../Typings/client';
-import { Dashboard } from '../dashboard/index';
 import { Event } from './Event';
 
 export class ExtendedClient extends Client {
 	commands: Collection<string, CommandType> = new Collection();
 
-	constructor () {
+	constructor() {
 		super({
 			intents: [
 				GatewayIntentBits.Guilds,
@@ -34,7 +33,6 @@ export class ExtendedClient extends Client {
 			}
 		});
 	}
-	dashboard = new Dashboard(this);
 	async start() {
 		const agent = new Agent({
 			connect: {
@@ -45,14 +43,10 @@ export class ExtendedClient extends Client {
 		this.rest.setAgent(agent);
 		this.registerModules();
 		if (process.env.Enviroment === 'dev') {
-			await this.login(process.env.DEV_DISCORD_BOT_TOKEN).then(() => {
-				this.dashboard.init();
-			});
+			await this.login(process.env.DEV_DISCORD_BOT_TOKEN);
 		}
 		else if (process.env.Enviroment === 'debug') {
-			await this.login(process.env.DEV_DISCORD_BOT_TOKEN).then(() => {
-				this.dashboard.init();
-			});
+			await this.login(process.env.DEV_DISCORD_BOT_TOKEN);
 		}
 		else {
 			await this.login(process.env.DISCORD_BOT_TOKEN);
@@ -89,12 +83,13 @@ export class ExtendedClient extends Client {
 		});
 
 		this.on('ready', () => {
-			if (process.env.Enviroment === 'dev') {
-				this.registerCommands({ commands: slashCommands, guildId: '959693430227894292' });
-			} else if (process.env.Enviroment === 'debug') {
-				this.registerCommands({ commands: slashCommands, guildId: '959693430227894292' });
-			} else {
-				this.registerCommands({ commands: slashCommands, guildId: undefined });
+			switch (process.env.Environment) {
+				case 'debug':
+				case 'dev':
+					this.registerCommands({ commands: slashCommands, guildId: '959693430227894292' });
+					break;
+				default:
+					this.registerCommands({ commands: slashCommands, guildId: undefined });
 			}
 		});
 

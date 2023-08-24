@@ -2,7 +2,7 @@ import { ChannelType, EmbedBuilder, Role, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
 import { Event } from '../../../src/Structures/Event';
-import ChanLogger from '../../Structures/Schemas/LogsChannelDB';
+import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 
 export default new Event<'roleCreate'>('roleCreate', async (role: Role) => {
 	const { guild, name } = role;

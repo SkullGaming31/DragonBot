@@ -2,7 +2,7 @@ import { ChannelType, EmbedBuilder, Role, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
 import { Event } from '../../../src/Structures/Event';
-import ChanLogger from '../../Structures/Schemas/LogsChannelDB';// DB
+import ChanLogger from '../../Database/Schemas/LogsChannelDB'; // DB
 
 export default new Event<'roleDelete'>('roleDelete', async (role: Role) => {
 	const { guild, name } = role;

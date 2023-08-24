@@ -2,7 +2,7 @@ import { ChannelType, EmbedBuilder, GuildEmoji, TextBasedChannel } from 'discord
 import { MongooseError } from 'mongoose';
 
 import { Event } from '../../../src/Structures/Event';
-import ChanLogger from '../../Structures/Schemas/LogsChannelDB';
+import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 
 export default new Event<'emojiUpdate'>('emojiUpdate', async (oldEmoji: GuildEmoji, newEmoji: GuildEmoji) => {
 	const { id, client, guild } = newEmoji;

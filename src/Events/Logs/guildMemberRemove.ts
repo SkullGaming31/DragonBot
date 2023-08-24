@@ -2,7 +2,7 @@ import { ChannelType, EmbedBuilder, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
 import { Event } from '../../../src/Structures/Event';
-import settings from '../../Structures/Schemas/settingsDB';
+import settings from '../../Database/Schemas/settingsDB';
 
 export default new Event<'guildMemberRemove'>('guildMemberRemove', async (member) => {
 	try {

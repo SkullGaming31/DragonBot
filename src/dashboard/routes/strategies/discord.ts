@@ -1,10 +1,10 @@
+import { config } from 'dotenv';
 import passport from 'passport';
 import { Profile, Strategy } from 'passport-discord';
-import { config } from 'dotenv';
 config();
 
+import { TokenModel } from '../../../Database/Schemas/tokenModel';
 import { ExtendedClient } from '../../../Structures/Client';
-import { TokenModel } from '../../../Structures/Schemas/tokenModel';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function discordStrategy(client: ExtendedClient) {

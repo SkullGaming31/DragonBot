@@ -1,8 +1,8 @@
 import { ChannelType, EmbedBuilder, Guild, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
+import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import { Event } from '../../Structures/Event';
-import ChanLogger from '../../Structures/Schemas/LogsChannelDB';
 
 export default new Event<'guildCreate'>('guildCreate', async (guild: Guild) => {
 	const { channels } = guild;

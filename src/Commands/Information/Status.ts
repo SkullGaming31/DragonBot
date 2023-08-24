@@ -1,4 +1,4 @@
-import { ApplicationCommandType, ChannelType, Colors, EmbedBuilder, version } from 'discord.js';
+import { ApplicationCommandType, ChannelType, EmbedBuilder, version } from 'discord.js';
 import { connection } from 'mongoose';
 import os from 'os';
 import { Command } from '../../Structures/Command';
@@ -34,15 +34,15 @@ export default new Command({
 		if (interaction.client.application.owner === null) return;
 
 		const embed = new EmbedBuilder()
-			.setColor(Colors.Blue)
+			.setColor('Blue')
 			.setTitle(`🍞 ${user?.username} Status`)
 			.setThumbnail(`${user?.displayAvatarURL({ size: 512 })}`)
-			.setDescription(`${interaction.client.application?.description || 'No Description'}`)
+			.setDescription(`${interaction.client.application?.description || 'No Bot Description Set'}`)
 			.addFields(
-				{ name: '👩🏻‍🔧 Client', value: `${user?.tag}` },
+				{ name: '👩🏻‍🔧 Client', value: `${user?.username}` },
 				{ name: '📆 Created', value: `<t:${parseInt(`${user?.createdTimestamp / 1000}`)}:R>`, inline: true },
 				{ name: '☑ Verified', value: user?.flags?.has('VerifiedBot') ? 'Yes' : 'No', inline: true },
-				{ name: '👩🏻‍💻 Bot Owner', value: `${interaction.client.user.tag || 'None'}`, inline: true },
+				{ name: '👩🏻‍💻 Bot Owner', value: `${interaction.client.user.username || 'None'}`, inline: true },
 				{ name: '📚 Database', value: status[connection.readyState], inline: true },
 				{ name: '🖥 System', value: os.type().replace('Windows_NT', 'Windows').replace('Darwin', 'macOS'), inline: true },
 				{ name: '🧠 CPU Model', value: `${os.cpus()[0].model}`, inline: true },
@@ -60,6 +60,6 @@ export default new Command({
 			)
 			.setFooter({ text: 'Last Checked' })
 			.setTimestamp();
-		interaction.editReply({ embeds: [embed] });
+		await interaction.editReply({ embeds: [embed] });
 	}
 });

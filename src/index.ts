@@ -18,7 +18,7 @@ async function main() {
 	const errorHook = new WebhookClient({ id: WebHookID, token: WebHookToken, });
 	await errorHandler(errorHook);
 	await connectDatabase();
-	await startApi();
+	startApi();
 	checkVariables(process.env); // checks if any variable's values are missing in the .env
 }
 

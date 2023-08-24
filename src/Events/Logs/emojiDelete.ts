@@ -2,7 +2,7 @@ import { ChannelType, EmbedBuilder, GuildEmoji, TextBasedChannel } from 'discord
 import { MongooseError } from 'mongoose';
 
 import { Event } from '../../../src/Structures/Event';
-import ChanLogger from '../../Structures/Schemas/LogsChannelDB';
+import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 
 export default new Event<'emojiDelete'>('emojiDelete', async (emoji: GuildEmoji) => {
 	const { id, guild } = emoji;

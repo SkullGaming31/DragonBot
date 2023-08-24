@@ -1,4 +1,4 @@
-import { ApplicationCommandType, /* ApplicationCommandOptionType, Colors, EmbedBuilder */ } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord.js';
 import { Command } from '../../../src/Structures/Command';
 
 export default new Command({
@@ -9,18 +9,18 @@ export default new Command({
 	defaultMemberPermissions: ['ManageMessages'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
-		// {
-		// 	name: 'amount',
-		// 	description: 'the ammount of messages you wanna clear from the channel',
-		// 	type: ApplicationCommandOptionType.Number,
-		// 	required: true
-		// },
-		// {
-		// 	name: 'target',
-		// 	description: 'the member you want to clear the messages for',
-		// 	type: ApplicationCommandOptionType.User,
-		// 	required: false
-		// }
+		{
+			name: 'amount',
+			description: 'the ammount of messages you wanna clear from the channel',
+			type: ApplicationCommandOptionType.Number,
+			required: true
+		},
+		{
+			name: 'target',
+			description: 'the member you want to clear the messages for',
+			type: ApplicationCommandOptionType.User,
+			required: false
+		}
 	],
 	run: async ({ interaction }) => {
 		if (!interaction.inCachedGuild()) return;
@@ -36,27 +36,27 @@ export default new Command({
 
 		// if (Messages === undefined) return;
 		// if (Amount === null) return interaction.reply({ content: 'You must provide an amount to clear' });
-		// const response = new EmbedBuilder().setColor(Colors.NotQuiteBlack);
+		// const response = new EmbedBuilder().setColor('NotQuiteBlack');
 
 		// if (Target) {
 		// 	let i = 0;
-		// 	const filtered: any[] = [];
-		// 	(Messages).filter((m: any) => {
+		// 	const filtered: Message[] = [];
+		// 	(Messages).filter((m: Message) => {
 		// 		if (m.author.id === Target.id && Amount > i) {
 		// 			filtered.push(m);
 		// 			i++;
 		// 		}
 		// 	});
-		// 	await channel?.bulkDelete(filtered, true).then(messages => {
+		// 	await channel?.bulkDelete(filtered, true).then(async (messages) => {
 		// 		response.setDescription(`🧹 ${interaction.user.username} Cleared ${messages.size} messages from ${Target}`)
-		// 			.setColor(Colors.Red);
-		// 		interaction.reply({ embeds: [response] });
+		// 			.setColor('Red');
+		// 		await interaction.reply({ embeds: [response] });
 		// 	});
 		// } else {
-		// 	await channel?.bulkDelete(Amount, true).then(messages => {
+		// 	await channel?.bulkDelete(Amount, true).then(async (messages) => {
 		// 		response.setDescription(`🧹 ${interaction.user.username} Cleared ${messages.size} messages from the channel`)
-		// 			.setColor(Colors.Red);
-		// 		interaction.reply({ embeds: [response] });
+		// 			.setColor('Red');
+		// 		await interaction.reply({ embeds: [response] });
 		// 	});
 		// }
 	}

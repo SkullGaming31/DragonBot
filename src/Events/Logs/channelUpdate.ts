@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ChannelType, DMChannel, EmbedBuilder, GuildChannel } from 'discord.js';
-import { MongooseError } from 'mongoose';
+import { DMChannel, GuildChannel } from 'discord.js';
 
 import { Event } from '../../../src/Structures/Event';
-import ChanLogger from '../../Structures/Schemas/LogsChannelDB';
 
 export default new Event<'channelUpdate'>('channelUpdate', async (oldChannel: DMChannel | GuildChannel, newChannel: DMChannel | GuildChannel) => {
 	// if (newChannel.isDMBased()) return;

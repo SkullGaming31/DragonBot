@@ -1,9 +1,9 @@
 import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, Colors, ComponentType, EmbedBuilder } from 'discord.js';
-import { Command } from '../../../src/Structures/Command';
+import { Command } from '../../Structures/Command';
 
 export default new Command({
 	name: 'ban',
-	description: 'bans a member from the guild',
+	description: 'bans a member from the Server',
 	UserPerms: ['BanMembers'],
 	BotPerms: ['BanMembers'],
 	defaultMemberPermissions: ['BanMembers'],
@@ -59,38 +59,39 @@ export default new Command({
 		col.on('collect', i => {
 			if (i.user.id !== user.id) return;
 			switch (i.customId) {
-			case 'ban-yes':
-				if (member?.bannable) member.ban({ reason: reason });
-				interaction.editReply({
-					embeds: [
-						banEmbed.setDescription(`✔ | ${member} **has been banned for : ${reason}**`)
-					],
-					components: []
-				});
-				member?.send({
-					embeds: [
-						new EmbedBuilder()
-							.setColor(Colors.Red)
-							.addFields([
-								{
-									name: 'Reason',
-									value: `you were banned from ${guild} for ${reason}`,
-									inline: true
-								}
-							])
-					]
-				}).catch(err => {
-					if (err.code !== 50007) return console.error('Users Dm\'s are turned off', err);
-				});
-				break;
-			case 'ban-no':
-				interaction.editReply({
-					embeds: [
-						banEmbed.setDescription('✅ | ban Request Canceled')
-					],
-					components: []
-				});
-				break;
+				case 'ban-yes':
+					if (member?.bannable) member.ban({ reason: reason, deleteMessageSeconds: 60 * 60 * 24 * 7 });
+					interaction.editReply({
+						embeds: [
+							banEmbed.setDescription(`✔ | ${member} **has been banned for : ${reason}**`)
+						],
+						components: []
+					});
+					member?.send({
+						embeds: [
+							new EmbedBuilder()
+								.setColor('Red')
+								.addFields([
+									{
+										name: 'Reason',
+										value: `you were banned from ${guild} for ${reason}`,
+										inline: true
+									}
+								])
+						]
+					}).catch((err: any) => {
+						if (err.code !== 50007) return console.error('Users Dm\'s are turned off', err);
+						interaction.reply({ content: 'a Message to the user was not sent, they have there DM\'s turned off', ephemeral: true });
+					});
+					break;
+				case 'ban-no':
+					interaction.editReply({
+						embeds: [
+							banEmbed.setDescription('✅ | ban Request Canceled')
+						],
+						components: []
+					});
+					break;
 			}
 		});
 		col.on('end', (collected) => {
