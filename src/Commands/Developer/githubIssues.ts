@@ -98,6 +98,7 @@ export default new Command({
 		}
 	],
 	run: async ({ interaction }) => {
+		const { options } = interaction;
 		const Title = options.getString('title');
 		const Body = options.getString('body');
 		const Labels = options.getString('labels') ? [options.getString('labels')] : [];

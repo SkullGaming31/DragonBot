@@ -26,9 +26,8 @@ export default new Command({
 	],
 	run: async ({ interaction }) => {
 		if (!interaction.inCachedGuild()) return;
-
+		if (!interaction.isChatInputCommand()) return;
 		const { guild, options } = interaction;
-
 		try {
 			const EnableLogs = options.getBoolean('enablelogs');
 			const Logger = options.getChannel('logger') || null;
