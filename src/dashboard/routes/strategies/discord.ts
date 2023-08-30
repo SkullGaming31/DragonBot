@@ -22,15 +22,26 @@ export function discordStrategy(client: ExtendedClient) {
 		}
 	});
 	passport.use(new Strategy({
-		clientID: `${process.env.DEV_DISCORD_CLIENT_ID}`,
-		clientSecret: `${process.env.DEV_DISCORD_CLIENT_SECRET}`,
-		callbackURL: 'http://localhost:3001/auth/discord/redirect',
-		scope: ['identify', 'email', 'guilds']
+		clientID: `${process.env.DISCORD_CLIENT_ID}`,
+		clientSecret: `${process.env.DISCORD_CLIENT_SECRET}`,
+		callbackURL: 'http://localhost:3001/api/auth/discord/redirect',
+		scope: ['identify', 'email', 'guilds', 'connections']
 	}, async (accessToken: string, refreshToken: string, profile: Profile, done) => {
 		const { id: discordId, email } = profile;
 		try {
-			const existingUser = await TokenModel.findOneAndUpdate({ id: discordId }, { accessToken, refreshToken }, { new: true });
-			if (existingUser) return done(null, existingUser);
+			// Find the existing user by their Discord ID
+			let existingUser = await TokenModel.findOne({ discordId });
+
+			// If the user already exists, update their information
+			if (existingUser) {
+				existingUser.accessToken = accessToken;
+				existingUser.refreshToken = refreshToken;
+				existingUser.email = email;
+				existingUser = await existingUser.save(); // Save the updated user
+				return done(null, existingUser);
+			}
+
+			// If the user does not exist, create a new entry
 			const newUser = new TokenModel({ discordId, accessToken, refreshToken, email });
 			const savedUser = await newUser.save();
 			return done(null, savedUser);

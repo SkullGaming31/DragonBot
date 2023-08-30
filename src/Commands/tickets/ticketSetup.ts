@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, ChannelType, Colors, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, ChannelType, EmbedBuilder } from 'discord.js';
 import ticket from '../../Database/Schemas/ticketSetupDB';
 import { Command } from '../../Structures/Command';
 
@@ -150,7 +150,7 @@ export default new Command({
 			);
 
 			const supportEmbed = new EmbedBuilder()
-				.setColor(Colors.DarkPurple)
+				.setColor('DarkPurple')
 				.setAuthor({ name: `${guild?.name} | Ticket System`, iconURL: guild?.iconURL({ size: 512 }) ?? undefined })
 				.setDescription(supportDescription);
 			const reportEmbed = new EmbedBuilder()
@@ -165,16 +165,17 @@ export default new Command({
 			if (ticketChannel?.type === ChannelType.GuildText) await ticketChannel.send({ embeds: [supportEmbed], components: [Buttons] });
 			if (reportChannel?.type === ChannelType.GuildText) await reportChannel.send({ embeds: [reportEmbed], components: [memberButton] });
 
-			interaction.reply({ content: 'done', ephemeral: true });
+			await interaction.reply({ content: 'done', ephemeral: true });
 		} catch (error) {
-			const errEmbed = new EmbedBuilder().setColor(Colors.Red)
+			const errEmbed = new EmbedBuilder()
+				.setColor('Red')
 				.setDescription(`⛔ | An Error occured while setting up your ticket system\n **What to make sure of?**
 			1. Make sure none of your buttons names are duplacated.
 			2. Make sure to use this format for your buttons => Name,Emoji.
 			3. Make sure your button names do not exceed 200 characters.
 			4. Make sure your button emojis are actually emojis, not ids.`);
 			console.error(error);
-			interaction.reply({ embeds: [errEmbed], ephemeral: true });
+			await interaction.reply({ embeds: [errEmbed], ephemeral: true });
 		}
 	}
 });

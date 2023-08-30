@@ -3,13 +3,20 @@ import express, { Request, Response } from 'express';
 import healthListener from './health';
 
 const app = express();
-const port = process.env.PORT || 8080;
+const port = 8080;
 
 app.use(express.json());
 app.use(express.static('public'));
 
 app.get('/', async (req, res) => {
 	res.sendFile('index.html', { root: './public' });
+});
+app.get('/discord', (req: Request, res: Response) => {
+	const scopes: string[] = ['identify', 'guilds', 'applications.commands', 'bot', 'connections'];
+	const joinedScopes: string = scopes.join('%20') as string;
+
+	const discordRedirect = `https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&permissions=30092622032118&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fauth%2Fdiscord%2Fredirect&response_type=code&scope=${joinedScopes}`;
+	res.redirect(discordRedirect);
 });
 app.get('/auth/discord/redirect', async (req: Request, res: Response) => {
 	// Handle the Discord OAuth2 redirect here
@@ -24,8 +31,8 @@ app.get('/auth/discord/redirect', async (req: Request, res: Response) => {
 					client_secret: process.env.DISCORD_CLIENT_SECRET as string,
 					code: code as string, // Explicitly cast code to string
 					grant_type: 'authorization_code',
-					redirect_uri: 'http://localhost:8080/auth/discord/redirect',
-					scope: 'identify guilds applications.commands',
+					redirect_uri: process.env.DEV_DISCORD_REDIRECT_URL as string,
+					scope: 'identify guilds applications.commands bot',
 				}).toString(),
 				{
 					headers: {

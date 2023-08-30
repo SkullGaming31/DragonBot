@@ -20,15 +20,15 @@ export default new Event<'guildCreate'>('guildCreate', async (guild: Guild) => {
 
 	let notificationSetting: string;
 	switch (guild.defaultMessageNotifications) {
-	case 0:
-		notificationSetting = 'All Messages';
-		break;
-	case 1:
-		notificationSetting = 'Only @Mentions';
-		break;
-	default:
-		notificationSetting = guild.defaultMessageNotifications.toString();
-		break;
+		case 0:
+			notificationSetting = 'All Messages';
+			break;
+		case 1:
+			notificationSetting = 'Only @Mentions';
+			break;
+		default:
+			notificationSetting = guild.defaultMessageNotifications.toString();
+			break;
 	}
 
 	const embed = new EmbedBuilder()

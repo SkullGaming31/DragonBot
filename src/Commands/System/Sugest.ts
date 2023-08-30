@@ -47,7 +47,7 @@ export default new Command({
 		const Response = new EmbedBuilder()
 			.setTitle('NEW SUGGESTION')
 			.setColor('Blue')
-			.setAuthor({ name: `${user.username}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` })
+			.setAuthor({ name: `${user.globalName || user.username}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` })
 			.setDescription(Description)
 			.addFields(
 				{ name: 'Name', value: `${Name}` },

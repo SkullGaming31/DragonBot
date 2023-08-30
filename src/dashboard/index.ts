@@ -4,7 +4,7 @@ import { createApp } from './util/createApp';
 
 export class Dashboard {
 	client: ExtendedClient;
-	constructor (client: ExtendedClient) {
+	constructor(client: ExtendedClient) {
 		this.client = client;
 	}
 	init() {
@@ -13,11 +13,11 @@ export class Dashboard {
 				const port = process.env.PORT;
 				const app = createApp(this.client);
 				app.listen(port, () => {
-					console.log(`The Dashboard Has started, http://localhost:${port}`);
+					console.log(`The Dashboard Has started, http://localhost:${port}/api`);
 				});
 			} catch (error) { console.error(error); }
 		};
-		if (!this.client.isReady()) this.client.once(Events.ClientReady, () => 
+		if (!this.client.isReady()) this.client.once(Events.ClientReady, () =>
 			initialize());
 		else initialize();
 	}

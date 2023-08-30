@@ -1,5 +1,5 @@
-import { EmbedBuilder, Message, ChannelType } from 'discord.js';
-import { Event } from '../../../src/Structures/Event';
+import { ChannelType, EmbedBuilder, Message } from 'discord.js';
+import { Event } from '../../Structures/Event';
 
 function createHelpEmbed(authorTag: string, guildName?: string) {
 	return new EmbedBuilder()

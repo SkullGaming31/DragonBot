@@ -1,15 +1,15 @@
-import routes from '../routes';
-import express from 'express';
+import store from 'connect-mongo';
 import cors from 'cors';
-import passport from 'passport';
+import express from 'express';
 import session from 'express-session';
 import ms from 'ms';
-import store from 'connect-mongo';
+import passport from 'passport';
 import path from 'path';
+import routes from '../routes';
 
-import { logger } from '../middleware/Logger';
-import { discordStrategy } from '../../dashboard/routes/strategies/discord';
 import { ExtendedClient } from '../../Structures/Client';
+import { discordStrategy } from '../../dashboard/routes/strategies/discord';
+import { logger } from '../middleware/Logger';
 
 export function createApp(client: ExtendedClient) {
 	discordStrategy(client);
@@ -22,7 +22,7 @@ export function createApp(client: ExtendedClient) {
 	app.use(express.urlencoded({ extended: true }));
 	app.set('views', path.join(__dirname, '../views'));
 	app.use(express.static(path.join(__dirname, '../public')));
-	app.set('view engine', 'ejs');
+	app.set('view engine', 'pug');
 	app.use(session({
 		secret: sessionSecret,
 		saveUninitialized: false,
@@ -33,7 +33,6 @@ export function createApp(client: ExtendedClient) {
 		store: store.create({ mongoUrl: process.env.MONGO_DATABASE_URI as string })
 	}));
 	app.use(passport.initialize());
-	app.use(session());
 	app.use('/api', routes);
 	app.use(logger);
 

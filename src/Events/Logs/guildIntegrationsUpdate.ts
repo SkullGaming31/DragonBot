@@ -17,7 +17,10 @@ export default new Event<'guildIntegrationsUpdate'>('guildIntegrationsUpdate', a
 
 	// const inter = await guild.fetchIntegrations();
 
-	const embed = new EmbedBuilder().setTitle(guild.name).setDescription('Not implemented yet!').setTimestamp();
+	const embed = new EmbedBuilder()
+		.setTitle(guild.name)
+		.setDescription('Not implemented yet!')
+		.setTimestamp();
 
 	try {
 		await logsChannelOBJ.send({ embeds: [embed] });

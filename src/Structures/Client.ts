@@ -6,6 +6,7 @@ const PG = promisify(glob);
 
 import { CommandType } from '../Typings/Command';
 import { RegisterCommandOptions } from '../Typings/client';
+import { Dashboard } from '../dashboard';
 import { Event } from './Event';
 
 export class ExtendedClient extends Client {
@@ -42,14 +43,16 @@ export class ExtendedClient extends Client {
 
 		this.rest.setAgent(agent);
 		this.registerModules();
-		if (process.env.Enviroment === 'dev') {
-			await this.login(process.env.DEV_DISCORD_BOT_TOKEN);
-		}
-		else if (process.env.Enviroment === 'debug') {
-			await this.login(process.env.DEV_DISCORD_BOT_TOKEN);
-		}
-		else {
-			await this.login(process.env.DISCORD_BOT_TOKEN);
+		if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
+			await this.login(process.env.DEV_DISCORD_BOT_TOKEN).then(() => {
+				const dashboard = new Dashboard(this);
+				dashboard.init();
+			});
+		} else {
+			await this.login(process.env.DISCORD_BOT_TOKEN).then(() => {
+				const dashboard = new Dashboard(this);
+				dashboard.init();
+			});
 		}
 	}
 

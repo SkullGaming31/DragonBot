@@ -21,10 +21,10 @@ export default new Event<'guildDelete'>('guildDelete', async (guild: Guild) => {
 		.setTitle(guild.name)
 		.setAuthor({ name: guildOwner.displayName, iconURL: guildOwner.displayAvatarURL({ size: 512 }) })
 		.setImage(guild.bannerURL({ size: 512 }))
-		.setColor('Green')
+		.setColor('Red')
 		.setDescription(`The bot has left ${guildOwner.displayName}'s guild`)
 		.setTimestamp();
-		
+
 	try {
 		await logsChannelOBJ.send({ embeds: [embed] });
 	} catch (error) {

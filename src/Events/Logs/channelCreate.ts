@@ -1,8 +1,8 @@
 import { ChannelType, EmbedBuilder, GuildChannel, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
-import { Event } from '../../../src/Structures/Event';
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
+import { Event } from '../../Structures/Event';
 
 export default new Event<'channelCreate'>('channelCreate', async (channel: GuildChannel) => {
 	const { guild, name } = channel;
@@ -16,7 +16,7 @@ export default new Event<'channelCreate'>('channelCreate', async (channel: Guild
 	if (!logsChannelObj || logsChannelObj.type !== ChannelType.GuildText) return;
 
 	const embed = new EmbedBuilder()
-		.setColor('Red')
+		.setColor('Green')
 		.setDescription(`A channel has been created named: ${channel}, **${name}**`)
 		.setTimestamp();
 

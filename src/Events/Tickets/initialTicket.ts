@@ -1,7 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, EmbedBuilder } from 'discord.js';
-import { Event } from '../../../src/Structures/Event';
 import DB from '../../Database/Schemas/ticketDB';
 import TicketSetup from '../../Database/Schemas/ticketSetupDB';
+import { Event } from '../../Structures/Event';
 
 export default new Event('interactionCreate', async (interaction) => {
 	if (!interaction.isButton() || !interaction.inCachedGuild()) return;
@@ -75,13 +75,13 @@ export default new Event('interactionCreate', async (interaction) => {
 						.setStyle(ButtonStyle.Secondary)
 						.setEmoji('🛄')
 				);
-				channel.send({ embeds: [embed], components: [Buttons], });
+				await channel.send({ embeds: [embed], components: [Buttons], });
 				await channel.send({ content: `${member} here is your ticket` }).then((m) => {
 					setTimeout(() => {
 						m.delete().catch((err: Error) => { console.error(err); });
 					}, 5000); // 1000ms = 1 second
 				}).catch((err: Error) => { console.error(err); });
-				interaction.reply({ content: `${member} your ticket has been created: ${channel}`, ephemeral: true, });
+				await interaction.reply({ content: `${member} your ticket has been created: ${channel}`, ephemeral: true, });
 			});
 	} catch (error) {
 		console.error(error);

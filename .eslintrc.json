@@ -19,17 +19,10 @@
     ],
     "rules": {
         "indent": ["error", "tab", { "SwitchCase": 1 }],
-        "linebreak-style": [
-            "error",
-            "windows"
-        ],
-        "quotes": [
-            "error",
-            "single"
-        ],
-        "semi": [
-            "error",
-            "always"
-        ]
+        "linebreak-style": ["error", "unix"],
+        "quotes": ["error", "single"],
+        "semi": ["error", "always"],
+        "prefer-arrow-callback": "error",
+        "prefer-const": "error"
     }
 }

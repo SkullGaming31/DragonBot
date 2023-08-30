@@ -1,8 +1,8 @@
 import { ChannelType, EmbedBuilder, Message, PartialMessage, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
-import { Event } from '../../../src/Structures/Event';
 import ChanLogger from '../../Database/Schemas/LogsChannelDB'; // DB
+import { Event } from '../../Structures/Event';
 
 export default new Event<'messageUpdate'>('messageUpdate', async (oldMessage: Message | PartialMessage, newMessage: Message | PartialMessage) => {
 	if (!newMessage.inGuild()) return;
@@ -30,7 +30,7 @@ export default new Event<'messageUpdate'>('messageUpdate', async (oldMessage: Me
 		.setColor('Yellow')
 		.setDescription(`📘 A [message](${newMessage.url} by ${author} was **edited** in ${channel}.\n
 				**Original**:\n ${Original} \n**Edited**: \n ${Edited}`)
-		.setFooter({ text: `Member: ${author?.tag} | ID: ${author?.id}` });
+		.setFooter({ text: `Member: ${author?.globalName} | ID: ${author?.id}` });
 
 	try {
 		await logsChannelOBJ.send({ embeds: [log] });

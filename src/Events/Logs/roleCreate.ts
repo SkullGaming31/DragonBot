@@ -1,8 +1,8 @@
 import { ChannelType, EmbedBuilder, Role, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
-import { Event } from '../../../src/Structures/Event';
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
+import { Event } from '../../Structures/Event';
 
 export default new Event<'roleCreate'>('roleCreate', async (role: Role) => {
 	const { guild, name } = role;
@@ -13,11 +13,15 @@ export default new Event<'roleCreate'>('roleCreate', async (role: Role) => {
 
 	const logsChannelID = data?.Channel;
 	if (logsChannelID === undefined) return;
-	
+
 	const logsChannelOBJ = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
 	if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
 
-	const Embed = new EmbedBuilder().setTitle('Role Created').setDescription(`a role has been created named: ${role}, \`${name}\``).setColor(role.color).setTimestamp();
+	const Embed = new EmbedBuilder()
+		.setTitle('Role Created')
+		.setDescription(`a role has been created named: ${role}, \`${name}\``)
+		.setColor(role.color)
+		.setTimestamp();
 
 	try {
 		await logsChannelOBJ.send({ embeds: [Embed] });

@@ -1,8 +1,8 @@
 import { ChannelType, EmbedBuilder, TextBasedChannel, channelMention } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
-import { Event } from '../../../src/Structures/Event';
 import settings from '../../Database/Schemas/settingsDB';
+import { Event } from '../../Structures/Event';
 
 export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member) => {
 	const { guild, user } = member;
@@ -25,7 +25,7 @@ export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member) => {
 	const embed = new EmbedBuilder()
 		.setTitle('New Member')
 		.setDescription(messageToSend)
-		.setAuthor({ name: user.tag, iconURL: user.displayAvatarURL({ size: 512 })})
+		.setAuthor({ name: `${user.globalName}`, iconURL: user.displayAvatarURL({ size: 512 }) })
 		.setColor('Blue')
 		.addFields([
 			{
@@ -40,7 +40,7 @@ export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member) => {
 			},
 		])
 		.setThumbnail(guild.iconURL({ size: 512 }))
-		.setFooter({ text: `UserID: ${member.id}`})
+		.setFooter({ text: `UserID: ${member.id}` })
 		.setTimestamp();
 	try {
 		if (data.Welcome === true) {

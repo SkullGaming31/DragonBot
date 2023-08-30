@@ -1,14 +1,14 @@
 import { ChannelType, DMChannel, EmbedBuilder, GuildChannel, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
-import { Event } from '../../../src/Structures/Event';
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
+import { Event } from '../../Structures/Event';
 
 export default new Event<'channelDelete'>('channelDelete', async (channel: GuildChannel | DMChannel) => {
 	if (channel.isDMBased()) return;
 
 	const { guild, name } = channel;
-	const data = await ChanLogger.findOne({ Guild: guild.id }).catch((err: MongooseError) => {console.error(err.message); });
+	const data = await ChanLogger.findOne({ Guild: guild.id }).catch((err: MongooseError) => { console.error(err.message); });
 	if (!data || data.enableLogs === false) return;
 
 	const logsChannelID = data.Channel;
@@ -16,7 +16,10 @@ export default new Event<'channelDelete'>('channelDelete', async (channel: Guild
 	const logChannelObj = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
 	if (!logChannelObj || logChannelObj.type !== ChannelType.GuildText) return;
 
-	const embed = new EmbedBuilder().setColor('Red').setDescription(`A channel has been deleted named: ${channel}, **${name}**`).setTimestamp();
+	const embed = new EmbedBuilder()
+		.setColor('Red')
+		.setDescription(`A channel has been deleted named: ${channel}, **${name}**`)
+		.setTimestamp();
 
 	try {
 		await logChannelObj.send({ embeds: [embed] });

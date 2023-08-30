@@ -1,8 +1,8 @@
 import { ChannelType, EmbedBuilder, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
-import { Event } from '../../../src/Structures/Event';
 import settings from '../../Database/Schemas/settingsDB';
+import { Event } from '../../Structures/Event';
 
 export default new Event<'guildMemberRemove'>('guildMemberRemove', async (member) => {
 	try {
@@ -17,7 +17,7 @@ export default new Event<'guildMemberRemove'>('guildMemberRemove', async (member
 
 		const embed = new EmbedBuilder()
 			.setTitle('Member Left')
-			.setAuthor({ name: user.tag, iconURL: user.displayAvatarURL({ size: 512 })})
+			.setAuthor({ name: `${user.globalName}`, iconURL: user.displayAvatarURL({ size: 512 }) })
 			.setColor('Red')
 			.addFields([
 				{
@@ -26,7 +26,7 @@ export default new Event<'guildMemberRemove'>('guildMemberRemove', async (member
 					inline: false
 				}
 			])
-			.setFooter({ text: `UserID: ${member.id}`})
+			.setFooter({ text: `UserID: ${member.id}` })
 			.setTimestamp();
 
 		if (data.Welcome === true) await logsChannelOBJ.send({ embeds: [embed] });

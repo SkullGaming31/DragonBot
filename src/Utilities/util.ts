@@ -36,5 +36,4 @@ export const localizations = {
 	'tr': 'Ping',
 	'uk': 'Ping',
 	'vi': 'Ping',
-	// Add more translations here
 };

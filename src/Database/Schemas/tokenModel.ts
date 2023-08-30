@@ -1,10 +1,10 @@
-import { model, Schema, Document, Model } from 'mongoose';
+import { Document, Model, Schema, model } from 'mongoose';
 
 export interface IToken extends Document {
-  discordId: string;
-  accessToken?: string;
-  refreshToken?: string;
-  email?: string;
+	discordId: string;
+	accessToken: string;
+	refreshToken: string;
+	email?: string;
 }
 
 const tokenSchema = new Schema<IToken>({

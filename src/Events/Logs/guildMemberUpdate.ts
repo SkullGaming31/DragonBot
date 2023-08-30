@@ -1,8 +1,8 @@
 import { ChannelType, EmbedBuilder, GuildMember, PartialGuildMember, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
-import { Event } from '../../../src/Structures/Event';
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
+import { Event } from '../../Structures/Event';
 
 export default new Event<'guildMemberUpdate'>('guildMemberUpdate', async (oldMember: GuildMember | PartialGuildMember, newMember: GuildMember) => {
 	const { guild, user } = newMember;
@@ -29,7 +29,7 @@ export default new Event<'guildMemberUpdate'>('guildMemberUpdate', async (oldMem
 			return logsChannelOBJ.send({
 				embeds: [
 					Embed.setTitle(`${guild.name} | Member Update`),
-					Embed.setDescription(`\`${user.tag}\` has lost the role \`${Role?.name}\``),
+					Embed.setDescription(`\`${user.globalName}\` has lost the role \`${Role?.name}\``),
 				],
 			});
 	} else if (oldRoles.length < newRoles.length) {
@@ -48,7 +48,7 @@ export default new Event<'guildMemberUpdate'>('guildMemberUpdate', async (oldMem
 			return logsChannelOBJ.send({
 				embeds: [
 					Embed.setTitle(`${guild.name} | Nickname Update`),
-					Embed.setDescription(`${newMember.user.tag}'s nickname has been changed from: \`${oldMember.nickname}\` to: \`${newMember.nickname}\``),
+					Embed.setDescription(`${newMember.user.globalName}'s nickname has been changed from: \`${oldMember.nickname}\` to: \`${newMember.nickname}\``),
 				],
 			});
 	} else if (!oldMember.premiumSince && newMember.premiumSince) {
@@ -56,7 +56,7 @@ export default new Event<'guildMemberUpdate'>('guildMemberUpdate', async (oldMem
 			return logsChannelOBJ.send({
 				embeds: [
 					Embed.setTitle(`${guild.name} | Boost Detected`),
-					Embed.setDescription(`\`${newMember.user.tag}\` has started boosting the server`),
+					Embed.setDescription(`\`${newMember.user.globalName}\` has started boosting the server`),
 				],
 			});
 	} else if (!newMember.premiumSince && oldMember.premiumSince) {
@@ -64,7 +64,7 @@ export default new Event<'guildMemberUpdate'>('guildMemberUpdate', async (oldMem
 			return logsChannelOBJ.send({
 				embeds: [
 					Embed.setTitle(`${guild.name} | Unboost Detected`),
-					Embed.setDescription(`${newMember.user.tag} has stopped boosting the server`),
+					Embed.setDescription(`${newMember.user.globalName} has stopped boosting the server`),
 				],
 			});
 	}

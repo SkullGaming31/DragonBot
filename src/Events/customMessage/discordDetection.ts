@@ -1,5 +1,5 @@
 import { ChannelType, EmbedBuilder, Message } from 'discord.js';
-import { Event } from '../../../src/Structures/Event';
+import { Event } from '../../Structures/Event';
 
 export default new Event<'messageCreate'>('messageCreate', async (message: Message) => {
 	if (!message.inGuild()) return;
@@ -30,27 +30,27 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 					.setColor('Red')
 					.setAuthor({ name: author.tag, iconURL: author.displayAvatarURL({ size: 512 }) })
 					.setThumbnail(author.displayAvatarURL())
-					.setFooter({ text: `UserID: ${author.id}`, iconURL: author.displayAvatarURL({ size: 512 })} )
+					.setFooter({ text: `UserID: ${author.id}`, iconURL: author.displayAvatarURL({ size: 512 }) })
 					.setTimestamp();
 
 				switch (warning) {
-				case 1:// first warning
-					discordLinkDetection.setDescription('This is your first warning Please do not post discord links in this server.');
-					discordLinkDetection.addFields({ name: 'Warnings', value: `${warning}` });
-					console.log('First Warning');
-					break;
-				case 2:// 2nd warning
-					// message.member.timeout(ms('5m'), 'Posted Discord Link');
-					discordLinkDetection.setDescription('Member has been timedout for 5 minutes for posting discord links in the server');
-					discordLinkDetection.addFields({ name: 'Warnings', value: `${warning}` });
-					console.log('Member has been Timed Out');
-					break;
-				case 3:// final warning
-					// message.member.ban({ deleteMessageDays: 7, reason: 'Posted Discord Link more then 3 times' });
-					discordLinkDetection.setDescription('Member has been banned for posting discord links in the server');
-					discordLinkDetection.addFields({ name: 'Warnings', value: `${warning}` });
-					console.log('Member has been banned for posting discord links');
-					break;
+					case 1:// first warning
+						discordLinkDetection.setDescription('This is your first warning Please do not post discord links in this server.');
+						discordLinkDetection.addFields({ name: 'Warnings', value: `${warning}` });
+						console.log('First Warning');
+						break;
+					case 2:// 2nd warning
+						// message.member.timeout(ms('5m'), 'Posted Discord Link');
+						discordLinkDetection.setDescription('Member has been timedout for 5 minutes for posting discord links in the server');
+						discordLinkDetection.addFields({ name: 'Warnings', value: `${warning}` });
+						console.log('Member has been Timed Out');
+						break;
+					case 3:// final warning
+						// message.member.ban({ deleteMessageDays: 7, reason: 'Posted Discord Link more then 3 times' });
+						discordLinkDetection.setDescription('Member has been banned for posting discord links in the server');
+						discordLinkDetection.addFields({ name: 'Warnings', value: `${warning}` });
+						console.log('Member has been banned for posting discord links');
+						break;
 				}
 				if (channel.id === '959693430647308292') { return; }// Moderator Channel
 				else {
@@ -88,7 +88,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 				// }
 			}
 		}
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	} catch (error: any) {
 		console.error(error.message);
 	}

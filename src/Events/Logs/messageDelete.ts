@@ -1,8 +1,8 @@
 import { ChannelType, EmbedBuilder, ErrorEvent, Message, PartialMessage, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
-import { Event } from '../../../src/Structures/Event';
 import ChanLogger from '../../Database/Schemas/LogsChannelDB'; // DB
+import { Event } from '../../Structures/Event';
 
 export default new Event<'messageDelete'>('messageDelete', async (message: Message | PartialMessage) => {
 	if (!message.inGuild()) return;
@@ -19,7 +19,7 @@ export default new Event<'messageDelete'>('messageDelete', async (message: Messa
 
 	const logsEmbed = new EmbedBuilder()
 		.setTitle('Automated Message Deletion')
-		.setAuthor({ name: author?.tag ?? 'Thread Message Deleted'})
+		.setAuthor({ name: author?.globalName ?? 'Thread Message Deleted' })
 		.setColor('Red')
 		.addFields([
 			{ name: 'User', value: author?.username ?? 'Unknown' },

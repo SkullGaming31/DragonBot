@@ -1,8 +1,8 @@
 import { ChannelType, EmbedBuilder, Guild, GuildAuditLogsEntry, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
-import { Event } from '../../../src/Structures/Event';
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
+import { Event } from '../../Structures/Event';
 
 export default new Event<'guildAuditLogEntryCreate'>('guildAuditLogEntryCreate', async (auditLogEntry: GuildAuditLogsEntry, guild: Guild) => {
 
@@ -14,7 +14,8 @@ export default new Event<'guildAuditLogEntryCreate'>('guildAuditLogEntryCreate',
 	const logsChannelObj = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
 	if (!logsChannelObj || logsChannelObj.type !== ChannelType.GuildText) return;
 
-	const embed = new EmbedBuilder().setDescription('Not Implemented Yet');
+	const embed = new EmbedBuilder()
+		.setDescription('Not Implemented Yet');
 
 	await logsChannelObj.send({ embeds: [embed] });
 });

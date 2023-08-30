@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { DMChannel, GuildChannel } from 'discord.js';
 
-import { Event } from '../../../src/Structures/Event';
+import { Event } from '../../Structures/Event';
 
 export default new Event<'channelUpdate'>('channelUpdate', async (oldChannel: DMChannel | GuildChannel, newChannel: DMChannel | GuildChannel) => {
 	// if (newChannel.isDMBased()) return;

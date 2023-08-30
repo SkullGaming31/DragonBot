@@ -11,7 +11,7 @@ window.onload = async () => {
 		if (!accessToken) {
 			loginButton.style.display = 'block';
 			loginButton.addEventListener('click', () => {
-				window.location.href = 'https://discord.com/api/oauth2/authorize?client_id=930882181595807774&permissions=30092622032118&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fauth%2Fdiscord%2Fredirect&response_type=code&scope=identify%20guilds%20applications.commands%20bot';
+				window.location.href = 'https://discord.com/api/oauth2/authorize?client_id=930882181595807774&permissions=30092622032118&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fauth%2Fdiscord%2Fredirect&response_type=code&scope=identify%20connections%20guilds%20applications.commands%20bot';
 			});
 		} else {
 			try {

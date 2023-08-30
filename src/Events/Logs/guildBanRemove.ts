@@ -1,8 +1,8 @@
 import { ChannelType, EmbedBuilder, GuildBan, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
-import { Event } from '../../../src/Structures/Event';
 import ChanLogger from '../../Database/Schemas/LogsChannelDB'; // DB
+import { Event } from '../../Structures/Event';
 
 export default new Event<'guildBanRemove'>('guildBanRemove', async (ban: GuildBan) => {
 	const { guild, user } = ban;
@@ -16,10 +16,14 @@ export default new Event<'guildBanRemove'>('guildBanRemove', async (ban: GuildBa
 	const logsChannelOBJ = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
 	if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
 
-	const embed = new EmbedBuilder().setColor('Red').setTitle('User Banned').setDescription(`\`${user.username}#${user.discriminator}\`(${user.id}) has been removed from the ban list for this server`).setTimestamp();
+	const embed = new EmbedBuilder()
+		.setTitle('User UnBanned')
+		.setDescription(`\`${user.globalName}\`(${user.id}) has been removed from the ban list for this server`)
+		.setColor('Green')
+		.setTimestamp();
 
 	try {
-		await logsChannelOBJ.send({ embeds: [embed]});
+		await logsChannelOBJ.send({ embeds: [embed] });
 	} catch (error) {
 		console.error(error);
 	}
