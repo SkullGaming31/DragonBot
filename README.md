@@ -31,7 +31,7 @@ guilds
 <br />
 <div align="center">
   <a href="https://github.com/skullgaming31/DragonBot">
-    <img src="./assets/images/logo.png" alt="Project Logo" width="100" height="100">
+    <img src="./public/assets/images/logo.png" alt="Project Logo" width="100" height="100">
   </a>
 
 <h3 align="center">DragonBot</h3>
