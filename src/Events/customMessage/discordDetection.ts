@@ -1,95 +1,126 @@
+import { randomBytes } from 'crypto';
 import { ChannelType, EmbedBuilder, Message } from 'discord.js';
+import WarningDB from '../../Database/Schemas/WarnDB'; // Update the import to your new WarningDB schema
 import { Event } from '../../Structures/Event';
 
 export default new Event<'messageCreate'>('messageCreate', async (message: Message) => {
-	if (!message.inGuild()) return;
-	const { channel, author } = message;
+	if (!message.guild) return;
+	const { channel, author, member } = message;
 	if (author.bot) return;
 
-	let sentInText = false;
-	let warning = 0;
+	// Find or create a document for the user in the database
+	let userWarning = await WarningDB.findOne({ GuildID: message.guild.id, UserID: author.id });
 
-	/*
-	ISSUE: Warnings are not increasing.
-	*/
+	// If the document doesn't exist, create it with a warning count of 0
+	if (!userWarning) {
+		userWarning = await WarningDB.create({
+			GuildID: message.guild.id,
+			UserID: author.id,
+			Warnings: [],
+		});
+	}
 
-	const discordInviteList = [
-		'discord.com/', 'discord.gg/',
-		'https://discord.com/', 'https://discord.gg/',
-		'.gift'
-	];
-	if (author.id === '353674019943219204') return;
+	// Get the user's current warning count from the database
+	const warningCount = userWarning.Warnings.length;
 
-	try {
-		for (const dInvite in discordInviteList) {// discord link detection
-			if (message.content.toLowerCase().includes(discordInviteList[dInvite].toLowerCase())) { sentInText = true; }
-			if (sentInText) {
-				const discordLinkDetection = new EmbedBuilder()// sends to the channel the link was posted too.
-					.setTitle('Discord Link Detected')
-					.setDescription(`:x: ${author} **Do not post discord links in this server.**`)
-					.setColor('Red')
-					.setAuthor({ name: author.tag, iconURL: author.displayAvatarURL({ size: 512 }) })
-					.setThumbnail(author.displayAvatarURL())
-					.setFooter({ text: `UserID: ${author.id}`, iconURL: author.displayAvatarURL({ size: 512 }) })
-					.setTimestamp();
+	const discordInviteRegex = /(discord\.(gg|com|io|me|gift)\/.+|discordapp\.com\/invite\/.+)/gi;
+	const isDiscordInvite = discordInviteRegex.test(message.content);
 
-				switch (warning) {
-					case 1:// first warning
-						discordLinkDetection.setDescription('This is your first warning Please do not post discord links in this server.');
-						discordLinkDetection.addFields({ name: 'Warnings', value: `${warning}` });
-						console.log('First Warning');
-						break;
-					case 2:// 2nd warning
-						// message.member.timeout(ms('5m'), 'Posted Discord Link');
-						discordLinkDetection.setDescription('Member has been timedout for 5 minutes for posting discord links in the server');
-						discordLinkDetection.addFields({ name: 'Warnings', value: `${warning}` });
-						console.log('Member has been Timed Out');
-						break;
-					case 3:// final warning
-						// message.member.ban({ deleteMessageDays: 7, reason: 'Posted Discord Link more then 3 times' });
-						discordLinkDetection.setDescription('Member has been banned for posting discord links in the server');
-						discordLinkDetection.addFields({ name: 'Warnings', value: `${warning}` });
-						console.log('Member has been banned for posting discord links');
-						break;
-				}
-				if (channel.id === '959693430647308292') { return; }// Moderator Channel
-				else {
-					if (channel.type === ChannelType.GuildText) {
-						await message.reply({ content: `${author}`, embeds: [discordLinkDetection] }); // send this warning embed to the channel the link was detected in
-						await message.delete().catch((error) => { console.error(error); return; });
-						warning += 1;
-						sentInText = false;
+	if (isDiscordInvite) {
+		const discordLinkDetection = new EmbedBuilder()
+			.setTitle('Discord Link Detected')
+			.setDescription(`:x: ${author} **Do not post Discord links in this server.**`)
+			.setColor('Red')
+			.setAuthor({ name: `${author.globalName}`, iconURL: author.displayAvatarURL({ size: 512 }) })
+			.setThumbnail(author.displayAvatarURL())
+			.setFooter({ text: `UserID: ${author.id}`, iconURL: author.displayAvatarURL({ size: 512 }) })
+			.setTimestamp();
+
+		let warningMessage = '';
+
+		if (channel.id === '959693430647308292') {
+			// Moderator Channel
+			warningMessage = 'This is a moderator channel.';
+		} else if (channel.type === ChannelType.GuildText) {
+			// Non-moderator channel
+			warningMessage = 'You have posted a Discord link.';
+
+			// Handle warnings and actions here
+			// You can use a switch statement to determine the appropriate action
+			switch (warningCount) {
+				case 0:
+					// First warning
+					warningMessage = 'This is your first warning. Please do not post Discord links in this server.';
+					break;
+				case 1:
+					// Second warning
+					if (member?.moderatable) {
+						// Send a DM to the user
+						await member?.timeout(30000, 'posted link for a discord server after being warned');// 5 minutes = 300000
+						await member?.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] })
+							.catch((error) => {
+								console.error(`Failed to send a DM to ${author.globalName}: ${error.message}`);
+							});
 					}
-				}
-				// console.log('Warning: ' + warning);
-				// Get the channel object where the forum posts are located
-				// const forumChannel = guild?.channels.cache.get('1020536302388662303') as ThreadChannel | NewsChannel;// Channel Parent ID for the forums channel
-
-				// if (forumChannel.isThread()) {
-				// 	// Fetch the messages in the channel
-				// 	guild.channels.fetch();
-				// 	const messages = await forumChannel.messages.fetch();
-
-				// 	// Loop through the messages and check for Discord invite links
-				// 	messages.forEach(async (message) => {
-				// 		const inviteRegex = /(discord\.(gg|com|io|me|gift)\/.+|discordapp\.com\/invite\/.+)/g;
-				// 		const content = message.content.toLowerCase();
-				// 		if (inviteRegex.test(content)) {
-				// 		// Take the appropriate action if a Discord invite link is found
-				// 			console.log(`Message ${message.id} contains a Discord invite link`);
-				// 			if (forumChannel.type === ChannelType.PublicThread)
-				// 				await message.delete().catch((err: Error) => { console.error(err.message); });
-				// 			forumChannel.setLocked(true, 'Detected Discord Link');
-				// 			forumChannel.setArchived(true, 'Detected Discord Link');
-				// 			forumChannel.sendTyping();
-				// 			forumChannel.send({ embeds: [discordLinkDetection] });
-				// 		}
-				// 	});
-				// }
+					break;
+				case 2:
+					// Third warning
+					if (member?.kickable) {
+						// Send a DM to the user
+						await member?.kick('Posted a discord link after being warned twise for posting links');
+						await member?.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] })
+							.catch((error) => {
+								console.error(`Failed to send a DM to ${author.globalName}: ${error.message}`);
+							});
+					}
+					break;
+				case 3:
+					// Third warning
+					if (member?.bannable) {
+						await member?.ban({ reason: 'Posting discord links after being told 3 times not to post them', deleteMessageSeconds: 5 });
+						// Send a DM to the user
+						await member?.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] })
+							.catch((error) => {
+								console.error(`Failed to send a DM to ${author.globalName}: ${error.message}`);
+							});
+					}
+					break;
 			}
+
+			// Create a new warning object
+			const newWarning = {
+				WarningID: generateUniqueID(), // Generate a unique ID for the new warning
+				Reason: 'Posting Discord links',
+				Source: 'bot'
+			};
+
+			// Add the new warning to the user's warnings array
+			userWarning.Warnings.push(newWarning);
+
+			// Save the updated warnings array to the database
+			await userWarning.save();
+
+			// Send the warning message in the channel
+			await message.reply({ content: `${author}`, embeds: [discordLinkDetection.setDescription(warningMessage)] });
+			await message.delete().catch((error) => { console.error(error); return; });
 		}
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	} catch (error: any) {
-		console.error(error.message);
+
+		// Log or perform additional actions as needed
+		console.log(warningMessage, 'Warning Count: ' + (warningCount + 1));
+
+		// You can continue to implement your desired actions here
+
+		// Optionally, you can also send the warning message to a specific moderator channel
+		// if (channel.type === ChannelType.GuildText) {
+		//     const moderatorChannel = message.guild?.channels.cache.get('ModeratorChannelID') as TextChannel;
+		//     if (moderatorChannel) {
+		//         await moderatorChannel.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] });
+		//     }
+		// }
 	}
 });
+
+// Function to generate a random unique ID
+function generateUniqueID(): string {
+	return randomBytes(8).toString('hex');
+}

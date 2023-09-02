@@ -66,6 +66,7 @@ export class ExtendedClient extends Client {
 			console.log(`Registering commands to ${guildId}`);
 		} else {
 			this.application?.commands.set(commands);
+			// console.log(commands);
 			console.log('Registering Global commands');
 		}
 	}

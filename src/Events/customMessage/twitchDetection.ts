@@ -10,12 +10,13 @@ const linkWhitelist: RegExp[] = [
 	/^(https?:\/\/)?(www\.)?instagram\.com\//i,
 	/^(https?:\/\/)?(www\.)?tiktok\.com\//i,
 	/^(https?:\/\/)?(www\.)?github\.com\//i,
+	/^(https?:\/\/)?(www\.)?kick\.com\//i,
 ];
 
-const linkCooldowns = new Map<string, number>(); // Map<User ID, Link Count>
+const linkCooldowns = new Map<string, number>();
 
 export default new Event<'messageCreate'>('messageCreate', async (message: Message) => {
-	const { guild, channel, author, content } = message;
+	const { guild, channel, author, content, member } = message;
 
 	if (author.bot || !guild) return;
 
@@ -29,12 +30,21 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 	const nowLiveChannel = guild.channels.cache.get(promotionChannelId);
 	if (!nowLiveChannel) return;
 
-	if (channel.id !== promotionChannelId && content.includes('https')) {
+	const allowedChannelId = '1068334501991809135';
+
+	const isModeratorOrAdmin = member?.permissions.has('Administrator') || member?.roles.cache.some((role) => role.name === 'Moderator');
+
+	if (channel.id !== promotionChannelId && content.includes('https') && !isModeratorOrAdmin && channel.id !== allowedChannelId) {
 		const hasInvalidLink = linkWhitelist.some((pattern) => {
 			if (!pattern.test(content)) {
 				const isWhitelisted = /^(overlay\.expert|https:\/\/overlay\.expert)/i.test(content);
 
 				if (!isWhitelisted) {
+					// Check for Discord invite links and skip further processing if found
+					if (content.includes('discord.gg/') || content.includes('discord.com/')) {
+						return false; // Skip processing for Discord invite links
+					}
+
 					const linkDetection = new EmbedBuilder()
 						.setTitle('Link Detected')
 						.setDescription(`:x: ${author} **Links should only be posted in ${nowLiveChannel}**`)

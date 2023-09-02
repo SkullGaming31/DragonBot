@@ -17,13 +17,19 @@ export default new Event<'messageDelete'>('messageDelete', async (message: Messa
 	const logsChannelOBJ = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
 	if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
 
+	// Get the message content or use 'None' if it's empty or undefined
+	const messageContent = message.content || 'None';
+
+	// Truncate the message content to fit within Discord's embed field limit
+	const truncatedContent = messageContent.slice(0, 4096);
+
 	const logsEmbed = new EmbedBuilder()
 		.setTitle('Automated Message Deletion')
 		.setAuthor({ name: author?.globalName ?? 'Thread Message Deleted' })
 		.setColor('Red')
 		.addFields([
 			{ name: 'User', value: author?.username ?? 'Unknown' },
-			{ name: '🚨 | Deleted Message: ', value: `${message.content ?? 'None'}`.slice(0, 4096) },
+			{ name: '🚨 | Deleted Message: ', value: truncatedContent },
 			{ name: 'Channel', value: `${channel}` },
 		])
 		.setURL(`${message.url}`)

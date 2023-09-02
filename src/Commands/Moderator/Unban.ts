@@ -19,12 +19,12 @@ export default new Command({
 	run: async ({ interaction }) => {
 		if (!interaction.inCachedGuild()) return;
 
-		interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply({ ephemeral: true });
 		const { options, user, guild } = interaction;
 
 		const id = options.getString('user-id');
 		if (id === null) return;
-		if (Number(id)) return interaction.editReply({ content: '❌ | Please provide a valid ID in numbers!' });
+		if (!/^\d+$/.test(id)) return interaction.editReply({ content: '❌ | Please provide a valid ID in numbers!' });
 		const bannedMembers = await guild.bans.fetch();
 		if (!bannedMembers.find(x => x.user.id === id)) return interaction.editReply({ content: '❌ | the user is not banned' });
 
@@ -33,36 +33,34 @@ export default new Command({
 
 		const row = new ActionRowBuilder<ButtonBuilder>();
 		row.addComponents(
-			new ButtonBuilder().setStyle(ButtonStyle.Danger).setCustomId('ban-yes').setLabel('Yes'),
-			new ButtonBuilder().setStyle(ButtonStyle.Primary).setCustomId('ban-no').setLabel('No')
+			new ButtonBuilder().setStyle(ButtonStyle.Danger).setCustomId('unban-yes').setLabel('Yes'),
+			new ButtonBuilder().setStyle(ButtonStyle.Primary).setCustomId('unban-no').setLabel('No')
 		);
 		const page = await interaction.editReply({
-			embeds: [unbanEmbed.setDescription('**⚠ | do you really wanna ban this member?**')],
+			embeds: [unbanEmbed.setDescription('**⚠ | do you really wanna unban this member?**')],
 			components: [row]
 		});
 		const col = page.createMessageComponentCollector({
 			componentType: ComponentType.Button,
 			time: 150000
 		});
-		col.on('collect', i => {
+		col.on('collect', async i => {
 			if (i.user.id !== user.id) return;
+
 			switch (i.customId) {
 				case 'unban-yes':
-					guild.members.unban(id);
-					interaction.editReply({
-						embeds: [
-							unbanEmbed.setDescription('**✔ | the user has been unbanned**')
-						],
-						components: []
-					});
+
+					// Attempt to unban the user
+					try {
+						await guild.members.unban(id);
+					} catch (error) {
+						console.error('Error while unbanning:', error);
+					}
+
+					interaction.editReply({ embeds: [unbanEmbed.setDescription('**✔ | the user has been unbanned**')], components: [] });
 					break;
 				case 'unban-no':
-					interaction.editReply({
-						embeds: [
-							unbanEmbed.setDescription('✅ | unban Request Canceled')
-						],
-						components: []
-					});
+					interaction.editReply({ embeds: [unbanEmbed.setDescription('✅ | unban Request Canceled')], components: [] });
 					break;
 			}
 		});

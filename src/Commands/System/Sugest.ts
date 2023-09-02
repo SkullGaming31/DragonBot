@@ -5,7 +5,7 @@ import { Command } from '../../Structures/Command';
 export default new Command({
 	name: 'suggest',
 	description: 'Suggest an improvment for the discord bot',
-	// UserPerms: ['SendMessages'],
+	UserPerms: ['SendMessages'],
 	BotPerms: ['SendMessages'],
 	defaultMemberPermissions: ['SendMessages'],
 	type: ApplicationCommandType.ChatInput,
