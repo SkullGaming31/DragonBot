@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, Colors, ComponentType, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, Colors, ComponentType, DiscordAPIError, EmbedBuilder } from 'discord.js';
 import { Command } from '../../Structures/Command';
 
 export default new Command({
@@ -79,9 +79,9 @@ export default new Command({
 									}
 								])
 						]
-					}).catch((err: any) => {
+					}).catch((err: DiscordAPIError) => {
 						if (err.code !== 50007) return console.error('Users Dm\'s are turned off', err);
-						interaction.reply({ content: 'a Message to the user was not sent, they have there DM\'s turned off', ephemeral: true });
+						interaction.editReply({ content: 'a Message to the user was not sent, they have there DM\'s turned off' });
 					});
 					break;
 				case 'ban-no':

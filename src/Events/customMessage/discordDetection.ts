@@ -5,8 +5,18 @@ import { Event } from '../../Structures/Event';
 
 export default new Event<'messageCreate'>('messageCreate', async (message: Message) => {
 	if (!message.guild) return;
-	const { channel, author, member } = message;
+	const { channel, author, member, guild } = message;
 	if (author.bot) return;
+
+	// Define the role names that indicate administrator status
+	const adminRoleNames = ['Admin', 'Mod']; // Add the role names you consider as administrators
+
+	// Check if the user has any of the administrator roles
+	const isAdmin = member?.roles.cache.some(role => adminRoleNames.includes(role.name));
+
+	// If the user is an admin, don't delete their message
+	if (isAdmin || author.id === guild?.ownerId) return;
+	if (channel.id === '1068334501991809135' || channel.id === '959693430647308292') return;
 
 	// Find or create a document for the user in the database
 	let userWarning = await WarningDB.findOne({ GuildID: message.guild.id, UserID: author.id });
@@ -67,7 +77,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 					// Third warning
 					if (member?.kickable) {
 						// Send a DM to the user
-						await member?.kick('Posted a discord link after being warned twise for posting links');
+						await member?.kick('Posted a discord link after being warned twice for posting links');
 						await member?.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] })
 							.catch((error) => {
 								console.error(`Failed to send a DM to ${author.globalName}: ${error.message}`);
@@ -107,16 +117,6 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 
 		// Log or perform additional actions as needed
 		console.log(warningMessage, 'Warning Count: ' + (warningCount + 1));
-
-		// You can continue to implement your desired actions here
-
-		// Optionally, you can also send the warning message to a specific moderator channel
-		// if (channel.type === ChannelType.GuildText) {
-		//     const moderatorChannel = message.guild?.channels.cache.get('ModeratorChannelID') as TextChannel;
-		//     if (moderatorChannel) {
-		//         await moderatorChannel.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] });
-		//     }
-		// }
 	}
 });
 

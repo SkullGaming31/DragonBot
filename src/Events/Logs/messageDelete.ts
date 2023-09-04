@@ -21,7 +21,7 @@ export default new Event<'messageDelete'>('messageDelete', async (message: Messa
 	const messageContent = message.content || 'None';
 
 	// Truncate the message content to fit within Discord's embed field limit
-	const truncatedContent = messageContent.slice(0, 4096);
+	const truncatedContent = messageContent.slice(0, 1024); // Truncate to 1024 characters
 
 	const logsEmbed = new EmbedBuilder()
 		.setTitle('Automated Message Deletion')

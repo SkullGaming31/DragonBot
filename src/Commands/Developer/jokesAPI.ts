@@ -25,7 +25,7 @@ export default new Command({
 
 		const embed = new EmbedBuilder()
 			.setTitle(jokeAPI.data.type)
-			.setAuthor({ name: user.tag, iconURL: user.displayAvatarURL({ size: 512 }) })
+			.setAuthor({ name: `${user.globalName}`, iconURL: user.displayAvatarURL({ size: 512 }) })
 			.addFields([
 				{
 					name: '**Setup:**',

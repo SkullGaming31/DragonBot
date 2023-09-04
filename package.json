@@ -21,7 +21,7 @@
 	"scripts": {
 		"start": "ts-node ./src/index.ts",
 		"dev": "nodemon ./src/index.ts",
-		"prod": "node .",
+		"prod": "tsc && node ./dist/index.js",
 		"lint": "eslint --fix src",
 		"build": "tsc",
 		"watch": "tsc -w",
