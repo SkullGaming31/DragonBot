@@ -34,21 +34,30 @@ export default new Command({
 			type: ApplicationCommandOptionType.String,
 			required: true,
 		},
+		{
+			name: 'title',
+			description: 'Add the title of your Embed or leave it out for a default title',
+			type: ApplicationCommandOptionType.String,
+			required: false
+		},
 	],
 	run: async ({ interaction }) => {
+		const { options, guild } = interaction;
 		// Get user-provided description, fields, and footer from the command interaction
-		const userDescription = interaction.options.getString('description');
-		const userFields = interaction.options.getString('fields');
-		const userFooter = interaction.options.getString('footer');
+		const userTitle = options.getString('title') || `${guild?.name} Rules`;
+		const userDescription = options.getString('description');
+		const userFields = options.getString('fields');
+		const userFooter = options.getString('footer');
 
-		const owner = await interaction.guild?.fetchOwner();
+		const owner = await guild?.fetchOwner();
 		// Create a new embed
-		const embed = new EmbedBuilder().setTitle(`${interaction.guild?.name} Rules`).setAuthor({ name: `${owner?.displayName}`, iconURL: `${owner?.displayAvatarURL({ size: 512 })}` }).setTimestamp();
+		const embed = new EmbedBuilder().setTitle(`${guild?.name} Rules`).setAuthor({ name: `${owner?.displayName}`, iconURL: `${owner?.displayAvatarURL({ size: 512 })}` }).setTimestamp();
+
+		// Set the title if provided by the user or use a default title
+		if (userTitle) embed.setTitle(userTitle);
 
 		// Set the description if provided by the user
-		if (userDescription) {
-			embed.setDescription(userDescription);
-		}
+		if (userDescription) embed.setDescription(userDescription);
 
 		// Set fields if provided by the user
 		if (userFields) {

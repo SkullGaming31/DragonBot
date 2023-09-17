@@ -1,6 +1,7 @@
 import { randomBytes } from 'crypto';
 import { ChannelType, EmbedBuilder, Message } from 'discord.js';
 import WarningDB from '../../Database/Schemas/WarnDB'; // Update the import to your new WarningDB schema
+import SettingsModel from '../../Database/Schemas/settingsDB';
 import { Event } from '../../Structures/Event';
 
 export default new Event<'messageCreate'>('messageCreate', async (message: Message) => {
@@ -8,23 +9,36 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 	const { channel, author, member, guild } = message;
 	if (author.bot) return;
 
-	// Define the role names that indicate administrator status
-	const adminRoleNames = ['Admin', 'Mod']; // Add the role names you consider as administrators
+	const settings = await SettingsModel.findOne({ GuildID: guild.id });
+	const adminRole = settings?.AdministratorRole || ['Admin'];
+	const modRole = settings?.ModeratorRole || ['Mod'];
+
+	// Combine admin and mod roles into one array for checking
+	const adminRoleNames = [...adminRole, ...modRole];
+
+	// Check if either AdministratorRole or ModeratorRole is not defined in the database
+	if (settings?.AdministratorRole === undefined || settings.ModeratorRole === undefined) return;
 
 	// Check if the user has any of the administrator roles
 	const isAdmin = member?.roles.cache.some(role => adminRoleNames.includes(role.name));
+
+	// Check if 'Admin' or 'Mod' roles are missing
+	if (!isAdmin) {
+		const systemChannel = guild.systemChannel;
+		if (systemChannel && systemChannel.type === ChannelType.GuildText) { systemChannel.send({ content: 'The bot requires the roles "Admin" or "Mod" to function properly.' }); }
+	}
 
 	// If the user is an admin, don't delete their message
 	if (isAdmin || author.id === guild?.ownerId) return;
 	if (channel.id === '1068334501991809135' || channel.id === '959693430647308292') return;
 
 	// Find or create a document for the user in the database
-	let userWarning = await WarningDB.findOne({ GuildID: message.guild.id, UserID: author.id });
+	let userWarning = await WarningDB.findOne({ GuildID: guild.id, UserID: author.id });
 
 	// If the document doesn't exist, create it with a warning count of 0
 	if (!userWarning) {
 		userWarning = await WarningDB.create({
-			GuildID: message.guild.id,
+			GuildID: guild.id,
 			UserID: author.id,
 			Warnings: [],
 		});
@@ -121,6 +135,4 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 });
 
 // Function to generate a random unique ID
-function generateUniqueID(): string {
-	return randomBytes(8).toString('hex');
-}
+function generateUniqueID(): string { return randomBytes(8).toString('hex'); }

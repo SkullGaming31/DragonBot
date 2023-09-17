@@ -1,4 +1,4 @@
-import { ChannelType, Colors, EmbedBuilder, Message } from 'discord.js';
+import { ChannelType, EmbedBuilder, Message } from 'discord.js';
 import settings from '../../Database/Schemas/settingsDB';
 import { Event } from '../../Structures/Event';
 
@@ -32,7 +32,8 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 
 	const allowedChannelId = '1068334501991809135';
 
-	const isModeratorOrAdmin = member?.permissions.has('Administrator') || member?.roles.cache.some((role) => role.name === 'Moderator');
+	const isModeratorOrAdmin = member?.permissions.has('Administrator') || member?.roles.cache.some((role) => role.name === 'Moderator' || member.roles.cache.some((role) => role.name === ''));
+	if (guild.ownerId === author.id) return;
 
 	if (channel.id !== promotionChannelId && content.includes('https') && !isModeratorOrAdmin && channel.id !== allowedChannelId) {
 		const hasInvalidLink = linkWhitelist.some((pattern) => {
@@ -48,7 +49,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 					const linkDetection = new EmbedBuilder()
 						.setTitle('Link Detected')
 						.setDescription(`:x: ${author} **Links should only be posted in ${nowLiveChannel}**`)
-						.setColor(Colors.Red)
+						.setColor('Red')
 						.setFooter({ text: guild.name })
 						.setThumbnail(author.avatarURL({ size: 512 }))
 						.setTimestamp();
@@ -70,7 +71,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 												const punishmentMessage = new EmbedBuilder()
 													.setTitle('Link Spam Detected')
 													.setDescription(`:x: ${author} has been kicked for posting too many links.`)
-													.setColor(Colors.Red)
+													.setColor('Red')
 													.setFooter({ text: guild.name })
 													.setThumbnail(author.avatarURL({ size: 512 }))
 													.setTimestamp();
@@ -82,7 +83,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 												const punishmentMessage = new EmbedBuilder()
 													.setTitle('Link Spam Detected')
 													.setDescription(`:x: ${author} has been kicked for posting too many links.`)
-													.setColor(Colors.Red)
+													.setColor('Red')
 													.setFooter({ text: guild.name })
 													.setThumbnail(author.avatarURL({ size: 512 }))
 													.setTimestamp();

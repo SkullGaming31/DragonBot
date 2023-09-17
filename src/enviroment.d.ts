@@ -15,7 +15,7 @@ declare global {
 			DEV_NOW_LIVE_CHANNEL: string;
 			DEV_DISCORD_ERR_WEBHOOK_ID: string;
 			DEV_DISCORD_ERR_WEBHOOK_TOKEN: string;
-			Environment: 'dev' | 'prod' | 'debug';
+			Enviroment: 'dev' | 'prod' | 'debug';
 			PORT: number;
 			MONGO_DATABASE_URI: string;
 			DEV_MONGO_DATABASE_URI: string;

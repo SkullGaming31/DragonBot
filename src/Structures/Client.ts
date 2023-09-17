@@ -1,4 +1,5 @@
 import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, GatewayIntentBits, Partials } from 'discord.js';
+import { config } from 'dotenv';
 import glob from 'glob';
 import { Agent } from 'undici';
 import { promisify } from 'util';
@@ -7,6 +8,7 @@ const PG = promisify(glob);
 import { CommandType } from '../Typings/Command';
 import { RegisterCommandOptions } from '../Typings/client';
 import { Event } from './Event';
+config();
 
 export class ExtendedClient extends Client {
 	commands: Collection<string, CommandType> = new Collection();
@@ -80,13 +82,16 @@ export class ExtendedClient extends Client {
 		});
 
 		this.on('ready', () => {
-			switch (process.env.Environment) {
+			switch (process.env.Enviroment) {
 				case 'debug':
 				case 'dev':
 					this.registerCommands({ commands: slashCommands, guildId: '959693430227894292' });
 					break;
-				default:
+				case 'prod':
 					this.registerCommands({ commands: slashCommands, guildId: undefined });
+					break;
+				default:
+					console.log('Enviroment: ', process.env.Enviroment);
 			}
 		});
 
