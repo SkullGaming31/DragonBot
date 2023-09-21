@@ -18,7 +18,8 @@ export default new Event('guildCreate', async (guild: Guild) => {
 	const isAdmin = members.cache.get(guild.client.user.id)?.roles.cache.some(role => adminRoleNames.includes(role.name));
 
 	if (!isAdmin) {
-		const systemChannel: TextChannel | null = guild.systemChannel;
-		if (systemChannel && systemChannel.type === ChannelType.GuildText) { await systemChannel.send({ content: 'The bot requires the roles "Admin" or "Mod" to function properly.' }); }
+		const modChannelId = settings.ModerationChannel;
+		const ModerationChannel = guild.channels.cache.get(modChannelId) as TextChannel | null;
+		if (ModerationChannel && ModerationChannel.type === ChannelType.GuildText) { await ModerationChannel.send({ content: 'The bot requires the roles "Admin" or "Mod" to function properly.' }); }
 	}
 });

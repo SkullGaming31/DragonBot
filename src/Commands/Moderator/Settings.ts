@@ -36,6 +36,13 @@ export default new Command({
 			required: true
 		},
 		{
+			name: 'modchannel',
+			description: 'Channel where all mod messages can be displayed',
+			type: ApplicationCommandOptionType.Channel,
+			required: true,
+			channelTypes: [ChannelType.GuildText]
+		},
+		{
 			name: 'welcomechan',
 			description: 'The channel were your welcome messages will be posted when they join the server',
 			type: ApplicationCommandOptionType.Channel,
@@ -82,6 +89,7 @@ export default new Command({
 			const Welcome = options.getBoolean('welcome');
 			const Welcomechan = options.getChannel('welcomechan') || null;
 			const NowLive = options.getChannel('live') || null;
+			const ModerationChannel = options.getChannel('modchannel') || null;
 
 			const Administrator = options.getRole('admin') ?? null;
 			const Moderator = options.getRole('moderator') ?? null;
@@ -101,7 +109,8 @@ export default new Command({
 						AdministratorRole: Administrator?.id,
 						ModeratorRole: Moderator?.id,
 						MemberRole: MemberRole?.id,
-						SuggestChan: SuggestionChan?.id
+						SuggestChan: SuggestionChan?.id,
+						ModerationChannel: ModerationChannel?.id
 					});
 				} else {
 					await settings.findOneAndUpdate(
@@ -115,7 +124,8 @@ export default new Command({
 							AdministratorRole: Administrator?.id,
 							ModeratorRole: Moderator?.id,
 							MemberRole: MemberRole?.id,
-							SuggestChan: SuggestionChan?.id
+							SuggestChan: SuggestionChan?.id,
+							ModerationChannel: ModerationChannel?.id
 						},
 						{
 							new: true,
