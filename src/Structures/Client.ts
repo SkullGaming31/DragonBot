@@ -88,7 +88,10 @@ export class ExtendedClient extends Client {
 					this.registerCommands({ commands: slashCommands, guildId: '959693430227894292' });
 					break;
 				case 'prod':
-					this.registerCommands({ commands: slashCommands, guildId: undefined });
+					setInterval(() => {
+						this.registerCommands({ commands: slashCommands, guildId: undefined });
+						console.log('Commands Updated', slashCommands);
+					}, 30000);
 					break;
 				default:
 					console.log('Enviroment: ', process.env.Enviroment);

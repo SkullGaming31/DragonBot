@@ -4,6 +4,7 @@ interface ISettings extends Document {
 	GuildID: string;
 	AdministratorRole?: string;
 	ModeratorRole?: string;
+	MemberRole: string;
 	rulesChannel: string;
 	Welcome?: boolean;
 	WelcomeChannel?: string;
@@ -16,6 +17,7 @@ const settingsSchema = new Schema<ISettings>({
 	GuildID: { type: String, required: true, unique: true },
 	AdministratorRole: { type: String },
 	ModeratorRole: { type: String },
+	MemberRole: { type: String },
 	rulesChannel: { type: String },
 	Welcome: { type: Boolean, default: false },
 	WelcomeChannel: { type: String },

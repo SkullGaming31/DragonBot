@@ -40,7 +40,7 @@ export default new Event<'guildMemberUpdate'>('guildMemberUpdate', async (oldMem
 			return logsChannelOBJ.send({
 				embeds: [
 					Embed.setTitle(`${guild.name} | Member Update`),
-					Embed.setDescription(`\`${user.tag}\` has got the role \`${Role?.name}\``),
+					Embed.setDescription(`\`${user.username}\` has got the role \`${Role?.name}\``),
 				],
 			});
 	} else if (newMember.nickname !== oldMember.nickname) {

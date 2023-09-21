@@ -16,6 +16,7 @@ export default new Event<'messageDelete'>('messageDelete', async (message: Messa
 	if (logsChannelID === undefined) return;
 	const logsChannelOBJ = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
 	if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
+	if (channel.id === data.Channel) return;
 
 	// Get the message content or use 'None' if it's empty or undefined
 	const messageContent = message.content || 'None';

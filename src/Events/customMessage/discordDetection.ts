@@ -25,7 +25,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 	// Check if 'Admin' or 'Mod' roles are missing
 	if (!isAdmin) {
 		const systemChannel = guild.systemChannel;
-		if (systemChannel && systemChannel.type === ChannelType.GuildText) { systemChannel.send({ content: 'The bot requires the roles "Admin" or "Mod" to function properly.' }); }
+		if (systemChannel && systemChannel.type === ChannelType.GuildText) { await systemChannel.send({ content: 'The bot requires the roles "Admin" or "Mod" to function properly.' }); }
 	}
 
 	// If the user is an admin, don't delete their message

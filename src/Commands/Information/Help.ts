@@ -8,6 +8,7 @@ export default new Command({
 	BotPerms: ['SendMessages'],
 	defaultMemberPermissions: ['SendMessages'],
 	type: ApplicationCommandType.ChatInput,
+	Development: true,
 	options: [
 		{
 			name: 'contact',
@@ -20,11 +21,11 @@ export default new Command({
 		const { user, options } = interaction;
 		const Contact = options.getBoolean('contact');
 		const constructionEmbed = new EmbedBuilder()
-			.setTitle(`${client.user?.tag}, helpdesk`)
+			.setTitle(`${client.user?.username}, helpdesk`)
 			.setAuthor({ name: `${user.username}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` })
 			.setDescription('This command is still a work in progress');
 		if (Contact === true) {
-			interaction.reply({ content: `${user.tag}, your request has been submited and someone will get back to you as soon as possible.`, ephemeral: true });
+			interaction.reply({ content: `${user.username}, your request has been submited and someone will get back to you as soon as possible.`, ephemeral: true });
 		} else {
 			interaction.reply({ embeds: [constructionEmbed], ephemeral: true });
 		}

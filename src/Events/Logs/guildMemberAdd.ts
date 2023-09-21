@@ -44,6 +44,21 @@ export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member) => {
 		.setTimestamp();
 	try {
 		if (data.Welcome === true) {
+			switch (guild.id) {
+				case '819180459950473236':
+					// eslint-disable-next-line no-case-declarations
+					const memberRole = guild.roles.cache.get('879461309870125147');
+					if (memberRole) guild.members.addRole({ user: member, role: memberRole, reason: 'Auto Role Assign' });
+					break;
+			}
+			if (guild.id === '819180459950473236') {
+				const memberRole = guild.roles.cache.get('879461309870125147');
+				if (memberRole) {
+					guild.members.addRole({ user: member, role: memberRole, reason: 'Auto Role Assign' });
+				} else {
+					console.error(`Error finding Role ${memberRole}`);
+				}
+			}
 			await logsChannelOBJ.send({ content: `Welcome ${member}`, embeds: [embed] });
 		}
 	} catch (error) {

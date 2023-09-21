@@ -17,6 +17,7 @@ export default new Event<'messageUpdate'>('messageUpdate', async (oldMessage: Me
 	if (logsChannelID === undefined) return;
 	const logsChannelOBJ = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
 	if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
+	if (channel.id === data.Channel) return;
 
 	if (oldMessage.content === newMessage.content) return;
 

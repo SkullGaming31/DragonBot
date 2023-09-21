@@ -4,7 +4,7 @@ import { MongooseError } from 'mongoose';
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import { Event } from '../../Structures/Event';
 
-export default new Event<'roleCreate'>('roleCreate', async (role: Role) => {
+export default new Event('roleCreate', async (role: Role) => {
 	const { guild, name } = role;
 
 	const data = await ChanLogger.findOne({ Guild: guild.id }).catch((err: MongooseError) => { console.error(err.message); });

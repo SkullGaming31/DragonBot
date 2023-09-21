@@ -8,6 +8,7 @@ export default new Command({
 	BotPerms: ['ManageGuild'],
 	defaultMemberPermissions: ['Administrator'],
 	type: ApplicationCommandType.ChatInput,
+	Development: true,
 	options: [
 		{
 			name: 'event',
@@ -54,6 +55,8 @@ export default new Command({
 		if (!interaction.isChatInputCommand()) return;
 		const { options, member, guild } = interaction;
 		const choices = options.getString('event');
+
+		if (guild?.id !== '959693430227894292') return interaction.reply({ content: 'This is a development Only Command', ephemeral: true });
 
 		switch (choices) {
 			case 'guildMemberAdd':

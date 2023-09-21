@@ -77,7 +77,7 @@ export default new Command({
 
 					const newInfraction = {
 						IssuerID: member.id,
-						IssuerTag: member.user.tag,
+						IssuerTag: member.user.username,
 						Reason: Reason,
 						Date: Date.now()
 					};

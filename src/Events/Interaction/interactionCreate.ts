@@ -1,13 +1,16 @@
 /* eslint-disable no-case-declarations */
-import { CommandInteractionOptionResolver, EmbedBuilder } from 'discord.js';
+import { CommandInteractionOptionResolver, EmbedBuilder, RoleResolvable } from 'discord.js';
 import { MongooseError } from 'mongoose';
 import SuggestionModel, { ISuggestion } from '../../Database/Schemas/SuggestDB';
+import SettingsModel from '../../Database/Schemas/settingsDB';
 import { Event } from '../../Structures/Event';
 import { ExtendedInteraction } from '../../Typings/Command';
 import { client } from '../../index';
 
 
 export default new Event<'interactionCreate'>('interactionCreate', async (interaction) => {
+	const { guild, user } = interaction;
+	const settings = await SettingsModel.findOne({ GuildID: guild?.id });
 	//chat input commands
 	if (interaction.isCommand()) {
 		const command = client.commands.get(interaction.commandName);
@@ -24,30 +27,41 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 		switch (interaction.customId) {
 			case 'accept':
 				// Check if the interaction is in the "rules" channel
-				const rulesChannelId = '1068285178738376736';
+				const data = settings?.rulesChannel;
+				const rulesChannelId = data;
 				if (interaction.channelId !== rulesChannelId) return;
 
 				// Check if the button custom ID is 'accept'
 				if (interaction.customId === 'accept') {
-					// Assign the desired role to the user
-					const roleId = '1068285177891131423';
-					const member = interaction.guild?.members.cache.get(interaction.user.id);
+					// Get the role ID from settings
+					const roleId: RoleResolvable | undefined = settings?.MemberRole;
 
-					if (member && roleId) {
-						const role = interaction.guild?.roles.cache.get(roleId);
-						if (role && !member.roles.cache.has(roleId)) {
-							try {
-								await member.roles.add(role);
-								await interaction.reply({ content: 'Role assigned successfully!', ephemeral: true });
-							} catch (error) {
-								console.error('Error assigning role:', error);
-								await interaction.reply({ content: 'An error occurred while assigning the role.', ephemeral: true });
+					if (roleId) {
+						const member = interaction.guild?.members.cache.get(user?.id);
+
+						if (member) {
+							const role = interaction.guild?.roles.cache.get(roleId);
+							if (role && !member.roles.cache.has(roleId)) {
+								try {
+									await member.roles.add(role);
+									await interaction.reply({ content: 'Role assigned successfully!', ephemeral: true });
+								} catch (error) {
+									console.error('Error assigning role:', error);
+									await interaction.reply({ content: 'An error occurred while assigning the role.', ephemeral: true });
+								}
+							} else {
+								await interaction.reply({ content: 'You already have the role!', ephemeral: true });
 							}
 						} else {
-							await interaction.reply({ content: 'You already have the role!', ephemeral: true });
+							await interaction.reply({ content: 'Member not found.', ephemeral: true });
 						}
 					} else {
-						await interaction.reply({ content: 'Role or member not found.', ephemeral: true });
+						const owner = await interaction.guild?.fetchOwner({ cache: true });
+						if (user.id !== owner?.id) {
+							await interaction.reply({ content: 'Role ID not found in settings. Please contact an admin to assign the role.', ephemeral: true });
+						} else {
+							await interaction.reply({ content: 'Role ID not found in settings. Please use the ``/settings`` commands to set it', ephemeral: true });
+						}
 					}
 				}
 				break;

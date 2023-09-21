@@ -62,6 +62,12 @@ export default new Command({
 			type: ApplicationCommandOptionType.Channel,
 			required: false,
 			channelTypes: [ChannelType.GuildText]
+		},
+		{
+			name: 'memberrole',
+			description: 'Role to assign when someone joins the discord server',
+			type: ApplicationCommandOptionType.Role,
+			required: false,
 		}
 	],
 	run: async ({ interaction }) => {
@@ -79,6 +85,7 @@ export default new Command({
 
 			const Administrator = options.getRole('admin') ?? null;
 			const Moderator = options.getRole('moderator') ?? null;
+			const MemberRole = options.getRole('memberrole') ?? null;
 
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			settings.findOne({ GuildID: guild.id }, async (err: any, data: any) => {
@@ -93,6 +100,7 @@ export default new Command({
 						PunishmentChan: PunishmentChan?.id,
 						AdministratorRole: Administrator?.id,
 						ModeratorRole: Moderator?.id,
+						MemberRole: MemberRole?.id,
 						SuggestChan: SuggestionChan?.id
 					});
 				} else {
@@ -106,6 +114,7 @@ export default new Command({
 							PunishmentChan: PunishmentChan?.id,
 							AdministratorRole: Administrator?.id,
 							ModeratorRole: Moderator?.id,
+							MemberRole: MemberRole?.id,
 							SuggestChan: SuggestionChan?.id
 						},
 						{
@@ -144,6 +153,11 @@ export default new Command({
 						name: 'Moderator Role',
 						value: Moderator ? roleMention(Moderator.id) : 'None',
 						inline: true
+					},
+					{
+						name: 'Member Role',
+						value: MemberRole ? roleMention(MemberRole.id) : 'NONE',
+						inline: false
 					},
 					{
 						name: 'Suggestion Channel:',
