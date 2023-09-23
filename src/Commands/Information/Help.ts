@@ -21,13 +21,13 @@ export default new Command({
 		const { user, options } = interaction;
 		const Contact = options.getBoolean('contact');
 		const constructionEmbed = new EmbedBuilder()
-			.setTitle(`${client.user?.username}, helpdesk`)
-			.setAuthor({ name: `${user.username}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` })
+			.setTitle(`${client.user?.globalName}, helpdesk`)
+			.setAuthor({ name: `${user.globalName}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` })
 			.setDescription('This command is still a work in progress');
 		if (Contact === true) {
-			interaction.reply({ content: `${user.username}, your request has been submited and someone will get back to you as soon as possible.`, ephemeral: true });
+			await interaction.reply({ content: `${user.globalName}, your request has been submited and someone will get back to you as soon as possible.`, ephemeral: true });
 		} else {
-			interaction.reply({ embeds: [constructionEmbed], ephemeral: true });
+			await interaction.reply({ embeds: [constructionEmbed], ephemeral: true });
 		}
 	}
 });

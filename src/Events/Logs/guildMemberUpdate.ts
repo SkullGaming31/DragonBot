@@ -4,7 +4,7 @@ import { MongooseError } from 'mongoose';
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import { Event } from '../../Structures/Event';
 
-export default new Event<'guildMemberUpdate'>('guildMemberUpdate', async (oldMember: GuildMember | PartialGuildMember, newMember: GuildMember) => {
+export default new Event('guildMemberUpdate', async (oldMember: GuildMember | PartialGuildMember, newMember: GuildMember) => {
 	const { guild, user } = newMember;
 
 	const data = await ChanLogger.findOne({ Guild: guild.id }).catch((err: MongooseError) => { console.error(err.message); });
@@ -25,25 +25,29 @@ export default new Event<'guildMemberUpdate'>('guildMemberUpdate', async (oldMem
 		const RoleID = Unique(oldRoles, newRoles);
 		const Role = guild.roles.cache.get(RoleID[0].toString());
 
-		if (logsChannelOBJ.type === ChannelType.GuildText)
+		if (logsChannelOBJ.type === ChannelType.GuildText) {
 			return logsChannelOBJ.send({
 				embeds: [
 					Embed.setTitle(`${guild.name} | Member Update`),
-					Embed.setDescription(`\`${user.globalName}\` has lost the role \`${Role?.name}\``),
+					Embed.setDescription(`\`${user.username}\` has lost the role \`${Role?.name}\``),
 				],
 			});
-	} else if (oldRoles.length < newRoles.length) {
+		}
+	}
+	if (oldRoles.length < newRoles.length) {
 		const RoleID = Unique(oldRoles, newRoles);
 		const Role = guild.roles.cache.get(RoleID[0].toString());
 
-		if (logsChannelOBJ.type === ChannelType.GuildText)
+		if (logsChannelOBJ.type === ChannelType.GuildText) {
 			return logsChannelOBJ.send({
 				embeds: [
 					Embed.setTitle(`${guild.name} | Member Update`),
 					Embed.setDescription(`\`${user.username}\` has got the role \`${Role?.name}\``),
 				],
 			});
-	} else if (newMember.nickname !== oldMember.nickname) {
+		}
+	}
+	if (newMember.nickname !== oldMember.nickname) {
 		if (logsChannelOBJ.type === ChannelType.GuildText)
 			return logsChannelOBJ.send({
 				embeds: [
@@ -51,7 +55,8 @@ export default new Event<'guildMemberUpdate'>('guildMemberUpdate', async (oldMem
 					Embed.setDescription(`${newMember.user.globalName}'s nickname has been changed from: \`${oldMember.nickname}\` to: \`${newMember.nickname}\``),
 				],
 			});
-	} else if (!oldMember.premiumSince && newMember.premiumSince) {
+	}
+	if (!oldMember.premiumSince && newMember.premiumSince) {
 		if (logsChannelOBJ.type === ChannelType.GuildText)
 			return logsChannelOBJ.send({
 				embeds: [
@@ -59,7 +64,8 @@ export default new Event<'guildMemberUpdate'>('guildMemberUpdate', async (oldMem
 					Embed.setDescription(`\`${newMember.user.globalName}\` has started boosting the server`),
 				],
 			});
-	} else if (!newMember.premiumSince && oldMember.premiumSince) {
+	}
+	if (!newMember.premiumSince && oldMember.premiumSince) {
 		if (logsChannelOBJ.type === ChannelType.GuildText)
 			return logsChannelOBJ.send({
 				embeds: [

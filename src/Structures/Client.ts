@@ -60,7 +60,8 @@ export class ExtendedClient extends Client {
 			this.guilds.cache.get(guildId)?.commands.set(commands);
 			console.log(`Registering commands to ${guildId}`);
 		} else {
-			this.application?.commands.set(commands);
+			// Testing for registering commands in new servers when the bot joins a new server
+			setInterval(() => { this.application?.commands.set(commands); }, 30000);
 			// console.log(commands);
 			console.log('Registering Global commands');
 		}
