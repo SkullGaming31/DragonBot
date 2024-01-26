@@ -64,6 +64,11 @@ interface Github {
 	state_reason: string[] | null;
 }
 
+enum EmbedColors {
+	Green = 'Green',
+	Red = 'Red',
+}
+
 export default new Command({
 	name: 'github',
 	description: 'Create a GitHub Issue',
@@ -99,6 +104,7 @@ export default new Command({
 	],
 	run: async ({ interaction }) => {
 		const { options } = interaction;
+
 		const Title = options.getString('title');
 		const Body = options.getString('body');
 		const Labels = options.getString('labels') ? [options.getString('labels')] : [];
@@ -107,6 +113,11 @@ export default new Command({
 		const owner = 'SkullGaming31';
 		const repo = 'DragonBot';
 		const token = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
+
+		if (!token) {
+			console.error('GitHub token not found');
+			return;
+		}
 
 		const apiUrl = `https://api.github.com/repos/${owner}/${repo}/issues`;
 		const headers = {
@@ -127,7 +138,7 @@ export default new Command({
 				console.log('Github Response: ', response.data);
 				const successfulEmbed = new EmbedBuilder()
 					.setTitle(`${response.data.title}`)
-					.setColor('Green')
+					.setColor(EmbedColors.Green)
 					.setAuthor({ name: `${response.data.user.login}`, iconURL: `${response.data.user.avatar_url}` })
 					.setURL(`https://github.com/${owner}/${repo}/issues/${response.data.number}`)
 					.setTimestamp();
@@ -135,12 +146,13 @@ export default new Command({
 			} else {
 				await interaction.reply({ content: 'Failed to create a GitHub issue.', ephemeral: true });
 			}
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			console.error('Error creating GitHub issue:', error);
 			const errorEmbed = new EmbedBuilder()
 				.setTitle('ERROR')
 				.setDescription(`${error.response?.data?.message}`)
-				.setColor('Red')
+				.setColor(EmbedColors.Red)
 				.setTimestamp();
 			await interaction.reply({ content: 'An error occurred while creating the GitHub issue.', embeds: [errorEmbed], ephemeral: true });
 		}

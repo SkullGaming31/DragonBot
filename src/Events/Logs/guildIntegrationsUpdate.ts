@@ -6,6 +6,7 @@ import { Event } from '../../Structures/Event';
 
 export default new Event<'guildIntegrationsUpdate'>('guildIntegrationsUpdate', async (guild: Guild) => {
 	const { channels } = guild;
+	console.log('guildIntegrationsUpdate: ', guild);
 
 	const data = await ChanLogger.findOne({ Guild: guild.id }).catch((err: MongooseError) => { console.error(err.message); });
 	if (!data || data.enableLogs === false) return;

@@ -6,6 +6,8 @@ import { Event } from '../../Structures/Event';
 
 export default new Event('roleUpdate', async (oldRole: Role, newRole: Role) => {
 	const { guild, name } = newRole;
+	// If the roles are identical, it's a new role and we return
+	if (oldRole.equals(newRole)) return;
 
 	const data = await DB.findOne({ Guild: guild.id }).catch((err: MongooseError) => { console.error(err.message); });
 

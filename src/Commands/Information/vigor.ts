@@ -1,5 +1,5 @@
 /* eslint-disable no-case-declarations */
-import { ApplicationCommandOptionType, ApplicationCommandType, AttachmentBuilder, ColorResolvable, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, AttachmentBuilder, ColorResolvable, EmbedBuilder, channelMention } from 'discord.js';
 import * as fs from 'fs';
 import { Command } from '../../Structures/Command';
 import { sleep } from '../../Utilities/util';
@@ -67,9 +67,9 @@ interface Throwable {
 interface Item {
 	weapon?: Weapon[];
 	consumables?: Consumable[];
-	tools: Tools[];
+	Tools: Tools[];
 	traps?: Trap[];
-	throwable: Throwable[];
+	throwables: Throwable[];
 	melee?: Melee[];
 }
 
@@ -130,7 +130,14 @@ export default new Command({
 		await interaction.deferReply();
 		try {
 			const Choice = options.getString('choice');
-			// const items: Item = JSON.parse(fs.readFileSync('./src/Item_Data.json', 'utf8'));
+
+			if (interaction.channel?.id !== '1200333548125700186') {
+				const message = await interaction.editReply({ content: `the vigor command can only be used in ${channelMention('1200333548125700186')}` });
+				await sleep(20000); // 20000 milliseconds = 20 seconds
+				if (interaction.guild?.ownerId === '353674019943219204') return;
+				await message.delete().catch((err) => console.error(err));
+			}
+
 			switch (Choice) {
 				case 'about':
 					const vigorURL = 'https://vigorgame.com/about';
@@ -155,8 +162,8 @@ export default new Command({
 					const consumables: Consumable[] = items.consumables || [];
 					const traps: Trap[] = items.traps || [];
 					const melees: Melee[] = items.melee || [];
-					const tools: Tools[] = items.tools || [];
-					const throwns: Throwable[] = items.throwable || [];
+					const tools: Tools[] = items.Tools || [];
+					const throwns: Throwable[] = items.throwables || [];
 
 					const weapon = weapons.find((w: Weapon) => w.name.toLowerCase() === itemName.toLowerCase());
 					const tool = tools.find((t: Tools) => t.name.toLowerCase() === itemName.toLowerCase());
@@ -165,8 +172,8 @@ export default new Command({
 					const thrown = throwns.find((th: Throwable) => th.name.toLowerCase() === itemName.toLowerCase());
 					const melee = melees.find((m: Melee) => m.name.toLowerCase() === itemName.toLowerCase());
 
-					if (consumable) {// TODO: add image for the item Selected
-						const imagePath = `../../../assets/images/${consumable.folder}/${consumable.name}.png`;
+					if (consumable) {
+						const imagePath = `C:/Development/DragonBot/assets/vigor/${consumable.folder}/${consumable.name.replace(/ /g, '_')}.png`;
 						const imageAttachment = new AttachmentBuilder(imagePath);
 						const ConsumableEmbed = new EmbedBuilder()
 							.setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ size: 512 }) })
@@ -193,7 +200,7 @@ export default new Command({
 									inline: false
 								}
 							)
-							.setImage(`attachment://${consumable.name}.png`) // Set the image for the embed
+							.setImage(`attachment://${consumable.name.replace(/ /g, '_')}.png`) // Set the image for the embed
 							.setTimestamp();
 
 						const itemColor = getItemColor(consumable.quality);
@@ -203,7 +210,7 @@ export default new Command({
 						await sleep(1000);
 						await interaction.editReply({ content: `${user}`, embeds: [ConsumableEmbed], files: [imageAttachment] });
 					} else if (melee) {
-						const imagePath = `../../../assets/images/${melee.folder}/${melee.name}.png`;
+						const imagePath = `C:/Development/DragonBot/assets/vigor/${melee.folder}/${melee.name.replace(/ /g, '_')}.png`;
 						const imageAttachment = new AttachmentBuilder(imagePath);
 						const meleeEmbed = new EmbedBuilder()
 							.setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ size: 512 }) })
@@ -235,18 +242,20 @@ export default new Command({
 									inline: true
 								}
 							)
+							.setImage(`attachment://${melee.name.replace(/ /g, '_')}.png`) // Set the image for the embed
 							.setTimestamp();
 
 						const itemColor = getItemColor(melee.quality);
 						meleeEmbed.setColor(itemColor);
 
-						const tbd = await interaction.editReply({ content: `Hold on 1 second, I will check the data for ${melee.name}` });
-						console.log(tbd.id);
+						await interaction.editReply({ content: `Hold on 1 second, I will check the data for ${melee.name}` });
+						// console.log(tbd.id);
 						await sleep(1000);
 						await interaction.editReply({ content: `${user}`, embeds: [meleeEmbed], files: [imageAttachment] });
 					} else if (tool) {
-						const imagePath = `../../../assets/images/${tool.folder}/${tool.name}.png`;
+						const imagePath = `C:/Development/DragonBot/assets/vigor/${tool.folder}/${tool.name.replace(/ /g, '_')}.png`;
 						const imageAttachment = new AttachmentBuilder(imagePath);
+						// console.log(`attachment://${tool.name.replace(/ /g, '_')}.png`);
 						const toolEmbed = new EmbedBuilder()
 							.setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ size: 512 }) })
 							.setDescription(`Item stats for \`${tool.name}\``)
@@ -267,6 +276,7 @@ export default new Command({
 									inline: true
 								}
 							)
+							.setImage(`attachment://${tool.name.replace(/ /g, '_')}.png`) // Set the image for the embed
 							.setTimestamp();
 
 						const itemColor = getItemColor(tool.quality);
@@ -275,9 +285,8 @@ export default new Command({
 						const tbd = await interaction.editReply({ content: `Hold on 1 second, I will check the data for ${tool.name}` });
 						await sleep(1000);
 						tbd.edit({ content: `${user}`, embeds: [toolEmbed], files: [imageAttachment] });
-						// await interaction.editReply({ content: `${user}`, embeds: [toolEmbed] });
 					} else if (trap) {
-						const imagePath = `../../../assets/images/${trap.folder}/${trap.name}.png`;
+						const imagePath = `C:/Development/DragonBot/assets/vigor/${trap.folder}/${trap.name.replace(/ /g, '_')}.png`;
 						const imageAttachment = new AttachmentBuilder(imagePath);
 						const trapEmbed = new EmbedBuilder()
 							.setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ size: 512 }) })
@@ -299,6 +308,7 @@ export default new Command({
 									inline: true
 								}
 							)
+							.setImage(`attachment://${trap.name.replace(/ /g, '_')}.png`) // Set the image for the embed
 							.setTimestamp();
 
 						const itemColor = getItemColor(trap.quality);
@@ -310,7 +320,7 @@ export default new Command({
 						await sleep(1000);
 						await interaction.editReply({ content: `${user}`, embeds: [trapEmbed], files: [imageAttachment] });
 					} else if (thrown) {
-						const imagePath = `../../../assets/images/${thrown.folder}/${thrown.name}.png`;
+						const imagePath = `C:/Development/DragonBot/assets/vigor/${thrown.folder}/${thrown.name.replace(/ /g, '_')}.png`;
 						const imageAttachment = new AttachmentBuilder(imagePath);
 						const thrownEmbed = new EmbedBuilder()
 							.setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ size: 512 }) })
@@ -332,6 +342,7 @@ export default new Command({
 									inline: true
 								}
 							)
+							.setImage(`attachment://${thrown.name.replace(/ /g, '_')}.png`) // Set the image for the embed
 							.setTimestamp();
 
 						const itemColor = getItemColor(thrown.quality);
@@ -341,6 +352,8 @@ export default new Command({
 						await sleep(1000);
 						await interaction.editReply({ content: `${user}`, embeds: [thrownEmbed], files: [imageAttachment] });
 					} else if (weapon) {
+						const imagePath = `C:/Development/DragonBot/assets/vigor/${weapon.folder}/${weapon.name.replace(/ /g, '_')}.png`;
+						const imageAttachment = new AttachmentBuilder(imagePath);
 						const weaponEmbed = new EmbedBuilder()
 							.setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ size: 512 }) })
 							.setDescription(`Item stats for \`${weapon.name}\``)
@@ -391,19 +404,16 @@ export default new Command({
 									inline: true
 								},
 							)
+							.setImage(`attachment://${weapon.name.replace(/ /g, '_')}.png`) // Set the image for the embed
 							.setTimestamp();
 
 						const itemColor = getItemColor(weapon.quality);
 						weaponEmbed.setColor(itemColor);
 
-						const weaponsResponse = await interaction.editReply({ content: `Hold on 1 second, I will check the data for ${weapon.name}` });
+						// console.log(imageAttachment);
+						await interaction.editReply({ content: `Hold on 1 second, I will check the data for ${weapon.name}` });
 						await sleep(1000);
-						if (weaponsResponse.editable) {
-							weaponsResponse.edit({ content: `${user}`, embeds: [weaponEmbed] });
-						} else {
-							await interaction.editReply({ content: 'there was an error editing the weapon response embed' });
-						}
-						// await interaction.editReply({ content: `${user}`, embeds: [weaponEmbed] });
+						await interaction.editReply({ content: `${user}`, embeds: [weaponEmbed], files: [imageAttachment] });
 					} else {
 						await interaction.editReply({ content: `Sorry, I could not find an item named "${itemName}".` });
 					}

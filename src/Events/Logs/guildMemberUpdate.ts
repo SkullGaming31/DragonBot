@@ -5,53 +5,69 @@ import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import { Event } from '../../Structures/Event';
 
 export default new Event('guildMemberUpdate', async (oldMember: GuildMember | PartialGuildMember, newMember: GuildMember) => {
-	const { guild, user } = newMember;
 
-	const data = await ChanLogger.findOne({ Guild: guild.id }).catch((err: MongooseError) => { console.error(err.message); });
+	const data = await ChanLogger.findOne({ Guild: newMember.guild.id }).catch((err: MongooseError) => { console.error(err.message); });
 
 	if (!data || data.enableLogs === false) return;
 
 	const logsChannelID = data?.Channel;
 	if (logsChannelID === undefined) return;
-	const logsChannelOBJ = guild.channels.cache.get(logsChannelID) as TextBasedChannel | null;
+	const logsChannelOBJ = newMember.guild.channels.cache.get(logsChannelID) as TextBasedChannel | null;
 	if (!logsChannelOBJ) return;
 
 	const oldRoles = oldMember.roles.cache.map(r => r.id);
 	const newRoles = newMember.roles.cache.map(r => r.id);
 
-	const Embed = new EmbedBuilder().setColor('Red').setTimestamp();
+	const Embed = new EmbedBuilder().setTimestamp();
 
-	if (oldRoles.length > newRoles.length) {
-		const RoleID = Unique(oldRoles, newRoles);
-		const Role = guild.roles.cache.get(RoleID[0].toString());
-
-		if (logsChannelOBJ.type === ChannelType.GuildText) {
-			return logsChannelOBJ.send({
+	if (oldRoles.length > newRoles.length) { // removing a role
+		const RoleIDs = Unique(oldRoles, newRoles);
+		let description = '';
+		RoleIDs.forEach(roleId => {
+			const Role = newMember.guild.roles.cache.get(roleId.toString());
+			if (Role) {
+				description += `\`${newMember.user.globalName}\` has lost the role \`${Role.name}\`\n`;
+			}
+		});
+		if (description && logsChannelOBJ.type === ChannelType.GuildText) {
+			logsChannelOBJ.send({
 				embeds: [
-					Embed.setTitle(`${guild.name} | Member Update`),
-					Embed.setDescription(`\`${user.username}\` has lost the role \`${Role?.name}\``),
+					Embed.setTitle(`${newMember.guild.name} | Member Update`)
+						.setDescription(description)
+						.setColor('Red'),
 				],
 			});
 		}
 	}
-	if (oldRoles.length < newRoles.length) {
-		const RoleID = Unique(oldRoles, newRoles);
-		const Role = guild.roles.cache.get(RoleID[0].toString());
-
-		if (logsChannelOBJ.type === ChannelType.GuildText) {
-			return logsChannelOBJ.send({
+	if (oldRoles.length < newRoles.length) { // adding a role
+		const addedRoles = AddedRoles(oldRoles, newRoles);
+		console.log('Added roles:', addedRoles); // Debugging statement
+		let description = '';
+		addedRoles.forEach(roleId => {
+			const Role = newMember.guild.roles.cache.get(roleId.toString());
+			// console.log('Role:', Role); // Debugging statement
+			if (Role) {
+				description += `\`${newMember.user.globalName}\` has got the role \`${Role.name}\`\n`;
+			}
+		});
+		if (description && logsChannelOBJ.type === ChannelType.GuildText) {
+			logsChannelOBJ.send({
 				embeds: [
-					Embed.setTitle(`${guild.name} | Member Update`),
-					Embed.setDescription(`\`${user.username}\` has got the role \`${Role?.name}\``),
+					Embed.setTitle(`${newMember.guild.name} | Member Update`)
+						.setDescription(description)
+						.setColor('Green'),
 				],
-			});
+			}).catch(error => console.error('Error sending message:', error)); // Error handling
 		}
 	}
+	console.log('oldRoles: ', oldRoles);
+	console.log('newRoles', newRoles);
+
 	if (newMember.nickname !== oldMember.nickname) {
 		if (logsChannelOBJ.type === ChannelType.GuildText)
 			return logsChannelOBJ.send({
 				embeds: [
-					Embed.setTitle(`${guild.name} | Nickname Update`),
+					Embed.setTitle(`${newMember.guild.name} | Nickname Update`),
 					Embed.setDescription(`${newMember.user.globalName}'s nickname has been changed from: \`${oldMember.nickname}\` to: \`${newMember.nickname}\``),
 				],
 			});
@@ -60,7 +76,7 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 		if (logsChannelOBJ.type === ChannelType.GuildText)
 			return logsChannelOBJ.send({
 				embeds: [
-					Embed.setTitle(`${guild.name} | Boost Detected`),
+					Embed.setTitle(`${newMember.guild.name} | Boost Detected`),
 					Embed.setDescription(`\`${newMember.user.globalName}\` has started boosting the server`),
 				],
 			});
@@ -69,16 +85,20 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 		if (logsChannelOBJ.type === ChannelType.GuildText)
 			return logsChannelOBJ.send({
 				embeds: [
-					Embed.setTitle(`${guild.name} | Unboost Detected`),
+					Embed.setTitle(`${newMember.guild.name} | Unboost Detected`),
 					Embed.setDescription(`${newMember.user.globalName} has stopped boosting the server`),
 				],
 			});
 	}
 });
 
-function Unique(arr1: string[], arr2: string[]) {
-	const unique1 = arr1.filter((o) => arr2.indexOf(o) === -1);
-	const unique2 = arr2.filter((o) => arr1.indexOf(o) === -1);
-	const unique = unique1.concat(unique2);
-	return unique;
+// function Unique(oldRoles: string[], newRoles: string[]) {
+// 	return newRoles.filter(role => !oldRoles.includes(role));
+// }
+
+function Unique(firstArray: string[], secondArray: string[]) {
+	return firstArray.filter(role => !secondArray.includes(role));
+}
+function AddedRoles(oldRoles: string[], newRoles: string[]) {
+	return newRoles.filter(role => !oldRoles.includes(role.toString()));
 }

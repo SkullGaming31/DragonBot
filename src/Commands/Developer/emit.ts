@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType } from 'discord.js';
 import { Command } from '../../Structures/Command';
 
@@ -8,7 +9,6 @@ export default new Command({
 	BotPerms: ['ManageGuild'],
 	defaultMemberPermissions: ['Administrator'],
 	type: ApplicationCommandType.ChatInput,
-	Development: true,
 	options: [
 		{
 			name: 'event',
@@ -47,6 +47,18 @@ export default new Command({
 				{
 					name: 'channelUpdate',
 					value: 'channelUpdate'
+				},
+				{
+					name: 'roleCreate',
+					value: 'roleCreate'
+				},
+				{
+					name: 'roleDelete',
+					value: 'roleDelete'
+				},
+				{
+					name: 'roleUpdate',
+					value: 'roleUpdate'
 				}
 			]
 		}
@@ -56,7 +68,7 @@ export default new Command({
 		const { options, member, guild } = interaction;
 		const choices = options.getString('event');
 
-		if (guild?.id !== '959693430227894292') return interaction.reply({ content: 'This is a development Only Command', ephemeral: true });
+		if (guild?.id !== '1199589597668188200') return interaction.reply({ content: 'This is a development Only Command', ephemeral: true });
 
 		switch (choices) {
 			case 'guildMemberAdd':
@@ -113,6 +125,15 @@ export default new Command({
 				} else {
 					await interaction.reply({ content: 'Cannot emit event. Channel is null or not a text channel.', ephemeral: true });
 				}
+				break;
+			case 'roleCreate':
+				interaction.reply({ content: 'Role Event Emitted', ephemeral: true });
+				break;
+			case 'roleDelete':
+				interaction.reply({ content: 'Role Event Emitted', ephemeral: true });
+				break;
+			case 'roleUpdate':
+				interaction.reply({ content: 'Role Event Emitted', ephemeral: true });
 				break;
 		}
 	}

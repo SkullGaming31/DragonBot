@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
 import { Command } from '../../Structures/Command';
+import { sleep } from '../../Utilities/util';
 
 interface WarframeData {
 	uniqueName: string;
@@ -149,7 +150,7 @@ export default new Command({
 		const Choices = options.getString('choice');
 		const Query = options.getString('query');
 		const Name = options.getString('name');
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply();
 
 		let warframeName = '';
 		let itemName = '';
@@ -170,16 +171,15 @@ export default new Command({
 				await interaction.editReply({ content: 'Warframe is a free-to-play action role-playing third-person shooter multiplayer online game developed and published by Digital Extremes.' });
 				break;
 			case 'mr':
-				const xblWFRank = 12;
-				const ps4WFRank = 17;
-				const pcWFRank = 1;
+				const ps4WFRank = 18;
 				const embed = new EmbedBuilder()
 					.setTitle('Mastery Rank')
+					.setDescription('my warframe is now set for cross save, xbl ps4 pc are all my ps4 account now')
 					.setAuthor({ name: `${user.globalName}`, iconURL: user.displayAvatarURL({ size: 512 }) })
 					.addFields([
 						{
 							name: 'Xbox:',
-							value: `${xblWFRank}`,
+							value: `${ps4WFRank}`,
 							inline: true
 						},
 						{
@@ -189,7 +189,7 @@ export default new Command({
 						},
 						{
 							name: 'PC: ',
-							value: `${pcWFRank}`,
+							value: `${ps4WFRank}`,
 							inline: true
 						}
 					])
@@ -204,12 +204,12 @@ export default new Command({
 							const warframeUrl = `https://api.warframestat.us/warframes/search/${warframeName}`;
 							const response = await axios.get(warframeUrl);
 							const data = await response.data;
-							console.log('response data: ', data);
+							// console.log('response data: ', data);
 							if (!data || data.length === 0) {
 								return interaction.editReply({ content: `No Warframe found with the name "${warframeName}"` });
 							}
 							const warframeData: WarframeData = data[0];
-							console.log('Component Data: ', warframeData.components);
+							// console.log('Component Data: ', warframeData.components);
 
 							if (warframeName?.endsWith('Prime')) return interaction.editReply({ content: 'I can not look up prime version of warframes yet' });
 
@@ -240,11 +240,11 @@ export default new Command({
 									.addComponents(
 										new ButtonBuilder()
 											.setCustomId('yes')
-											.setLabel('Yes')
+											.setLabel('yes')
 											.setStyle(ButtonStyle.Primary),
 										new ButtonBuilder()
 											.setCustomId('no')
-											.setLabel('No')
+											.setLabel('no')
 											.setStyle(ButtonStyle.Danger)
 									);
 
@@ -253,22 +253,53 @@ export default new Command({
 
 								// Await button interaction
 								const collector = interaction.channel?.createMessageComponentCollector({
-									time: 30000, // 5 seconds
+									time: 30000, // 30 seconds
 									filter: (buttonInteraction) => buttonInteraction.customId === 'yes' || buttonInteraction.customId === 'no',
 								});
 
 								collector?.on('collect', async (buttonInteraction) => {
+									console.log('buttonInteraction Object: ', buttonInteraction); // Log the entire buttonInteraction object
+									console.log('Button Interaction customId: ', buttonInteraction.customId); // Log the customId of the clicked button
 									if (buttonInteraction.customId === 'yes') {
 										// create DM and send warframe Data
 										const tbd = await user.createDM();
-										await tbd.send({ content: `${message}` });
-										await buttonInteraction.update({ content: 'The information has been sent to your whispers.', components: [] });
+										let messageChunks;
+
+										if (Array.isArray(message)) {
+											// If message is an array, join it into a single string
+											messageChunks = message.join('').match(/.{1,4000}/g);
+										} else {
+											// If message is a string, split it into chunks
+											messageChunks = message.match(/.{1,4000}/g);
+										}
+
+										if (messageChunks) {
+											try {
+												for (const chunk of messageChunks) {
+													await tbd.send({ content: `${chunk}` });
+													await sleep(3000); // Wait for 3 seconds before sending the next chunk
+												}
+												if (!buttonInteraction.replied) {
+													await buttonInteraction.update({ content: 'The information has been sent to your DMs.', components: [] });
+												}
+											} catch (error) {
+												console.error(error);
+												if (!buttonInteraction.replied) {
+													await buttonInteraction.update({ content: 'I was unable to send you a DM. Please make sure your DM settings allow me to message you.', components: [] });
+												}
+											}
+										} else {
+											console.log('No message chunks to send');
+										}
 									} else if (buttonInteraction.customId === 'no') {
-										await buttonInteraction.update({ content: 'You chose not to receive the information via whisper.', components: [] });
+										if (!buttonInteraction.replied) {
+											await buttonInteraction.update({ content: 'You chose not to receive the information via whisper.', components: [] });
+										}
 									}
 								});
 
 								collector?.on('end', async (_, reason) => {
+									// console.log(reason); // Log the reason why the collector ended
 									if (reason === 'time') {
 										await initialMessage.edit({ content: 'You took too long to respond. The buttons have expired.', components: [] });
 									}

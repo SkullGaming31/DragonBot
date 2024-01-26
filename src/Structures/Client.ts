@@ -1,4 +1,4 @@
-import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, GatewayIntentBits, Partials } from 'discord.js';
+import { ActivityType, ApplicationCommandDataResolvable, Client, ClientEvents, Collection, GatewayIntentBits, Options, Partials } from 'discord.js';
 import { config } from 'dotenv';
 import glob from 'glob';
 import { Agent } from 'undici';
@@ -19,7 +19,8 @@ export class ExtendedClient extends Client {
 				GatewayIntentBits.Guilds,
 				GatewayIntentBits.GuildMembers,
 				GatewayIntentBits.GuildMessages,
-				GatewayIntentBits.MessageContent
+				GatewayIntentBits.MessageContent,
+				GatewayIntentBits.GuildWebhooks
 			],
 			partials: [
 				Partials.Channel,
@@ -30,9 +31,12 @@ export class ExtendedClient extends Client {
 				Partials.ThreadMember,
 				Partials.User
 			],
-			allowedMentions: {
-				parse: ['everyone', 'roles', 'users']
-			}
+			allowedMentions: { parse: ['everyone', 'roles', 'users'] },
+			makeCache: Options.cacheWithLimits({
+				...Options.DefaultMakeCacheSettings,
+				MessageManager: { maxSize: 200 }
+			}),
+			presence: { activities: [{ name: 'Testing', type: ActivityType.Custom, url: 'https://twitch.tv/canadiendragon' }], afk: false, status: 'online' },
 		});
 	}
 	async start() {
@@ -43,7 +47,7 @@ export class ExtendedClient extends Client {
 		});
 
 		this.rest.setAgent(agent);
-		this.registerModules();
+		await this.registerModules();
 		if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
 			await this.login(process.env.DEV_DISCORD_BOT_TOKEN);
 		} else {
@@ -51,14 +55,17 @@ export class ExtendedClient extends Client {
 		}
 	}
 
-	async importFile(filePath: string) {
-		return (await import(filePath))?.default;
-	}
+	async importFile(filePath: string) { return (await import(filePath))?.default; }
 
 	async registerCommands({ commands, guildId }: RegisterCommandOptions): Promise<void> {
 		if (guildId) {
 			this.guilds.cache.get(guildId)?.commands.set(commands);
-			console.log(`Registering commands to ${guildId}`);
+			// const commands = await this.guilds.cache.get(guildId)?.commands.fetch();// trying to delete old commands
+			// commands?.forEach((cmd) => {
+			// 	this.guilds.cache.get(guildId)?.commands.delete(cmd.id);
+			// 	console.log(`Deleting Command ${cmd.name} from ${cmd.guild?.id}, ApplicationID: ${cmd.applicationId}`);
+			// });
+			console.log(`Registering Commands to ${guildId}`);
 		} else {
 			// Testing for registering commands in new servers when the bot joins a new server
 			setInterval(() => { this.application?.commands.set(commands); }, 30000);
@@ -84,15 +91,13 @@ export class ExtendedClient extends Client {
 
 		this.on('ready', () => {
 			switch (process.env.Enviroment) {
-				case 'debug':
 				case 'dev':
 					this.registerCommands({ commands: slashCommands, guildId: '959693430227894292' });
+					console.log('Enviroment: ', process.env.Enviroment);
 					break;
 				case 'prod':
-					setInterval(() => {
-						this.registerCommands({ commands: slashCommands, guildId: undefined });
-						console.log('Commands Updated', slashCommands);
-					}, 30000);
+					this.registerCommands({ commands: slashCommands, guildId: undefined });
+					console.log('Enviroment: ', process.env.Enviroment);
 					break;
 				default:
 					console.log('Enviroment: ', process.env.Enviroment);
