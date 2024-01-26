@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, EmbedBuilder } from 'discord.js';
 import { Command } from '../../Structures/Command';
 
 export default new Command({
@@ -8,26 +8,41 @@ export default new Command({
 	BotPerms: ['SendMessages'],
 	defaultMemberPermissions: ['SendMessages'],
 	type: ApplicationCommandType.ChatInput,
-	Development: true,
 	options: [
 		{
 			name: 'contact',
 			description: 'Would you like someone to contact you about this issue?',
 			type: ApplicationCommandOptionType.Boolean,
+			required: true
+		},
+		{
+			name: 'issue',
+			description: 'Give a brief description of your issue',
+			type: ApplicationCommandOptionType.String,
 			required: false
 		}
 	],
 	run: async ({ interaction, client }) => {
-		const { user, options } = interaction;
+		const { user, options, guild } = interaction;
 		const Contact = options.getBoolean('contact');
+
 		const constructionEmbed = new EmbedBuilder()
-			.setTitle(`${client.user?.username}, helpdesk`)
-			.setAuthor({ name: `${user.username}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` })
+			.setTitle(`${client.user?.globalName}, helpdesk`)
+			.setAuthor({ name: `${user.globalName}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` })
 			.setDescription('This command is still a work in progress');
+
+		const contactEmbed = new EmbedBuilder()
+			.setTitle(`${client.user?.globalName}, helpdesk`)
+			.setAuthor({ name: `${user.globalName}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` })
+			.setDescription('test');
+		const contactChannel = guild?.channels.cache.get('1080703340549242970');
 		if (Contact === true) {
-			interaction.reply({ content: `${user.username}, your request has been submited and someone will get back to you as soon as possible.`, ephemeral: true });
+			if (contactChannel?.type === ChannelType.GuildText) {
+				await interaction.reply({ embeds: [contactEmbed] });
+			}
+			await interaction.reply({ content: `${user.globalName}, your request has been submited and someone will get back to you as soon as possible.`, ephemeral: true });
 		} else {
-			interaction.reply({ embeds: [constructionEmbed], ephemeral: true });
+			await interaction.reply({ embeds: [constructionEmbed], ephemeral: true });
 		}
 	}
 });

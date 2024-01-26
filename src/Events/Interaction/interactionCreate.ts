@@ -23,25 +23,33 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 			interaction: interaction as ExtendedInteraction
 		});
 	}
+	// button clicks
 	if (interaction.isButton()) {
 		switch (interaction.customId) {
-			case 'accept':
+			case 'accept':// accept rules
 				// Check if the interaction is in the "rules" channel
 				const data = settings?.rulesChannel;
 				const rulesChannelId = data;
 				if (interaction.channelId !== rulesChannelId) return;
+				// Get the role ID from settings
+				const roleId: RoleResolvable | undefined = settings?.MemberRole;
 
-				// Check if the button custom ID is 'accept'
-				if (interaction.customId === 'accept') {
-					// Get the role ID from settings
-					const roleId: RoleResolvable | undefined = settings?.MemberRole;
+				if (roleId) {
+					const member = interaction.guild?.members.cache.get(user?.id);
 
-					if (roleId) {
-						const member = interaction.guild?.members.cache.get(user?.id);
+					if (member) {
+						const role = interaction.guild?.roles.cache.get(roleId);
 
-						if (member) {
-							const role = interaction.guild?.roles.cache.get(roleId);
-							if (role && !member.roles.cache.has(roleId)) {
+						if (role) {
+							if (member.roles.cache.has(roleId)) {
+								try {
+									await member.roles.remove(role);
+									await interaction.reply({ content: 'Role removed successfully!', ephemeral: true });
+								} catch (error) {
+									console.error('Error removing role:', error);
+									await interaction.reply({ content: 'An error occurred while removing the role.', ephemeral: true });
+								}
+							} else {
 								try {
 									await member.roles.add(role);
 									await interaction.reply({ content: 'Role assigned successfully!', ephemeral: true });
@@ -49,19 +57,19 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 									console.error('Error assigning role:', error);
 									await interaction.reply({ content: 'An error occurred while assigning the role.', ephemeral: true });
 								}
-							} else {
-								await interaction.reply({ content: 'You already have the role!', ephemeral: true });
 							}
 						} else {
-							await interaction.reply({ content: 'Member not found.', ephemeral: true });
+							await interaction.reply({ content: 'Role not found in the server.', ephemeral: true });
 						}
 					} else {
-						const owner = await interaction.guild?.fetchOwner({ cache: true });
-						if (user.id !== owner?.id) {
-							await interaction.reply({ content: 'Role ID not found in settings. Please contact an admin to assign the role.', ephemeral: true });
-						} else {
-							await interaction.reply({ content: 'Role ID not found in settings. Please use the ``/settings`` commands to set it', ephemeral: true });
-						}
+						await interaction.reply({ content: 'Member not found.', ephemeral: true });
+					}
+				} else {
+					const owner = await interaction.guild?.fetchOwner({ cache: true });
+					if (user.id !== owner?.id) {
+						await interaction.reply({ content: 'Role ID not found in settings. Please contact an admin to assign the role.', ephemeral: true });
+					} else {
+						await interaction.reply({ content: 'Role ID not found in settings. Please use the `/settings` commands to set it', ephemeral: true });
 					}
 				}
 				break;
@@ -77,7 +85,7 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 					if (!Embed) return;
 
 					switch (customId) {
-						case 'sugges-accept': {
+						case 'sugges-accept': {// accept suggestion button
 							try {
 								// Handle suggestion accept button
 								Embed.fields[2] = { name: 'Status: ', value: 'Accepted', inline: true };
@@ -99,7 +107,7 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 							}
 						}
 							break;
-						case 'sugges-decline': {
+						case 'sugges-decline': { // decline suggestion button
 							try {
 								// Handle suggestion decline button
 								Embed.fields[2] = { name: 'Status: ', value: 'Declined', inline: true };

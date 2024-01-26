@@ -26,11 +26,7 @@ declare global {
 			OAUTH_CLIENT_ID: string;
 			OAUTH_CLIENT_SECRET: string;
 			OAUTH_REDIRECT_URL: string;
-			DEV_DASHBOARD_DOMAIN: string;
-			DASHBOARD_DOMAIN: string;
 			GITHUB_PERSONAL_ACCESS_TOKEN: string;
-			OPEN_API_KEY: string;
-			CHATGPT_CHANNEL: string;
 		}
 	}
 }

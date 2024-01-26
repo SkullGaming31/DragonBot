@@ -18,7 +18,7 @@ export default new Event<'channelDelete'>('channelDelete', async (channel: Guild
 
 	const embed = new EmbedBuilder()
 		.setColor('Red')
-		.setDescription(`A channel has been deleted named: ${channel}, **${name}**`)
+		.setDescription(`the channel **${name}** has been deleted`)
 		.setTimestamp();
 
 	try {

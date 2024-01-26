@@ -20,6 +20,8 @@ export default new Event('guildCreate', async (guild: Guild) => {
 	if (!isAdmin) {
 		const modChannelId = settings.ModerationChannel;
 		const ModerationChannel = guild.channels.cache.get(modChannelId) as TextChannel | null;
-		if (ModerationChannel && ModerationChannel.type === ChannelType.GuildText) { await ModerationChannel.send({ content: 'The bot requires the roles "Admin" or "Mod" to function properly.' }); }
+		if (ModerationChannel && ModerationChannel.type === ChannelType.GuildText) {
+			await ModerationChannel.send({ content: 'The bot requires the roles "Admin" or "Mod" to function properly.' });
+		}
 	}
 });

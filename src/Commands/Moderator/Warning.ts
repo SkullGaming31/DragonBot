@@ -169,9 +169,7 @@ export default new Command({
 						],
 					});
 					await newWarning.save();
-					interaction.reply({
-						content: `${Target?.globalName} has been warned. They now have their first warning for Reason: ${Reason}`,
-					});
+					await interaction.reply({ content: `${Target?.globalName} has been warned. They now have their first warning for Reason: ${Reason}` });
 				}
 				break;
 			default:

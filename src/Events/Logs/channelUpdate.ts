@@ -1,30 +1,33 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { DMChannel, GuildChannel } from 'discord.js';
-
+import { ChannelType, DMChannel, EmbedBuilder, GuildChannel, TextChannel } from 'discord.js';
+import { MongooseError } from 'mongoose';
+import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import { Event } from '../../Structures/Event';
 
 export default new Event<'channelUpdate'>('channelUpdate', async (oldChannel: DMChannel | GuildChannel, newChannel: DMChannel | GuildChannel) => {
-	// if (newChannel.isDMBased()) return;
+	if (newChannel.isDMBased()) return;
 
-	// const data = await ChanLogger.findOne({ Guild: newChannel.guildId }).catch((err: MongooseError) => { console.error(err.message); });
+	const data = await ChanLogger.findOne({ Guild: newChannel.guildId }).catch((err: MongooseError) => { console.error(err.message); });
 
-	// if (!data || data.enableLogs === false) return;
+	if (!data || data.enableLogs === false) return;
 
-	// const logsChannelID = data.Channel;
-	// if (logsChannelID === undefined) return;
-	// const logsChannelOBJ = newChannel.guild.channels.cache.get(logsChannelID);
+	const logsChannelID = data.Channel;
+	if (logsChannelID === undefined) return;
+	const logsChannelOBJ = newChannel.guild.channels.cache.get(logsChannelID);
 
-	// if (!logsChannelOBJ || Channel.type !== ChannelType.GuildText) return;
+	if (!logsChannelOBJ || oldChannel.type !== ChannelType.GuildText || newChannel.type !== ChannelType.GuildText) return;
+	const oldTextChannel = oldChannel as TextChannel;
+	const newTextChannel = newChannel as TextChannel;
 
+	// Check if both oldChannel and newChannel have a topic property before comparing
+	if (oldTextChannel.topic !== newTextChannel.topic) {
+		const embed = new EmbedBuilder()
+			.setColor('Red')
+			.setTitle(`${newTextChannel.guild.name} | Topic Updated`)
+			.setDescription(`${newTextChannel} topic has been changed from \`${oldTextChannel.topic || 'N/A'}\` to \`${newTextChannel.topic || 'N/A'}\``)
+			.setTimestamp();
 
-	// if (oldChannel.topic !== newChannel.topic) {
-	// 	const embed = new EmbedBuilder()
-	// 		.setColor('Red')
-	// 		.setTitle(`${newChannel.guild.name} | Topic Updated`)
-	// 		.setDescription(`${newChannel} topic has been changed from \`${oldChannel.topic}\` to \`${newChannel.topic}\``)
-	// 		.setTimestamp();
-
-	// 	return await logsChannelOBJ.send({ embeds: [embed] });
-	// }
+		return await (logsChannelOBJ as TextChannel).send({ embeds: [embed] });
+	}
 	return;
 });

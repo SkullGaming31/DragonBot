@@ -60,7 +60,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 					// Second warning
 					if (member?.moderatable) {
 						// Send a DM to the user
-						await member?.timeout(30000, 'posted link for a discord server after being warned');// 5 minutes = 300000
+						// await member?.timeout(30000, 'posted link for a discord server after being warned');// 5 minutes = 300000
 						await member?.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] })
 							.catch((error) => {
 								console.error(`Failed to send a DM to ${author.globalName}: ${error.message}`);
@@ -71,7 +71,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 					// Third warning
 					if (member?.kickable) {
 						// Send a DM to the user
-						await member?.kick('Posted a discord link after being warned twice for posting links');
+						// await member?.kick('Posted a discord link after being warned twice for posting links');
 						await member?.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] })
 							.catch((error) => {
 								console.error(`Failed to send a DM to ${author.globalName}: ${error.message}`);
@@ -81,8 +81,8 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 				case 3:
 					// Third warning
 					if (member?.bannable) {
-						await member?.ban({ reason: 'Posting discord links after being told 3 times not to post them', deleteMessageSeconds: 5 });
 						// Send a DM to the user
+						// await member?.ban({ reason: 'Posting discord links after being told 3 times not to post them', deleteMessageSeconds: 5 });
 						await member?.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] })
 							.catch((error) => {
 								console.error(`Failed to send a DM to ${author.globalName}: ${error.message}`);
@@ -106,7 +106,9 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 
 			// Send the warning message in the channel
 			await message.reply({ content: `${author}`, embeds: [discordLinkDetection.setDescription(warningMessage)] });
-			await message.delete().catch((error) => { console.error(error); return; });
+			console.log('Before message deletion');
+			await message.delete().catch((error) => { console.error(`Failed to delete message: ${error.message}`); });
+			console.log('After message deletion');
 		}
 
 		// Log or perform additional actions as needed

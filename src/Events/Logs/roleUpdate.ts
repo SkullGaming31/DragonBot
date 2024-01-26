@@ -4,8 +4,10 @@ import { MongooseError } from 'mongoose';
 import DB from '../../Database/Schemas/LogsChannelDB'; // DB
 import { Event } from '../../Structures/Event';
 
-export default new Event<'roleUpdate'>('roleUpdate', async (oldRole: Role, newRole: Role) => {
+export default new Event('roleUpdate', async (oldRole: Role, newRole: Role) => {
 	const { guild, name } = newRole;
+	// If the roles are identical, it's a new role and we return
+	if (oldRole.equals(newRole)) return;
 
 	const data = await DB.findOne({ Guild: guild.id }).catch((err: MongooseError) => { console.error(err.message); });
 
@@ -18,7 +20,7 @@ export default new Event<'roleUpdate'>('roleUpdate', async (oldRole: Role, newRo
 
 	const Embed = new EmbedBuilder()
 		.setTitle(`${guild.name}'s Logs | Role Updated`)
-		.setDescription(`${oldRole.name} has been updated from ${name} Color: ${oldRole.color}`)
+		.setDescription(`\`${oldRole.name}\` has been updated to \`${name}\`, Color: \`${oldRole.color}\``)
 		.setColor(newRole.color)
 		.setTimestamp();
 

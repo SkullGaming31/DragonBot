@@ -186,7 +186,7 @@ export default new Command({
 					}
 				)
 				.setTimestamp();
-			interaction.reply({ embeds: [embed], ephemeral: true });
+			await interaction.reply({ embeds: [embed], ephemeral: true });
 		} catch (error) {
 			console.error(error);
 		}
