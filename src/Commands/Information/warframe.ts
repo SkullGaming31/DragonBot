@@ -42,6 +42,7 @@ interface WarframeData {
 }
 
 interface ItemResponse {
+	description: string;
 	baseDrain: number;
 	category: string;
 	compatName: string;
@@ -198,135 +199,250 @@ export default new Command({
 				await interaction.editReply({ embeds: [embed] });
 				break;
 			case 'lookup':
-				try {
-					switch (Query) {
-						case 'warframe':
-							const warframeUrl = `https://api.warframestat.us/warframes/search/${warframeName}`;
-							const response = await axios.get(warframeUrl);
-							const data = await response.data;
-							// console.log('response data: ', data);
-							if (!data || data.length === 0) {
-								return interaction.editReply({ content: `No Warframe found with the name "${warframeName}"` });
-							}
-							const warframeData: WarframeData = data[0];
-							// console.log('Component Data: ', warframeData.components);
+				switch (Query) {
+					case 'warframe':
+						const warframeUrl = `https://api.warframestat.us/warframes/search/${warframeName}`;
+						const response = await axios.get(warframeUrl);
+						const data = await response.data;
+						// console.log('response data: ', data);
+						if (!data || data.length === 0) {
+							return interaction.editReply({ content: `No Warframe found with the name "${warframeName}"` });
+						}
+						const warframeData: WarframeData = data[0];
+						// console.log('Warframe Component Data: ', warframeData.components);
 
-							if (warframeName?.endsWith('Prime')) return interaction.editReply({ content: 'I can not look up prime version of warframes yet' });
+						if (warframeName?.endsWith('Prime')) return interaction.editReply({ content: 'I can not look up prime versions of warframes yet' });
 
-							// let prompted = false;
-							let message: string | string[];
-							if (warframeData) {
-								const components = warframeData.components
-									.map((component) => {
-										const drops = component.drops
-											.map((drop) => {
-												return `${drop.type} (Rarity: ${drop.rarity}, Chance: ${drop.chance.toFixed(2)}%, Location: ${drop.location})`;
-											})
-											.join('; ');
-										return `${component.name} (Tradeable: ${component.tradable}) - Drops: ${drops}`;
-									})
-									.join('\n');
-
-								const buildTime = formatTime(warframeData.buildTime);
-								const polarities = warframeData.polarities.map(polarity => `${polarity}`).join(', ');
-
-								message = `Warframe: ${warframeData.name}\n - Aura: ${warframeData.aura},\n Build Time: ${buildTime}\n Components:\n${components}\n Tradable: ${warframeData.tradable}\n Masterable: ${warframeData.masterable}\n Mastery Requirement: ${warframeData.masteryReq}\n Polarities: ${polarities}\n Wiki: ${warframeData.wikiaUrl}`;
+						// let prompted = false;
+						const componentFields = warframeData.components.map((component) => {
+							// Construct drops text based on prime status
+							let dropsText = '';
+							if (warframeData.isPrime) {
+								dropsText = component.drops.map((drop, index) => {
+									return `Drop ${index + 1}:\n${JSON.stringify(drop, null, 2)}`;
+								}).join('\n');
 							} else {
-								message = 'No data found for that Warframe.';
+								dropsText = component.drops.map((drop) => {
+									return `${drop.type} (Rarity: ${drop.rarity}, Chance: ${drop.chance.toFixed(2)}%, Location: ${drop.location})`;
+								}).join('; ');
 							}
-							if (message.length > 2000) {
-								// Creating buttons
-								const row = new ActionRowBuilder<ButtonBuilder>()
-									.addComponents(
-										new ButtonBuilder()
-											.setCustomId('yes')
-											.setLabel('yes')
-											.setStyle(ButtonStyle.Primary),
-										new ButtonBuilder()
-											.setCustomId('no')
-											.setLabel('no')
-											.setStyle(ButtonStyle.Danger)
-									);
+							return {
+								name: component.name,
+								value: `Tradeable: ${component.tradable} - Drops:\n${dropsText}`,
+								inline: false
+							};
+						});
+						const warframeEmbed = new EmbedBuilder()
+							.setTitle(`${warframeData.name}`)
+							.setDescription(`${warframeData.components[0].description}`)
+							.addFields([
+								{
+									name: 'Armor: ',
+									value: `${warframeData.armor}`,
+									inline: false
+								},
+								{
+									name: 'Health: ',
+									value: `${warframeData.health}`,
+									inline: false
+								},
+								{
+									name: 'aura: ',
+									value: `${warframeData.aura}`,
+									inline: false
+								},
+								{
+									name: 'Build Time: ',
+									value: `${warframeData.buildTime}`,
+									inline: true
+								},
+								{
+									name: 'Tradeable: ',
+									value: `${warframeData.tradable}`,
+									inline: true
+								},
+								{
+									name: 'Masterable: ',
+									value: `${warframeData.masterable}`,
+									inline: true
+								},
+								{
+									name: 'Mastery Requirement: ',
+									value: `${warframeData.masteryReq}`,
+									inline: false
+								},
+								{
+									name: 'Polarities: ',
+									value: `${warframeData.polarities.join(', ')}`,
+									inline: true
+								},
+								...componentFields,
+							])
+							.setThumbnail(`${warframeData.wikiaThumbnail}`)
+							.setURL(`${warframeData.wikiaUrl}`)
+							.setTimestamp();
 
-								// Sending the initial message with buttons
-								const initialMessage = await interaction.editReply({ content: 'The message is too long to be sent in chat. Do you want me to send it to you via whisper?', components: [row] });
+						let message: string | string[] = '';
+						if (warframeData) {
+							const components = warframeData.components
+								.map((component) => {
+									const drops = component.drops
+										.map((drop) => {
+											return `${drop.type} (Rarity: ${drop.rarity}, Chance: ${drop.chance.toFixed(2)}%, Location: ${drop.location})`;
+										})
+										.join('; ');
+									return `${component.name} (Tradeable: ${component.tradable}) - Drops: ${drops}`;
+								})
+								.join('\n');
 
-								// Await button interaction
-								const collector = interaction.channel?.createMessageComponentCollector({
-									time: 30000, // 30 seconds
-									filter: (buttonInteraction) => buttonInteraction.customId === 'yes' || buttonInteraction.customId === 'no',
-								});
+							const buildTime = formatTime(warframeData.buildTime);
+							const polarities = warframeData.polarities.map(polarity => `${polarity}`).join(', ');
 
-								collector?.on('collect', async (buttonInteraction) => {
-									console.log('buttonInteraction Object: ', buttonInteraction); // Log the entire buttonInteraction object
-									console.log('Button Interaction customId: ', buttonInteraction.customId); // Log the customId of the clicked button
-									if (buttonInteraction.customId === 'yes') {
-										// create DM and send warframe Data
-										const tbd = await user.createDM();
-										let messageChunks;
+							message = `Warframe: ${warframeData.name}\n - Aura: ${warframeData.aura},\n Build Time: ${buildTime}\n Components:\n${components}\n Tradable: ${warframeData.tradable}\n Masterable: ${warframeData.masterable}\n Mastery Requirement: ${warframeData.masteryReq}\n Polarities: ${polarities}\n Wiki: ${warframeData.wikiaUrl}`;
+						} else {
+							message = 'No data found for that Warframe.';
+						}
 
-										if (Array.isArray(message)) {
-											// If message is an array, join it into a single string
-											messageChunks = message.join('').match(/.{1,4000}/g);
-										} else {
-											// If message is a string, split it into chunks
-											messageChunks = message.match(/.{1,4000}/g);
+						// Check if message length exceeds Discord limit
+						if (message.length > 1024) {
+							// Creating buttons
+							const row = new ActionRowBuilder<ButtonBuilder>()
+								.addComponents(
+									new ButtonBuilder()
+										.setCustomId('yes')
+										.setLabel('yes')
+										.setStyle(ButtonStyle.Primary),
+									new ButtonBuilder()
+										.setCustomId('no')
+										.setLabel('no')
+										.setStyle(ButtonStyle.Danger)
+								);
+
+							// Sending the initial message with buttons
+							const initialMessage = await interaction.editReply({ content: 'The message is too long to be sent in chat. Do you want me to send it to you via whisper?', components: [row] });
+
+							// Await button interaction
+							const collector = interaction.channel?.createMessageComponentCollector({
+								time: 30000, // 30 seconds
+								filter: (buttonInteraction) => buttonInteraction.customId === 'yes' || buttonInteraction.customId === 'no',
+							});
+
+							collector?.on('collect', async (buttonInteraction) => {
+								console.log('buttonInteraction Object: ', buttonInteraction); // Log the entire buttonInteraction object
+								console.log('Button Interaction customId: ', buttonInteraction.customId); // Log the customId of the clicked button
+								if (buttonInteraction.customId === 'yes') {
+									// create DM and send warframe Data
+									const tbd = await user.createDM();
+									// let messageChunks;
+
+									const messageChunks = Array.isArray(message) ? message.join('').match(/.{1,4000}/g) : message.match(/.{1,4000}/g);
+									if (messageChunks) {
+										for (const chunk of messageChunks) {
+											await tbd.send({ content: `${chunk}` }); // Send each chunk of the message
+											await sleep(3000); // Wait for 3 seconds before sending the next chunk (rate limiting)
 										}
+										// If message is an array, join it into a single string
+										// messageChunks = message.join('').match(/.{1,4000}/g);
+									} else {
+										// If message is a string, split it into chunks
+										console.log('No message chunks to send');
+										// messageChunks = message.match(/.{1,4000}/g);
+									}
 
-										if (messageChunks) {
-											try {
-												for (const chunk of messageChunks) {
-													await tbd.send({ content: `${chunk}` });
-													await sleep(3000); // Wait for 3 seconds before sending the next chunk
-												}
-												if (!buttonInteraction.replied) {
-													await buttonInteraction.update({ content: 'The information has been sent to your DMs.', components: [] });
-												}
-											} catch (error) {
-												console.error(error);
-												if (!buttonInteraction.replied) {
-													await buttonInteraction.update({ content: 'I was unable to send you a DM. Please make sure your DM settings allow me to message you.', components: [] });
-												}
-											}
-										} else {
-											console.log('No message chunks to send');
+									if (messageChunks) {
+										for (const chunk of messageChunks) {
+											await tbd.send({ content: `${chunk}` });
+											await sleep(3000); // Wait for 3 seconds before sending the next chunk
 										}
-									} else if (buttonInteraction.customId === 'no') {
 										if (!buttonInteraction.replied) {
-											await buttonInteraction.update({ content: 'You chose not to receive the information via whisper.', components: [] });
+											await buttonInteraction.update({ content: 'The information has been sent to your DMs.', components: [] });
 										}
+									} else {
+										console.log('No message chunks to send');
 									}
-								});
+								} else if (buttonInteraction.customId === 'no') {
+									if (!buttonInteraction.replied) {
+										await buttonInteraction.update({ content: 'You chose not to receive the information via whisper.', components: [] });
+									}
+								}
+							});
 
-								collector?.on('end', async (_, reason) => {
-									// console.log(reason); // Log the reason why the collector ended
-									if (reason === 'time') {
-										await initialMessage.edit({ content: 'You took too long to respond. The buttons have expired.', components: [] });
-									}
+							collector?.on('end', async (_, reason) => {
+								// console.log(reason); // Log the reason why the collector ended
+								if (reason === 'time') {
+									await initialMessage.edit({ content: 'You took too long to respond. The buttons have expired.', components: [] });
+								}
+							});
+						} else {
+							await interaction.editReply({ /*content: message,*/ embeds: [warframeEmbed] });
+						}
+						break;
+					case 'item':
+						try {
+							const itemUrl = `https://api.warframestat.us/items/search/${itemName}`;
+							// console.log('Item Url: ', itemUrl);
+							const itemResponse = await axios.get(itemUrl);
+							const itemData: ItemResponse[] = await itemResponse.data;
+
+							// console.log('item response data: ', itemData);
+
+							if (!itemData || itemData.length === 0) {
+								return interaction.editReply({ content: `No item found with the name "${itemName}"` });
+							}
+
+							// Assuming you want to display information about the first item found
+							const firstItem = itemData[0];
+
+							const fields: { name: string; value: string }[] = [];
+
+							if ('components' in firstItem) {
+								// Access the components array and assert its type
+								const componentsArray = (firstItem as { components: Components[] }).components;
+
+								// Iterate over each component
+								componentsArray.forEach((component: Components, index: number) => {
+									// Construct fields for each component
+									fields.push({
+										name: `Recipe Item ${index + 1}`,
+										value: `Name: ${component.name}\nDescription: \`${component.description}\`\nItem Count: ${component.itemCount}\n`
+									});
 								});
 							} else {
-								await interaction.editReply({ content: message });
+								fields.push({
+									name: 'Components',
+									value: 'This item does not have components.'
+								});
 							}
-							break;
-						case 'item':
-							const itemUrl = `https://api.warframestat.us/items/search/${itemName}`;
-							console.log('Item Url: ', itemUrl);
-							const itemResponse = await axios.get(itemUrl);
-							const itemData: ItemResponse = await itemResponse.data;
 
+							const itemEmbed = new EmbedBuilder()
+								.setTitle(firstItem.name)
+								.setDescription(firstItem.description)
+								.addFields([
+									{
+										name: 'Category',
+										value: firstItem.category
+									},
+									{
+										name: 'Type',
+										value: firstItem.type
+									},
+									{
+										name: 'Tradable',
+										value: firstItem.tradable ? 'Yes' : 'No'
+									}
+								])
+								.addFields(fields) // Add the fields array to the embed
+								.setThumbnail(`https://cdn.warframestat.us/img/${firstItem.imageName}`)
+								.setTimestamp();
 
-							console.log('item response data: ', itemData);
-
-							await interaction.editReply({ content: 'Coming Soon!' });
-							break;
-					}
-				} catch (e) {
-					console.error(`Error fetching Warframe data: ${e}`);
-					await interaction.editReply({ content: `An error occurred while fetching data for "${warframeName}"` });
+							await interaction.editReply({ embeds: [itemEmbed] });
+						} catch (error) {
+							console.error(error);
+						}
+						break;
+					default:
+						break;
 				}
-				break;
-			default:
-				break;
 		}
 	}
 });

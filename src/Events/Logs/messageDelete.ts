@@ -5,7 +5,7 @@ import ChanLogger from '../../Database/Schemas/LogsChannelDB'; // DB
 import { Event } from '../../Structures/Event';
 
 export default new Event<'messageDelete'>('messageDelete', async (message: Message | PartialMessage) => {
-	if (!message.inGuild()) return;
+	if (!message.guild) return;
 
 	const { guild, author, channel } = message;
 	const data = await ChanLogger.findOne({ Guild: guild.id }).catch((err: MongooseError) => { console.error(err.message); });
@@ -19,17 +19,20 @@ export default new Event<'messageDelete'>('messageDelete', async (message: Messa
 	if (channel.id === data.Channel) return;
 
 	// Get the message content or use 'None' if it's empty or undefined
-	const messageContent = message.content || 'None';
+	const messageContent = (message as Message | PartialMessage).content || 'None';
+
+	// Get the author's name (including discriminator for users, tag for bots)
+	const authorName = author?.bot ? author.tag : author?.globalName || 'Unknown';
 
 	// Truncate the message content to fit within Discord's embed field limit
 	const truncatedContent = messageContent.slice(0, 1024); // Truncate to 1024 characters
 
 	const logsEmbed = new EmbedBuilder()
 		.setTitle('Automated Message Deletion')
-		.setAuthor({ name: author?.globalName ?? 'Thread Message Deleted' })
+		.setAuthor({ name: authorName })
 		.setColor('Red')
 		.addFields([
-			{ name: 'User', value: author?.username ?? 'Unknown' },
+			{ name: 'User', value: authorName },
 			{ name: '🚨 | Deleted Message: ', value: truncatedContent },
 			{ name: 'Channel', value: `${channel}` },
 		])

@@ -357,6 +357,25 @@
       ]
     },
     {
+      "name": "M14",
+      "type": "Assult Rifle",
+      "slot": "Primary",
+      "quality": "Rare",
+      "basedamage": 43,
+      "rateoffire": 560,
+      "muzzleSpeed": 850,
+      "magsize": 21,
+      "weight": 4.1,
+      "folder": "Guns",
+      "firemode": [
+        "Semi-Auto",
+        "Auto"
+      ],
+      "Misc": [
+        "None"
+      ]
+    },
+    {
       "name": "l85a1",
       "type": "Assult Rifle",
       "slot": "Primary",

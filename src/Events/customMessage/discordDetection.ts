@@ -1,6 +1,7 @@
 import { randomBytes } from 'crypto';
 import { ChannelType, EmbedBuilder, Message } from 'discord.js';
 import WarningDB from '../../Database/Schemas/WarnDB'; // Update the import to your new WarningDB schema
+import DB from '../../Database/Schemas/settingsDB';
 import { Event } from '../../Structures/Event';
 
 export default new Event<'messageCreate'>('messageCreate', async (message: Message) => {
@@ -14,6 +15,9 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 
 	// Find or create a document for the user in the database
 	let userWarning = await WarningDB.findOne({ GuildID: guild.id, UserID: author.id });
+	const SettingsDB = await DB.findOne({ GuildID: guild.id });
+
+	if (!SettingsDB) return;
 
 	// If the document doesn't exist, create it with a warning count of 0
 	if (!userWarning) {
@@ -29,6 +33,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 
 	const discordInviteRegex = /(discord\.(gg|com|io|me|gift)\/.+|discordapp\.com\/invite\/.+)/gi;
 	const isDiscordInvite = discordInviteRegex.test(message.content);
+	if (member?.permissions.has('ManageMessages')) return;
 
 	if (isDiscordInvite) {
 		const discordLinkDetection = new EmbedBuilder()

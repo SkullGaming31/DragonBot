@@ -127,13 +127,13 @@ export default new Command({
 				}
 				break;
 			case 'roleCreate':
-				interaction.reply({ content: 'Role Event Emitted', ephemeral: true });
+				interaction.reply({ content: 'Not Currently Implemented', ephemeral: true });
 				break;
 			case 'roleDelete':
-				interaction.reply({ content: 'Role Event Emitted', ephemeral: true });
+				interaction.reply({ content: 'Not Currently Implemented', ephemeral: true });
 				break;
 			case 'roleUpdate':
-				interaction.reply({ content: 'Role Event Emitted', ephemeral: true });
+				interaction.reply({ content: 'Not Currently Implemented', ephemeral: true });
 				break;
 		}
 	}

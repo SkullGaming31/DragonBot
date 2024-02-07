@@ -5,16 +5,23 @@ import DB from '../../Database/Schemas/LogsChannelDB'; // DB
 import { Event } from '../../Structures/Event';
 
 export default new Event('roleUpdate', async (oldRole: Role, newRole: Role) => {
-	const { guild, name } = newRole;
-	// If the roles are identical, it's a new role and we return
+	const { guild, name, color } = newRole;
+
+	// Check if the roles are identical
 	if (oldRole.equals(newRole)) return;
 
-	const data = await DB.findOne({ Guild: guild.id }).catch((err: MongooseError) => { console.error(err.message); });
+	// Check if only color was changed
+	if (oldRole.name === newRole.name && oldRole.color === newRole.color) return;
+
+	const data = await DB.findOne({ Guild: guild.id }).catch((err: MongooseError) => {
+		console.error(err.message);
+	});
 
 	if (!data || data.enableLogs === false) return;
 
 	const logsChannelID = data.Channel;
 	if (logsChannelID === undefined) return;
+
 	const logsChannelOBJ = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
 	if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
 

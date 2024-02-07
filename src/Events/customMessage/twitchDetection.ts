@@ -30,12 +30,12 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 	const nowLiveChannel = guild.channels.cache.get(promotionChannelId);
 	if (!nowLiveChannel) return;
 
-	const allowedChannelId = '1068334501991809135';
+	// const allowedChannelId = '1068334501991809135';
 
-	const isModeratorOrAdmin = member?.permissions.has('Administrator') || member?.roles.cache.some((role) => role.name === 'Moderator' || member.roles.cache.some((role) => role.name === ''));
+	const isModeratorOrAdmin = member?.permissions.has('Administrator') || member?.roles.cache.some((role) => role.name === 'Moderator' || member.roles.cache.some((role) => role.name === 'Admin'));
 	if (guild.ownerId === author.id) return;
 
-	if (channel.id !== promotionChannelId && content.includes('https') && !isModeratorOrAdmin && channel.id !== allowedChannelId) {
+	if (channel.id !== promotionChannelId && content.includes('https') && !isModeratorOrAdmin && channel.id !== promotionChannelId) {
 		const hasInvalidLink = linkWhitelist.some((pattern) => {
 			if (!pattern.test(content)) {
 				const isWhitelisted = /^(overlay\.expert|https:\/\/overlay\.expert)/i.test(content);

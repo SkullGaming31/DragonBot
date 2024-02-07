@@ -60,8 +60,8 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 			}).catch(error => console.error('Error sending message:', error)); // Error handling
 		}
 	}
-	console.log('oldRoles: ', oldRoles);
-	console.log('newRoles', newRoles);
+	// console.log('oldRoles: ', oldRoles);
+	// console.log('newRoles', newRoles);
 
 	if (newMember.nickname !== oldMember.nickname) {
 		if (logsChannelOBJ.type === ChannelType.GuildText)
@@ -91,10 +91,6 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 			});
 	}
 });
-
-// function Unique(oldRoles: string[], newRoles: string[]) {
-// 	return newRoles.filter(role => !oldRoles.includes(role));
-// }
 
 function Unique(firstArray: string[], secondArray: string[]) {
 	return firstArray.filter(role => !secondArray.includes(role));
