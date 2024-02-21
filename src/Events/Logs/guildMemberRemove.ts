@@ -1,6 +1,7 @@
 import { ChannelType, EmbedBuilder, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
+import logger from '../../Database/Schemas/LogsChannelDB';
 import settings from '../../Database/Schemas/settingsDB';
 import { Event } from '../../Structures/Event';
 
@@ -9,8 +10,9 @@ export default new Event<'guildMemberRemove'>('guildMemberRemove', async (member
 		const { guild, user } = member;
 
 		const data = await settings.findOne({ GuildID: guild.id }).catch((err: MongooseError) => { console.error(err.message); });
-		if (data?.WelcomeChannel === undefined) return;
-		const logsChannelOBJ = guild.channels.cache.get(data.WelcomeChannel) as TextBasedChannel | undefined;
+		const DB = await logger.findOne({ Guild: guild.id }).catch((err: MongooseError) => { console.error(err.message); });
+		if (data?.WelcomeChannel === undefined || DB?.Channel === undefined) return;
+		const logsChannelOBJ = guild.channels.cache.get(DB?.Channel) as TextBasedChannel | undefined;
 		if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
 
 		if (member.joinedTimestamp === null) return;

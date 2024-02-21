@@ -152,7 +152,7 @@ export default new Command({
 			const errorEmbed = new EmbedBuilder()
 				.setTitle('ERROR')
 				.setDescription(`${error.response?.data?.message}`)
-				.setColor(EmbedColors.Red)
+				.setColor('Red')
 				.setTimestamp();
 			await interaction.reply({ content: 'An error occurred while creating the GitHub issue.', embeds: [errorEmbed], ephemeral: true });
 		}

@@ -1494,6 +1494,13 @@
       "quality": "Special Issue",
       "carry": 2,
       "folder": "Thrown"
+    },
+    {
+      "name": "Smoke Grenade",
+      "description": "Covers a large area with a thick smoke which dissipates after a while",
+      "quality": "Special Issue",
+      "carry": 2,
+      "folder": "Thrown"
     }
   ],
   "traps": [
