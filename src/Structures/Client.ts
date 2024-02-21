@@ -20,7 +20,8 @@ export class ExtendedClient extends Client {
 				GatewayIntentBits.GuildMembers,
 				GatewayIntentBits.GuildMessages,
 				GatewayIntentBits.MessageContent,
-				GatewayIntentBits.GuildWebhooks
+				GatewayIntentBits.GuildWebhooks,
+				GatewayIntentBits.GuildMessageReactions
 			],
 			partials: [
 				Partials.Channel,
@@ -92,7 +93,7 @@ export class ExtendedClient extends Client {
 		this.on('ready', () => {
 			switch (process.env.Enviroment) {
 				case 'dev':
-					this.registerCommands({ commands: slashCommands, guildId: '959693430227894292' });
+					this.registerCommands({ commands: slashCommands, guildId: '1199589597668188200' });
 					console.log('Enviroment: ', process.env.Enviroment);
 					break;
 				case 'prod':

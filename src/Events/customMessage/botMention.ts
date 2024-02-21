@@ -18,11 +18,7 @@ function createButtonRow() {
 		new ButtonBuilder()
 			.setStyle(ButtonStyle.Link)
 			.setURL('https://twitch.tv/canadiendragon')
-			.setLabel('SkullGaming31\'s Twitch'),
-		new ButtonBuilder()
-			.setStyle(ButtonStyle.Link)
-			.setURL('https://discord.com/api/oauth2/authorize?client_id=930882181595807774&permissions=30092622032118&redirect_uri=https%3A%2F%2Fdiscord.events.stdlib.com%2Fdiscord%2Fauth%2F&response_type=code&scope=bot%20applications.commands%20identify%20guilds%20messages.read')
-			.setLabel('Invite Me')
+			.setLabel('SkullGaming31\'s Twitch')
 	);
 }
 

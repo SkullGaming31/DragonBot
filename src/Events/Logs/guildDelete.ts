@@ -12,7 +12,7 @@ export default new Event<'guildDelete'>('guildDelete', async (guild: Guild) => {
 
 	const logsChannelID = data.Channel;
 	if (logsChannelID === undefined) return;
-	const logsChannelOBJ = channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
+	const logsChannelOBJ = channels.cache.get('1207907317190885376') as TextBasedChannel | undefined;
 	if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
 
 	const guildOwner = await guild.fetchOwner();

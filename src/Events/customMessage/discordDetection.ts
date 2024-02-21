@@ -33,7 +33,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 
 	const discordInviteRegex = /(discord\.(gg|com|io|me|gift)\/.+|discordapp\.com\/invite\/.+)/gi;
 	const isDiscordInvite = discordInviteRegex.test(message.content);
-	if (member?.permissions.has('ManageMessages')) return;
+	// if (member?.permissions.has('ManageMessages')) return;
 
 	if (isDiscordInvite) {
 		const discordLinkDetection = new EmbedBuilder()

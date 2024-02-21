@@ -69,7 +69,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 
 											if (punishmentChannel && punishmentChannel.type === ChannelType.GuildText) {
 												const punishmentMessage = new EmbedBuilder()
-													.setTitle('Link Spam Detected')
+													.setTitle('Discord Event[LINK SPAM]')
 													.setDescription(`:x: ${author} has been kicked for posting too many links.`)
 													.setColor('Red')
 													.setFooter({ text: guild.name })
@@ -81,7 +81,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 													.catch((error) => console.error(error));
 											} else if (defaultPunishmentChannel && defaultPunishmentChannel.type === ChannelType.GuildText) {
 												const punishmentMessage = new EmbedBuilder()
-													.setTitle('Link Spam Detected')
+													.setTitle('Discord Event[LINK SPAM]')
 													.setDescription(`:x: ${author} has been kicked for posting too many links.`)
 													.setColor('Red')
 													.setFooter({ text: guild.name })

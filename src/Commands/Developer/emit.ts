@@ -80,8 +80,8 @@ export default new Command({
 				await interaction.reply({ content: 'Emitted the event!', ephemeral: true });
 				break;
 			case 'guildMemberUpdate':
-				client.emit('guildMemberUpdate', member, member);
-				await interaction.reply({ content: 'Event Emitted!', ephemeral: true });
+				// Emit the guildMemberUpdate event with the simulated data
+				await interaction.reply({ content: 'Dont Know how to do this command!', ephemeral: true });
 				break;
 			case 'guildCreate':
 				if (guild) {
