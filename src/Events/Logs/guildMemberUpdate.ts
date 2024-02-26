@@ -5,6 +5,8 @@ import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import { Event } from '../../Structures/Event';
 
 export default new Event('guildMemberUpdate', async (oldMember: GuildMember | PartialGuildMember, newMember: GuildMember) => {
+	console.log('oldMember: ', oldMember.presence);
+	console.log('newMember: ', newMember.presence);
 
 	const data = await ChanLogger.findOne({ Guild: newMember.guild.id }).catch((err: MongooseError) => { console.error(err.message); });
 
@@ -18,7 +20,7 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 	const oldRoles = oldMember.roles.cache.map(r => r.id);
 	const newRoles = newMember.roles.cache.map(r => r.id);
 
-	const Embed = new EmbedBuilder().setTimestamp();
+	const Embed = new EmbedBuilder().setTitle(`${newMember.guild.name}[empty]`).setTimestamp();
 
 	if (oldRoles.length > newRoles.length) { // removing a role
 		const RoleIDs = Unique(oldRoles, newRoles);
@@ -32,7 +34,8 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 		if (description && logsChannelOBJ.type === ChannelType.GuildText) {
 			logsChannelOBJ.send({
 				embeds: [
-					Embed.setTitle(`${newMember.guild.name} | Member Update`)
+					Embed
+						// .setTitle(`${newMember.guild.name} | Member Update`)
 						.setDescription(description)
 						.setColor('Red'),
 				],
@@ -41,7 +44,7 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 	}
 	if (oldRoles.length < newRoles.length) { // adding a role
 		const addedRoles = AddedRoles(oldRoles, newRoles);
-		console.log('Added roles:', addedRoles); // Debugging statement
+		// console.log('Added roles:', addedRoles); // Debugging statement
 		let description = '';
 		addedRoles.forEach(roleId => {
 			const Role = newMember.guild.roles.cache.get(roleId.toString());
@@ -53,21 +56,30 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 		if (description && logsChannelOBJ.type === ChannelType.GuildText) {
 			logsChannelOBJ.send({
 				embeds: [
-					Embed.setTitle(`${newMember.guild.name} | Member Update`)
+					Embed
+						// .setTitle(`${newMember.guild.name} | Member Update`)
 						.setDescription(description)
 						.setColor('Green'),
 				],
 			}).catch(error => console.error('Error sending message:', error)); // Error handling
 		}
 	}
-	// console.log('oldRoles: ', oldRoles);
-	// console.log('newRoles', newRoles);
+
+	if (newMember.presence?.activities !== oldMember.presence?.activities) {
+		if (logsChannelOBJ.type === ChannelType.GuildText)
+			return logsChannelOBJ.send({
+				embeds: [
+					// Embed.setTitle('guildMemberUpdate[Presence]'),
+					Embed.setDescription(`${newMember.user.globalName} status has changed from \`${oldMember.presence?.activities[0].state}\` to: \`${newMember.presence?.activities[0].state}\``)
+				]
+			});
+	}
 
 	if (newMember.nickname !== oldMember.nickname) {
 		if (logsChannelOBJ.type === ChannelType.GuildText)
 			return logsChannelOBJ.send({
 				embeds: [
-					Embed.setTitle(`${newMember.guild.name} | Nickname Update`),
+					// Embed.setTitle(`${newMember.guild.name} | Nickname Update`),
 					Embed.setDescription(`${newMember.user.globalName}'s nickname has been changed from: \`${oldMember.nickname}\` to: \`${newMember.nickname}\``),
 				],
 			});
@@ -76,7 +88,7 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 		if (logsChannelOBJ.type === ChannelType.GuildText)
 			return logsChannelOBJ.send({
 				embeds: [
-					Embed.setTitle(`${newMember.guild.name} | Boost Detected`),
+					// Embed.setTitle(`${newMember.guild.name} | Boost Detected`),
 					Embed.setDescription(`\`${newMember.user.globalName}\` has started boosting the server`),
 				],
 			});
@@ -85,7 +97,7 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 		if (logsChannelOBJ.type === ChannelType.GuildText)
 			return logsChannelOBJ.send({
 				embeds: [
-					Embed.setTitle(`${newMember.guild.name} | Unboost Detected`),
+					// Embed.setTitle(`${newMember.guild.name} | Unboost Detected`),
 					Embed.setDescription(`${newMember.user.globalName} has stopped boosting the server`),
 				],
 			});

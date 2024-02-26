@@ -81,6 +81,7 @@ export default new Command({
 				break;
 			case 'guildMemberUpdate':
 				// Emit the guildMemberUpdate event with the simulated data
+				client.emit('guildMemberUpdate', member, member);
 				await interaction.reply({ content: 'Dont Know how to do this command!', ephemeral: true });
 				break;
 			case 'guildCreate':
@@ -89,7 +90,7 @@ export default new Command({
 					await interaction.reply({ content: 'Event emitted!', ephemeral: true });
 				} else {
 					await interaction.reply({ content: 'Cannot emit event. Guild is null.', ephemeral: true });
-				}
+				}// heather.is678
 				break;
 			case 'guildDelete':
 				if (guild) {

@@ -21,7 +21,8 @@ export class ExtendedClient extends Client {
 				GatewayIntentBits.GuildMessages,
 				GatewayIntentBits.MessageContent,
 				GatewayIntentBits.GuildWebhooks,
-				GatewayIntentBits.GuildMessageReactions
+				GatewayIntentBits.GuildMessageReactions,
+				GatewayIntentBits.GuildPresences
 			],
 			partials: [
 				Partials.Channel,
@@ -37,7 +38,7 @@ export class ExtendedClient extends Client {
 				...Options.DefaultMakeCacheSettings,
 				MessageManager: { maxSize: 200 }
 			}),
-			presence: { activities: [{ name: 'Testing', type: ActivityType.Custom, url: 'https://twitch.tv/canadiendragon' }], afk: false, status: 'online' },
+			presence: { activities: [{ name: 'Im DragonBot', type: ActivityType.Custom, url: 'https://github.com/skullgaming31/DragonBot' }], afk: false, status: 'online' },
 		});
 	}
 	async start() {
