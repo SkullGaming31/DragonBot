@@ -1,27 +1,32 @@
-import { EmbedBuilder, WebhookClient } from 'discord.js';
+import * as fs from 'fs/promises'; // For file logging
 
-async function errorHandler(errorHook: WebhookClient) {
-	const Embed = new EmbedBuilder().setColor('DarkRed').setTitle('⚠ | Error Encountered').setFooter({ text: 'Anti-Crash by DragoLuca' }).setTimestamp();
+interface ErrorContext {
+	promise?: Promise<unknown>;
+	origin?: NodeJS.UncaughtExceptionOrigin;
+}
 
+async function errorHandler(): Promise<void> {
 
-	process.on('unhandledRejection', async (reason: unknown, p: Promise<unknown>) => {
-		console.log(reason, p);
+	process.on('unhandledRejection', async (reason: unknown, promise: Promise<unknown>) => {
+		console.error('Unhandled Rejection:', reason, promise);
+		const context: ErrorContext = { promise };
 
-		await errorHook.send({ embeds: [Embed.setDescription('**Unhandled Rejection/Catch: \n\n** ```' + reason + '```')] });
-		return;
+		// const errorMessage = `**Unhandled Rejection/Catch: \n\n** ${reason}\n\n${context.promise ? `Promise: ${context.promise}` : ''}\n`;
+
+		// Optional: Log error to file
+		await fs.appendFile('../dev logs/logs.log', `${Date.now()} | Unhandled Rejection: ${reason}\n${context.promise ? `Promise: ${context.promise}\n` : ''}\n\n`);
 	});
-	process.on('uncaughtException', async (err: Error, orgin: NodeJS.UncaughtExceptionOrigin) => {
-		console.log(err, orgin);
 
-		await errorHook.send({ embeds: [Embed.setDescription('**Uncaught Exception/Catch:\n\n** ```' + err + '\n\n' + orgin.toString() + '```').setTitle(err.name)] });
-		return;
-	});
-	process.on('uncaughtException', async (err: Error, orgin: NodeJS.UncaughtExceptionOrigin) => {
-		console.log(err, orgin);
+	process.on('uncaughtException', async (err: Error, origin: NodeJS.UncaughtExceptionOrigin) => {
+		console.error(err, origin);
 
-		await errorHook.send({ embeds: [Embed.setDescription('**Uncaught Exception/Catch: (MONITOR)\n\n** ```' + err + '\n\n' + orgin.toString() + '```').setTitle(err.name)] });
-		return;
+		const context: ErrorContext = { origin };
+		// const errorMessage = `**Uncaught Exception/Catch: \n\n** ${err.stack}\n\nOrigin: ${context.origin ? context.origin.toString() : ''}\n`;
+
+		// Optional: Log error to file
+		await fs.appendFile('../dev logs/logs.log', `${Date.now()} | Uncaught Exception: ${err.message}\n${err.stack}\nOrigin: ${context.origin ? context.origin : ''}\n\n`);
 	});
+
 }
 
 export default errorHandler;
