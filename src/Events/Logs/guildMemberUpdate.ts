@@ -5,8 +5,8 @@ import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import { Event } from '../../Structures/Event';
 
 export default new Event('guildMemberUpdate', async (oldMember: GuildMember | PartialGuildMember, newMember: GuildMember) => {
-	console.log('oldMember: ', oldMember.presence);
-	console.log('newMember: ', newMember.presence);
+	// console.log('oldMember: ', oldMember);
+	// console.log('newMember: ', newMember);
 
 	const data = await ChanLogger.findOne({ Guild: newMember.guild.id }).catch((err: MongooseError) => { console.error(err.message); });
 
@@ -63,16 +63,6 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 				],
 			}).catch(error => console.error('Error sending message:', error)); // Error handling
 		}
-	}
-
-	if (newMember.presence?.activities !== oldMember.presence?.activities) {
-		if (logsChannelOBJ.type === ChannelType.GuildText)
-			return logsChannelOBJ.send({
-				embeds: [
-					// Embed.setTitle('guildMemberUpdate[Presence]'),
-					Embed.setDescription(`${newMember.user.globalName} status has changed from \`${oldMember.presence?.activities[0].state}\` to: \`${newMember.presence?.activities[0].state}\``)
-				]
-			});
 	}
 
 	if (newMember.nickname !== oldMember.nickname) {
