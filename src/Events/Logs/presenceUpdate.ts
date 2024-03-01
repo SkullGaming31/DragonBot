@@ -6,8 +6,8 @@ import { Event } from '../../Structures/Event';
 export default new Event<'presenceUpdate'>('presenceUpdate', async (oldPresence: Presence | null, newPresence: Presence) => {
 	try {
 		const data = await ChanLogger.findOne({ Guild: newPresence.guild?.id }).catch((err: MongooseError) => { console.error(err.message); });
-		console.log('oldPresence: ', oldPresence);
-		console.log('newPresence: ', newPresence);
+		// console.log('oldPresence: ', oldPresence);
+		// console.log('newPresence: ', newPresence);
 
 		if (!data || data.enableLogs === false) return;
 
