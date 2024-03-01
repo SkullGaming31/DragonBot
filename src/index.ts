@@ -1,9 +1,7 @@
-import { WebhookClient } from 'discord.js';
 import { config } from 'dotenv';
 import { connectDatabase } from './Database';
 import { ExtendedClient } from './Structures/Client';
 import { checkVariables } from './Structures/checkVariables';
-import errorHandler from './Structures/errorHandler';
 
 config();
 
@@ -14,8 +12,7 @@ async function main() {
 	const WebHookID = process.env.DISCORD_ERR_WEBHOOK_ID as string;
 	const WebHookToken = process.env.DISCORD_ERR_WEBHOOK_TOKEN as string;
 
-	const errorHook = new WebhookClient({ id: WebHookID, token: WebHookToken, });
-	await errorHandler(errorHook);
+	// const errorHook = new WebhookClient({ id: WebHookID, token: WebHookToken, });
 	await connectDatabase();
 	checkVariables(process.env); // checks if any variable's values are missing in the .env
 
