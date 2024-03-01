@@ -16,50 +16,17 @@ export default new Command({
 			type: ApplicationCommandOptionType.String,
 			required: true,
 			choices: [
-				{
-					name: 'guildMemberAdd',
-					value: 'guildMemberAdd',
-				},
-				{
-					name: 'guildMemberRemove',
-					value: 'guildMemberRemove'
-				},
-				{
-					name: 'guildMemberUpdate',
-					value: 'guildMemberUpdate'
-				},
-				{
-					name: 'guildCreate',
-					value: 'guildCreate'
-				},
-				{
-					name: 'guildDelete',
-					value: 'guildDelete'
-				},
-				{
-					name: 'channelCreate',
-					value: 'channelCreate'
-				},
-				{
-					name: 'channelDelete',
-					value: 'channelDelete'
-				},
-				{
-					name: 'channelUpdate',
-					value: 'channelUpdate'
-				},
-				{
-					name: 'roleCreate',
-					value: 'roleCreate'
-				},
-				{
-					name: 'roleDelete',
-					value: 'roleDelete'
-				},
-				{
-					name: 'roleUpdate',
-					value: 'roleUpdate'
-				}
+				{ name: 'guildMemberAdd', value: 'guildMemberAdd' },
+				{ name: 'guildMemberRemove', value: 'guildMemberRemove' },
+				{ name: 'guildMemberUpdate', value: 'guildMemberUpdate' },
+				{ name: 'guildCreate', value: 'guildCreate' },
+				{ name: 'guildDelete', value: 'guildDelete' },
+				{ name: 'channelCreate', value: 'channelCreate' },
+				{ name: 'channelDelete', value: 'channelDelete' },
+				{ name: 'channelUpdate', value: 'channelUpdate' },
+				{ name: 'roleCreate', value: 'roleCreate' },
+				{ name: 'roleDelete', value: 'roleDelete' },
+				{ name: 'roleUpdate', value: 'roleUpdate' },
 			]
 		}
 	],
@@ -90,7 +57,7 @@ export default new Command({
 					await interaction.reply({ content: 'Event emitted!', ephemeral: true });
 				} else {
 					await interaction.reply({ content: 'Cannot emit event. Guild is null.', ephemeral: true });
-				}// heather.is678
+				}
 				break;
 			case 'guildDelete':
 				if (guild) {
@@ -127,13 +94,13 @@ export default new Command({
 					await interaction.reply({ content: 'Cannot emit event. Channel is null or not a text channel.', ephemeral: true });
 				}
 				break;
-			case 'roleCreate':
+			case 'roleCreate':// dont know how to use this to test role create event
 				interaction.reply({ content: 'Not Currently Implemented', ephemeral: true });
 				break;
-			case 'roleDelete':
+			case 'roleDelete':// dont know how to use this to test role delete event
 				interaction.reply({ content: 'Not Currently Implemented', ephemeral: true });
 				break;
-			case 'roleUpdate':
+			case 'roleUpdate':// dont know how to use this to test role update event
 				interaction.reply({ content: 'Not Currently Implemented', ephemeral: true });
 				break;
 		}
