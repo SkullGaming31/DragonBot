@@ -5,6 +5,7 @@ import SuggestionModel, { ISuggestion } from '../../Database/Schemas/SuggestDB';
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { Event } from '../../Structures/Event';
 import { ExtendedInteraction } from '../../Typings/Command';
+import { setCooldown } from '../../Utilities/functions';
 import { client } from '../../index';
 
 
@@ -13,7 +14,19 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 	const settings = await SettingsModel.findOne({ GuildID: guild?.id });
 	//chat input commands
 	if (interaction.isCommand()) {
+		const commandName = interaction.commandName;
+		const user = interaction.user;
 		const command = client.commands.get(interaction.commandName);
+		// if (isOnCooldown(commandName, user.id)) {
+		// 	switch (commandName) {
+		// 		case 'beg':
+		// 		case 'daily':
+		// 		case 'work':
+		// 			return interaction.reply({ content: 'This command is currently on a 24 hour cooldown, please come back tomorrow', ephemeral: true });
+		// 		default:
+		// 			return interaction.reply({ content: 'This command is currently on cooldown.', ephemeral: true });
+		// 	}
+		// }
 		// console.log(command);
 		if (!command) return interaction.reply({ content: 'You have used a non-existant command, please try another command', ephemeral: true });
 
@@ -22,6 +35,11 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 			client,
 			interaction: interaction as ExtendedInteraction
 		});
+
+		// Set cooldown after successful command execution
+		if (command.Cooldown) {
+			setCooldown(commandName, user.id, command.Cooldown);
+		}
 	}
 	// button clicks
 	if (interaction.isButton()) {
