@@ -19,6 +19,17 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 	}
 
 	switch (messageReaction.emoji.name) {
+		case '✅':
+			// const settings = await SettingsModel.findOne({ GuildID: reaction.message.guild?.id });
+			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'Verified');
+			if (!role) {
+				console.log('Role not found');
+				return;
+			}
+			if (messageReaction.message.id !== '1199602079434555532' || messageReaction.message.channelId !== reaction.message.guild?.rulesChannelId) return;
+
+			await member.roles.remove(role);
+			break;
 		case '🚀': {
 			// Fetch the role you want to give (replace 'ROLE_NAME' with the name of the role)
 			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'Space Engineers');
@@ -70,9 +81,7 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 			break;
 		}
 		// Add more cases for other reactions if needed
-		default:
-			console.log('Unhandled reaction: ', messageReaction.emoji.name);
 	}
-	console.log('Message Reaction Object: ', messageReaction);
-	console.log('User Object', reactionUser);
+	// console.log('Message Reaction Object: ', messageReaction);
+	// console.log('User Object', reactionUser);
 });

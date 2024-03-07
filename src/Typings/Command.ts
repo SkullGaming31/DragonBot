@@ -27,5 +27,6 @@ export type CommandType = {
 	BotPerms?: PermissionResolvable[];
 	defaultMemberPermissions?: PermissionResolvable[];
 	Development?: boolean;
+	Cooldown?: number;
 	run: RunFunction;
 } & ChatInputApplicationCommandData
