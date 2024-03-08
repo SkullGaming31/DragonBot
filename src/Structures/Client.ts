@@ -79,10 +79,10 @@ export class ExtendedClient extends Client {
 	async registerModules() {
 		//Commands
 		const slashCommands: ApplicationCommandDataResolvable[] = [];
-		const commandFiles = await PG(`${__dirname}/../Commands/*/*{.ts,.js}`);
+		const commandFiles = await PG(`${__dirname}/../Commands/*/*{.ts,.js}`, {});
 		// console.log({ commandFiles });
 
-		commandFiles.forEach(async (filePath) => {
+		commandFiles.forEach(async (filePath: string) => {
 			const command: CommandType = await this.importFile(filePath);
 
 			if (!command.name) return;
@@ -110,7 +110,7 @@ export class ExtendedClient extends Client {
 		const eventFiles = await PG(`${__dirname}/../Events/*/*{.ts,.js}`);
 		// console.log({ eventFiles });
 
-		eventFiles.forEach(async (filePath) => {
+		eventFiles.forEach(async (filePath: string) => {
 			const event: Event<keyof ClientEvents> = await this.importFile(filePath);
 			if (event.event === 'ready') { this.once(event.event, event.run); } else { this.on(event.event, event.run); }
 		});
