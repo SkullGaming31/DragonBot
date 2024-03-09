@@ -23,7 +23,7 @@ export default new Command({
 		}
 	],
 	run: async ({ interaction }) => {
-		const { options } = interaction;
+		const { options, guild } = interaction;
 		const TargetUser = options.getUser('target');
 		const Amount = options.getNumber('amount') || 0;
 
@@ -48,9 +48,9 @@ export default new Command({
 
 		try {
 			// Find or create the target user in the database
-			let user = await UserModel.findOne({ id: TargetUser?.id });
+			let user = await UserModel.findOne({ guildID: guild?.id, id: TargetUser?.id });
 			if (!user) {
-				user = new UserModel({ id: TargetUser?.id, username: TargetUser?.username, balance: Amount });
+				user = new UserModel({ guildID: guild?.id, id: TargetUser?.id, username: TargetUser?.username, balance: Amount });
 			}
 
 			// Update the user's balance

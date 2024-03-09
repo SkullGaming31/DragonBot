@@ -6,7 +6,7 @@ import { Command } from '../../Structures/Command';
 // Define roles for moderators and/or admins (adjust as needed)
 // const moderatorRoles = ['Mod', 'Admin'];
 
-export default new Command({
+export default new Command({// TODO: Unable to retrieve server settings
 	name: 'bal',
 	description: 'Check the balance of your account or another user (if you have permission)',
 	UserPerms: ['SendMessages'],
@@ -23,7 +23,7 @@ export default new Command({
 	],
 	run: async ({ interaction }) => {
 		try {
-			const { user, options, guild } = interaction;
+			const { user, options, guild, channel } = interaction;
 
 			// Check if the user is attempting to check another user's balance
 			const targetUser = options.getUser('target');
@@ -34,8 +34,19 @@ export default new Command({
 			// Check if the command user is the server owner (no need for serverMember here)
 			const isOwner = commandUser?.id === guild?.ownerId;
 
-			// check for economy channel
-			if (interaction.channel?.id !== '1214134334093664307') return interaction.reply({ content: `all economy commands are to be used in ${channelMention('1214134334093664307')}`, ephemeral: true });
+			const settingsDoc = await SettingsModel.findOne({ GuildID: guild?.id });
+			let economyChannel;
+			if (settingsDoc && settingsDoc.EconChan) {
+				economyChannel = guild?.channels.cache.get(settingsDoc.EconChan);
+			} else {
+				// No economy channel set, use the command channel
+				economyChannel = interaction.channel;
+			}
+			if (economyChannel) {
+				if (economyChannel?.id !== channel?.id) {
+					return interaction.reply({ content: `${userMention(user.id)}, You can only use this command in the economy spam channel ${channelMention(economyChannel.id)}`, ephemeral: true });
+				}
+			}
 
 			const guildSettings = await SettingsModel.findOne({ GuildID: guild?.id });
 
@@ -44,7 +55,7 @@ export default new Command({
 			// Check if the user is in the guild to access their roles
 			if (targetUser && !guild) return interaction.reply({ content: 'This command can only be used in a guild.', ephemeral: true });
 
-			if (!guildSettings) return interaction.reply({ content: 'Unable to retrieve server settings.', ephemeral: true });
+			if (!guildSettings) return interaction.reply({ content: 'Unable to retrieve server settings, please run the ``/settings`` command', ephemeral: true });
 			// Assert only if certain values will be strings:
 			const adminRoleId = guildSettings.AdministratorRole as string;
 			const modRoleId = guildSettings.ModeratorRole as string;
@@ -63,21 +74,24 @@ export default new Command({
 
 			// Find the user in the database (target user or the original user)
 			const userId = targetUser?.id || user.id;
-			const userDoc = await UserModel.findOne({ id: userId });
+			const userDoc = await UserModel.findOne({ guildID: guild?.id, id: userId });
 			if (!userDoc) {
 				const message = `${targetUser ? userMention(targetUser.id) : 'You'} don't have an entry in the database yet. Use the \`/begin\` command to register!`;
 				return interaction.reply({ content: message, ephemeral: true });
 			}
 
 			// Check if the user has a balance property (just in case)
-			if (!userDoc.balance) {
-				userDoc.balance = 0; // Set to 0 if not present (optional)
-				await userDoc.save(); // Save the updated document if needed
-			}
+			if (!userDoc.balance) return interaction.reply({ content: 'Please run the ``/begin`` command to start making gold' });
 			const targetUsername = targetUser ? targetUser.username : user.username;
+
+			// Get all user balances, sorted by balance (descending)
+			const allUserBalances = await UserModel.find({ guildID: guild?.id }).sort({ balance: -1 }).select('balance');
+			// Get the rank of the current user's balance within the sorted list
+			const userRank = allUserBalances.findIndex(doc => doc.balance === userDoc.balance) + 1;
 
 			const embed = new EmbedBuilder()
 				.setTitle(`${targetUsername}'s Account Stats`)
+				.setColor('Green')
 				.addFields([
 					{
 						name: 'Balance',
@@ -88,9 +102,14 @@ export default new Command({
 						name: 'Inventory',
 						value: `${userDoc.inventory?.length ? userDoc.inventory.join('\n') : 'Empty'}`, // Check length and join if exists, otherwise show "Empty"
 						inline: true
+					},
+					{
+						name: 'Rank',
+						value: `${userRank}`,
+						inline: true
 					}
 				])
-				.setFooter({ text: `${guild?.name}`, iconURL: `${guild?.iconURL({ size: 512 })}` })
+				.setFooter({ text: `${guild?.name}` })
 				.setTimestamp();
 
 			if (targetUser) {

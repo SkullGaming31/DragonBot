@@ -1,5 +1,6 @@
 import { randomInt } from 'crypto';
 import { ApplicationCommandOptionType, ApplicationCommandType, Collection, EmbedBuilder, GuildTextBasedChannel, TextChannel, channelMention, userMention } from 'discord.js';
+import SettingsModel from '../../Database/Schemas/settingsDB';
 import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
 
@@ -36,15 +37,31 @@ export default new Command({
 		}
 	],
 	run: async ({ interaction }) => {
-		const { options } = interaction;
+		const { options, user, guild } = interaction;
 		try {
 			await interaction.deferReply();
 
 			const Amount = options.getNumber('amount');
 			if (!Amount) return;
 			if (Amount < 1000 || Amount > 10000) return interaction.editReply({ content: 'The bet amount must be between 1000-10000' });
-			const econChannel = interaction.guild?.channels.cache.get('1214134334093664307');
-			if (interaction.channel?.id !== econChannel?.id) return interaction.editReply({ content: `All economy commands should be used in ${channelMention('1214134334093664307')}` });
+
+			// Channel lookup
+			const settingsDoc = await SettingsModel.findOne({ GuildID: guild?.id });
+
+			const economyChannelID = settingsDoc?.EconChan;
+			if (economyChannelID) {
+				const econChannel = interaction.guild?.channels.cache.get(economyChannelID);
+
+				if (econChannel === undefined) {
+					// Log a warning if the channel is not found
+					console.warn(`Economy channel ${economyChannelID} not found.`);
+				} else if (interaction.channel?.id !== econChannel?.id) {
+					// Send a message in the current channel with a mention of the economy channel
+					return interaction.editReply({
+						content: `All economy commands should be used in ${channelMention(econChannel?.id)}. Please try again there.`
+					});
+				}
+			}
 
 			// Initialize variables (implement your logic here)
 			const heistInProgress = false;
@@ -65,7 +82,7 @@ export default new Command({
 			await heistMessageDetails.react('✅');
 
 			try {
-				const filter = { id: interaction.user.id };
+				const filter = { guildID: guild?.id, id: user.id };
 				const update = { $inc: { balance: -Amount } }; // Deduct Amount
 				const options = { new: true };
 				await UserModel.findOneAndUpdate(filter, update, options);
@@ -89,8 +106,7 @@ export default new Command({
 
 				const participant: Participant = {
 					userId: user.id,
-					username: user.username,
-					// ... assign other participant information ...
+					username: user.username
 				};
 				participants.set(user.id, participant);
 
@@ -201,7 +217,7 @@ export default new Command({
 						// Announce the winners
 						let winnerString = '';
 						for (const winner of winners) {
-							const filter = { id: winner.userId };
+							const filter = { guildID: guild?.id, id: winner.userId };
 							const update = { $inc: { balance: Amount } }; // Award Amount
 							const options = { new: true };
 							await UserModel.findOneAndUpdate(filter, update, options);

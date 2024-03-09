@@ -1,82 +1,47 @@
 import { ChannelType, Message, userMention } from 'discord.js';
-import { UserModel } from '../../Database/Schemas/userModel';
+import SettingsModel from '../../Database/Schemas/settingsDB';
+import { IUser, UserModel } from '../../Database/Schemas/userModel';
 import { Event } from '../../Structures/Event';
 
-// Set a random chance (e.g., 0.05 5%) for awarding currency
-const CURRENCY_CHANCE = 0.2;
-const SUBSCRIBER_CHANCE = 0.25;
+const BASE_CURRENCY_CHANCE = 0.2;
+const SUBSCRIBER_CHANCE_BOOST = 0.05;
+
 export default new Event('messageCreate', async (message: Message) => {
 	const { author, guild } = message;
-	if (author.bot && !guild) return; // Ignore bot messages
 
-	// Generate a random number between 0 and 1
-	const randomValue = Math.random();
+	// Ignore bot messages and DMs
+	if (author.bot || !guild) return;
 
-	// Check if the random number falls within the currency chance
-	const isSubscriber = message.member?.roles.cache.some(role => role.name === 'Twitch Subscriber'); // Check for subscriber role
+	// Determine currency chance based on subscriber status
+	const isSubscriber = message.member?.roles.cache.some((role) => role.name === 'Twitch Subscriber');
+	const currencyChance = isSubscriber ? BASE_CURRENCY_CHANCE + SUBSCRIBER_CHANCE_BOOST : BASE_CURRENCY_CHANCE;
 
-	if (isSubscriber) {
-		// Use subscriber chance for subscribers
-		if (randomValue <= SUBSCRIBER_CHANCE) {
-			// Existing code to award currency and update user balance (replace with your actual implementation)
-			console.log(`${author.username} (subscriber) earned currency!`);
-
-			// Example: Update user balance in your database
+	// Award currency if random chance is met
+	if (Math.random() <= currencyChance) {
+		try {
 			const userId = author.id;
-			const username = author.username;
-			const currencyAmount = Math.floor(Math.random() * (300 - 10 + 1)) + 10;
 
-			try {
-				let user = await UserModel.findOne({ id: userId });
-				if (!user) {
-					user = new UserModel({ id: userId, username, balance: 0 });
-				}
-				if (!author.bot) {
-					user.balance += currencyAmount;
-					await user.save();
+			// Generate random currency amount (10-300)
+			const currencyAmount = Math.floor(Math.random() * 291) + 10;
 
-					const econChannel = message.guild?.channels.cache.get('1214134334093664307'); // Replace with your channel ID
-					if (econChannel?.type === ChannelType.GuildText) {
-						await econChannel.send({ content: `Hey ${userMention(author.id)}, you just earned ${currencyAmount} gold as a subscriber!` });
-					}
-				}
-			} catch (error) {
-				console.error('Error updating user currency:', error);
-			}
-		}
-	} else {
-		// Use regular chance for non-subscribers
-		if (randomValue <= CURRENCY_CHANCE) {
-			const userId = author.id;
-			const username = author.username;
+			// Retrieve or create user model
+			await UserModel.findOneAndUpdate<IUser>(
+				{ guildID: guild.id, id: userId },
+				{ $inc: { balance: currencyAmount } },
+				{ new: true, upsert: true }
+			);
 
-			// Generate a random currency amount between 10 and 300 (inclusive)
-			const currencyAmount = Math.floor(Math.random() * (300 - 10 + 1)) + 10;
+			// Notify user about earned currency
+			const settings = await SettingsModel.findOne({ GuildID: guild.id });
+			const econChannel = settings?.EconChan ? guild.channels.cache.get(settings.EconChan) : undefined;
 
-			// Find the user in the database or create a new entry if they don't exist
-			try {
-				// Find the user using a query for your custom string ID field
-				let user = await UserModel.findOne({ id: userId });
+			const channelForNotification = econChannel || message.channel;
 
-				if (!user) {
-					// Create a new user model with the correct field names
-					user = new UserModel({ id: userId, username, balance: 0 });
-				}
-
-				if (!author.bot) {
-					// Update the user's balance
-					user.balance += currencyAmount;
-					// Save the updated user data
-					await user.save();
-
-					// Inform the user about the earned currency
-					const econChannel = message.guild?.channels.cache.get('1214134334093664307');
-					if (econChannel?.type === ChannelType.GuildText) await econChannel.send({ content: `Hey ${userMention(author.id)}, you just earned ${currencyAmount} gold!` });
-				}
-			} catch (error) {
-				console.error('Error updating user currency:', error);
-				// Handle errors appropriately, e.g., log the error and consider retry logic
-			}
+			await new Promise((resolve) => setTimeout(resolve, 1000)); // Delay 1 second
+			if (channelForNotification.type === ChannelType.GuildText) await channelForNotification.send({ content: `Hey ${userMention(author.id)}, you just earned ${currencyAmount} gold!` });
+		} catch (error) {
+			console.error('Error updating user currency:', error);
+			// Handle errors appropriately
 		}
 	}
 });

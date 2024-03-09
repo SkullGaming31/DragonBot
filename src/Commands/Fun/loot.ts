@@ -78,7 +78,7 @@ export default new Command({
 		}
 	],
 	run: async ({ interaction }) => {
-		const { user, options } = interaction;
+		const { user, options, guild } = interaction;
 		const robberyTarget = options.getString('target');
 		await interaction.deferReply();
 		// const chosenItems = interaction.options.getString('items')?.split(' ');// not needed for time being as items havnt been implemented yet
@@ -113,7 +113,7 @@ export default new Command({
 				// Update user's balance with stolen value
 				const userId = interaction.user.id;
 				try {
-					const user = await UserModel.findOne({ id: userId });
+					const user = await UserModel.findOne({ guildID: guild?.id, id: userId });
 
 					if (user && user.balance !== undefined) {
 						user.balance = user.balance + totalStolenValue;
@@ -140,7 +140,7 @@ export default new Command({
 					const userId = member.id;
 
 					// Retrieve the user model
-					const user = await UserModel.findOne({ id: userId });
+					const user = await UserModel.findOne({ guildID: guild?.id, id: userId });
 
 					// Check if the user is found in the database
 					if (!user) {
@@ -209,7 +209,7 @@ export default new Command({
 			case 'store':
 				try {
 					// Select random items from the store if no specific items are chosen
-					const discordUser = await UserModel.findOne({ id: user.id });
+					const discordUser = await UserModel.findOne({ guildID: guild?.id, id: user.id });
 					if (!discordUser) throw new Error('User not found.'); // Added error handling
 
 					const itemsToSteal = Object.keys(storeItems); // Get all item names

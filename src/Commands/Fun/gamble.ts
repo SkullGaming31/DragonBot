@@ -35,7 +35,7 @@ export default new Command({
 			// Retrieve user from database 
 			let userModel: IUser | null;
 			try {
-				userModel = await UserModel.findOne<IUser>({ id: user.id });
+				userModel = await UserModel.findOne<IUser>({ guildID: guild?.id, id: user.id });
 			} catch (error) {
 				console.error('Error retrieving user from database:', error);
 				await interaction.reply({ content: 'An error occurred while retrieving user information.' });
@@ -50,7 +50,7 @@ export default new Command({
 			switch (Options) {
 				case 'all'://DONE !gamble [all] gamble everything in there balance
 					try {
-						const currentBalance = await UserModel.findOne({ id: user.id });
+						const currentBalance = await UserModel.findOne({ guildID: guild.id, id: user.id });
 						if (!currentBalance || currentBalance.balance === undefined) return;
 						if (currentBalance.balance === 0) return interaction.reply({ content: 'You do not have any gold to gamble away', ephemeral: true });
 
@@ -59,7 +59,7 @@ export default new Command({
 
 						const winAmount = isWin ? currentBalance?.balance * 2 : -currentBalance?.balance; // Update balance based on win/loss
 
-						await UserModel.findOneAndUpdate({ id: user.id }, { $inc: { balance: winAmount } });
+						await UserModel.findOneAndUpdate({ guildID: guild.id, id: user.id }, { $inc: { balance: winAmount } });
 
 						const finalResponse = isWin ? `Congratulations! You risked it all and won ${winAmount} gold!` : `Sorry, you lost ${winAmount} gold.`;
 
@@ -70,7 +70,7 @@ export default new Command({
 					break;
 				case 'percentage': //DONE !gamble [percentage] ex !gamble 20% of balance
 					try {
-						const currentBalance = await UserModel.findOne({ id: user.id });
+						const currentBalance = await UserModel.findOne({ guildID: guild.id, id: user.id });
 						if (!currentBalance || currentBalance.balance === undefined) return;
 						if (currentBalance.balance === 0) return interaction.reply({ content: 'You do not have any gold to gamble away', ephemeral: true });
 
@@ -83,7 +83,7 @@ export default new Command({
 
 						const winAmount = isWin ? Number((amountToGamble * 2).toFixed(2)) : Number((-amountToGamble).toFixed(2)); // Update balance based on win/loss
 
-						await UserModel.findOneAndUpdate({ id: user.id }, { $inc: { balance: winAmount }, });
+						await UserModel.findOneAndUpdate({ guildID: guild.id, id: user.id }, { $inc: { balance: winAmount }, });
 
 						const finalResponse = isWin ? `Congratulations! You risked ${percentage}% of your balance and won ${winAmount} gold!` : `Sorry, you lost ${percentage}% of your balance, resulting in ${winAmount} gold loss.`;
 
@@ -109,7 +109,7 @@ export default new Command({
 					const winAmount = isWin ? fixedAmount * 2 : -fixedAmount; // Calculate win/loss amount
 
 					try {
-						await UserModel.findOneAndUpdate({ id: user.id }, { $inc: { balance: winAmount } });
+						await UserModel.findOneAndUpdate({ guildID: guild.id, id: user.id }, { $inc: { balance: winAmount } });
 						const response = isWin ? `Congratulations! You won ${winAmount} gold.` : `Sorry, you lost ${winAmount} gold.`;
 						await interaction.reply({ content: response });
 					} catch (error) {
@@ -119,9 +119,6 @@ export default new Command({
 				default:
 					break;
 			}
-
-			// ... (rest of the gambling logic and database updates as before, adjusted for Discord)
-
 		} catch (error) {
 			console.error('Error in gamble command:', error);
 			await interaction.reply({ content: 'An error occurred while processing your gamble.' });

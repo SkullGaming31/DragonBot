@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, channelMention, userMention } from 'discord.js';
 import { randomInt } from 'node:crypto';
+import SettingsModel from '../../Database/Schemas/settingsDB';
 import { IUser, UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
 
@@ -20,25 +21,36 @@ export default new Command({
 	],
 	type: ApplicationCommandType.ChatInput,
 	run: async ({ interaction }) => {
-		const { options, user, channel } = interaction;
+		const { options, user, channel, guild } = interaction;
 
 		// Parse the dig amount from the arguments
 		const digAmount = options.getNumber('amount');
+
 
 		// Check if the dig amount is valid
 		if (!digAmount || digAmount <= 0) return interaction.reply({ content: 'Invalid bet amount, Usage:', ephemeral: true });
 
 		if (digAmount < 100 || digAmount > 5000) return interaction.reply({ content: 'Invalid bet amount. Minimum bet is 100 gold and maximum is 5000 gold.', ephemeral: true, });
+		// Check settings for economy channel
+		const settings = await SettingsModel.findOne({ GuildID: guild?.id });
 
-		if (channel?.id !== '1214134334093664307') return interaction.reply({ content: `${userMention(user.id)}, You can only use this command in the economy spam channel ${channelMention('1214134334093664307')}`, ephemeral: true });
-
-		const isGuildOwner = interaction.member.id === interaction.guild?.ownerId;
-		if (!isGuildOwner) {
-			// Check if the user has enough balance
-			const userDoc = await UserModel.findOne<IUser>({ id: user.id });
-			if (userDoc?.balance === undefined) return;
-			if (!userDoc || userDoc.balance < digAmount) { return interaction.reply({ content: 'You don\'t have enough balance to dig.', ephemeral: true }); }
+		let economyChannel;
+		if (settings && settings.EconChan) {
+			economyChannel = guild?.channels.cache.get(settings.EconChan);
+		} else {
+			// No economy channel set, use the command channel
+			economyChannel = interaction.channel;
 		}
+		if (economyChannel) {
+			if (economyChannel?.id !== channel?.id) {
+				return interaction.reply({ content: `${userMention(user.id)}, You can only use this command in the economy spam channel ${channelMention(economyChannel.id)}`, ephemeral: true });
+			}
+		}
+
+		// Check if the user has enough balance
+		const userDoc = await UserModel.findOne<IUser>({ id: user.id });
+		if (userDoc?.balance === undefined) return;
+		if (!userDoc || userDoc.balance < digAmount) { return interaction.reply({ content: 'You don\'t have enough balance to dig.', ephemeral: true }); }
 		// Deduct the dig amount from the user's balance
 		// await UserModel.updateOne({ id: user.id, balance: { $gte: digAmount } }, { $inc: { balance: -digAmount } });
 
