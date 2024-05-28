@@ -9,8 +9,6 @@ export const client = new ExtendedClient();
 
 async function main() {
 	await client.start();
-	const WebHookID = process.env.DISCORD_ERR_WEBHOOK_ID as string;
-	const WebHookToken = process.env.DISCORD_ERR_WEBHOOK_TOKEN as string;
 
 	// const errorHook = new WebhookClient({ id: WebHookID, token: WebHookToken, });
 	await connectDatabase();

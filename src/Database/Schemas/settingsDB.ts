@@ -11,6 +11,7 @@ interface ISettings extends Document {
 	PromotionChannel?: string;
 	punishmentChannel?: string;
 	SuggestChan?: string;
+	EconChan?: string;
 	ModerationChannel: string;
 }
 
@@ -25,6 +26,7 @@ const settingsSchema = new Schema<ISettings>({
 	PromotionChannel: { type: String },
 	punishmentChannel: { type: String },
 	SuggestChan: { type: String },
+	EconChan: { type: String },
 	ModerationChannel: { type: String }
 });
 

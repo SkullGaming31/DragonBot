@@ -17,6 +17,7 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 		const commandName = interaction.commandName;
 		const user = interaction.user;
 		const command = client.commands.get(interaction.commandName);
+		// console.log(`ApplicationID: ${interaction.applicationId}, CreatedAt: ${interaction.createdAt}`);
 		// if (isOnCooldown(commandName, user.id)) {
 		// 	switch (commandName) {
 		// 		case 'beg':

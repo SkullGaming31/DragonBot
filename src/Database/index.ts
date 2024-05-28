@@ -4,8 +4,11 @@ import mongoose, { MongooseError } from 'mongoose';
 config();
 
 export const connectDatabase = async (): Promise<void> => {
-	// Set Mongoose options here for improved logging and other configurations
-	mongoose.set('debug', true); // Enable detailed logging (optional)
+	if (process.env.Enviroment === 'debug' || process.env.Enviroment === 'dev') {
+		mongoose.set('debug', true); // Enable detailed logging (optional)
+	} else {
+		mongoose.set('debug', false);
+	}
 
 	const connectionString = process.env.MONGO_DATABASE_URI as string;
 

@@ -64,6 +64,13 @@ export default new Command({
 			channelTypes: [ChannelType.GuildText]
 		},
 		{
+			name: 'econchan',
+			description: 'Channel your economy games can be played in',
+			type: ApplicationCommandOptionType.Channel,
+			required: false,
+			channelTypes: [ChannelType.GuildText]
+		},
+		{
 			name: 'punishmentchan',
 			description: 'Channel your Punishment Logs are sent too',
 			type: ApplicationCommandOptionType.Channel,
@@ -78,11 +85,12 @@ export default new Command({
 		}
 	],
 	run: async ({ interaction }) => {
-		if (!interaction.inCachedGuild()) return;
-
-		const { guild, options } = interaction;
-
 		try {
+			if (!interaction.inCachedGuild()) return;
+			const { guild, options } = interaction;
+			if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
+				console.log('Retrieved options:', options);
+			}
 			const SuggestionChan = options.getChannel('sugestchan') || null;
 			const PunishmentChan = options.getChannel('punishmentchan') || null;
 			const RulesChannel = options.getChannel('ruleschan');
@@ -90,51 +98,62 @@ export default new Command({
 			const Welcomechan = options.getChannel('welcomechan') || null;
 			const NowLive = options.getChannel('live') || null;
 			const ModerationChannel = options.getChannel('modchannel') || null;
+			const EconChannel = options.getChannel('econchan') || null;
 
 			const Administrator = options.getRole('admin') ?? null;
+			if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
+				console.log('Administrator role ID:', Administrator);
+			}
 			const Moderator = options.getRole('moderator') ?? null;
 			const MemberRole = options.getRole('memberrole') ?? null;
 
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			settings.findOne({ GuildID: guild.id }, async (err: any, data: any) => {
-				if (err) throw err;
-				if (!data) {
-					data = new settings({
-						GuildID: guild.id,
-						rulesChannel: RulesChannel?.id,
-						Welcome: Welcome,
-						WelcomeChannel: Welcomechan?.id,
-						PromotionChannel: NowLive?.id,
-						PunishmentChan: PunishmentChan?.id,
-						AdministratorRole: Administrator?.id,
-						ModeratorRole: Moderator?.id,
-						MemberRole: MemberRole?.id,
-						SuggestChan: SuggestionChan?.id,
-						ModerationChannel: ModerationChannel?.id
-					});
-				} else {
-					await settings.findOneAndUpdate(
-						{ GuildID: guild.id },
-						{
-							rulesChannel: RulesChannel?.id,
-							Welcome: Welcome,
-							WelcomeChannel: Welcomechan?.id,
-							PromotionChannel: NowLive?.id,
-							PunishmentChan: PunishmentChan?.id,
-							AdministratorRole: Administrator?.id,
-							ModeratorRole: Moderator?.id,
-							MemberRole: MemberRole?.id,
-							SuggestChan: SuggestionChan?.id,
-							ModerationChannel: ModerationChannel?.id
-						},
-						{
-							new: true,
-							upsert: true
-						}
-					);
+			// Find or create a document using async/await
+			let data;
+			try {
+				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
+					console.log('Fetching settings data');
 				}
-				data.save();
-			});
+				data = await settings.findOne({ GuildID: guild.id });
+			} catch (err) {
+				console.error('Error fetching data:', err);
+				return interaction.reply({ content: 'An error occurred.', ephemeral: true });
+			}
+
+			if (!data) {
+				data = new settings({
+					GuildID: guild.id,
+					rulesChannel: RulesChannel?.id,
+					Welcome: Welcome,
+					WelcomeChannel: Welcomechan?.id,
+					PromotionChannel: NowLive?.id,
+					PunishmentChan: PunishmentChan?.id,
+					AdministratorRole: Administrator?.id,
+					ModeratorRole: Moderator?.id,
+					MemberRole: MemberRole?.id,
+					SuggestChan: SuggestionChan?.id,
+					EconChan: EconChannel?.id,
+					ModerationChannel: ModerationChannel?.id
+				});
+				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
+					console.log('Created new document in database');
+				}
+				await data.save();
+			} else {
+				data.rulesChannel = RulesChannel?.id as string;
+				data.Welcome = Welcome as boolean;
+				data.WelcomeChannel = Welcomechan?.id;
+				data.PromotionChannel = NowLive?.id;
+				data.punishmentChannel = PunishmentChan?.id;
+				data.AdministratorRole = Administrator?.id;
+				data.ModeratorRole = Moderator?.id;
+				data.MemberRole = MemberRole?.id as string;
+				data.SuggestChan = SuggestionChan?.id;
+				data.EconChan = EconChannel?.id;
+				data.ModerationChannel = ModerationChannel?.id as string;
+				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
+					console.log('updating document in database');
+				}
+			}
 			const embed = new EmbedBuilder()
 				.setTitle('Database')
 				.setDescription('Added and/or Updated the database')
@@ -181,8 +200,13 @@ export default new Command({
 					},
 					{
 						name: 'Rules Channel',
-						value: RulesChannel ? channelMention(RulesChannel?.id) : 'none',
+						value: RulesChannel ? channelMention(RulesChannel?.id) : 'None',
 						inline: false
+					},
+					{
+						name: 'Econ Channel',
+						value: EconChannel ? channelMention(EconChannel.id) : 'None',
+						inline: true
 					}
 				)
 				.setTimestamp();

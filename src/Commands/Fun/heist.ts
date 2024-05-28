@@ -5,8 +5,106 @@ import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
 
 interface Participant {
-	userId: string; // User ID for future reference
-	username: string; // Username for display purposes
+    userId: string; // User ID for future reference
+    username: string; // Username for display purposes
+}
+
+type LootValue = {
+    [itemName: string]: number | Gems | Antique | Artwork | Cash;
+};
+
+const lootValues: LootValue = {
+	gold: 2000,
+	silver: 1500,
+	artwork: {
+		Paintings: 5000,
+		Sculptures: 4000,
+		Prints: 3000,
+		Photography: 2000,
+		Tapestry: 1500,
+		ArtisticInstallations: 1000,
+		DecorativeArtObjects: 500,
+	},
+	antique: {
+		RareCoins: 1000,
+		Currency: 800,
+		Documents: 1200,
+		Artifacts: 2500,
+		Jewelry: 2000,
+		Timepieces: 1500,
+		Porcelain: 800,
+		Ceramics: 1000,
+		Collectibles: 1200,
+	},
+	gems: {
+		ruby: 1000,
+		diamond: 2000,
+		sapphire: 1500,
+		Emerald: 1800,
+		Aquamarine: 1200,
+		Topaz: 800,
+		Opal: 1000,
+		Amethyst: 900,
+		Garnet: 700,
+		Pearl: 600,
+	},
+	cash: {
+		Bill1000: 1000,
+		Bill500: 500,
+		Bill5000: 5000,
+		Bill10000: 10000,
+		Bill100000: 100000,
+	},
+	documents: 500,
+};
+
+interface Cash {
+    Bill1000: number;
+    Bill500: number;
+    Bill5000: number;
+    Bill10000: number;
+    Bill100000: number;
+}
+
+interface Artwork {
+    Paintings: number;
+    Sculptures: number;
+    Prints: number;
+    Photography: number;
+    Tapestry: number;
+    ArtisticInstallations: number;
+    DecorativeArtObjects: number;
+}
+
+interface Antique {
+    RareCoins: number;
+    Currency: number;
+    Documents: number;
+    Artifacts: number;
+    Jewelry: number;
+    Timepieces: number;
+    Porcelain: number;
+    Ceramics: number;
+    Collectibles: number;
+}
+
+interface Gems {
+    diamond: number;
+    ruby: number;
+    sapphire: number;
+    Emerald: number;
+    Aquamarine: number;
+    Topaz: number;
+    Opal: number;
+    Amethyst: number;
+    Garnet: number;
+    Pearl: number;
+}
+
+interface LootResult {
+    totalAmount: number;
+    items: string[];
+    message: string;
 }
 
 export default new Command({
@@ -22,18 +120,6 @@ export default new Command({
 			description: 'The amount you want to bet on the heist! 1000-10000',
 			type: ApplicationCommandOptionType.Number,
 			required: true,
-		},
-		{
-			name: 'zone',
-			description: 'The Zone(Difficulty) you want to play the heist in',
-			type: ApplicationCommandOptionType.String,
-			required: false,
-			choices: [
-				{ name: 'bank', value: 'bank' },
-				{ name: 'museum', value: 'museum' },
-				{ name: 'casino', value: 'casino' },
-				{ name: 'jewelry store', value: 'jewelry store' },
-			]
 		}
 	],
 	run: async ({ interaction }) => {
@@ -45,152 +131,113 @@ export default new Command({
 			if (!Amount) return;
 			if (Amount < 1000 || Amount > 10000) return interaction.editReply({ content: 'The bet amount must be between 1000-10000' });
 
-			// Channel lookup
 			const settingsDoc = await SettingsModel.findOne({ GuildID: guild?.id });
-
 			const economyChannelID = settingsDoc?.EconChan;
 			if (economyChannelID) {
 				const econChannel = interaction.guild?.channels.cache.get(economyChannelID);
-
 				if (econChannel === undefined) {
-					// Log a warning if the channel is not found
 					console.warn(`Economy channel ${economyChannelID} not found.`);
 				} else if (interaction.channel?.id !== econChannel?.id) {
-					// Send a message in the current channel with a mention of the economy channel
-					return interaction.editReply({
-						content: `All economy commands should be used in ${channelMention(econChannel?.id)}. Please try again there.`
-					});
+					return interaction.editReply({ content: `All economy commands should be used in ${channelMention(econChannel?.id)}. Please try again there.` });
 				}
 			}
 
-			// Initialize variables (implement your logic here)
-			const heistInProgress = false;
-			const participants: Collection<string, Participant> = new Collection();
+			// Check if the user balance is sufficient for the bet amount
+			const userBalance = await UserModel.findOne({ guildID: guild?.id, id: user.id }).then(user => user?.balance);
+			if (!userBalance || userBalance < Amount) {
+				return interaction.editReply({ content: 'You don\'t have enough coins to start this heist!' });
+			}
 
-			let heistStage = 1;
-			const baseChance = 0.1; // 10% base chance
-			const participantBonus = 0.05; // 5% chance increase per participant
-			// Declare a Map to store participant IDs and their corresponding join message IDs
+			const updatedBalance = userBalance - Amount;
+			await UserModel.findOneAndUpdate({ guildID: guild?.id, id: user.id }, { balance: updatedBalance });
+
+			let heistInProgress = false;
+			const participants: Collection<string, Participant> = new Collection();
+			const baseChance = 0.1;
+			const participantBonus = 0.05;
 			const joinMessagesMap = new Map();
 
-			// Check if a heist is already in progress (implement your logic here)
 			if (heistInProgress) return interaction.editReply({ content: 'A heist is already in progress. Please wait for it to finish!' });
 
-			// Start heist message with reaction and collector
-			const heistMessage = await interaction.editReply({ content: '**Heist starting in 30 seconds! React with ✅ to participate.**' });
+			const heistMessage = await interaction.editReply({ content: '**Heist starting in 60 seconds! React with ✅ to participate.**' });
 			const heistMessageDetails = await heistMessage.fetch();
 			await heistMessageDetails.react('✅');
 
-			try {
-				const filter = { guildID: guild?.id, id: user.id };
-				const update = { $inc: { balance: -Amount } }; // Deduct Amount
-				const options = { new: true };
-				await UserModel.findOneAndUpdate(filter, update, options);
-			} catch (error) {
-				console.error('Failed to deduct bet amount from interaction user:', error);
-			}
-
 			const collector = heistMessageDetails.createReactionCollector({
-				filter: (reaction, user) => !user.bot, // Simplified filter for remaining reactions
-				time: 30000,
+				filter: (reaction, user) => !user.bot && reaction.emoji.name === '✅',
+				time: 60000,
+				dispose: true
 			});
 
 			collector.on('collect', async (reaction, user) => {
-				if (user.bot) return; // Ignore bot reactions
-				// console.log('Reaction Count: ', reaction.count);
-
-				// Ensure the user is not a bot and the reaction is the ✅ emoji
-				if (user.bot || reaction.emoji.name !== '✅') {
-					return; // Ignore bot reactions and other emojis
-				}
-
 				const participant: Participant = {
 					userId: user.id,
 					username: user.username
 				};
 				participants.set(user.id, participant);
-
-				// Send message to channel
-				const channel = (reaction.message.channel as TextChannel);
+        
+				// Calculate the odds of winning based on the number of participants
+				const successChance = baseChance + (participants.size * participantBonus);
+				const oddsOfWinning = Math.round(successChance * 100);
+        
+				const channel = reaction.message.channel as TextChannel;
 				if (channel) {
-					const participantJoinMessage = await channel.send({ content: `${userMention(user.id)} has joined the heist!` });
-
-					// Add participant ID and join message ID to a map for future reference
+					const participantJoinMessage = await channel.send({ content: `${userMention(user.id)} has joined the heist! Current odds of winning: ${oddsOfWinning}%` });
 					joinMessagesMap.set(user.id, participantJoinMessage.id);
-					// for (const [participantId, participant] of participants) {
-					// 	console.log(`ParticipantID: ${participantId}, ${participant.username}, has joined the heist!`);
-					// }
-				} else {
-					console.warn('Unable to send message, channel not found.');
 				}
 			});
-			collector.on('remove', async (reaction, user) => {
-				if (!user.bot && reaction.emoji.name === '✅') {
-					// Check for user's presence in the participants collection
-					const participant = participants.get(user.id);
 
-					if (participant) {
-						// User found in participants, remove from collection and update message
-						console.log(`${user.username} unreacted, removing from participants.`);
-						participants.delete(user.id);
-						await interaction.editReply({ content: `${user.globalName} has backed out of the heist` });
-					} else {
-						// User not found in participants, handle potential other scenarios (optional)
-						console.log(`${user.username} unreacted but wasn't in participants.`);
-						// You might want to handle cases where a user un reacts but wasn't part of the heist.
+			collector.on('remove', async (reaction, user) => {
+				const userId = user.id;
+				if (!user.bot && reaction.emoji.name === '✅') {
+					if (participants.has(userId)) {
+						participants.delete(userId);
+        
+						const successChance = baseChance + (participants.size * participantBonus);
+						const oddsOfWinning = Math.round(successChance * 100);
+        
+						const channel = reaction.message.channel as TextChannel;
+						if (channel) {
+							await channel.send(`${userMention(userId)} has left the heist. Current odds of winning: ${oddsOfWinning}%`);
+						}
+        
+						if (participants.size === 0) {
+							channel.send('Not enough participants joined. Heist cancelled!');
+							heistInProgress = false;
+							await reaction.message.reactions.removeAll();
+						}
 					}
-				} else {
-					// Ignore bot reactions and other emoji removals
-					console.log(`${user.username} removed unhandled reaction.`);
 				}
 			});
 
 			collector.on('end', async () => {
-				// Check for enough participants
-				if (participants.size < 2) {
-					await interaction.editReply({ content: 'Not enough participants joined. Heist cancelled!' });
-					return;
+				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
+					if (participants.size < 1) {
+						await interaction.editReply({ content: 'Not enough participants joined. Heist cancelled!' });
+						await heistMessage.reactions.removeAll();
+						return;
+					}
+				} else {
+					if (participants.size < 2) {
+						await interaction.editReply({ content: 'Not enough participants joined. Heist cancelled!' });
+						await heistMessage.reactions.removeAll();
+						return;
+					}
 				}
 
-				// Start the heist loop (implement your logic here)
-				while (heistStage <= 1) { // Replace 5 with the number of heist stages
-					// Send messages describing the heist stage (implement your logic here)
-					await interaction.editReply({ content: `**Heist Stage ${heistStage}:**` });
+				const successChance = baseChance + (participants.size * participantBonus);
+				const randomValue = randomInt(1, 100);
+				const success = randomValue <= successChance * 100;
 
-					// Introduce challenges or obstacles (implement your logic here)
-					// Use random elements or user input to determine success/failure
-
-					// Update heist stage (implement your logic here)
-					heistStage++;
-				}
-
-				// Inside the heist loop or a separate function:
-
-				// Calculate success chance without a cap
-				const successChance: number = baseChance + (participants.size * participantBonus);
-
-				// Generate a random integer between 1 and 100
-				const randomValue: number = randomInt(1, 100);
-
-				// Determine success or failure based on random value and success chance
-				const success: boolean = randomValue <= successChance * 100;
-
-				// Announce the heist outcome (implement your logic here)
-				// await interaction.editReply({ content: '**Heist completed!** (Announce the outcome based on success/failure)' });
-				const textChannel = interaction.channel as GuildTextBasedChannel; // Type assertion
+				const textChannel = interaction.channel as GuildTextBasedChannel;
 				if (!heistInProgress) {
 					await heistMessage.reactions.removeAll();
-					// Convert map values to an array of message IDs
 					const messageIdsToDelete = Array.from(joinMessagesMap.values());
-
-					// Attempt to bulk delete messages
 					if (textChannel) {
 						try {
 							await textChannel.bulkDelete(messageIdsToDelete, true).catch((err) => { console.error(err); });
 						} catch (error) {
 							console.error('Failed to bulk delete messages:', error);
-
-							// Fallback to individual deletion
 							for (const messageId of messageIdsToDelete) {
 								try {
 									await interaction.channel?.messages.fetch(messageId).then(message => message.delete());
@@ -201,28 +248,35 @@ export default new Command({
 						}
 					}
 				}
-				// Announce outcome
+				let loot: number = 0;
+				let stolenItems: string[] = [];
+				const numWinners = randomInt(1, participants.size + 1);
+				const participantArray = Array.from(participants.values());
+				const shuffledParticipants = participantArray.sort(() => 0.5 - Math.random());
+				const winners = shuffledParticipants.slice(0, numWinners);
+
 				if (success) {
-					console.log('The heist is successful!');
-					// Check if there are participants before picking winners
+					const lootResult = calculateLoot();
+					loot = lootResult.totalAmount;
+					stolenItems = lootResult.items;
+
+					const winningAmount = Math.floor(loot / numWinners); // Move this line inside the if (success) block
 					if (participants.size > 0) {
-						// Determine the number of winners based on your logic (replace with your calculation)
-						const numWinners = Math.min(Math.floor(Math.random() * participants.size) + 1, participants.size); // grab a random number between 1 and participants.size
-
-						// Convert Collection to array, shuffle, and select winners
-						const participantArray = Array.from(participants.values()); // Create array from Collection values
-						participantArray.sort(() => Math.random() - 0.5); // Shuffle using random sort
-						const winners = participantArray.slice(0, numWinners); // Select first 'numWinners' elements
-
-						// Announce the winners
-						let winnerString = '';
+						let winnerString = '```Winners: \n';
 						for (const winner of winners) {
 							const filter = { guildID: guild?.id, id: winner.userId };
-							const update = { $inc: { balance: Amount } }; // Award Amount
+							const update = { $inc: { balance: winningAmount } };
 							const options = { new: true };
 							await UserModel.findOneAndUpdate(filter, update, options);
-							winnerString += `${userMention(winner.userId)} `; // Access the participant's userId
+							winnerString += `${winner.username}: ${winningAmount} coins\n`;
 						}
+						winnerString += '```\n';
+						winnerString += '```Stolen Items: \n';
+						for (const item of stolenItems) {
+							winnerString += `${item}\n`;
+						}
+						winnerString += '```';
+
 						const embed = new EmbedBuilder()
 							.setTitle('Heist Winners')
 							.setDescription(winnerString)
@@ -230,17 +284,64 @@ export default new Command({
 						await interaction.editReply({ content: '**Heist completed!**', embeds: [embed] });
 						participants.clear();
 					} else {
-						console.log('No participants in the heist.');
-						await textChannel.send('There were no participants in the heist.');
+						await textChannel.send({ content: 'There were no participants in the heist.' });
 						participants.clear();
 					}
 				} else {
-					console.log('the heist has failed');
 					await interaction.editReply({ content: '**Heist completed!** The heist has failed, Everyone Loses' });
-				}
+				}          
 			});
 		} catch (error) {
 			console.error(error);
 		}
 	},
 });
+
+// Function to calculate the loot amount and items for the heist
+function calculateLoot(): LootResult {
+	const lootItems = Object.entries(lootValues);
+	const numItems = randomInt(1, 9);
+	let totalLootAmount = 0;
+	const chosenItems: string[] = [];
+
+	const bonusMultiplier = 1;
+
+	for (let i = 0; i < numItems; i++) {
+		const [itemName, itemValue] = lootItems[randomInt(0, lootItems.length - 1)];
+		const lootWorth = getValue(itemValue);
+
+		const adjustedLootWorth = lootWorth * bonusMultiplier;
+
+		if (totalLootAmount + adjustedLootWorth < 0) {
+			totalLootAmount = 0;
+			break;
+		} else {
+			totalLootAmount += adjustedLootWorth;
+			chosenItems.push(itemName);
+		}
+	}
+
+	const resultMessage = '';
+
+	return {
+		totalAmount: totalLootAmount,
+		items: chosenItems,
+		message: resultMessage,
+	};
+}
+
+// Function to get the numerical value of a loot item
+function getValue(item: number | Gems | Antique | Artwork | Cash): number {
+	if (typeof item === 'number') {
+		return item;
+	} else if (typeof item === 'object') {
+		if (Array.isArray(item)) {
+			return item.reduce((sum, value) => sum + value, 0);
+		} else {
+			const values = Object.values(item);
+			return values.reduce((sum, value) => sum + value, 0);
+		}
+	} else {
+		throw new Error('Invalid loot item type.');
+	}
+}

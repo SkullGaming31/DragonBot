@@ -36,13 +36,16 @@ export default new Command({
 
 		let economyChannel;
 		if (settings && settings.EconChan) {
+			if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
+				console.log('econchannelid: ', economyChannel);
+			}
 			economyChannel = guild?.channels.cache.get(settings.EconChan);
 		} else {
 			// No economy channel set, use the command channel
 			economyChannel = interaction.channel;
 		}
 		if (economyChannel) {
-			if (economyChannel?.id !== channel?.id) {
+			if (channel?.id !== economyChannel?.id) {
 				return interaction.reply({ content: `${userMention(user.id)}, You can only use this command in the economy spam channel ${channelMention(economyChannel.id)}`, ephemeral: true });
 			}
 		}

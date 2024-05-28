@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, EmbedBuilder, channelMention } from 'discord.js';
 import DB from '../../Database/Schemas/LogsChannelDB'; // DB
 import { Command } from '../../Structures/Command';
 
@@ -28,37 +28,43 @@ export default new Command({
 		if (!interaction.inCachedGuild()) return;
 		if (!interaction.isChatInputCommand()) return;
 		const { guild, options } = interaction;
+
 		try {
-			const EnableLogs = options.getBoolean('enablelogs');
+			const EnableLogs = options.getBoolean('enablelogs') || undefined;
 			const Logger = options.getChannel('logger') || null;
 
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			DB.findOne({ GuildID: guild.id }, async (err: any, data: any) => {
-				if (err) throw err;
-				if (!data) {
-					data = new DB({
-						Guild: guild.id,
-						enableLogs: EnableLogs,
-						Channel: Logger?.id,
-					});
-				} else {
-					await DB.findOneAndUpdate(
-						{ Guild: guild.id },
-						{
-							enableLogs: EnableLogs,
-							Channel: Logger?.id,
-						},
-						{
-							new: true,
-							upsert: true
-						}
-					);
-				}
-				data.save();
-			});
-			interaction.reply({ content: 'Added and/or Updated the database', ephemeral: true });
+			// Find or create a document using async/await
+			let data;
+			try {
+				data = await DB.findOne({ GuildID: guild.id });
+			} catch (err) {
+				console.error('Error fetching data:', err);
+				return interaction.reply({ content: 'An error occurred.', ephemeral: true });
+			}
+
+			if (Logger?.id === undefined) return;
+
+			if (!data) {
+				data = new DB({
+					Guild: guild.id,
+					enableLogs: EnableLogs,
+					Channel: Logger?.id,
+				});
+			} else {
+				data.enableLogs = EnableLogs;
+				data.Channel = Logger?.id;
+			}
+
+			const embed = new EmbedBuilder()
+				.setTitle('Logger Channel')
+				.setDescription(`Logs Enabled: ${data.enableLogs}\nChannelLogger: ${channelMention(Logger?.id)}`)
+				.setTimestamp();
+
+			await data.save();
+			await interaction.reply({ content: 'Added and/or Updated the database', embeds: [embed], ephemeral: true });
 		} catch (error) {
 			console.error(error);
+			await interaction.reply({ content: 'An error occurred.', ephemeral: true });
 			return;
 		}
 	}

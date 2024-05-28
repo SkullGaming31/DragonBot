@@ -1,4 +1,4 @@
-import { ChannelType, EmbedBuilder, ErrorEvent, Message, PartialMessage, TextBasedChannel } from 'discord.js';
+import { ChannelType, EmbedBuilder, Message, PartialMessage, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
 import ChanLogger from '../../Database/Schemas/LogsChannelDB'; // DB
@@ -45,7 +45,7 @@ export default new Event<'messageDelete'>('messageDelete', async (message: Messa
 	}
 
 	try {
-		await logsChannelOBJ.send({ embeds: [logsEmbed] }).catch((err: ErrorEvent) => { console.error(err.type + ':' + err.message); });
+		await logsChannelOBJ.send({ embeds: [logsEmbed] }).catch((err) => { console.error(err.type + ':' + err.message); });
 	} catch (err) {
 		console.error(err);
 	}

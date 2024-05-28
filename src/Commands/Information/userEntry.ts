@@ -9,7 +9,7 @@ export default new Command({
 	defaultMemberPermissions: ['SendMessages'],
 	type: ApplicationCommandType.ChatInput,
 	run: async ({ interaction }) => {
-		const { user } = interaction;
+		const { user, guild } = interaction;
 
 		// Check if the user already exists in the database
 		try {
@@ -19,7 +19,7 @@ export default new Command({
 			}
 
 			// Create a new user entry with 0 balance
-			const newUser = new UserModel({ id: user.id, username: user.username, balance: 0 });
+			const newUser = new UserModel({ guildID: guild?.id, id: user.id, username: user.username, balance: 0 });
 			await newUser.save();
 
 			await interaction.reply({ content: 'Welcome! You have been added to the database and can now start earning gold!', ephemeral: true });

@@ -48,7 +48,7 @@ export default new Command({
 			.setColor(Colors.Red);
 		try {
 			await Target?.setNickname(setNickname, Reason);
-			interaction.reply({ embeds: [embed], ephemeral: true });
+			await interaction.reply({ embeds: [embed], ephemeral: true });
 		} catch (error) {
 			console.error(error);
 			return;

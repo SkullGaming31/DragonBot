@@ -22,7 +22,7 @@ export class ExtendedClient extends Client {
 				GatewayIntentBits.MessageContent,
 				GatewayIntentBits.GuildWebhooks,
 				GatewayIntentBits.GuildMessageReactions,
-				GatewayIntentBits.GuildPresences
+				GatewayIntentBits.GuildPresences,
 			],
 			partials: [
 				Partials.Channel,
@@ -50,10 +50,16 @@ export class ExtendedClient extends Client {
 
 		this.rest.setAgent(agent);
 		await this.registerModules();
-		if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
-			await this.login(process.env.DEV_DISCORD_BOT_TOKEN);
-		} else {
-			await this.login(process.env.DISCORD_BOT_TOKEN);
+		switch (process.env.Enviroment) {
+			case 'dev':
+			case 'debug':
+				await this.login(process.env.DEV_DISCORD_BOT_TOKEN);
+				console.log('dev/debug hit');
+				break;
+			case 'prod':
+				await this.login(process.env.DISCORD_BOT_TOKEN);
+				console.log('prod hit');
+				break;
 		}
 	}
 
@@ -61,17 +67,17 @@ export class ExtendedClient extends Client {
 
 	async registerCommands({ commands, guildId }: RegisterCommandOptions): Promise<void> {
 		if (guildId) {
-			this.guilds.cache.get(guildId)?.commands.set(commands);
-			// const commands = await this.guilds.cache.get(guildId)?.commands.fetch();// trying to delete old commands
-			// commands?.forEach((cmd) => {
-			// 	this.guilds.cache.get(guildId)?.commands.delete(cmd.id);
-			// 	console.log(`Deleting Command ${cmd.name} from ${cmd.guild?.id}, ApplicationID: ${cmd.applicationId}`);
-			// });
+			const CommandsFetched = await this.guilds.cache.get(guildId)?.commands.fetch();
+			const commandsList = await this.guilds.cache.get(guildId)?.commands.set(commands);
+			console.log(`Commands Count: ${commandsList?.size}`);
+			console.log(`Commands Fetched: ${CommandsFetched?.size}`);
+
 			console.log(`Registering Commands to ${guildId}`);
 		} else {
-			// Testing for registering commands in new servers when the bot joins a new server
-			setInterval(() => { this.application?.commands.set(commands); }, 30000);
-			// console.log(commands);
+			const fetched = await this.application?.commands.fetch();
+			const tbd = await this.application?.commands.set(commands);
+			console.log(`Commands Fetched: ${fetched?.size}`);
+			console.log(`Commands Count: ${tbd?.size}`);
 			console.log('Registering Global commands');
 		}
 	}
@@ -94,7 +100,7 @@ export class ExtendedClient extends Client {
 		this.on('ready', () => {
 			switch (process.env.Enviroment) {
 				case 'dev':
-					this.registerCommands({ commands: slashCommands, guildId: '1199589597668188200' });
+					this.registerCommands({ commands: slashCommands, guildId: '959693430227894292' });
 					console.log('Enviroment: ', process.env.Enviroment);
 					break;
 				case 'prod':

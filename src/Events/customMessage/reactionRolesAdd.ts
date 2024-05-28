@@ -54,31 +54,6 @@ export default new Event<'messageReactionAdd'>('messageReactionAdd', async (reac
 			// console.log(`Role ${role.name} added to user ${member.user.username}`);
 			break;
 		}
-		case '🧌': {
-			// Fetch the role you want to give (replace 'ROLE_NAME' with the name of the role)
-			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'pals');
-			if (!role) {
-				console.log('Role not found');
-				return;
-			}
-
-			// Add the role to the member
-			await member.roles.add(role);
-			break;
-		}
-		case '🔫': {
-			// Fetch the role you want to give (replace 'ROLE_NAME' with the name of the role)
-			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'vigor');
-			if (!role) {
-				console.log('Role not found');
-				return;
-			}
-
-			// Add the role to the member
-			await member.roles.add(role);
-			// console.log(`Role ${role.name} added to user ${member.user.username}`);
-			break;
-		}
 		case '🥷': {
 			// Fetch the role you want to give (replace 'ROLE_NAME' with the name of the role)
 			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'Warframe');

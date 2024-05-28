@@ -117,7 +117,7 @@ export default new Command({
 
 					if (user && user.balance !== undefined) {
 						user.balance = user.balance + totalStolenValue;
-						user.save();
+						await user.save(); // Update balance and save to database
 						console.log(`Updated user balance to: ${user.balance}`);
 					} else {
 						console.error('Couldn\'t find user to update balance.');
@@ -130,7 +130,7 @@ export default new Command({
 				const formattedItems = stolenItems.map(item => `${item} (${houseItems[item]} gold)`);
 				await interaction.editReply({ content: `You stole ${formattedItems.join(', ')} from the house, totaling ${totalStolenValue} gold!`, });
 				break;
-			case 'person':// needs work (selecting bot when i dont want it to be, it should only select from users that are registered in the database already, then tag them using the info in the database)
+			case 'person':
 				try {
 					// Retrieve a random user from the server
 					const guild = interaction.guild;
@@ -138,10 +138,10 @@ export default new Command({
 					const member = guild.members.cache.random();
 					if (!member) throw new Error('Member not found.'); // Added error handling
 					const userId = member.id;
-
+			
 					// Retrieve the user model
 					const user = await UserModel.findOne({ guildID: guild?.id, id: userId });
-
+			
 					// Check if the user is found in the database
 					if (!user) {
 						console.log(member.user.username);
@@ -149,19 +149,19 @@ export default new Command({
 					}
 					if (member.user.bot) { return interaction.editReply({ content: 'You cant rob the bot' }); }
 					if (interaction.user.id === member.id) return interaction.editReply({ content: 'You cant rob yourself' });
-
+			
 					// Calculate the robbery amount
 					robberyAmount = randomInt(1, 15); // Take a random percentage between 1-15%
-
+			
 					// Check if the robbery amount is valid
 					if (robberyAmount === 0) { return interaction.editReply({ content: 'There are no eligible users to rob at the moment.' }); }
-
+			
 					// Check if the member is attempting to block the robbery
 					const blockChance = randomInt(1, 100); // Random number to determine if the block is successful
 					if (blockChance <= 20) { // 20% chance of successful block
 						return interaction.editReply({ content: `${member.user.username} blocked your robbery attempt!` });
 					}
-
+			
 					// Create a row for the button
 					const row = new ActionRowBuilder<ButtonBuilder>()
 						.addComponents(
@@ -170,15 +170,15 @@ export default new Command({
 								.setLabel('Block')
 								.setStyle(ButtonStyle.Danger)
 						);
-
+			
 					// Send the message with the button
 					await interaction.editReply({ content: `${userMention(userId)}, you are being robbed, you have 30seconds to click the \`block\` button to stop them from stealing some of your gold`, components: [row] });
-
+			
 					// Await the interaction with the button
 					const collector = interaction.channel?.createMessageComponentCollector({ filter: (interaction) => interaction.isButton() && interaction.user.id === member.id && interaction.customId === 'block', time: 30000, });
-
+			
 					if (collector === undefined) return;
-
+			
 					collector.on('collect', async (interaction: ButtonInteraction) => {
 						// The person blocked the robbery
 						if (interaction.componentType === ComponentType.Button) {
@@ -186,7 +186,7 @@ export default new Command({
 							await interaction.reply({ content: 'You blocked the robbery attempt!', components: [] });
 						}
 					});
-
+			
 					collector.on('end', async (collected: Collection<string, ButtonInteraction>) => {
 						if (collected.size === 0) {
 							// The person did not respond, continue with the robbery
@@ -195,11 +195,11 @@ export default new Command({
 							await interaction.editReply({ content: `You successfully robbed ${userMention(member.user.id)} and gained ${robberyAmount} gold.`, components: [] });
 						}
 					});
-
+			
 					// Update the user's balance by deducting the robbery amount
-					user.balance -= robberyAmount;
-					await user.save();
-
+					user.balance -= robberyAmount; // Move this line outside the collector's end event
+					await user.save(); // Move this line outside the collector's end event
+			
 					// await interaction.editReply({ content: `You successfully robbed ${member.user.username} and gained ${robberyAmount} gold.`, });
 				} catch (error) {
 					console.error(error);
