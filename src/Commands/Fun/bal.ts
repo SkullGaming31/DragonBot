@@ -74,7 +74,9 @@ export default new Command({// TODO: Unable to retrieve server settings
 
 			// Find the user in the database (target user or the original user)
 			const userId = targetUser?.id || user.id;
+			console.log('Searching for user with ID:', userId);
 			const userDoc = await UserModel.findOne({ guildID: guild?.id, id: userId });
+			console.log('Retrieved user document:', userDoc);
 			if (!userDoc) {
 				const message = `${targetUser ? userMention(targetUser.id) : 'You'} don't have an entry in the database yet. Use the \`/begin\` command to register!`;
 				return interaction.reply({ content: message, ephemeral: true });

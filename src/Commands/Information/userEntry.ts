@@ -1,6 +1,7 @@
 import { ApplicationCommandType } from 'discord.js';
 import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
+
 export default new Command({
 	name: 'begin',
 	description: 'Add an entry into the database to start earning gold',
@@ -9,11 +10,11 @@ export default new Command({
 	defaultMemberPermissions: ['SendMessages'],
 	type: ApplicationCommandType.ChatInput,
 	run: async ({ interaction }) => {
-		const { user, guild } = interaction;
-
-		// Check if the user already exists in the database
 		try {
-			const existingUser = await UserModel.findOne({ id: user.id });
+			const { user, guild } = interaction;
+
+			// Check if the user already exists in the database for this guild
+			const existingUser = await UserModel.findOne({ guildID: guild?.id, id: user.id });
 			if (existingUser) {
 				return interaction.reply({ content: 'You already have an entry in the database!', ephemeral: true });
 			}
@@ -22,10 +23,10 @@ export default new Command({
 			const newUser = new UserModel({ guildID: guild?.id, id: user.id, username: user.username, balance: 0 });
 			await newUser.save();
 
-			await interaction.reply({ content: 'Welcome! You have been added to the database and can now start earning gold!', ephemeral: true });
+			return interaction.reply({ content: 'Welcome! You have been added to the database and can now start earning gold!', ephemeral: true });
 		} catch (error) {
 			console.error('Error creating user entry:', error);
-			await interaction.reply({ content: 'Oops! Something went wrong while creating your entry. Please try again later.', ephemeral: true });
+			return interaction.reply({ content: 'Oops! Something went wrong while creating your entry. Please try again later.', ephemeral: true });
 		}
 	},
 });
