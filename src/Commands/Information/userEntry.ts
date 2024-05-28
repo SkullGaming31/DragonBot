@@ -15,6 +15,7 @@ export default new Command({
 
 			// Check if the user already exists in the database for this guild
 			const existingUser = await UserModel.findOne({ guildID: guild?.id, id: user.id });
+			console.log(`${guild?.id} : ${user.username}`);
 			if (existingUser) {
 				return interaction.reply({ content: 'You already have an entry in the database!', ephemeral: true });
 			}
