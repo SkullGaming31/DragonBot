@@ -18,8 +18,8 @@ export interface IUser extends Document {
 
 const userSchema = new Schema<IUser>({
 	guildID: { type: String, required: true },
-	id: { type: String, required: true, unique: true },
-	username: { type: String },
+	id: { type: String, required: true },
+	username: { type: String, required: true },
 	balance: { type: Number, default: 0 },
 	inventory: { type: [String], default: [] },
 	cooldowns: {
