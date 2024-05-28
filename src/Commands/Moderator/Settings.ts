@@ -139,17 +139,24 @@ export default new Command({
 				}
 				await data.save();
 			} else {
-				data.rulesChannel = RulesChannel?.id as string;
-				data.Welcome = Welcome as boolean;
-				data.WelcomeChannel = Welcomechan?.id;
-				data.PromotionChannel = NowLive?.id;
-				data.punishmentChannel = PunishmentChan?.id;
-				data.AdministratorRole = Administrator?.id;
-				data.ModeratorRole = Moderator?.id;
-				data.MemberRole = MemberRole?.id as string;
-				data.SuggestChan = SuggestionChan?.id;
-				data.EconChan = EconChannel?.id;
-				data.ModerationChannel = ModerationChannel?.id as string;
+				await settings.findOneAndUpdate({ 
+					GuildID: guild.id }, 
+				{ 
+					rulesChannel: RulesChannel?.id,
+					Welcome: Welcome,
+					WelcomeChannel: Welcomechan?.id,
+					PromotionChannel: NowLive?.id,
+					PunishmentChan: PunishmentChan?.id,
+					AdministratorRole: Administrator?.id,
+					ModeratorRole: Moderator?.id,
+					MemberRole: MemberRole?.id,
+					SuggestChan: SuggestionChan?.id,
+					EconChan: EconChannel?.id,
+					ModerationChannel: ModerationChannel?.id 
+				}, { 
+					new: true, 
+					upsert: true 
+				});
 				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
 					console.log('updating document in database');
 				}

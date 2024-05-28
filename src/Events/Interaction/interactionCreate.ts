@@ -17,17 +17,6 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 		const commandName = interaction.commandName;
 		const user = interaction.user;
 		const command = client.commands.get(interaction.commandName);
-		// console.log(`ApplicationID: ${interaction.applicationId}, CreatedAt: ${interaction.createdAt}`);
-		// if (isOnCooldown(commandName, user.id)) {
-		// 	switch (commandName) {
-		// 		case 'beg':
-		// 		case 'daily':
-		// 		case 'work':
-		// 			return interaction.reply({ content: 'This command is currently on a 24 hour cooldown, please come back tomorrow', ephemeral: true });
-		// 		default:
-		// 			return interaction.reply({ content: 'This command is currently on cooldown.', ephemeral: true });
-		// 	}
-		// }
 		// console.log(command);
 		if (!command) return interaction.reply({ content: 'You have used a non-existant command, please try another command', ephemeral: true });
 

@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, EmbedBuilder, RoleResolvable } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { Command } from '../../Structures/Command';
 
@@ -110,61 +110,61 @@ export default new Command({
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(acceptButton);
 
 		// Send the embed with the accept button
-		await interaction.reply({ embeds: [embed], components: [row] });
+		const tbd = await interaction.reply({ embeds: [embed], components: [row] });
 
-		client.on('interactionCreate', async (interaction) => {
-			//
-			if (interaction.isButton()) {
-				// Check if the button custom ID is 'accept'
-				if (interaction.customId === 'accept') {
-					// Check if the interaction is in the "rules" channel
-					const data = settings?.rulesChannel;
-					const rulesChannelId = data;
-					if (interaction.channelId !== rulesChannelId) return;
+		// client.on('interactionCreate', async (interaction) => {
+		// 	//
+		// 	if (interaction.isButton()) {
+		// 		// Check if the button custom ID is 'accept'
+		// 		if (interaction.customId === 'accept') {
+		// 			// Check if the interaction is in the "rules" channel
+		// 			const data = settings?.rulesChannel;
+		// 			const rulesChannelId = data;
+		// 			if (interaction.channelId !== rulesChannelId) return;
 
-					// Get the role ID from settings
-					const roleId: RoleResolvable | undefined = settings?.MemberRole;
+		// 			// Get the role ID from settings
+		// 			const roleId: RoleResolvable | undefined = settings?.MemberRole;
 
-					if (roleId) {
-						const member = interaction.guild?.members.cache.get(user?.id);
+		// 			if (roleId) {
+		// 				const member = interaction.guild?.members.cache.get(user?.id);
 
-						if (member) {
-							const role = interaction.guild?.roles.cache.get(roleId);
+		// 				if (member) {
+		// 					const role = interaction.guild?.roles.cache.get(roleId);
 
-							if (role) {
-								if (member.roles.cache.has(roleId)) {
-									try {
-										await member.roles.remove(role);
-										await interaction.reply({ content: 'Role removed successfully!', ephemeral: true });
-									} catch (error) {
-										console.error('Error removing role:', error);
-										await interaction.reply({ content: 'An error occurred while removing the role.', ephemeral: true });
-									}
-								} else {
-									try {
-										await member.roles.add(role);
-										await interaction.reply({ content: 'Role assigned successfully!', ephemeral: true });
-									} catch (error) {
-										console.error('Error assigning role:', error);
-										await interaction.reply({ content: 'An error occurred while assigning the role.', ephemeral: true });
-									}
-								}
-							} else {
-								await interaction.reply({ content: 'Role not found in the server.', ephemeral: true });
-							}
-						} else {
-							await interaction.reply({ content: 'Member not found.', ephemeral: true });
-						}
-					} else {
-						const owner = await interaction.guild?.fetchOwner({ cache: true });
-						if (user.id !== owner?.id) {
-							await interaction.reply({ content: 'Role ID not found in settings. Please contact an admin to assign the role.', ephemeral: true });
-						} else {
-							await interaction.reply({ content: 'Role ID not found in settings. Please use the `/settings` commands to set it', ephemeral: true });
-						}
-					}
-				}
-			}
-		});
+		// 					if (role) {
+		// 						if (member.roles.cache.has(roleId)) {
+		// 							try {
+		// 								await member.roles.remove(role);
+		// 								await interaction.reply({ content: 'Role removed successfully!', ephemeral: true });
+		// 							} catch (error) {
+		// 								console.error('Error removing role:', error);
+		// 								await interaction.reply({ content: 'An error occurred while removing the role.', ephemeral: true });
+		// 							}
+		// 						} else {
+		// 							try {
+		// 								await member.roles.add(role);
+		// 								await interaction.reply({ content: 'Role assigned successfully!', ephemeral: true });
+		// 							} catch (error) {
+		// 								console.error('Error assigning role:', error);
+		// 								await interaction.reply({ content: 'An error occurred while assigning the role.', ephemeral: true });
+		// 							}
+		// 						}
+		// 					} else {
+		// 						await interaction.reply({ content: 'Role not found in the server.', ephemeral: true });
+		// 					}
+		// 				} else {
+		// 					await interaction.reply({ content: 'Member not found.', ephemeral: true });
+		// 				}
+		// 			} else {
+		// 				const owner = await interaction.guild?.fetchOwner({ cache: true });
+		// 				if (user.id !== owner?.id) {
+		// 					await interaction.reply({ content: 'Role ID not found in settings. Please contact an admin to assign the role.', ephemeral: true });
+		// 				} else {
+		// 					await interaction.reply({ content: 'Role ID not found in settings. Please use the `/settings` commands to set it', ephemeral: true });
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// });
 	},
 });
