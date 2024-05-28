@@ -51,7 +51,7 @@ export default new Command({
 		}
 
 		// Check if the user has enough balance
-		const userDoc = await UserModel.findOne<IUser>({ id: user.id });
+		const userDoc = await UserModel.findOne<IUser>({ guildID: guild?.id, id: user.id });
 		if (userDoc?.balance === undefined) return;
 		if (!userDoc || userDoc.balance < digAmount) { return interaction.reply({ content: 'You don\'t have enough balance to dig.', ephemeral: true }); }
 		// Deduct the dig amount from the user's balance

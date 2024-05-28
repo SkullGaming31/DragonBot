@@ -82,8 +82,6 @@ export default new Command({// TODO: Unable to retrieve server settings
 				return interaction.reply({ content: message, ephemeral: true });
 			}
 
-			// Check if the user has a balance property (just in case)
-			if (!userDoc.balance) return interaction.reply({ content: 'Please run the ``/begin`` command to start making gold' });
 			const targetUsername = targetUser ? targetUser.username : user.username;
 
 			// Get all user balances, sorted by balance (descending)
