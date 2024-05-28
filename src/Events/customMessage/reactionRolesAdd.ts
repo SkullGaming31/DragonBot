@@ -19,19 +19,19 @@ export default new Event<'messageReactionAdd'>('messageReactionAdd', async (reac
 	}
 
 	switch (messageReaction.emoji.name) {
-		case '✅':
+		case '✅': {
 			// const settings = await SettingsModel.findOne({ GuildID: reaction.message.guild?.id });
 			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'Verified');
 			if (!role) {
 				console.log('Role not found');
 				return;
 			}
-			if (messageReaction.message.id !== '1199602079434555532' || messageReaction.message.channelId !== reaction.message.guild?.rulesChannelId) return;
+			if (messageReaction.message.id !== '1244988959055024152' || messageReaction.message.channelId !== reaction.message.guild?.rulesChannelId) return;
 
 			await member.roles.add(role);
 			break;
+		}
 		case '📋': {
-			// Fetch the role you want to give (replace 'ROLE_NAME' with the name of the role)
 			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'Announcements');
 			if (!role) {
 				console.log('Role not found');
@@ -39,6 +39,16 @@ export default new Event<'messageReactionAdd'>('messageReactionAdd', async (reac
 			}
 
 			// Add the role to the member
+			await member.roles.add(role);
+			break;
+		}
+		case '⛵': {
+			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'SoT');
+			if (!role) {
+				console.log('Role not found');
+				return;
+			}
+
 			await member.roles.add(role);
 			break;
 		}

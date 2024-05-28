@@ -19,7 +19,7 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 	}
 
 	switch (messageReaction.emoji.name) {
-		case '✅':
+		case '✅': {
 			// const settings = await SettingsModel.findOne({ GuildID: reaction.message.guild?.id });
 			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'Verified');
 			if (!role) {
@@ -27,9 +27,20 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 				return;
 			}
 			if (messageReaction.message.id !== '1199602079434555532' || messageReaction.message.channelId !== reaction.message.guild?.rulesChannelId) return;
-
 			await member.roles.remove(role);
 			break;
+		}
+		case '📋': {
+			// Fetch the role you want to give (replace 'ROLE_NAME' with the name of the role)
+			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'Announcements');
+			if (!role) {
+				console.log('Role not found');
+				return;
+			}
+			// Add the role to the member
+			await member.roles.remove(role);
+			break;
+		}
 		case '🚀': {
 			// Fetch the role you want to give (replace 'ROLE_NAME' with the name of the role)
 			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'Space Engineers');
@@ -39,32 +50,17 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 			}
 			// Add the role to the member
 			await member.roles.remove(role);
-			console.log(`Role ${role.name} removed from user ${member.user.username}`);
 			break;
 		}
-		case '🧌': {
+		case '⛵': {
 			// Fetch the role you want to give (replace 'ROLE_NAME' with the name of the role)
-			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'pals');
+			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'SoT');
 			if (!role) {
 				console.log('Role not found');
 				return;
 			}
-
 			// Add the role to the member
 			await member.roles.remove(role);
-			break;
-		}
-		case '🔫': {
-			// Fetch the role you want to give (replace 'ROLE_NAME' with the name of the role)
-			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'vigor');
-			if (!role) {
-				console.log('Role not found');
-				return;
-			}
-
-			// Add the role to the member
-			await member.roles.remove(role);
-			console.log(`Role ${role.name} added to user ${member.user.username}`);
 			break;
 		}
 		case '🥷': {

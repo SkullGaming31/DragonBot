@@ -20,7 +20,7 @@ export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member) => {
 	// }
 
 	const rulesChannel = channelMention(guild.rulesChannelId || '');
-	const messageToSend = guild.rulesChannel ? `Welcome to ${guild.name}'s server! Please read the rules in ${rulesChannel}.` : `Welcome to ${guild.name}'s server!`;
+	const messageToSend = guild.rulesChannel ? `Welcome to ${guild.name}'s server! Please read the rules in ${rulesChannel}. dont forget to pop into the introduction channel and introduce yourself to everyone` : `Welcome to ${guild.name}'s server!`;
 
 	const embed = new EmbedBuilder()
 		.setTitle('New Member')

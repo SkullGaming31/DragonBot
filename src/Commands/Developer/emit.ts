@@ -35,7 +35,7 @@ export default new Command({
 		const { options, member, guild } = interaction;
 		const choices = options.getString('event');
 
-		if (guild?.id !== '1199589597668188200') return interaction.reply({ content: 'This is a development Only Command', ephemeral: true });
+		if (guild?.id !== '959693430227894292' && guild?.id !== '1241597448690864169') return interaction.reply({ content: 'This is a development Only Command', ephemeral: true });
 
 		switch (choices) {
 			case 'guildMemberAdd':

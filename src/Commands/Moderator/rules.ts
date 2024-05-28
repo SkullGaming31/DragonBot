@@ -1,5 +1,4 @@
 import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
-import SettingsModel from '../../Database/Schemas/settingsDB';
 import { Command } from '../../Structures/Command';
 
 // Define an interface for the field object
@@ -42,9 +41,8 @@ export default new Command({
 			required: false
 		},
 	],
-	run: async ({ interaction, client }) => {
-		const { options, guild, user } = interaction;
-		const settings = await SettingsModel.findOne({ GuildID: guild?.id });
+	run: async ({ interaction }) => {
+		const { options, guild } = interaction;
 		// Get user-provided description, fields, and footer from the command interaction
 		const userTitle = options.getString('title') || `${guild?.name} Rules`;
 		const userDescription = options.getString('description');
@@ -110,7 +108,7 @@ export default new Command({
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(acceptButton);
 
 		// Send the embed with the accept button
-		const tbd = await interaction.reply({ embeds: [embed], components: [row] });
+		await interaction.reply({ embeds: [embed], components: [row] });
 
 		// client.on('interactionCreate', async (interaction) => {
 		// 	//
