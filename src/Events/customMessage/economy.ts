@@ -3,7 +3,7 @@ import SettingsModel from '../../Database/Schemas/settingsDB';
 import { IUser, UserModel } from '../../Database/Schemas/userModel';
 import { Event } from '../../Structures/Event';
 
-const BASE_CURRENCY_CHANCE = 0.2;
+const BASE_CURRENCY_CHANCE = 0.1;
 const SUBSCRIBER_CHANCE_BOOST = 0.05;
 
 export default new Event('messageCreate', async (message: Message) => {

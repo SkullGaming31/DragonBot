@@ -37,7 +37,7 @@ export default new Command({
 		},
 		{
 			name: 'modchannel',
-			description: 'Channel where all mod messages can be displayed',
+			description: 'Channel where all important bot messages will be displayed',
 			type: ApplicationCommandOptionType.Channel,
 			required: true,
 			channelTypes: [ChannelType.GuildText]
@@ -51,7 +51,7 @@ export default new Command({
 		},
 		{
 			name: 'live',
-			description: 'The channel were your members will post there going live links',
+			description: 'The channel were your members will post when going live',
 			type: ApplicationCommandOptionType.Channel,
 			required: false,
 			channelTypes: [ChannelType.GuildText]

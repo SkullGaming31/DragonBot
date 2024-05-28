@@ -39,7 +39,7 @@ export default new Command({
 
 			const embed = new EmbedBuilder()
 				.setTitle(' Top 10 Gold Leaders ')
-				.setColor('Green');
+				.setColor('Gold');
 
 			let i = 1;
 			for (const user of leaderboard) {

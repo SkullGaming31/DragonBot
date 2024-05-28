@@ -17,6 +17,10 @@ function createButtonRow() {
 			.setLabel('SkullGaming31\'s Github'),
 		new ButtonBuilder()
 			.setStyle(ButtonStyle.Link)
+			.setURL('https://discord.com/oauth2/authorize?client_id=930882181595807774')
+			.setLabel('Add Me to your Discord Server'),
+		new ButtonBuilder()
+			.setStyle(ButtonStyle.Link)
 			.setURL('https://twitch.tv/canadiendragon')
 			.setLabel('SkullGaming31\'s Twitch')
 	);
@@ -35,8 +39,32 @@ async function handleHelpMessage(message: Message) {
 	const embed = createHelpEmbed(author, guild?.name);
 	const row = createButtonRow();
 
-	const msg = await message.reply({ content: `${userMention(author.id)} :arrow_heading_down:`, embeds: [embed], components: [row] });
-	await msg.startThread({ name: `${author.globalName} Support`, reason: 'support' });
+	const msg = await message.reply({ content: `${userMention(author.id)}, this message will delete in 5 minutes`, embeds: [embed], components: [row] });
+
+	if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
+		setTimeout(() => {
+			if (msg.thread?.isThread()) {
+				msg.thread.delete('time elapsed').catch((err) => { console.error('Couldn\t delete the thread', err); });
+			}
+			msg.delete().catch((err) => { console.error('Error deleting message: ', err); });
+		}, 30000);
+	} else {
+		setTimeout(() => {
+			if (msg.thread?.isThread()) {
+				msg.thread.delete('time elapsed').catch((err) => { console.error('Couldn\t delete the thread', err); });
+			}
+			msg.delete().catch((err) => { console.error('Error deleting message: ', err); });
+		}, 300000);
+	}
+	// commented code below this is just thread testing code/ safe to delete
+	// const tbd = await msg.startThread({ name: `${author.globalName} Support`, reason: 'support' });
+	// const tt = guild.roles.cache.find((r) => r.name === 'Admin');
+	// console.log(guild.roles.cache);
+	// if (!tt) return message.reply({ content: 'Role was not found or doesnt exist' });
+	// if (tbd.isThread()) {
+	// 	await tbd.sendTyping();
+	// 	await tbd.send({ content: `${roleMention(tt?.id)} someone is requesting support` });
+	// }
 }
 
 export default new Event<'messageCreate'>('messageCreate', handleHelpMessage);

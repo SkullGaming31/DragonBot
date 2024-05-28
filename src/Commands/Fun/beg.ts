@@ -10,8 +10,7 @@ export default new Command({
 	defaultMemberPermissions: ['SendMessages'],
 	type: ApplicationCommandType.ChatInput,
 	run: async ({ interaction }) => {
-		const { guild } = interaction;
-		const user = interaction.user;
+		const { guild, user } = interaction;
 		const userId = user.id;
 
 		// Check if user has a cooldown entry

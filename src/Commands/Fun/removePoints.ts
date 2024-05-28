@@ -3,8 +3,8 @@ import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
 
 export default new Command({
-	name: 'addpoints',
-	description: 'Give points to a user',
+	name: 'removepoints',
+	description: 'Remove points from a user',
 	UserPerms: ['ManageMessages'],
 	BotPerms: ['ManageMessages'],
 	defaultMemberPermissions: ['ManageMessages'],
@@ -12,13 +12,13 @@ export default new Command({
 	options: [
 		{
 			name: 'target',
-			description: 'The target user to add points to',
+			description: 'The target user to remove points from',
 			type: ApplicationCommandOptionType.User,
 			required: true
 		},
 		{
 			name: 'amount',
-			description: 'The amount of points to give to the user',
+			description: 'The amount of points to remove from the user',
 			type: ApplicationCommandOptionType.Number,
 			required: true
 		}
@@ -36,7 +36,7 @@ export default new Command({
 
 		// Validate amount
 		if (amount === null || amount <= 0 || isNaN(amount)) {
-			return interaction.reply({ content: 'Please enter a valid positive amount of points to add.', ephemeral: true });
+			return interaction.reply({ content: 'Please enter a valid positive amount of points to remove.', ephemeral: true });
 		}
 
 		// Check if the target user is a guild member
@@ -46,32 +46,28 @@ export default new Command({
 		}
 
 		try {
-			// Find or create the target user in the database
-			let user = await UserModel.findOne({ guildID: guild?.id, id: targetUser.id });
+			// Find the target user in the database
+			const user = await UserModel.findOne({ guildID: guild?.id, id: targetUser.id });
 			if (!user) {
-				user = new UserModel({
-					guildID: guild?.id,
-					id: targetUser.id,
-					username: targetUser.username,
-					balance: 0,
-					inventory: [],
-					cooldowns: {},
-					AFKmessage: '',
-					AFKstatus: null,
-				});
+				return interaction.reply({ content: 'The target user does not have an entry in the database.', ephemeral: true });
+			}
+
+			// Ensure the user has enough balance to remove the specified amount
+			if (user.balance < amount) {
+				return interaction.reply({ content: `you are trying to remove more gold then the user has. Current balance: ${user.balance}`, ephemeral: true });
 			}
 
 			// Update the user's balance
-			user.balance += amount;
+			user.balance -= amount;
 
 			// Save the updated user data
 			await user.save();
 
 			// Send confirmation message
-			await interaction.reply({ content: `Successfully added ${amount} points to **${targetUser.username}**'s balance.`, ephemeral: false });
+			await interaction.reply({ content: `Successfully removed ${amount} points from **${targetUser.username}**'s balance.`, ephemeral: false });
 		} catch (error) {
-			console.error('Error adding points:', error);
-			await interaction.reply({ content: 'An error occurred while adding points. Please try again later.', ephemeral: true });
+			console.error('Error removing points:', error);
+			await interaction.reply({ content: 'An error occurred while removing points. Please try again later.', ephemeral: true });
 		}
 	},
 });
