@@ -1,50 +1,76 @@
-import { ChannelType, EmbedBuilder, Presence, TextBasedChannel } from 'discord.js';
+import { ChannelType, ColorResolvable, EmbedBuilder, Presence, TextBasedChannel } from 'discord.js';
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import { Event } from '../../Structures/Event';
 
-// Map to store the last presence update timestamp for each user
-const lastPresenceUpdateMap: Map<string, number> = new Map();
+// Map to store the last presence update for each user
+const lastPresenceMap: Map<string, Presence> = new Map();
 
 export default new Event<'presenceUpdate'>('presenceUpdate', async (oldPresence: Presence | null, newPresence: Presence) => {
-	try {
-		// Check if the presence update is for a member
-		if (!newPresence.member || !newPresence.guild) return;
+	// NOT CURRENTLY WORKING
+	
+	// try {
+	// 	console.log('Old Presence', oldPresence?.activities[0]);
+	// 	console.log('New Presence', newPresence?.activities[0]);
 
-		// Fetch the log channel data
-		const data = await ChanLogger.findOne({ Guild: newPresence.guild.id });
-		if (!data || !data.enableLogs) return;
+	// 	// Check if the presence update is for a member
+	// 	if (!newPresence.member || !newPresence.guild) return;
 
-		const logsChannelID = data.Channel;
-		if (!logsChannelID) return;
+	// 	// Fetch the log channel data
+	// 	const data = await ChanLogger.findOne({ Guild: newPresence.guild.id });
+	// 	if (!data || !data.enableLogs) return;
 
-		const logsChannelOBJ = newPresence.guild.channels.cache.get(logsChannelID) as TextBasedChannel | null;
-		if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
+	// 	const logsChannelID = data.Channel;
+	// 	if (!logsChannelID) return;
 
-		// Check if a presence update was recently logged for this user
-		const lastUpdateTimestamp = lastPresenceUpdateMap.get(newPresence.member.id) || 0;
-		const currentTime = Date.now();
-		const cooldown = 5 * 60 * 1000; // 5 minutes cooldown
+	// 	const logsChannelOBJ = newPresence.guild.channels.cache.get(logsChannelID) as TextBasedChannel | null;
+	// 	if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
 
-		if (currentTime - lastUpdateTimestamp < cooldown) return;
+	// 	// Get the last presence for this user
+	// 	const lastPresence = lastPresenceMap.get(newPresence.member.id);
 
-		// Update the last presence update timestamp for this user
-		lastPresenceUpdateMap.set(newPresence.member.id, currentTime);
+	// 	// Check if the user's status changed from "None" to a custom status or vice versa
+	// 	const hasChangedFromNoneToCustom = (!lastPresence || lastPresence.activities[0]?.state === undefined) && newPresence.activities[0]?.state !== undefined;
+	// 	const hasChangedFromCustomToNone = lastPresence?.activities[0]?.state !== undefined && newPresence.activities[0]?.state === undefined;
 
-		const Embed = new EmbedBuilder().setTitle(`${newPresence.guild.name}[empty]`).setTimestamp();
+	// 	if (hasChangedFromNoneToCustom || hasChangedFromCustomToNone) {
+	// 		// Update the last presence for this user
+	// 		lastPresenceMap.set(newPresence.member.id, newPresence);
 
-		// Check if the presence status or activity has changed
-		if (oldPresence?.status !== newPresence.status || oldPresence?.activities[0]?.state !== newPresence.activities[0]?.state) {
-			const oldState = oldPresence?.activities[0]?.state || 'None';
-			const newState = newPresence.activities[0]?.state || 'None';
+	// 		const Embed = new EmbedBuilder().setTitle(`${newPresence.guild.name}[empty]`).setTimestamp();
 
-			// Send the presence update to the logs channel
-			await logsChannelOBJ.send({
-				embeds: [
-					Embed.setDescription(`${newPresence.member.displayName} status has changed from \`${oldState}\` to: \`${newState}\`\nStatus: ${newPresence.status}`)
-				]
-			});
-		}
-	} catch (error) {
-		console.error(error);
-	}
+	// 		const newState = newPresence.activities[0]?.state || undefined;
+
+	// 		// Set color based on presence status
+	// 		let color;
+	// 		switch (newPresence.status) {
+	// 			case 'online':
+	// 				color = 'Green';
+	// 				break;
+	// 			case 'offline':
+	// 				color = 'Red';
+	// 				break;
+	// 			case 'dnd':
+	// 			case 'idle':
+	// 				color = 'Random';
+	// 				break;
+	// 			case 'invisible':
+	// 				color = 'White';
+	// 				break;
+	// 			default:
+	// 				color = 'Gold';
+	// 				break;
+	// 		}
+
+	// 		// Send the presence update to the logs channel
+	// 		await logsChannelOBJ.send({
+	// 			embeds: [
+	// 				Embed.setColor(color as ColorResolvable).setDescription(
+	// 					`${newPresence.member.displayName} status has changed to: \`${newState}\` Status: ${newPresence.status}`
+	// 				)
+	// 			]
+	// 		});
+	// 	}
+	// } catch (error) {
+	// 	console.error('There was an issue with presence update Status: ', error);
+	// }
 });
