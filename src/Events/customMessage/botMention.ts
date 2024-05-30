@@ -5,12 +5,25 @@ async function handleHelpMessage(message: Message) {
 	const { author, guild, content } = message;
 	const bot = guild?.members.cache.get('1147628312110305340');
 
-	if (!guild || author.bot) return;
+	console.log('Received message:', content);
+	console.log('Author:', author.id);
+	console.log('Guild:', guild?.name);
+	console.log('Bot:', bot?.id);
 
-	if (content.includes('@here') || content.includes('@everyone')) return;
+	if (!guild || author.bot) {
+		console.log('Message is from a bot or no guild found.');
+		return;
+	}
 
-	if (!content.includes(`${bot?.id}`)) return;
-	console.log(bot?.id);
+	if (content.includes('@here') || content.includes('@everyone')) {
+		console.log('Message contains @here or @everyone.');
+		return;
+	}
+
+	if (!content.includes(`${bot?.id}`)) {
+		console.log('Message does not mention the bot.');
+		return;
+	}
 
 	const embed = new EmbedBuilder()
 		.setColor('Green')
@@ -33,32 +46,18 @@ async function handleHelpMessage(message: Message) {
 			.setLabel('SkullGaming31\'s Twitch')
 	);
 
+	console.log('Sending reply with embed and buttons...');
 	const msg = await message.reply({ content: `${userMention(author.id)}, this message will delete in 5 minutes`, embeds: [embed], components: [row] });
 
-	if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
-		setTimeout(() => {
-			if (msg.thread?.isThread()) {
-				msg.thread.delete('time elapsed').catch((err) => { console.error('Couldn\'t delete the thread', err); });
-			}
-			msg.delete().catch((err) => { console.error('Error deleting message: ', err); });
-		}, 30000);
-	} else {
-		setTimeout(() => {
-			if (msg.thread?.isThread()) {
-				msg.thread.delete('time elapsed').catch((err) => { console.error('Couldn\'t delete the thread', err); });
-			}
-			msg.delete().catch((err) => { console.error('Error deleting message: ', err); });
-		}, 300000);
-	}
-	// commented code below this is just thread testing code/ safe to delete
-	// const tbd = await msg.startThread({ name: `${author.globalName} Support`, reason: 'support' });
-	// const tt = guild.roles.cache.find((r) => r.name === 'Admin');
-	// console.log(guild.roles.cache);
-	// if (!tt) return message.reply({ content: 'Role was not found or doesnt exist' });
-	// if (tbd.isThread()) {
-	// 	await tbd.sendTyping();
-	// 	await tbd.send({ content: `${roleMention(tt?.id)} someone is requesting support` });
-	// }
+	const timeoutDuration = process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug' ? 30000 : 300000;
+
+	console.log('Setting timeout for message deletion:', timeoutDuration);
+	setTimeout(() => {
+		if (msg.thread?.isThread()) {
+			msg.thread.delete('time elapsed').catch((err) => { console.error('Couldn\'t delete the thread', err); });
+		}
+		msg.delete().catch((err) => { console.error('Error deleting message: ', err); });
+	}, timeoutDuration);
 }
 
 export default new Event<'messageCreate'>('messageCreate', handleHelpMessage);

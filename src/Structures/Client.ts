@@ -72,13 +72,11 @@ export class ExtendedClient extends Client {
 
 			console.log(`Registering Commands to ${guildId}`);
 		} else {
-			setTimeout(async () => {
-				const fetched = await this.application?.commands.fetch();
-				const tbd = await this.application?.commands.set(commands);
-				console.log(`Commands Fetched: ${fetched?.size}`);
-				console.log(`Commands Count: ${tbd?.size}`);
-				console.log('Registering Global commands');
-			}, 300000);
+			const fetched = await this.application?.commands.fetch();
+			const tbd = await this.application?.commands.set(commands);
+			console.log(`Commands Fetched: ${fetched?.size}`);
+			console.log(`Commands Count: ${tbd?.size}`);
+			console.log('Registering Global commands');
 		}
 	}
 
