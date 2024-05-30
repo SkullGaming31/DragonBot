@@ -13,6 +13,7 @@ const linkWhitelist: { [domain: string]: LinkPattern } = {
 
 	// New allowed links
 	'twitter.com': /^(https?:\/\/)?(www\.)?twitter\.com\//i,
+	'x.com': /^(https?:\/\/)?(www\.)?x\.com\//i,
 	'instagram.com': /^(https?:\/\/)?(www\.)?instagram\.com\//i,
 	'tiktok.com': /^(https?:\/\/)?(www\.)?tiktok\.com\//i,
 	'github.com': /^(https?:\/\/)?(www\.)?github\.com\//i,

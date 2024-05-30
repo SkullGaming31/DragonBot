@@ -1,52 +1,48 @@
 import { ChannelType, EmbedBuilder, Presence, TextBasedChannel } from 'discord.js';
-import { MongooseError } from 'mongoose';
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import { Event } from '../../Structures/Event';
 
+// Map to store the last presence update timestamp for each user
+const lastPresenceUpdateMap: Map<string, number> = new Map();
+
 export default new Event<'presenceUpdate'>('presenceUpdate', async (oldPresence: Presence | null, newPresence: Presence) => {
 	try {
-		const data = await ChanLogger.findOne({ Guild: newPresence.guild?.id }).catch((err: MongooseError) => { console.error(err.message); });
-		// console.log('oldPresence: ', oldPresence);
-		// console.log('newPresence: ', newPresence);
+		// Check if the presence update is for a member
+		if (!newPresence.member || !newPresence.guild) return;
 
-		if (!data || data.enableLogs === false) return;
+		// Fetch the log channel data
+		const data = await ChanLogger.findOne({ Guild: newPresence.guild.id });
+		if (!data || !data.enableLogs) return;
 
-		const logsChannelID = data?.Channel;
-		if (logsChannelID === undefined) return;
-		const logsChannelOBJ = newPresence.guild?.channels.cache.get(logsChannelID) as TextBasedChannel | null;
-		if (!logsChannelOBJ) return;
+		const logsChannelID = data.Channel;
+		if (!logsChannelID) return;
 
-		const Embed = new EmbedBuilder().setTitle(`${newPresence.guild?.name}[empty]`).setTimestamp();
+		const logsChannelOBJ = newPresence.guild.channels.cache.get(logsChannelID) as TextBasedChannel | null;
+		if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
 
-		// Check if oldPresence is not null and if it has activities
-		if (oldPresence && oldPresence.activities && oldPresence.activities.length > 0 && oldPresence.activities[0].type === 4) {
-			// Access the old state only if oldPresence has activities
-			const oldState = oldPresence.activities[0]?.state;
-			const newState = newPresence.activities[0]?.state;
-			const oldStatus = oldPresence.status;
-			const newStatus = newPresence.status;
+		// Check if a presence update was recently logged for this user
+		const lastUpdateTimestamp = lastPresenceUpdateMap.get(newPresence.member.id) || 0;
+		const currentTime = Date.now();
+		const cooldown = 5 * 60 * 1000; // 5 minutes cooldown
 
-			// Check if newState is different from oldState
-			if (newState && newState !== oldState) {
-				if (logsChannelOBJ?.type === ChannelType.GuildText) {
-					return logsChannelOBJ.send({
-						embeds: [
-							Embed.setDescription(`${newPresence.user?.globalName} status has changed from \`${oldState}\` to: \`${newState}\` \noldStatus: ${oldStatus} to: newStatus: ${newStatus}`)
-						]
-					});
-				}
-			}
-		} else if (newPresence.activities && newPresence.activities.length > 0 && newPresence.activities[0].type === 4) {
-			// Handle the case where oldPresence has no activities but newPresence does
-			const newState = newPresence.activities[0]?.state;
+		if (currentTime - lastUpdateTimestamp < cooldown) return;
 
-			if (logsChannelOBJ?.type === ChannelType.GuildText && newState) {
-				return logsChannelOBJ.send({
-					embeds: [
-						Embed.setDescription(`${newPresence.user?.globalName} set a custom status: \`${newState}\` \nStatus: ${newPresence.status}`)
-					]
-				});
-			}
+		// Update the last presence update timestamp for this user
+		lastPresenceUpdateMap.set(newPresence.member.id, currentTime);
+
+		const Embed = new EmbedBuilder().setTitle(`${newPresence.guild.name}[empty]`).setTimestamp();
+
+		// Check if the presence status or activity has changed
+		if (oldPresence?.status !== newPresence.status || oldPresence?.activities[0]?.state !== newPresence.activities[0]?.state) {
+			const oldState = oldPresence?.activities[0]?.state || 'None';
+			const newState = newPresence.activities[0]?.state || 'None';
+
+			// Send the presence update to the logs channel
+			await logsChannelOBJ.send({
+				embeds: [
+					Embed.setDescription(`${newPresence.member.displayName} status has changed from \`${oldState}\` to: \`${newState}\`\nStatus: ${newPresence.status}`)
+				]
+			});
 		}
 	} catch (error) {
 		console.error(error);

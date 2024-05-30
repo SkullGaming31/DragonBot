@@ -41,7 +41,6 @@ export default new Event('messageCreate', async (message: Message) => {
 			if (channelForNotification.type === ChannelType.GuildText) await channelForNotification.send({ content: `Hey ${userMention(author.id)}, you just earned ${currencyAmount} gold!` });
 		} catch (error) {
 			console.error('Error updating user currency:', error);
-			// Handle errors appropriately
 		}
 	}
 });
