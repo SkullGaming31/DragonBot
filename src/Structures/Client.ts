@@ -100,15 +100,11 @@ export class ExtendedClient extends Client {
 		this.on('ready', () => {
 			switch (process.env.Enviroment) {
 				case 'dev':
-					setInterval(() => {
-						this.registerCommands({ commands: slashCommands, guildId: '959693430227894292' });
-					}, 300000);
+					this.registerCommands({ commands: slashCommands, guildId: '959693430227894292' });
 					console.log('Enviroment: ', process.env.Enviroment);
 					break;
 				case 'prod':
-					setInterval(() => {
-						this.registerCommands({ commands: slashCommands, guildId: undefined });
-					}, 300000);
+					this.registerCommands({ commands: slashCommands, guildId: undefined });
 					console.log('Enviroment: ', process.env.Enviroment);
 					break;
 				default:
