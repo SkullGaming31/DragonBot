@@ -54,11 +54,9 @@ export class ExtendedClient extends Client {
 			case 'dev':
 			case 'debug':
 				await this.login(process.env.DEV_DISCORD_BOT_TOKEN);
-				console.log('dev/debug hit');
 				break;
 			case 'prod':
 				await this.login(process.env.DISCORD_BOT_TOKEN);
-				console.log('prod hit');
 				break;
 		}
 	}
@@ -74,11 +72,13 @@ export class ExtendedClient extends Client {
 
 			console.log(`Registering Commands to ${guildId}`);
 		} else {
-			const fetched = await this.application?.commands.fetch();
-			const tbd = await this.application?.commands.set(commands);
-			console.log(`Commands Fetched: ${fetched?.size}`);
-			console.log(`Commands Count: ${tbd?.size}`);
-			console.log('Registering Global commands');
+			setTimeout(async () => {
+				const fetched = await this.application?.commands.fetch();
+				const tbd = await this.application?.commands.set(commands);
+				console.log(`Commands Fetched: ${fetched?.size}`);
+				console.log(`Commands Count: ${tbd?.size}`);
+				console.log('Registering Global commands');
+			}, 300000);
 		}
 	}
 
@@ -100,11 +100,15 @@ export class ExtendedClient extends Client {
 		this.on('ready', () => {
 			switch (process.env.Enviroment) {
 				case 'dev':
-					this.registerCommands({ commands: slashCommands, guildId: '959693430227894292' });
+					setInterval(() => {
+						this.registerCommands({ commands: slashCommands, guildId: '959693430227894292' });
+					}, 300000);
 					console.log('Enviroment: ', process.env.Enviroment);
 					break;
 				case 'prod':
-					this.registerCommands({ commands: slashCommands, guildId: undefined });
+					setInterval(() => {
+						this.registerCommands({ commands: slashCommands, guildId: undefined });
+					}, 300000);
 					console.log('Enviroment: ', process.env.Enviroment);
 					break;
 				default:

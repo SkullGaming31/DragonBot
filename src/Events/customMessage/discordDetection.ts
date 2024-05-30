@@ -64,7 +64,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 						warningMessage = 'This is your 2nd warning. Please do not post Discord links in this server. you have been muted for 5 minutes';
 						if (member?.moderatable) {
 							// Send a DM to the user
-							// await member?.timeout(300000, 'posted link for a discord server after being warned');// 5 minutes = 300000
+							await member?.timeout(300000, 'posted link for a discord server after being warned');// 5 minutes = 300000
 							await member?.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] })
 								.catch((error) => {
 									console.error(`Failed to send a DM to ${author.globalName}: ${error.message}`);
@@ -76,7 +76,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 						warningMessage = 'This is your 3rd warning. DO NOT post Discord links in the server. you have been kicked from the server with the possiblity to rejoin';
 						if (member?.kickable) {
 						// Send a DM to the user
-							// await member?.kick('Posted a discord link after being warned twice for posting links');
+							await member?.kick('Posted a discord link after being warned twice for posting links');
 							await member?.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] })
 								.catch((error) => {
 									console.error(`Failed to send a DM to ${author.globalName}: ${error.message}`);
@@ -88,7 +88,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 						warningMessage = 'This is your 3rd warning. DO NOT post Discord links in the server. you have been Banned from the server with no possiblity to rejoin the server with this account';
 						if (member?.bannable) {
 						// Send a DM to the user
-							// await member?.ban({ reason: 'Posting discord links after being told 3 times not to post them', deleteMessageSeconds: 5 });
+							await member?.ban({ reason: 'Posting discord links after being told 3 times not to post them', deleteMessageSeconds: 5 });
 							await member?.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] })
 								.catch((error) => {
 									console.error(`Failed to send a DM to ${author.globalName}: ${error.message}`);
