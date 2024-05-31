@@ -11,9 +11,9 @@ const BOT_ID = process.env.Enviroment === 'dev' || process.env.Enviroment === 'd
 export default new Event<'messageCreate'>('messageCreate', async (message: Message) => {
 	const { author, guild, content } = message;
 
-	console.log('Received message:', content);
-	console.log('Author:', author.id);
-	console.log('Guild:', guild?.name);
+	// console.log('Received message:', content);
+	// console.log('Author:', author.id);
+	// console.log('Guild:', guild?.name);
 
 	if (!guild) {
 		console.log('No guild found.');
@@ -21,7 +21,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 	}
 
 	const bot = guild.members.cache.get(BOT_ID);
-	console.log('Bot:', bot);
+	// console.log('Bot:', bot);
 
 	if (!bot) {
 		console.log('Bot not found in the guild.');
@@ -34,16 +34,16 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 	}
 
 	if (content.includes('@here') || content.includes('@everyone')) {
-		console.log('Message contains @here or @everyone.');
+		// console.log('Message contains @here or @everyone.');
 		return;
 	}
 
 	if (!content.includes(`<@${BOT_ID}>`)) {
-		console.log('Message does not mention the bot.');
+		// console.log('Message does not mention the bot.');
 		return;
 	}
 
-	console.log('Bot mentioned in message.');
+	// console.log('Bot mentioned in message.');
 
 	const embed = new EmbedBuilder()
 		.setColor('Green')
@@ -66,12 +66,12 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 			.setLabel('SkullGaming31\'s Twitch')
 	);
 
-	console.log('Sending reply with embed and buttons...');
+	// console.log('Sending reply with embed and buttons...');
 	const msg = await message.reply({ content: `${userMention(author.id)}, this message will delete in 5 minutes`, embeds: [embed], components: [row] });
 
 	const timeoutDuration = process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug' ? 30000 : 300000;
 
-	console.log('Setting timeout for message deletion:', timeoutDuration);
+	// console.log('Setting timeout for message deletion:', timeoutDuration);
 	setTimeout(() => {
 		if (msg.thread?.isThread()) {
 			msg.thread.delete('time elapsed').catch((err) => { console.error('Couldn\'t delete the thread', err); });
