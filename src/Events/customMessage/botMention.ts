@@ -1,17 +1,35 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message, userMention } from 'discord.js';
 import { Event } from '../../Structures/Event';
 
-async function handleHelpMessage(message: Message) {
+// Define the bot IDs for development and production
+const DEV_BOT_ID = '1147628312110305340';
+const PROD_BOT_ID = '930882181595807774';
+
+// Determine which bot ID to use based on the environment
+const BOT_ID = process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug' ? DEV_BOT_ID : PROD_BOT_ID;
+
+export default new Event<'messageCreate'>('messageCreate', async (message: Message) => {
 	const { author, guild, content } = message;
-	const bot = guild?.members.cache.get('1147628312110305340');
 
 	console.log('Received message:', content);
 	console.log('Author:', author.id);
 	console.log('Guild:', guild?.name);
-	console.log('Bot:', bot?.id);
 
-	if (!guild || author.bot) {
-		console.log('Message is from a bot or no guild found.');
+	if (!guild) {
+		console.log('No guild found.');
+		return;
+	}
+
+	const bot = guild.members.cache.get(BOT_ID);
+	console.log('Bot:', bot);
+
+	if (!bot) {
+		console.log('Bot not found in the guild.');
+		return;
+	}
+
+	if (author.bot) {
+		console.log('Message is from a bot.');
 		return;
 	}
 
@@ -20,16 +38,18 @@ async function handleHelpMessage(message: Message) {
 		return;
 	}
 
-	if (!content.includes(`${bot?.id}`)) {
+	if (!content.includes(`<@${BOT_ID}>`)) {
 		console.log('Message does not mention the bot.');
 		return;
 	}
+
+	console.log('Bot mentioned in message.');
 
 	const embed = new EmbedBuilder()
 		.setColor('Green')
 		.setDescription(`Hi ${author.globalName}, how can I help you out today? Leave a brief description of what your issue is, and someone will get to you as soon as they are free.`)
 		.setThumbnail(`${author.displayAvatarURL({ size: 512 })}`)
-		.setFooter({ text: guild?.name !== undefined ? guild.name : '' });
+		.setFooter({ text: guild.name });
 
 	const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 		new ButtonBuilder()
@@ -56,8 +76,6 @@ async function handleHelpMessage(message: Message) {
 		if (msg.thread?.isThread()) {
 			msg.thread.delete('time elapsed').catch((err) => { console.error('Couldn\'t delete the thread', err); });
 		}
-		msg.delete().catch((err) => { console.error('Error deleting message: ', err); });
+		msg.delete().catch((err) => { console.error('Error deleting message:', err); });
 	}, timeoutDuration);
-}
-
-export default new Event<'messageCreate'>('messageCreate', handleHelpMessage);
+});

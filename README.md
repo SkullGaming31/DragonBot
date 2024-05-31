@@ -20,6 +20,8 @@ messages.read
 guilds
 -->
 
+<!-- https://discord.com/oauth2/authorize?client_id=930882181595807774&permissions=21226735791350&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3001%2Fapi%2Fv1%2Fauth%2Fdiscord%2Fredirect&scope=identify+guilds+applications.commands+bot+webhook.incoming+connections -->
+
 
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
