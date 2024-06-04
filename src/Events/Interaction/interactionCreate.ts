@@ -15,7 +15,6 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 	//chat input commands
 	if (interaction.isCommand()) {
 		const commandName = interaction.commandName;
-		const user = interaction.user;
 		const command = client.commands.get(interaction.commandName);
 		// console.log(command);
 		if (!command) return interaction.reply({ content: 'You have used a non-existant command, please try another command', ephemeral: true });

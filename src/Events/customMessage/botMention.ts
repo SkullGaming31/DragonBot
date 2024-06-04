@@ -28,9 +28,11 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 		return;
 	}
 
-	if (author.bot) {
-		console.log('Message is from a bot.');
-		return;
+	if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
+		if (author.bot) {
+			console.log('Message is from a bot.');
+			return;
+		}
 	}
 
 	if (content.includes('@here') || content.includes('@everyone')) {
