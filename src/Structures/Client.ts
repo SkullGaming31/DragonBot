@@ -38,7 +38,7 @@ export class ExtendedClient extends Client {
 				...Options.DefaultMakeCacheSettings,
 				MessageManager: { maxSize: 200 }
 			}),
-			presence: { activities: [{ name: 'Im DragonBot', type: ActivityType.Custom, url: 'https://github.com/skullgaming31/DragonBot' }], afk: false, status: 'online' },
+			presence: { activities: [{ name: 'Im DragonBot', type: ActivityType.Watching, url: 'https://github.com/skullgaming31/dragonbot' }], afk: false, status: 'online' },
 		});
 	}
 

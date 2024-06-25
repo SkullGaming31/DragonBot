@@ -9,6 +9,7 @@ export default new Command({
 	name: 'roulette',
 	description: 'Play a game of Russian roulette!',
 	type: ApplicationCommandType.ChatInput,
+	
 	run: async ({ interaction }) => {
 		const { user, guild, channel } = interaction;
 		if (!user) return interaction.reply({ content: 'User not found!', ephemeral: true });
