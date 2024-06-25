@@ -2,7 +2,8 @@ import { ApplicationCommandType, channelMention } from 'discord.js';
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
-export default new Command({
+
+export default new Command({// TODO: Check to see if a econ channel has been set, if not just send it to the channel they are using the command in
 	name: 'daily',
 	description: 'Claim your daily gold reward.',
 	UserPerms: ['SendMessages'],

@@ -1,10 +1,11 @@
 import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
 import DB from '../../Database/Schemas/SuggestDB';
 import { Command } from '../../Structures/Command';
+import SettingsModel from '../../Database/Schemas/settingsDB';
 
 export default new Command({
-	name: 'suggest',
-	description: 'Suggest an improvment for the discord bot',
+	name: 'feature',
+	description: 'Suggest an improvment for the discord/twitch bot',
 	UserPerms: ['SendMessages'],
 	BotPerms: ['SendMessages'],
 	defaultMemberPermissions: ['SendMessages'],
@@ -12,7 +13,7 @@ export default new Command({
 	options: [
 		{
 			name: 'name',
-			description: 'give a name to your suggestion',
+			description: 'give a name to your feature suggestion',
 			type: ApplicationCommandOptionType.String,
 			maxLength: 50,
 			minLength: 5,
@@ -28,7 +29,7 @@ export default new Command({
 		},
 		{
 			name: 'type',
-			description: 'The type of suggestion(suggestion for Twitch or Discord)',
+			description: 'The type of feature(suggestion for Twitch or Discord)',
 			type: ApplicationCommandOptionType.String,
 			required: true,
 			choices: [
@@ -45,7 +46,7 @@ export default new Command({
 		const Description = options.getString('description');
 
 		const Response = new EmbedBuilder()
-			.setTitle('NEW SUGGESTION')
+			.setTitle('NEW FEATURE REQUEST')
 			.setColor('Blue')
 			.setAuthor({ name: `${user.globalName || user.username}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` })
 			.setDescription(Description)
@@ -56,23 +57,26 @@ export default new Command({
 			)
 			.setTimestamp();
 
+		const data = await SettingsModel.findOne({ GuildID: guild?.id });
+		if (!data || data.SuggestChan === undefined) return;
+
 		const Buttons = new ActionRowBuilder<ButtonBuilder>();
 		Buttons.addComponents(
 			new ButtonBuilder().setCustomId('sugges-accept').setLabel('✅ Accept').setStyle(ButtonStyle.Primary),
 			new ButtonBuilder().setCustomId('sugges-decline').setLabel('⛔ Decline').setStyle(ButtonStyle.Danger)
 		);
 
-		const suggestionChannel = guild?.channels.cache.get('1142639289264513115');
+		const featureChannel = data.SuggestChan || interaction.channel?.id;
+		if (!featureChannel) return;
+		const suggestionChannel = guild?.channels.cache.get(featureChannel);
 		if (channel?.id !== '1142639289264513115') return interaction.reply({ content: `❌ | you may only use this command in the suggestion channel ${suggestionChannel}`, ephemeral: true });
-		if (guild?.id !== '1068285177891131422') return interaction.reply({ content: '❌ | you may only use this command in the Discord Bots Main Server', ephemeral: true });
+		// if (guild?.id !== '1068285177891131422') return interaction.reply({ content: '❌ | you may only use this command in the Discord Bots Main Server', ephemeral: true });
 
 		try {
 			const M = await interaction.reply({ embeds: [Response], components: [Buttons], fetchReply: true });
-			// M.react('✅');
-			// M.react('❌');
 
 			await DB.create({
-				guildId: guild.id, messageId: M.id,
+				guildId: guild?.id, messageId: M.id,
 				details: [
 					{
 						MemberID: member.id,

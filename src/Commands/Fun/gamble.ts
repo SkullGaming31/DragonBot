@@ -68,7 +68,7 @@ export default new Command({
 						console.error(error);
 					}
 					break;
-				case 'percentage': //DONE !gamble [percentage] ex !gamble 20% of balance
+				case 'percentage': //DONE !gamble [percentage] ex !gamble 20% of your balance
 					try {
 						const currentBalance = await UserModel.findOne({ guildID: guild.id, id: user.id });
 						if (!currentBalance || currentBalance.balance === undefined) return;
@@ -92,16 +92,13 @@ export default new Command({
 						console.error(error);
 					}
 					break;
-				case 'fixed number'://DONE !gamble [Amount]
+				case 'fixed number'://DONE !gamble [Amount] ex !gamble 500coins from your balance
 					const fixedAmount = Amount as number; // Assuming Amount is already validated as a number
-					if (userModel.balance < fixedAmount) return interaction.reply({ content: 'You can not cover that bet with your current Balance, ``/bal``', ephemeral: true });
+					if (userModel.balance < fixedAmount) return interaction.reply({ content: 'You can not cover that bet with your current Balance, please use ``/bal`` and try again', ephemeral: true });
 
-					if (fixedAmount <= 0) {
-						await interaction.reply({ content: 'Please enter a positive amount to gamble.' });
-						return;
-					}
+					if (fixedAmount <= 0) await interaction.reply({ content: 'Please enter a positive amount to gamble.' });
 
-					// Check if user has the "Twitch Subscriber" role (replace with your Discord role checking logic)
+					// Check if user has the "Twitch Subscriber" role
 					const hasTwitchSubscriberRole = member?.roles.cache.has('Twitch Subscriber') ?? false; // Check for role and handle potential undefined member or role cache
 
 					const winProbability = hasTwitchSubscriberRole ? 0.25 : 0.2;

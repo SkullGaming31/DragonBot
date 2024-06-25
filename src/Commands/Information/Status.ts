@@ -22,12 +22,7 @@ export default new Command({
 
 		const { user } = client;
 
-		const status = [
-			'Disconnected',
-			'Connected',
-			'Connecting',
-			'Disconnecting'
-		];
+		const status = ['Disconnected', 'Connected', 'Connecting', 'Disconnecting'];
 
 		if (user?.createdTimestamp === undefined) return;
 		if (client.readyTimestamp === null) return;

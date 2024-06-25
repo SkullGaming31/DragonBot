@@ -14,4 +14,4 @@ const tokenSchema = new Schema<IToken>({
 	email: { type: String },
 });
 
-export const TokenModel: Model<IToken> = model<IToken>('Token', tokenSchema);
+export const TokenModel: Model<IToken> = model<IToken>('usertokens', tokenSchema);

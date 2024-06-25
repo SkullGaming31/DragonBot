@@ -2,6 +2,7 @@ import { config } from 'dotenv';
 import { connectDatabase } from './Database';
 import { ExtendedClient } from './Structures/Client';
 import { checkVariables } from './Structures/checkVariables';
+import createApp from './Utilities/createApp';
 
 config();
 
@@ -13,6 +14,10 @@ async function main() {
 	// const errorHook = new WebhookClient({ id: WebHookID, token: WebHookToken, });
 	await connectDatabase();
 	checkVariables(process.env); // checks if any variable's values are missing in the .env
+
+	const app = createApp();
+
+	app.listen(3000, () => { console.log('http://localhost:3000'); });
 
 	// Function to update the process title with the bot's uptime
 	function updateProcessTitle() {

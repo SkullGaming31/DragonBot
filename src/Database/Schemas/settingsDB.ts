@@ -1,6 +1,6 @@
 import { Document, Schema, model } from 'mongoose';
 
-interface ISettings extends Document {
+export interface ISettings extends Document {
 	GuildID: string;
 	AdministratorRole?: string;
 	ModeratorRole?: string;

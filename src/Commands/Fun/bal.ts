@@ -6,7 +6,7 @@ import { Command } from '../../Structures/Command';
 // Define roles for moderators and/or admins (adjust as needed)
 // const moderatorRoles = ['Mod', 'Admin'];
 
-export default new Command({// TODO: Unable to retrieve server settings
+export default new Command({
 	name: 'bal',
 	description: 'Check the balance of your account or another user (if you have permission)',
 	UserPerms: ['SendMessages'],
@@ -35,30 +35,28 @@ export default new Command({// TODO: Unable to retrieve server settings
 			const isOwner = commandUser?.id === guild?.ownerId;
 
 			const settingsDoc = await SettingsModel.findOne({ GuildID: guild?.id });
+			if (!settingsDoc) return;
 			let economyChannel;
 			if (settingsDoc && settingsDoc.EconChan) {
-				economyChannel = guild?.channels.cache.get(settingsDoc.EconChan);
+				economyChannel = guild?.channels.cache.get(settingsDoc?.EconChan);
 			} else {
 				// No economy channel set, use the command channel
 				economyChannel = interaction.channel;
 			}
 			if (economyChannel) {
 				if (economyChannel?.id !== channel?.id) {
-					return interaction.reply({ content: `${userMention(user.id)}, You can only use this command in the economy spam channel ${channelMention(economyChannel.id)}`, ephemeral: true });
+					return interaction.reply({ content: `${userMention(user.id)}, You can only use this command in the economy channel ${channelMention(economyChannel.id)}`, ephemeral: true });
 				}
 			}
 
-			const guildSettings = await SettingsModel.findOne({ GuildID: guild?.id });
-
-			// Ensure guild settings exist
 
 			// Check if the user is in the guild to access their roles
 			if (targetUser && !guild) return interaction.reply({ content: 'This command can only be used in a guild.', ephemeral: true });
 
-			if (!guildSettings) return interaction.reply({ content: 'Unable to retrieve server settings, please run the ``/settings`` command', ephemeral: true });
+			if (!settingsDoc) return interaction.reply({ content: 'Unable to retrieve server settings, please run the ``/settings`` command', ephemeral: true });
 			// Assert only if certain values will be strings:
-			const adminRoleId = guildSettings.AdministratorRole as string;
-			const modRoleId = guildSettings.ModeratorRole as string;
+			const adminRoleId = settingsDoc.AdministratorRole as string;
+			const modRoleId = settingsDoc.ModeratorRole as string;
 
 			// Check if the user has either role
 			const hasPermission = isOwner || interaction.member.roles.cache.has(adminRoleId) || interaction.member.roles.cache.has(modRoleId);
