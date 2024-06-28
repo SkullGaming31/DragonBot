@@ -36,7 +36,7 @@ export default new Command({
 
 		// Create a new roulette document if it doesn't exist
 		if (!rouletteDoc) {
-			rouletteDoc = await RouletteModel.create({ GuildID: guild?.id, bulletCount: 1 });
+			rouletteDoc = await RouletteModel.create({ GuildID: guild?.id, username: interaction.user.username, bulletCount: 1 });
 		}
 
 		// Funny messages array
