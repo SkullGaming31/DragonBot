@@ -25,15 +25,15 @@ const houseItems: {
 	silverware: 500, // Added value for silverware
 };
 
-const personItems: {
-	watch: number;
-	jewelry: number;
-	cash: number;
-} = {
-	watch: 500,
-	jewelry: 1500,
-	cash: 1000,
-};
+// const personItems: {
+// 	watch: number;
+// 	jewelry: number;
+// 	cash: number;
+// } = {
+// 	watch: 500,
+// 	jewelry: 1500,
+// 	cash: 1000,
+// };
 
 const cashRegisterMin = 200;
 const cashRegisterMax = 2000;
@@ -49,13 +49,13 @@ const storeItems: StoreItems = {
 	personalBelongings: 1000,
 };
 
-const successOdds: { [item: string]: number } = {
-	lockpick: 0.3,         // 30% success rate
-	disguise: 0.2,         // 20% success rate
-	getawayCar: 0.5,    // 50% success rate
-	flashlight: 0.1,       // 10% success rate
-	hackingDevice: 0.4,    // 40% success rate
-};
+// const successOdds: { [item: string]: number } = {
+// 	lockpick: 0.3,         // 30% success rate
+// 	disguise: 0.2,         // 20% success rate
+// 	getawayCar: 0.5,    // 50% success rate
+// 	flashlight: 0.1,       // 10% success rate
+// 	hackingDevice: 0.4,    // 40% success rate
+// };
 
 export default new Command({
 	name: 'loot',
@@ -104,7 +104,7 @@ export default new Command({
 
 				// Check if any items were stolen
 				if (stolenItems.length === 0) {
-					return interaction.editReply({ content: 'You couldn\'t find anything valuable to steal.', });
+					return interaction.editReply({ content: 'You couldn\'t find anything valuable to steal.' });
 				}
 
 				// Calculate total value of stolen items
@@ -126,9 +126,11 @@ export default new Command({
 					console.error('Error updating user balance:', error);
 				}
 
-				// Announce stolen items and their value
+				// Announce stolen items and their value along with total house value
 				const formattedItems = stolenItems.map(item => `${item} (${houseItems[item]} gold)`);
-				await interaction.editReply({ content: `You stole ${formattedItems.join(', ')} from the house, totaling ${totalStolenValue} gold!`, });
+				await interaction.editReply({ 
+					content: `You stole ${formattedItems.join(', ')} from the house, totaling ${totalStolenValue} gold! The total possible value in the house was ${houseValue} gold.` 
+				});
 				break;
 			case 'person':
 				try {
@@ -140,7 +142,7 @@ export default new Command({
 					const userId = member.id;
 			
 					// Retrieve the user model
-					const user = await UserModel.findOne({ guildID: guild?.id, id: userId });
+					const user = await UserModel.findOne({ guildID: guild?.id, username: member.user.username });
 			
 					// Check if the user is found in the database
 					if (!user) {
@@ -148,7 +150,7 @@ export default new Command({
 						return interaction.editReply({ content: 'The robbery attempt failed because the target user is not registered in the database.' });
 					}
 					if (member.user.bot) { return interaction.editReply({ content: 'You cant rob the bot' }); }
-					if (interaction.user.id === member.id) return interaction.editReply({ content: 'You cant rob yourself' });
+					if (user.id === member.id) return interaction.editReply({ content: 'You cant rob yourself' });
 			
 					// Calculate the robbery amount
 					robberyAmount = randomInt(1, 15); // Take a random percentage between 1-15%
