@@ -78,6 +78,7 @@ export default new Command({
 			if (guildMember) {
 				await guildMember.timeout(60000, 'lost in Russian roulette');
 			}
+			await interaction.reply({ content: `${interaction.user.globalName} has been timed out for 60 Seconds after trying to beat the odds at Russian Roulette.` });
 			// Reset the bullet count to 1
 			rouletteDoc.bulletCount = 1;
 		} else {
