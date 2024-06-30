@@ -1,30 +1,58 @@
 import { config } from 'dotenv';
-import mongoose, { MongooseError } from 'mongoose';
+import mongoose, { Connection } from 'mongoose';
 
 config();
 
 export const connectDatabase = async (): Promise<void> => {
-	if (process.env.Enviroment === 'debug' || process.env.Enviroment === 'dev') {
-		mongoose.set('debug', true); // Enable detailed logging (optional)
-	} else {
-		mongoose.set('debug', false);
-	}
+	// Set mongoose debug mode based on environment
+	const environment = process.env.Enviroment;
+	const isDev = environment === 'dev' || environment === 'debug';
+	mongoose.set('debug', isDev);
 
-	const connectionString = process.env.MONGO_DATABASE_URI as string;
+	// MongoDB connection URIs
+	const devUri = 'mongodb://localhost:27017/dragonbot_dev';
+	const prodUri = process.env.MONGO_DATABASE_URI as string;
+
+	// Determine which URI to use
+	const uri = isDev ? devUri : prodUri;
 
 	try {
-		await mongoose.connect(connectionString, { connectTimeoutMS: 10000 });
+		// Attempt to connect to MongoDB
+		await mongoose.connect(uri, { connectTimeoutMS: 10000 });
 
-		console.log('MongoDB connection established successfully');
+		// Cast mongoose.connection to Connection type
+		const connection: Connection = mongoose.connection;
 
-		// Use `mongoose.connection` directly for event listeners (more concise)
-		mongoose.connection.on('connected', () => console.log('MongoDB connection re-established successfully'));
-		mongoose.connection.on('error', (error: MongooseError) => {
-			console.error('MongoDB connection error:', error.name, error.message, error.stack);
-		});
-		mongoose.connection.on('disconnected', () => console.warn('MongoDB disconnected'));
+		/**
+		 * Mongo readyState enums
+		 * 0 = disconnected
+		 * 1 = connected
+		 * 2 = connecting
+		 * 3 = disconnecting
+		 * 99 = uninitialized
+		 */
+		switch (connection.readyState) {
+			case 0:
+				console.log('Disconnected from the database');
+				break;
+			case 1:
+				console.log('Connected to the Mongo Database');
+				break;
+			case 2:
+				console.log('Connecting to the Mongo Database');
+				break;
+			case 3:
+				console.log('Disconnected from the Database');
+				break;
+			case 99:
+				console.log('The Mongo Database is not initialized');
+				break;
+			default:
+				break;
+		}
 	} catch (error) {
+		// Handle connection errors
 		console.error('Error connecting to MongoDB:', error);
-		process.exit(1); // Exit the process on failure (optional)
+		process.exit(1); // Exit the process on failure
 	}
 };
