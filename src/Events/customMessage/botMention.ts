@@ -11,10 +11,6 @@ const BOT_ID = process.env.Enviroment === 'dev' || process.env.Enviroment === 'd
 export default new Event<'messageCreate'>('messageCreate', async (message: Message) => {
 	const { author, guild, content } = message;
 
-	// console.log('Received message:', content);
-	// console.log('Author:', author.id);
-	// console.log('Guild:', guild?.name);
-
 	if (!guild) {
 		console.log('No guild found.');
 		return;
