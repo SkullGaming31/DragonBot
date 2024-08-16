@@ -29,7 +29,7 @@ export default new Command({
 
 		// Measure MongoDB connection latency
 		const start = Date.now();
-		await mongoose.connection.db.admin().ping();
+		await mongoose.connection.db?.admin().ping();
 		const mongoLatency = Date.now() - start;
 
 		await interaction.reply({ content: `Bot Uptime: \`${uptimeHours}h ${uptimeMinutes}m ${uptimeSeconds}s\`\nBot Ping: \`${ping}ms\`\nMongoDB Latency: \`${mongoLatency}ms\``, ephemeral: true });
