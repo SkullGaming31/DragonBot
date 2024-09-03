@@ -132,82 +132,102 @@ export default new Command({
 					content: `You stole ${formattedItems.join(', ')} from the house, totaling ${totalStolenValue} gold! The total possible value in the house was ${houseValue} gold.` 
 				});
 				break;
-			case 'person':
-				try {
-					// Retrieve a random user from the server
-					const guild = interaction.guild;
-					if (!guild) throw new Error('Guild not found.'); // Added error handling
-					const member = guild.members.cache.random();
-					if (!member) throw new Error('Member not found.'); // Added error handling
-					const userId = member.id;
-			
-					// Retrieve the user model
-					const user = await UserModel.findOne({ guildID: guild?.id, username: member.user.username });
-			
-					// Check if the user is found in the database
-					if (!user) {
-						console.log(member.user.username);
-						return interaction.editReply({ content: 'The robbery attempt failed because the target user is not registered in the database.' });
-					}
-					if (member.user.bot) { return interaction.editReply({ content: 'You cant rob the bot' }); }
-					if (user.id === member.id) return interaction.editReply({ content: 'You cant rob yourself' });
-			
-					// Calculate the robbery amount
-					robberyAmount = randomInt(1, 15); // Take a random percentage between 1-15%
-			
-					// Check if the robbery amount is valid
-					if (robberyAmount === 0) { return interaction.editReply({ content: 'There are no eligible users to rob at the moment.' }); }
-			
-					// Check if the member is attempting to block the robbery
-					const blockChance = randomInt(1, 100); // Random number to determine if the block is successful
-					if (blockChance <= 20) { // 20% chance of successful block
-						return interaction.editReply({ content: `${member.user.username} blocked your robbery attempt!` });
-					}
-			
-					// Create a row for the button
-					const row = new ActionRowBuilder<ButtonBuilder>()
-						.addComponents(
-							new ButtonBuilder()
-								.setCustomId('block')
-								.setLabel('Block')
-								.setStyle(ButtonStyle.Danger)
-						);
-			
-					// Send the message with the button
-					await interaction.editReply({ content: `${userMention(userId)}, you are being robbed, you have 30seconds to click the \`block\` button to stop them from stealing some of your gold`, components: [row] });
-			
-					// Await the interaction with the button
-					const collector = interaction.channel?.createMessageComponentCollector({ filter: (interaction) => interaction.isButton() && interaction.user.id === member.id && interaction.customId === 'block', time: 30000, });
-			
-					if (collector === undefined) return;
-			
-					collector.on('collect', async (interaction: ButtonInteraction) => {
-						// The person blocked the robbery
-						if (interaction.componentType === ComponentType.Button) {
-							collector.stop();
-							await interaction.reply({ content: 'You blocked the robbery attempt!', components: [] });
-						}
-					});
-			
-					collector.on('end', async (collected: Collection<string, ButtonInteraction>) => {
-						if (collected.size === 0) {
-							// The person did not respond, continue with the robbery
-							user.balance -= robberyAmount;
-							await user.save();
-							await interaction.editReply({ content: `You successfully robbed ${userMention(member.user.id)} and gained ${robberyAmount} gold.`, components: [] });
-						}
-					});
-			
-					// Update the user's balance by deducting the robbery amount
-					user.balance -= robberyAmount; // Move this line outside the collector's end event
-					await user.save(); // Move this line outside the collector's end event
-			
-					// await interaction.editReply({ content: `You successfully robbed ${member.user.username} and gained ${robberyAmount} gold.`, });
-				} catch (error) {
-					console.error(error);
-					return interaction.editReply({ content: 'An error occurred while attempting to rob a user.' });
-				}
-				break;
+				case 'person':
+    try {
+        // Retrieve users from the database
+        const usersInDB = await UserModel.find({ guildID: guild?.id });
+
+        if (usersInDB.length === 0) {
+            return interaction.editReply({ content: 'No users are registered in the database.' });
+        }
+
+        // Filter out the guild members who are present in the database
+        const validMembers = guild?.members.cache.filter(member => 
+            !member.user.bot && usersInDB.some(user => user.id === member.id)
+        );
+
+        if (validMembers?.size === 0) {
+            return interaction.editReply({ content: 'No valid users to rob.' });
+        }
+
+        // Randomly select a user from valid members
+        const member = validMembers?.random();
+        if (!member) throw new Error('No member found.');
+
+        const userId = member.id;
+
+        // Retrieve the user model
+        const user = await UserModel.findOne({ guildID: guild?.id, id: userId });
+
+        if (!user) {
+            return interaction.editReply({ content: 'The robbery attempt failed because the target user is not registered in the database.' });
+        }
+
+        if (user.id === interaction.user.id) return interaction.editReply({ content: 'You can\'t rob yourself.' });
+
+        // Calculate the robbery amount
+        robberyAmount = randomInt(1, 15); // Take a random percentage between 1-15%
+
+        // Check if the robbery amount is valid
+        if (robberyAmount === 0) { return interaction.editReply({ content: 'There are no eligible users to rob at the moment.' }); }
+
+        // Check if the member is attempting to block the robbery
+        const blockChance = randomInt(1, 100); // Random number to determine if the block is successful
+        if (blockChance <= 20) { // 20% chance of successful block
+            return interaction.editReply({ content: `${member.user.username} blocked your robbery attempt!` });
+        }
+
+        // Create a row for the button
+        const row = new ActionRowBuilder<ButtonBuilder>()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('block')
+                    .setLabel('Block')
+                    .setStyle(ButtonStyle.Danger)
+            );
+
+        // Ensure userId is defined
+        if (userId) {
+            // Send the message with the button
+            await interaction.editReply({ content: `${userMention(userId)}, you are being robbed, you have 30 seconds to click the \`block\` button to stop them from stealing some of your gold`, components: [row] });
+        } else {
+            return interaction.editReply({ content: 'An error occurred: User ID is undefined.' });
+        }
+
+        // Await the interaction with the button
+        const collector = interaction.channel?.createMessageComponentCollector({
+            filter: (interaction) => interaction.isButton() && interaction.user.id === member.id && interaction.customId === 'block',
+            time: 30000,
+        });
+
+        if (collector === undefined) return;
+
+        collector.on('collect', async (interaction: ButtonInteraction) => {
+            // The person blocked the robbery
+            if (interaction.componentType === ComponentType.Button) {
+                collector.stop();
+                await interaction.reply({ content: 'You blocked the robbery attempt!', components: [] });
+            }
+        });
+
+        collector.on('end', async (collected: Collection<string, ButtonInteraction>) => {
+            if (collected.size === 0) {
+                // The person did not respond, continue with the robbery
+                user.balance -= robberyAmount;
+                await user.save();
+                await interaction.editReply({ content: `You successfully robbed ${userMention(member.user.id)} and gained ${robberyAmount} gold.`, components: [] });
+            }
+        });
+
+        // Update the user's balance by deducting the robbery amount
+        user.balance -= robberyAmount; // Move this line outside the collector's end event
+        await user.save(); // Move this line outside the collector's end event
+
+    } catch (error) {
+        console.error(error);
+        return interaction.editReply({ content: 'An error occurred while attempting to rob a user.' });
+    }
+    break;
 			case 'store':
 				try {
 					// Select random items from the store if no specific items are chosen

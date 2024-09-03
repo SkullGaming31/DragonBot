@@ -1,3 +1,10 @@
+/**
+ * remote: warning: See https://gh.io/lfs for more information.
+	 remote: warning: File src/TFD_metadata/nexon_reactor.json is 50.13 MB; this is larger than GitHub's recommended maximum file size of 50.00 MB
+	 remote: warning: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.
+	*
+ */
+
 import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder } from 'discord.js';
 import { Command } from '../../Structures/Command';
 import axios from 'axios';
