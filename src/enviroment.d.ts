@@ -27,6 +27,8 @@ declare global {
 			OAUTH_CLIENT_SECRET: string;
 			OAUTH_REDIRECT_URL: string;
 			GITHUB_PERSONAL_ACCESS_TOKEN: string;
+			NITRADO_LONGLIFE_TOKEN: string;
+			NEXON_API_KEY: string;
 		}
 	}
 }
