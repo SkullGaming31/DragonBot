@@ -1,6 +1,6 @@
 /* eslint-disable no-case-declarations */
 import axios from 'axios';
-import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from 'discord.js';
 import { Command } from '../../Structures/Command';
 import { sleep } from '../../Utilities/util';
 
@@ -321,8 +321,10 @@ export default new Command({
 							// Sending the initial message with buttons
 							const initialMessage = await interaction.editReply({ content: 'The message is too long to be sent in chat. Do you want me to send it to you via whisper?', components: [row] });
 
+							const textChannel = interaction.channel as TextChannel;
+
 							// Await button interaction
-							const collector = interaction.channel?.createMessageComponentCollector({
+							const collector = textChannel.createMessageComponentCollector({
 								time: 30000, // 30 seconds
 								filter: (buttonInteraction) => buttonInteraction.customId === 'yes' || buttonInteraction.customId === 'no',
 							});

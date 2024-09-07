@@ -4,6 +4,8 @@ import glob from 'glob';
 import { Agent } from 'undici';
 import { promisify } from 'util';
 const PG = promisify(glob);
+import fs from 'fs';
+import path from 'path';
 
 import { CommandType } from '../Typings/Command';
 import { RegisterCommandOptions } from '../Typings/client';
@@ -60,6 +62,32 @@ export class ExtendedClient extends Client {
 				await this.login(process.env.DISCORD_BOT_TOKEN);
 				break;
 		}
+		//#region Copy Files from src -> TFD_metadata
+		const sourceDir = './src/TFD_metadata';
+		const destDir = './dist/TFD_metadata';
+
+		// Check if the source directory exists
+		if (fs.existsSync(sourceDir)) {
+			// Ensure the destination directory exists
+			if (!fs.existsSync(destDir)) {
+				fs.mkdirSync(destDir, { recursive: true });
+			}
+
+			// Read the files in the source directory
+			const files = fs.readdirSync(sourceDir);
+
+			// Copy each file to the destination directory
+			files.forEach((file) => {
+				const sourceFile = path.join(sourceDir, file);
+				const destFile = path.join(destDir, file);
+				fs.copyFileSync(sourceFile, destFile);
+			});
+
+			console.log('Files copied successfully!');
+		} else {
+			console.log('Source directory does not exist.');
+		}
+		//#endregion
 	}
 
 	async importFile(filePath: string) { return (await import(filePath))?.default; }
