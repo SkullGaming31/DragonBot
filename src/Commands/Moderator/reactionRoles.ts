@@ -1,4 +1,4 @@
-import { ApplicationCommandType, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandType, EmbedBuilder, TextChannel } from 'discord.js';
 import { Command } from '../../Structures/Command';
 export default new Command({
 	name: 'reaction',
@@ -36,8 +36,10 @@ export default new Command({
 			])
 			.setColor('Green');
 
+			const textChannel = interaction.channel as TextChannel;
+
 		// Send the embed message
-		const message = await interaction.channel?.send({ embeds: [embed] });
+		const message = await textChannel.send({ embeds: [embed] });
 
 		// Add the rocket emoji reaction to the message
 		await message?.react('📋');

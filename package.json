@@ -9,6 +9,9 @@
 	"maintainers": [
 		"SkullGaming31"
 	],
+	"engines": {
+		"node": "^20.16.0"
+	},
 	"repository": {
 		"directory": "public",
 		"type": "git",
@@ -31,8 +34,8 @@
 		"axios": "^1.7.4",
 		"connect-mongo": "^5.1.0",
 		"cors": "^2.8.5",
-		"discord-api-types": "^0.37.94",
-		"discord.js": "^14.15.3",
+		"discord-api-types": "^0.37.99",
+		"discord.js": "^14.16.1",
 		"dotenv": "^16.4.5",
 		"express": "^4.19.2",
 		"express-rate-limit": "^7.4.0",
@@ -48,7 +51,7 @@
 		"@types/express-session": "^1.18.0",
 		"@types/glob": "^8.1.0",
 		"@types/ms": "^0.7.34",
-		"@types/node": "^22.3.0",
+		"@types/node": "^22.5.2",
 		"@typescript-eslint/eslint-plugin": "^8.1.0",
 		"@typescript-eslint/parser": "^8.1.0",
 		"eslint": "^9.9.0",

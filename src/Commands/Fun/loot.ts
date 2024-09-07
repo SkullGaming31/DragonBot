@@ -1,6 +1,6 @@
 /* eslint-disable no-case-declarations */
 import { randomInt } from 'crypto';
-import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonInteraction, ButtonStyle, Collection, ComponentType, userMention } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonInteraction, ButtonStyle, Collection, CommandInteraction, ComponentType, TextChannel, userMention } from 'discord.js';
 import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
 
@@ -194,8 +194,10 @@ export default new Command({
             return interaction.editReply({ content: 'An error occurred: User ID is undefined.' });
         }
 
+				const textChannel = interaction.channel as TextChannel;
+
         // Await the interaction with the button
-        const collector = interaction.channel?.createMessageComponentCollector({
+        const collector = textChannel.createMessageComponentCollector({
             filter: (interaction) => interaction.isButton() && interaction.user.id === member.id && interaction.customId === 'block',
             time: 30000,
         });
