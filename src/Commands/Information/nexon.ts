@@ -134,42 +134,12 @@ interface ExternalComponentResponse {
 	external_component: ExternalComponent[];
 }
 
-interface Descendants {
-	id: string;
-	name: string;
-}
-
-const descendantsList: Descendants[] = [
-	{ id: '101000002', name: 'ajax' },
-	{ id: '101000007', name: 'ultimate ajax' },
-	{ id: '101000001', name: 'lepic' },
-	{ id: '101000004', name: 'ultimate lepic' },
-	{ id: '101000012', name: 'blair' },
-	{ id: '101000009', name: 'gley' },
-	{ id: '101000020', name: 'ultimate gley' },
-	{ id: '101000006', name: 'bunny' },
-	{ id: '101000019', name: 'ultimate bunny' },
-	{ id: '101000014', name: 'kyle' },
-	{ id: '101000011', name: 'sharen' },
-	{ id: '101000013', name: 'valby' },
-	{ id: '101000022', name: 'ultimate valby' },
-	{ id: '101000003', name: 'viessa' },
-	{ id: '101000010', name: 'ultimate viessa' },
-	{ id: '101000021', name: 'hailey' },
-	{ id: '101000005', name: 'jayber' },
-	{ id: '101000015', name: 'esiemo' },
-	{ id: '101000016', name: 'enzo' },
-	{ id: '101000017', name: 'yujin' },
-	{ id: '101000018', name: 'luna' },
-	{ id: '101000008', name: 'freyna' }
-];
-
 export default new Command({
 	name: 'nexon',
 	description: 'Nexon API related commands',
-	UserPerms: ['ManageGuild'],
-	BotPerms: ['ManageGuild'],
-	defaultMemberPermissions: ['ManageGuild'],
+	UserPerms: ['SendMessages'],
+	BotPerms: ['SendMessages'],
+	defaultMemberPermissions: ['SendMessages'],
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{
@@ -504,7 +474,7 @@ export default new Command({
 						module,
 					} = descendantResponse.data;
 
-					const descendantImageUrl = descendantData.find((desc: { descendant_id: string }) => desc.descendant_id === descendant_id)?.descendant_image_url || '';
+					const descendantImageUrl = descendantData.find((desc: Descendant) => desc.descendant_id === descendant_id)?.descendant_image_url || '';
 
 					const descendantEmbed = new EmbedBuilder()
 						.setTitle(`${user_name}'s Descendant Info`)
@@ -627,7 +597,7 @@ export default new Command({
 
 					const { reactor_id, reactor_slot_id, reactor_level, reactor_additional_stat, reactor_enchant_level } = reactorResponse.data;
 
-					const reactorImageUrl = reactorData.find((rea: { reactor_id: string }) => rea.reactor_id === reactor_id)?.image_url || '';
+					const reactorImageUrl = reactorData.find((rea: Reactor) => rea.reactor_id === reactor_id)?.image_url || '';
 
 					const reactorEmbed = new EmbedBuilder()
 						.setTitle(`${userName}'s Reactor Info`)
