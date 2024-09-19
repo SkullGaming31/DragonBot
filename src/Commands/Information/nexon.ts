@@ -28,157 +28,165 @@ const reactorData = JSON.parse(fs.readFileSync(reactorDataPath, 'utf-8'));
 const externalComponentDataPath = path.join(__dirname, '../../TFD_metadata', 'nexon_external-component.json');
 const externalComponentData = JSON.parse(fs.readFileSync(externalComponentDataPath, 'utf-8'));
 
+const voidBattlePath = path.join(__dirname, '../../TFD_metadata', 'nexon_void-battle.json');
+const voidBattleData = JSON.parse(fs.readFileSync(voidBattlePath, 'utf-8'));
+
 // Function to get module name by ID
 function getModuleNameById(id: string): string {
-  const module = moduleData.find((mod: { module_id: string; module_name: string }) => mod.module_id === id);
-  return module ? module.module_name : 'Unknown Module';
+	const module = moduleData.find((mod: { module_id: string; module_name: string }) => mod.module_id === id);
+	return module ? module.module_name : 'Unknown Module';
 }
 
 // Function to get descendant name by ID
 function getDescendantNameById(id: string): string {
-  const descendant = descendantData.find((desc: { descendant_id: string; descendant_name: string }) => desc.descendant_id === id);
-  return descendant ? descendant.descendant_name : 'Unknown Descendant';
+	const descendant = descendantData.find((desc: { descendant_id: string; descendant_name: string }) => desc.descendant_id === id);
+	return descendant ? descendant.descendant_name : 'Unknown Descendant';
 }
 
 // Function to get weapon name by ID
 function getWeaponNameById(id: string): string {
 	const weapon = weaponData.find((wep: { weapon_id: string; weapon_name: string }) => wep.weapon_id === id);
-  return weapon ? weapon.weapon_name : 'Unknown Weapon';
+	return weapon ? weapon.weapon_name : 'Unknown Weapon';
 }
 // Function to get weapon name by ID
 function getReactorNameById(id: string): string {
 	const reactor = reactorData.find((rea: { reactor_id: string; reactor_name: string }) => rea.reactor_id === id);
-  return reactor ? reactor.reactor_name : 'Unknown Reactor';
+	return reactor ? reactor.reactor_name : 'Unknown Reactor';
 }
 
 // Function to get weapon name by ID
 function getExternalComponentNameById(id: string): string {
 	const externalcomponent = externalComponentData.find((ec: { external_component_id: string; external_component_name: string }) => ec.external_component_id === id);
-  return externalcomponent ? externalcomponent.external_component_name : 'Unknown External Component';
+	return externalcomponent ? externalcomponent.external_component_name : 'Unknown External Component';
+}
+
+function getVoidBattleNameById(id: string): string {
+	const voidBattle = voidBattleData.find((vb: { void_battle_id: string; void_battle_name: string }) => vb.void_battle_id === id);
+	return voidBattle ? voidBattle.void_battle_name : 'Unknown Void Battle Boss';
 }
 
 export const nexonApi = axios.create({
-  baseURL: 'https://open.api.nexon.com/tfd/v1',
-  headers: {
-    'X-NXOPEN-API-KEY': process.env.NEXON_API_KEY,
-    'Accept': 'application/json',
-  },
+	baseURL: 'https://open.api.nexon.com/tfd/v1',
+	headers: {
+		'X-NXOPEN-API-KEY': process.env.NEXON_API_KEY,
+		'Accept': 'application/json',
+	},
 });
 
 // Define the type for the module
 interface Module {
-  module_slot_id: string;
-  module_id: string;
-  module_enchant_level: number;
+	module_slot_id: string;
+	module_id: string;
+	module_enchant_level: number;
 }
 
 // Define the type for the descendant
 interface Descendant {
-  descendant_id: string;
-  descendant_name: string;
+	descendant_id: string;
+	descendant_name: string;
 }
 
 // Define the type for the weapon
 interface Weapon {
-  module_max_capacity: number;
-  module_capacity: number;
-  weapon_slot_id: string;
-  weapon_id: string;
-  weapon_level: number;
-  perk_ability_enchant_level: number;
-  weapon_additional_stat: Array<{ additional_stat_name: string; additional_stat_value: string }>;
-  module: Array<Module>;
+	module_max_capacity: number;
+	module_capacity: number;
+	weapon_slot_id: string;
+	weapon_id: string;
+	weapon_level: number;
+	perk_ability_enchant_level: number;
+	weapon_additional_stat: Array<{ additional_stat_name: string; additional_stat_value: string }>;
+	module: Array<Module>;
 }
 
 interface ReactorAdditionalStat {
-  additional_stat_name: string;
-  additional_stat_value: string;
+	additional_stat_name: string;
+	additional_stat_value: string;
 }
 
 interface Reactor {
-  reactor_id: string;
-  reactor_slot_id: string;
-  reactor_level: number;
-  reactor_additional_stat: ReactorAdditionalStat[];
-  reactor_enchant_level: number;
+	reactor_id: string;
+	reactor_slot_id: string;
+	reactor_level: number;
+	reactor_additional_stat: ReactorAdditionalStat[];
+	reactor_enchant_level: number;
 }
 
 interface ExternalComponentAdditionalStat {
-  additional_stat_name: string;
-  additional_stat_value: string;
+	additional_stat_name: string;
+	additional_stat_value: string;
 }
 
 interface ExternalComponent {
-  external_component_slot_id: string;
-  external_component_id: string;
-  external_component_level: number;
-  external_component_additional_stat: ExternalComponentAdditionalStat[];
+	external_component_slot_id: string;
+	external_component_id: string;
+	external_component_level: number;
+	external_component_additional_stat: ExternalComponentAdditionalStat[];
 }
 
 interface ExternalComponentResponse {
-  ouid: string;
-  user_name: string;
-  external_component: ExternalComponent[];
+	ouid: string;
+	user_name: string;
+	external_component: ExternalComponent[];
 }
 
 export default new Command({
-  name: 'nexon',
-  description: 'Nexon API related commands',
-  UserPerms: ['ManageGuild'],
-  BotPerms: ['ManageGuild'],
-  defaultMemberPermissions: ['ManageGuild'],
-  type: ApplicationCommandType.ChatInput,
-  options: [
-    {
-      name: 'get-ouid',
-      description: 'Fetch and store the OUID using your Nexon username',
-      type: ApplicationCommandOptionType.Subcommand,
-      options: [
-        {
-          name: 'user_name',
-          description: 'Your Nexon assigned name',
-          type: ApplicationCommandOptionType.String,
-          required: true,
-        },
-      ],
-    },
-    {
-      name: 'get-user-info',
-      description: 'Fetch user info using the stored OUID',
-      type: ApplicationCommandOptionType.Subcommand,
-      options: [
-        {
-          name: 'user_name',
-          description: 'Your Nexon assigned name',
-          type: ApplicationCommandOptionType.String,
-          required: true,
-        },
-      ],
-    },
-    {
-      name: 'get-user-descendant',
-      description: 'Fetch user descendant info using the stored OUID',
-      type: ApplicationCommandOptionType.Subcommand,
-      options: [
-        {
-          name: 'user_name',
-          description: 'Your Nexon assigned name',
-          type: ApplicationCommandOptionType.String,
-          required: true,
-        },
-      ],
-    },
-    {
-      name: 'get-user-weapon',
-      description: 'Fetch user weapon info using the stored OUID',
-      type: ApplicationCommandOptionType.Subcommand,
-      options: [
-        {
-          name: 'user_name',
-          description: 'Your Nexon assigned name',
-          type: ApplicationCommandOptionType.String,
-          required: true,
-        },
+	name: 'nexon',
+	description: 'Nexon API related commands',
+	UserPerms: ['ManageGuild'],
+	BotPerms: ['ManageGuild'],
+	defaultMemberPermissions: ['ManageGuild'],
+	type: ApplicationCommandType.ChatInput,
+	options: [
+		{
+			name: 'get-ouid',
+			description: 'Fetch and store the OUID using your Nexon username',
+			type: ApplicationCommandOptionType.Subcommand,
+			options: [
+				{
+					name: 'user_name',
+					description: 'Your Nexon assigned name',
+					type: ApplicationCommandOptionType.String,
+					required: true,
+				},
+			],
+		},
+		{
+			name: 'get-user-info',
+			description: 'Fetch user info using the stored OUID',
+			type: ApplicationCommandOptionType.Subcommand,
+			options: [
+				{
+					name: 'user_name',
+					description: 'Your Nexon assigned name',
+					type: ApplicationCommandOptionType.String,
+					required: true,
+				},
+			],
+		},
+		{
+			name: 'get-user-descendant',
+			description: 'Fetch user descendant info using the stored OUID',
+			type: ApplicationCommandOptionType.Subcommand,
+			options: [
+				{
+					name: 'user_name',
+					description: 'Your Nexon assigned name',
+					type: ApplicationCommandOptionType.String,
+					required: true,
+				},
+			],
+		},
+		{
+			name: 'get-user-weapon',
+			description: 'Fetch user weapon info using the stored OUID',
+			type: ApplicationCommandOptionType.Subcommand,
+			options: [
+				{
+					name: 'user_name',
+					description: 'Your Nexon assigned name',
+					type: ApplicationCommandOptionType.String,
+					required: true,
+				},
 				{
 					name: 'language_code',
 					description: 'The Language you want the message to be in',
@@ -199,19 +207,19 @@ export default new Command({
 						{ name: 'es', value: 'es' }
 					]
 				}
-      ],
-    },
+			],
+		},
 		{
 			name: 'get-user-reactor',
-      description: 'Fetch user reactor info using the stored OUID',
-      type: ApplicationCommandOptionType.Subcommand,
-      options: [
-        {
-          name: 'user_name',
-          description: 'Your Nexon assigned name',
-          type: ApplicationCommandOptionType.String,
-          required: true,
-        },
+			description: 'Fetch user reactor info using the stored OUID',
+			type: ApplicationCommandOptionType.Subcommand,
+			options: [
+				{
+					name: 'user_name',
+					description: 'Your Nexon assigned name',
+					type: ApplicationCommandOptionType.String,
+					required: true,
+				},
 				{
 					name: 'language_code',
 					description: 'The Language you want the message to be in',
@@ -232,19 +240,19 @@ export default new Command({
 						{ name: 'es', value: 'es' }
 					]
 				}
-      ],
+			],
 		},
 		{
 			name: 'get-user-ec',
-      description: 'Fetch user external components info using the stored OUID',
-      type: ApplicationCommandOptionType.Subcommand,
-      options: [
-        {
-          name: 'user_name',
-          description: 'Your Nexon assigned name',
-          type: ApplicationCommandOptionType.String,
-          required: true,
-        },
+			description: 'Fetch user external components info using the stored OUID',
+			type: ApplicationCommandOptionType.Subcommand,
+			options: [
+				{
+					name: 'user_name',
+					description: 'Your Nexon assigned name',
+					type: ApplicationCommandOptionType.String,
+					required: true,
+				},
 				{
 					name: 'language_code',
 					description: 'The Language you want the message to be in',
@@ -265,31 +273,86 @@ export default new Command({
 						{ name: 'es', value: 'es' }
 					]
 				}
-      ],
+			],
+		},
+		{
+			name: 'get-module-rec',
+			description: 'Get The reccomended modules for your weapon and descendant to take on the Void Intercept Boss Battle',
+			type: ApplicationCommandOptionType.Subcommand,
+			options: [
+				{
+					name: 'descendants_id',
+					description: 'The Id of the descendant you plan on using!',
+					type: ApplicationCommandOptionType.String,
+					required: true
+				},
+				{
+					name: 'weapon_id',
+					description: 'The Id of the weapon you plan on using',
+					type: ApplicationCommandOptionType.String,
+					required: true
+				},
+				{
+					name: 'void_intercept_battle',
+					description: 'The Boss you want to take on in the void intercept battles.',
+					type: ApplicationCommandOptionType.String,
+					required: true,
+					choices: [
+						{ name: 'Grave Walker(Easy)', value: '651000001' },
+						{ name: 'Stunning Beauty(Easy)', value: '651000002' },
+						{ name: 'executioner(Easy)', value: '651000003' },
+						{ name: 'dead_bride(Easy)', value: '651000004' },
+						{ name: 'devourer(Easy)', value: '651000005' },
+						{ name: 'pyromaniac(Easy)', value: '651000006' },
+						{ name: 'swamp_walker(Easy)', value: '651000006' },
+						{ name: 'hanged_man(Easy)', value: '651000008' },
+						{ name: 'executioner(Hard)', value: '652000001' },
+						{ name: 'dead_bride(Hard)', value: '652000002' },
+						{ name: 'devourer(Hard)', value: '652000003' },
+						{ name: 'pyromaniac(Hard)', value: '652000004' },
+						{ name: 'swamp_walker(Hard)', value: '652000005' },
+						{ name: 'obstructer(Hard)', value: '652000006' },
+						{ name: 'frost_walker(Hard)', value: '652000007' },
+						{ name: 'molten_fortress(Hard)', value: '652000008' },
+						{ name: 'gluttony(Hard)', value: '652000009' },
+					]
+				},
+				{
+					name: 'period',
+					description: 'Choose a period of time to search',
+					type: ApplicationCommandOptionType.String,
+					required: true,
+					choices: [
+						{ name: '7 Days', value: '0' },
+						{ name: '30 Days', value: '1' },
+						{ name: 'All Time', value: '2' },
+					]
+				}
+			]
 		}
-  ],
-  run: async ({ interaction }) => {
+	],
+	run: async ({ interaction }) => {
 		const { options } = interaction;
-    const subcommand = options.getSubcommand();
-    const userName = options.getString('user_name');
+		const subcommand = options.getSubcommand();
+		const userName = options.getString('user_name');
 		const Lang = options.getString('language_code');
 
-		switch(subcommand) {
+		switch (subcommand) {
 			case 'get-ouid':
 				// Handle fetching and storing OUID
 				try {
 					let ouidEntry = await tfd.findOne({ username: userName });
-	
+
 					if (!ouidEntry) {
 						const response = await nexonApi.get('/id', {
 							params: { user_name: userName },
 						});
-	
+
 						const ouid = response.data.ouid;
-	
+
 						ouidEntry = new tfd({ OUID: ouid, username: userName });
 						await ouidEntry.save();
-	
+
 						await interaction.reply({ content: `OUID saved: ${ouid}`, ephemeral: true });
 					} else {
 						await interaction.reply({ content: `OUID already exists: ${ouidEntry.OUID}`, ephemeral: true });
@@ -306,18 +369,18 @@ export default new Command({
 				// Handle fetching user info
 				try {
 					const ouidEntry = await tfd.findOne({ username: userName });
-	
+
 					if (!ouidEntry) {
 						return interaction.reply({
 							content: `No OUID found for username: ${userName}. Please use the \`get-ouid\` command first.`,
 							ephemeral: true,
 						});
 					}
-	
+
 					const userResponse = await nexonApi.get('/user/basic', {
 						params: { ouid: ouidEntry.OUID },
 					});
-	
+
 					const {
 						ouid,
 						user_name,
@@ -329,7 +392,7 @@ export default new Command({
 						os_language,
 						game_language,
 					} = userResponse.data;
-	
+
 					const userEmbed = new EmbedBuilder()
 						.setTitle(`${user_name}'s User Info`)
 						.setColor(0x1a73e8)
@@ -344,7 +407,7 @@ export default new Command({
 							{ name: 'Game Language', value: game_language, inline: true }
 						)
 						.setTimestamp();
-	
+
 					await interaction.reply({ embeds: [userEmbed], ephemeral: true });
 				} catch (error) {
 					console.error('Error fetching user data:', error);
@@ -358,18 +421,18 @@ export default new Command({
 				// Handle fetching user descendant info
 				try {
 					const ouidEntry = await tfd.findOne({ username: userName });
-	
+
 					if (!ouidEntry) {
 						return interaction.reply({
 							content: `No OUID found for username: ${userName}. Please use the \`get-ouid\` command first.`,
 							ephemeral: true,
 						});
 					}
-	
+
 					const descendantResponse = await nexonApi.get('/user/descendant', {
 						params: { ouid: ouidEntry.OUID },
 					});
-	
+
 					const {
 						ouid,
 						user_name,
@@ -380,9 +443,9 @@ export default new Command({
 						module_capacity,
 						module,
 					} = descendantResponse.data;
-	
+
 					const descendantImageUrl = descendantData.find((desc: { descendant_id: string }) => desc.descendant_id === descendant_id)?.descendant_image_url || '';
-	
+
 					const descendantEmbed = new EmbedBuilder()
 						.setTitle(`${user_name}'s Descendant Info`)
 						.setImage(descendantImageUrl)
@@ -398,14 +461,14 @@ export default new Command({
 						.addFields(
 							module.length > 0
 								? module.map((mod: Module) => ({
-										name: `Module ${mod.module_slot_id}`,
-										value: `Name: ${getModuleNameById(mod.module_id)}\nEnchantment Level: ${mod.module_enchant_level}`,
-										inline: true,
-									}))
+									name: `Module ${mod.module_slot_id}`,
+									value: `Name: ${getModuleNameById(mod.module_id)}\nEnchantment Level: ${mod.module_enchant_level}`,
+									inline: true,
+								}))
 								: { name: 'Modules', value: 'No modules equipped', inline: true }
 						)
 						.setTimestamp();
-	
+
 					await interaction.reply({ embeds: [descendantEmbed], ephemeral: true });
 				} catch (error) {
 					console.error('Error fetching user descendant data:', error);
@@ -418,46 +481,46 @@ export default new Command({
 			case 'get-user-weapon':
 				try {
 					const ouidEntry = await tfd.findOne({ username: userName });
-	
+
 					if (!ouidEntry) {
 						return interaction.reply({
 							content: `No OUID found for username: ${userName}. Please use the \`get-ouid\` command first.`,
 							ephemeral: true,
 						});
 					}
-	
+
 					const weaponResponse = await nexonApi.get('/user/weapon', {
-						params: { 
+						params: {
 							ouid: ouidEntry.OUID,
 							language_code: Lang
 						},
 					});
-	
+
 					const { weapon } = weaponResponse.data;
-	
+
 					// Split weapon data into chunks of 25 fields or less
 					const chunks: EmbedBuilder[] = [];
 					let currentEmbed = new EmbedBuilder()
 						.setTitle(`${userName}'s Weapon Info`)
 						.setColor(0x1a73e8);
-	
+
 					// Initialize the embed fields array
 					let fields: any[] = [];
-	
+
 					weapon.forEach((weap: Weapon, index: number) => {
 						const weaponFields = {
 							name: `Weapon ${weap.weapon_slot_id}`,
 							value: `Name: ${getWeaponNameById(weap.weapon_id)}\nLevel: ${weap.weapon_level}\n` +
-										 `Perk Ability Enchant Level: ${weap.perk_ability_enchant_level}\n` +
-										 `Module Max Capacity: ${weap.module_max_capacity}\n` +
-										 `Module Capacity: ${weap.module_capacity}\n` +
-										 `Additional Stats: ${weap.weapon_additional_stat.map(stat => `${stat.additional_stat_name}: ${stat.additional_stat_value}`).join(', ')}`,
+								`Perk Ability Enchant Level: ${weap.perk_ability_enchant_level}\n` +
+								`Module Max Capacity: ${weap.module_max_capacity}\n` +
+								`Module Capacity: ${weap.module_capacity}\n` +
+								`Additional Stats: ${weap.weapon_additional_stat.map(stat => `${stat.additional_stat_name}: ${stat.additional_stat_value}`).join(', ')}`,
 							inline: true,
 						};
-	
+
 						// Add field to current embed
 						fields.push(weaponFields);
-	
+
 						// If 25 fields are reached, push the current embed and create a new one
 						if (fields.length >= 25) {
 							currentEmbed.addFields(fields);
@@ -468,13 +531,13 @@ export default new Command({
 							fields = [];
 						}
 					});
-	
+
 					// Add remaining fields to the last embed
 					if (fields.length > 0) {
 						currentEmbed.addFields(fields);
 						chunks.push(currentEmbed);
 					}
-	
+
 					await interaction.reply({ embeds: chunks, ephemeral: true });
 				} catch (error) {
 					console.error('Error fetching user weapon data:', error);
@@ -487,25 +550,25 @@ export default new Command({
 			case 'get-user-reactor':
 				try {
 					const ouidEntry = await tfd.findOne({ username: userName });
-	
+
 					if (!ouidEntry) {
 						return interaction.reply({
 							content: `No OUID found for username: ${userName}. Please use the \`get-ouid\` command first.`,
 							ephemeral: true,
 						});
 					}
-	
+
 					const reactorResponse = await nexonApi.get('/user/reactor', {
-						params: { 
+						params: {
 							ouid: ouidEntry.OUID,
 							language_code: Lang
 						},
 					});
-	
+
 					const { reactor_id, reactor_slot_id, reactor_level, reactor_additional_stat, reactor_enchant_level } = reactorResponse.data;
-	
+
 					const reactorImageUrl = reactorData.find((rea: { reactor_id: string }) => rea.reactor_id === reactor_id)?.image_url || '';
-	
+
 					const reactorEmbed = new EmbedBuilder()
 						.setTitle(`${userName}'s Reactor Info`)
 						.setImage(reactorImageUrl)
@@ -516,13 +579,14 @@ export default new Command({
 							{ name: 'Reactor Slot ID', value: reactor_slot_id || 'None', inline: true },
 							{ name: 'Reactor Level', value: reactor_level.toString(), inline: true },
 							{ name: 'Reactor Enchant Level', value: reactor_enchant_level.toString(), inline: true },
-							{ name: 'Additional Stats', value: reactor_additional_stat.length > 0
-								? reactor_additional_stat.map((stat: ReactorAdditionalStat) => `${stat.additional_stat_name}: ${stat.additional_stat_value}`).join('\n')
-								: 'No additional stats', inline: false
+							{
+								name: 'Additional Stats', value: reactor_additional_stat.length > 0
+									? reactor_additional_stat.map((stat: ReactorAdditionalStat) => `${stat.additional_stat_name}: ${stat.additional_stat_value}`).join('\n')
+									: 'No additional stats', inline: false
 							}
 						)
 						.setTimestamp();
-	
+
 					await interaction.reply({ embeds: [reactorEmbed], ephemeral: true });
 				} catch (error) {
 					console.error('Error fetching user reactor data:', error);
@@ -533,49 +597,113 @@ export default new Command({
 				}
 				break;
 			case 'get-user-ec':
-					try {
-						const ouidEntry = await tfd.findOne({ username: userName });
-				
-						if (!ouidEntry) {
-							return interaction.reply({
-								content: `No OUID found for username: ${userName}. Please use the \`get-ouid\` command first.`,
-								ephemeral: true,
-							});
-						}
-				
-						const externalComponentResponse = await nexonApi.get('/user/external-component', {
-							params: { ouid: ouidEntry.OUID, language_code: Lang },
-						});
-				
-						const {
-							external_component,
-						}: ExternalComponentResponse = externalComponentResponse.data;
-				
-						const externalComponentEmbed = new EmbedBuilder()
-							.setTitle(`${userName}'s External Components`)
-							.setColor(0x1a73e8)
-							.setTimestamp();
-				
-						external_component.forEach((component: ExternalComponent, index: number) => {
-							externalComponentEmbed.addFields(
-								{ name: `Component ${index + 1} - Slot ID`, value: component.external_component_slot_id, inline: true },
-								{ name: 'Component Name', value: getExternalComponentNameById(component.external_component_id), inline: true },
-								{ name: 'Component Level', value: component.external_component_level.toString(), inline: true },
-								{ name: 'Additional Stats', value: component.external_component_additional_stat.length > 0
-									? component.external_component_additional_stat.map((stat: ExternalComponentAdditionalStat) => `${stat.additional_stat_name}: ${stat.additional_stat_value}`).join('\n')
-									: 'No additional stats', inline: false }
-							);
-						});
-				
-						await interaction.reply({ embeds: [externalComponentEmbed], ephemeral: true });
-					} catch (error) {
-						console.error('Error fetching external component data:', error);
-						await interaction.reply({
-							content: 'An error occurred while trying to retrieve the external component data.',
+				try {
+					const ouidEntry = await tfd.findOne({ username: userName });
+
+					if (!ouidEntry) {
+						return interaction.reply({
+							content: `No OUID found for username: ${userName}. Please use the \`get-ouid\` command first.`,
 							ephemeral: true,
 						});
 					}
-					break;
+
+					const externalComponentResponse = await nexonApi.get('/user/external-component', {
+						params: { ouid: ouidEntry.OUID, language_code: Lang },
+					});
+
+					const {
+						external_component,
+					}: ExternalComponentResponse = externalComponentResponse.data;
+
+					const externalComponentEmbed = new EmbedBuilder()
+						.setTitle(`${userName}'s External Components`)
+						.setColor(0x1a73e8)
+						.setTimestamp();
+
+					external_component.forEach((component: ExternalComponent, index: number) => {
+						externalComponentEmbed.addFields(
+							{ name: `Component ${index + 1} - Slot ID`, value: component.external_component_slot_id, inline: true },
+							{ name: 'Component Name', value: getExternalComponentNameById(component.external_component_id), inline: true },
+							{ name: 'Component Level', value: component.external_component_level.toString(), inline: true },
+							{
+								name: 'Additional Stats', value: component.external_component_additional_stat.length > 0
+									? component.external_component_additional_stat.map((stat: ExternalComponentAdditionalStat) => `${stat.additional_stat_name}: ${stat.additional_stat_value}`).join('\n')
+									: 'No additional stats', inline: false
+							}
+						);
+					});
+
+					await interaction.reply({ embeds: [externalComponentEmbed], ephemeral: true });
+				} catch (error) {
+					console.error('Error fetching external component data:', error);
+					await interaction.reply({
+						content: 'An error occurred while trying to retrieve the external component data.',
+						ephemeral: true,
+					});
+				}
+				break;
+			case 'get-module-rec':
+				try {
+					const descendantId = options.getString('descendants_id');
+					const weaponId = options.getString('weapon_id');
+					const voidBattleId = options.getString('void_intercept_battle');
+					const period = options.getString('period');
+
+					if (!voidBattleId) return;
+
+					// make API request to get module recommendations
+					const response = await nexonApi.get('/recommendation/module', {
+						params: {
+							descendant_id: descendantId,
+							weapon_id: weaponId,
+							void_battle_id: voidBattleId,
+							period: period,
+						},
+					});
+
+					// extract module recommendations for descendant and weapon
+					const descendantRecommendations = response.data.descendant.recommendation;
+					const weaponRecommendations = response.data.weapon.recommendation;
+
+					const descendantImageUrl = descendantData.find((desc: { descendant_id: string }) => desc.descendant_id === descendantId)?.descendant_image_url || '';
+					const weaponImageUrl = weaponData.find((wep: { weapon_id: string }) => wep.weapon_id === weaponId)?.image_url || '';
+
+					// create embed for descendant module recommendations
+					const descendantEmbed = new EmbedBuilder()
+						.setTitle('Recommended Modules for Descendant')
+						.setImage(descendantImageUrl)
+						.setColor(0x1a73e8);
+
+					// add fields for each recommended module
+					descendantRecommendations.forEach((recommendation: Module, index: number) => {
+						const moduleName = getModuleNameById(recommendation.module_id); // replace with actual function to get module name
+						descendantEmbed.addFields({ name: `Module ${index + 1}`, value: moduleName, inline: false });
+					});
+
+					// create embed for weapon module recommendations
+					const weaponEmbed = new EmbedBuilder()
+						.setTitle('Recommended Modules for Weapon')
+						.setImage(weaponImageUrl)
+						.setColor(0x1a73e8);
+
+					// add fields for each recommended module
+					weaponRecommendations.forEach((recommendation: Module, index: number) => {
+						const moduleName = getModuleNameById(recommendation.module_id); // replace with actual function to get module name
+						weaponEmbed.addFields({ name: `Module ${index + 1}`, value: moduleName, inline: false });
+					});
+
+					// send both embeds as a reply to the user
+					await interaction.reply({ content: `Recommended Modules for battling \`${getVoidBattleNameById(voidBattleId)}\``, embeds: [descendantEmbed, weaponEmbed], ephemeral: true });
+				} catch (error: any) {
+					if (error.isAxiosError) {
+						console.error('Axios error:', error);
+						// handle Axios error
+					} else {
+						console.error('Unknown error:', error);
+						// handle other errors
+					}
+				}
+				break;
 			default:
 				console.log('Issue Detected with nexon sub command');
 				interaction.reply({ content: 'Issue detected with nexon sub commands', ephemeral: true });
