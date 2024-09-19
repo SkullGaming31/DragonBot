@@ -48,6 +48,11 @@ function getWeaponNameById(id: string): string {
 	const weapon = weaponData.find((wep: { weapon_id: string; weapon_name: string }) => wep.weapon_id === id);
 	return weapon ? weapon.weapon_name : 'Unknown Weapon';
 }
+// Function to get weapon ID by name
+function getWeaponIdByName(name: string): string {
+	const weapon = weaponData.find((wep: { weapon_id: string; weapon_name: string }) => wep.weapon_name.toLowerCase() === name.toLowerCase());
+	return weapon ? weapon.weapon_id : 'Unknown Weapon';
+}
 // Function to get weapon name by ID
 function getReactorNameById(id: string): string {
 	const reactor = reactorData.find((rea: { reactor_id: string; reactor_name: string }) => rea.reactor_id === id);
@@ -128,6 +133,36 @@ interface ExternalComponentResponse {
 	user_name: string;
 	external_component: ExternalComponent[];
 }
+
+interface Descendants {
+	id: string;
+	name: string;
+}
+
+const descendantsList: Descendants[] = [
+	{ id: '101000002', name: 'ajax' },
+	{ id: '101000007', name: 'ultimate ajax' },
+	{ id: '101000001', name: 'lepic' },
+	{ id: '101000004', name: 'ultimate lepic' },
+	{ id: '101000012', name: 'blair' },
+	{ id: '101000009', name: 'gley' },
+	{ id: '101000020', name: 'ultimate gley' },
+	{ id: '101000006', name: 'bunny' },
+	{ id: '101000019', name: 'ultimate bunny' },
+	{ id: '101000014', name: 'kyle' },
+	{ id: '101000011', name: 'sharen' },
+	{ id: '101000013', name: 'valby' },
+	{ id: '101000022', name: 'ultimate valby' },
+	{ id: '101000003', name: 'viessa' },
+	{ id: '101000010', name: 'ultimate viessa' },
+	{ id: '101000021', name: 'hailey' },
+	{ id: '101000005', name: 'jayber' },
+	{ id: '101000015', name: 'esiemo' },
+	{ id: '101000016', name: 'enzo' },
+	{ id: '101000017', name: 'yujin' },
+	{ id: '101000018', name: 'luna' },
+	{ id: '101000008', name: 'freyna' }
+];
 
 export default new Command({
 	name: 'nexon',
@@ -281,14 +316,38 @@ export default new Command({
 			type: ApplicationCommandOptionType.Subcommand,
 			options: [
 				{
-					name: 'descendants_id',
-					description: 'The Id of the descendant you plan on using!',
+					name: 'descendants_name',
+					description: 'The name of the descendant you plan on using!',
 					type: ApplicationCommandOptionType.String,
-					required: true
+					required: true,
+					choices: [
+						{ value: '101000002', name: 'ajax' },
+						{ value: '101000007', name: 'ultimate ajax' },
+						{ value: '101000001', name: 'lepic' },
+						{ value: '101000004', name: 'ultimate lepic' },
+						{ value: '101000012', name: 'blair' },
+						{ value: '101000009', name: 'gley' },
+						{ value: '101000020', name: 'ultimate gley' },
+						{ value: '101000006', name: 'bunny' },
+						{ value: '101000019', name: 'ultimate bunny' },
+						{ value: '101000014', name: 'kyle' },
+						{ value: '101000011', name: 'sharen' },
+						{ value: '101000013', name: 'valby' },
+						{ value: '101000022', name: 'ultimate valby' },
+						{ value: '101000003', name: 'viessa' },
+						{ value: '101000010', name: 'ultimate viessa' },
+						{ value: '101000021', name: 'hailey' },
+						{ value: '101000005', name: 'jayber' },
+						{ value: '101000015', name: 'esiemo' },
+						{ value: '101000016', name: 'enzo' },
+						{ value: '101000017', name: 'yujin' },
+						{ value: '101000018', name: 'luna' },
+						{ value: '101000008', name: 'freyna' }
+					]
 				},
 				{
-					name: 'weapon_id',
-					description: 'The Id of the weapon you plan on using',
+					name: 'weapon_name',
+					description: 'The name of the weapon you plan on using',
 					type: ApplicationCommandOptionType.String,
 					required: true
 				},
@@ -331,6 +390,7 @@ export default new Command({
 			]
 		}
 	],
+	// TODO: Add Difficulty Rewards from reward.JSON in a name searchable way.
 	run: async ({ interaction }) => {
 		const { options } = interaction;
 		const subcommand = options.getSubcommand();
@@ -644,17 +704,26 @@ export default new Command({
 				break;
 			case 'get-module-rec':
 				try {
-					const descendantId = options.getString('descendants_id');
-					const weaponId = options.getString('weapon_id');
+					const descendantName = options.getString('descendants_name');
+					const weaponName = options.getString('weapon_name');
 					const voidBattleId = options.getString('void_intercept_battle');
 					const period = options.getString('period');
 
-					if (!voidBattleId) return;
+					if (!voidBattleId || !weaponName || !descendantName) return;
+
+					// Lookup weaponId using weaponName
+					const weaponId = getWeaponIdByName(weaponName);
+
+					if (!weaponId) {
+						// Handle the case where the weapon name is invalid
+						await interaction.reply({ content: `Weapon '${weaponName}' not found.`, ephemeral: true });
+						return;
+					}
 
 					// make API request to get module recommendations
 					const response = await nexonApi.get('/recommendation/module', {
 						params: {
-							descendant_id: descendantId,
+							descendant_id: descendantName,
 							weapon_id: weaponId,
 							void_battle_id: voidBattleId,
 							period: period,
@@ -665,12 +734,12 @@ export default new Command({
 					const descendantRecommendations = response.data.descendant.recommendation;
 					const weaponRecommendations = response.data.weapon.recommendation;
 
-					const descendantImageUrl = descendantData.find((desc: { descendant_id: string }) => desc.descendant_id === descendantId)?.descendant_image_url || '';
+					const descendantImageUrl = descendantData.find((desc: { descendant_id: string }) => desc.descendant_id === descendantName)?.descendant_image_url || '';
 					const weaponImageUrl = weaponData.find((wep: { weapon_id: string }) => wep.weapon_id === weaponId)?.image_url || '';
 
 					// create embed for descendant module recommendations
 					const descendantEmbed = new EmbedBuilder()
-						.setTitle('Recommended Modules for Descendant')
+						.setTitle(`Recommended Modules for Descendant(${getDescendantNameById(descendantName)})`)
 						.setImage(descendantImageUrl)
 						.setColor(0x1a73e8);
 
@@ -682,7 +751,7 @@ export default new Command({
 
 					// create embed for weapon module recommendations
 					const weaponEmbed = new EmbedBuilder()
-						.setTitle('Recommended Modules for Weapon')
+						.setTitle(`Recommended Modules for Weapon(${weaponName})`)
 						.setImage(weaponImageUrl)
 						.setColor(0x1a73e8);
 
