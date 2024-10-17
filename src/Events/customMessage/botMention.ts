@@ -45,7 +45,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 
 	const embed = new EmbedBuilder()
 		.setColor('Green')
-		.setDescription(`Hi ${author.globalName}, how can I help you out today? Leave a brief description of what your issue is, and someone will get to you as soon as they are free.`)
+		.setDescription(`Hi ${author.globalName || author.tag}, how can I help you out today? Leave a brief description of what your issue is, and someone will get to you as soon as they are free.`)
 		.setThumbnail(`${author.displayAvatarURL({ size: 512 })}`)
 		.setFooter({ text: guild.name });
 
@@ -60,8 +60,8 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 			.setLabel('Add Me to your Discord Server'),
 		new ButtonBuilder()
 			.setStyle(ButtonStyle.Link)
-			.setURL('https://twitch.tv/canadiendragon')
-			.setLabel('SkullGaming31\'s Twitch')
+			.setURL('https://twitch.tv/skullgaminghq')
+			.setLabel('skullgaminghq\'s Twitch')
 	);
 
 	// console.log('Sending reply with embed and buttons...');

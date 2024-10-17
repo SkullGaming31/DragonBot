@@ -1,3 +1,5 @@
+import { CommandInteraction, Emoji } from "discord.js";
+
 // Map to store cooldowns for commands
 export const cooldowns = new Map<string, Map<string, number>>(); // Key: command name, Sub-key: user ID, Value: cooldown end timestamp (ms)
 

@@ -1,17 +1,3 @@
 {
-	"import { ApplicationCommandType } from 'discord.js';"
-	"import { Command } from '../../Structures/Command';"
-
-	"export default new Command({"
-	"name: '',"
-	"description: '',"
-	"UserPerms: [],"
-	"BotPerms: [],"
-	"defaultMemberPermissions: [],"
-	"type: ApplicationCommandType.ChatInput,"
-
-	"run: async ({ interaction, client }) => {"
-	"//"
-	"}"
-	"});"
+	"import { ApplicationCommandType } from 'discord.js';""import { Command } from '../../Structures/Command';""export default new Command({""name: '',""description: '',""UserPerms: [],""BotPerms: [],""defaultMemberPermissions: [],""type: ApplicationCommandType.ChatInput,""run: async ({ interaction, client }) => {""//""}""});"
 }

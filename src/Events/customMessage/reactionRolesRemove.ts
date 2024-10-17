@@ -27,7 +27,7 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 				return;
 			}
 			if (messageReaction.message.id !== '1199602079434555532' || messageReaction.message.channelId !== reaction.message.guild?.rulesChannelId) return;
-			await member.roles.remove(role);
+			await member.roles.remove(role, 'unreacted from role');
 			break;
 		}
 		case '📋': {
@@ -38,7 +38,7 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 				return;
 			}
 			// Add the role to the member
-			await member.roles.remove(role);
+			await member.roles.remove(role, 'unreacted from role');
 			break;
 		}
 		case '🚀': {
@@ -49,7 +49,7 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 				return;
 			}
 			// Add the role to the member
-			await member.roles.remove(role);
+			await member.roles.remove(role, 'unreacted from role');
 			break;
 		}
 		case '⛵': {
@@ -60,7 +60,7 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 				return;
 			}
 			// Add the role to the member
-			await member.roles.remove(role);
+			await member.roles.remove(role, 'unreacted from role');
 			break;
 		}
 		case '🥷': {
@@ -72,8 +72,7 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 			}
 
 			// Add the role to the member
-			await member.roles.remove(role);
-			console.log(`Role ${role.name} added to user ${member.user.username}`);
+			await member.roles.remove(role, 'unreacted from role');
 			break;
 		}
 		case '7️⃣': {
@@ -84,9 +83,17 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 				return;
 			}
 			// Add the role to the member
-			await member.roles.remove(role);
+			await member.roles.remove(role, 'unreacted from role');
 			break;
 		}
+		case '‼':
+			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'TFD');
+			if (!role) {
+				console.log('Role not found');
+				return;
+			}
+			await member.roles.remove(role, 'unreacted from role');
+			break;
 		// Add more cases for other reactions if needed
 	}
 	// console.log('Message Reaction Object: ', messageReaction);

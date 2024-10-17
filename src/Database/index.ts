@@ -1,58 +1,93 @@
+// import { config } from 'dotenv';
+// import mongoose, { Connection } from 'mongoose';
+
+// config();
+
+// export const connectDatabase = async (): Promise<void> => {
+// 	// Set mongoose debug mode based on environment
+// 	const isDev = process.env.ENVIRONMENT === 'dev' || process.env.ENVIRONMENT === 'debug';
+// 	mongoose.set('debug', isDev);
+
+// 	// MongoDB connection URIs
+// 	const uri = isDev ? process.env.MONGO_DEV_URI : process.env.MONGO_DATABASE_URI;
+
+// 	if (!uri) {
+// 		throw new Error('MongoDB URI is not defined');
+// 	}
+
+// 	try {
+// 		// Attempt to connect to MongoDB
+// 		await mongoose.connect(uri, { connectTimeoutMS: 10000 });
+
+// 		const connection: Connection = mongoose.connection;
+
+// 		// Connection readyState mappings
+// 		const connectionStates = {
+// 			0: 'Disconnected from the database',
+// 			1: 'Connected to the Mongo Database',
+// 			2: 'Connecting to the Mongo Database',
+// 			3: 'Disconnecting from the Database',
+// 			99: 'Mongo Database is not initialized',
+// 		};
+
+// 		console.log(connectionStates[connection.readyState] || 'Unknown state');
+
+// 		// Handle connection errors
+// 		connection.on('error', (err) => {
+// 			console.error('MongoDB connection error:', err);
+// 		});
+// 	} catch (error) {
+// 		// Handle connection errors
+// 		console.error('Error connecting to MongoDB:', error);
+// 	}
+// };
 import { config } from 'dotenv';
 import mongoose, { Connection } from 'mongoose';
 
 config();
 
+export class MongoDBConnectionError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = 'MongoDBConnectionError';
+	}
+}
+
 export const connectDatabase = async (): Promise<void> => {
 	// Set mongoose debug mode based on environment
-	const environment = process.env.Enviroment;
-	const isDev = environment === 'dev' || environment === 'debug';
+	const isDev = process.env.ENVIRONMENT === 'dev' || process.env.ENVIRONMENT === 'debug';
 	mongoose.set('debug', isDev);
 
 	// MongoDB connection URIs
-	const devUri = 'mongodb://localhost:27017/dragonbot_dev';
-	const prodUri = process.env.MONGO_DATABASE_URI as string;
+	const uri = isDev ? process.env.MONGO_DEV_URI : process.env.MONGO_DATABASE_URI;
 
-	// Determine which URI to use
-	const uri = isDev ? devUri : prodUri;
+	if (!uri) {
+		throw new MongoDBConnectionError('MongoDB URI is not defined');
+	}
 
 	try {
 		// Attempt to connect to MongoDB
 		await mongoose.connect(uri, { connectTimeoutMS: 10000 });
 
-		// Cast mongoose.connection to Connection type
 		const connection: Connection = mongoose.connection;
 
-		/**
-		 * Mongo readyState enums
-		 * 0 = disconnected
-		 * 1 = connected
-		 * 2 = connecting
-		 * 3 = disconnecting
-		 * 99 = uninitialized
-		 */
-		switch (connection.readyState) {
-			case 0:
-				console.log('Disconnected from the database');
-				break;
-			case 1:
-				console.log('Connected to the Mongo Database');
-				break;
-			case 2:
-				console.log('Connecting to the Mongo Database');
-				break;
-			case 3:
-				console.log('Disconnected from the Database');
-				break;
-			case 99:
-				console.log('The Mongo Database is not initialized');
-				break;
-			default:
-				break;
-		}
+		// Connection readyState mappings
+		const connectionStates = {
+			0: 'Disconnected from the database',
+			1: 'Connected to the Mongo Database',
+			2: 'Connecting to the Mongo Database',
+			3: 'Disconnecting from the Database',
+			99: 'Mongo Database is not initialized',
+		};
+
+		console.log(connectionStates[connection.readyState] || 'Unknown state');
+
+		// Handle connection errors
+		connection.on('error', (err) => {
+			throw new MongoDBConnectionError(`MongoDB connection error: ${err}`);
+		});
 	} catch (error) {
 		// Handle connection errors
-		console.error('Error connecting to MongoDB:', error);
-		process.exit(1); // Exit the process on failure
+		throw new MongoDBConnectionError(`Error connecting to MongoDB: ${error}`);
 	}
 };

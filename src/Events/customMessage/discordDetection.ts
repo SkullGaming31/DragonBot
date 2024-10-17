@@ -43,24 +43,24 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 			const discordLinkDetection = new EmbedBuilder()
 				.setTitle('Discord Link Detected')
 				.setColor('Red')
-				.setAuthor({ name: `${author.globalName}`, iconURL: author.displayAvatarURL({ size: 512 }) })
-				.setThumbnail(author.displayAvatarURL())
+				.setAuthor({ name: `${author.globalName || author.tag}`, iconURL: author.displayAvatarURL({ size: 512 }) })
+				.setThumbnail(author.displayAvatarURL({ forceStatic: true, size: 512 }))
 				.setFooter({ text: `guild: ${guild.name}` })
 				.setTimestamp();
 
 			let warningMessage = '';
-			
+
 			if (channel.id === '959693430647308292' || channel.id === '959693430647308292') {
 				return;
 			} else if (channel.type === ChannelType.GuildText) {
 
 				switch (warningCount) {
 					case 0:
-					// First warning
+						// First warning
 						warningMessage = 'This is your first warning. Please do not post Discord links in this server.';
 						break;
 					case 1:
-					// Second warning
+						// Second warning
 						warningMessage = 'This is your 2nd warning. Please do not post Discord links in this server. you have been muted for 5 minutes';
 						if (member?.moderatable) {
 							// Send a DM to the user
@@ -72,10 +72,10 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 						}
 						break;
 					case 2:
-					// Third warning
+						// Third warning
 						warningMessage = 'This is your 3rd warning. DO NOT post Discord links in the server. you have been kicked from the server with the possiblity to rejoin';
 						if (member?.kickable) {
-						// Send a DM to the user
+							// Send a DM to the user
 							await member?.kick('Posted a discord link after being warned twice for posting links');
 							await member?.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] })
 								.catch((error) => {
@@ -84,10 +84,10 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 						}
 						break;
 					case 3:
-					// Third warning
+						// Third warning
 						warningMessage = 'This is your 3rd warning. DO NOT post Discord links in the server. you have been Banned from the server with no possiblity to rejoin the server with this account';
 						if (member?.bannable) {
-						// Send a DM to the user
+							// Send a DM to the user
 							await member?.ban({ reason: 'Posting discord links after being told 3 times not to post them', deleteMessageSeconds: 5 });
 							await member?.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] })
 								.catch((error) => {

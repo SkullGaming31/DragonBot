@@ -105,7 +105,6 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 		}
 	};
 
-	// Check if the link is allowed using the helper function
 	if (!isLinkAllowed(content)) {
 		await handleInvalidLink();
 	}
