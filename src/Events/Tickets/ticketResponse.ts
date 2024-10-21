@@ -1,7 +1,7 @@
 import { BaseInteraction, ChannelType, Colors, EmbedBuilder, GuildMember } from 'discord.js';
 import { Event } from '../../Structures/Event';
 // import settings from '../../Structures/Schemas/settingsDB';
-import DB from '../../Database/Schemas/ticketDB';
+import DB, { Ticket } from '../../Database/Schemas/ticketDB';
 import ticket from '../../Database/Schemas/ticketSetupDB';
 
 export default new Event('interactionCreate', async (interaction: BaseInteraction) => {
@@ -30,20 +30,19 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 
 	const embed = new EmbedBuilder().setColor(Colors.Blue);
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	DB.findOne({ ChannelID: channel?.id }, async (err: Error, docs: any) => {
 		if (err) throw err;
 		if (!docs) return interaction.reply({ content: 'no data was found related to this ticket, please delete it manually', ephemeral: true });
 
 		switch (customId) {
 			case 'lock':
-				if (docs.locked == true)
+				if (docs.Locked == true)
 					return interaction.reply({ content: 'this ticket is already Locked', ephemeral: true });
 				await DB.updateOne({ ChannelID: channel?.id }, { Locked: true });
 				embed.setDescription('🔒 | this channel is now locked Pending Review');
 
 				if (channel?.type === ChannelType.GuildText)
-					docs.MembersID.forEach((m: GuildMember) => {
+					docs.MembersID?.forEach((m: GuildMember) => {
 						channel?.permissionOverwrites.edit(m, {
 							SendMessages: false,
 							EmbedLinks: false,
@@ -53,7 +52,7 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 				await interaction.reply({ embeds: [embed] });
 				break;
 			case 'unlock':
-				if (docs.locked == false)
+				if (docs.Locked == false)
 					return interaction.reply({ content: 'this ticket is already unlocked', ephemeral: true });
 				await DB.updateOne({ ChannelID: channel?.id }, { Locked: false });
 				embed.setDescription('🔓 | this channel has been unlocked');

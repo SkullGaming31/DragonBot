@@ -15,6 +15,17 @@ config();
 export class ExtendedClient extends Client {
 	commands: Collection<string, CommandType> = new Collection();
 
+	/**
+	 * Constructs a new ExtendedClient instance.
+	 *
+	 * @remarks
+	 * The client is constructed with the following options:
+	 * - Gateway intents: Guilds, GuildMembers, GuildMessages, MessageContent, GuildWebhooks, GuildMessageReactions, GuildPresences
+	 * - Partials: Channel, GuildMember, GuildScheduledEvent, Message, Reaction, ThreadMember, User
+	 * - Allowed mentions: everyone, roles, users
+	 * - Cache: limited to 200 messages
+	 * - Presence: watching "Im DragonBot", afk false, status online
+	 */
 	constructor() {
 		super({
 			intents: [
@@ -44,6 +55,10 @@ export class ExtendedClient extends Client {
 		});
 	}
 
+	/**
+	 * Logs the bot into Discord and registers all commands, events, and modules.
+	 * @async
+	 */
 	async start() {
 		const agent = new Agent({
 			connect: {
@@ -94,6 +109,13 @@ export class ExtendedClient extends Client {
 
 	async importFile(filePath: string) { return (await import(filePath))?.default; }
 
+	/**
+	 * Registers commands for a guild or globally
+	 * @param {RegisterCommandOptions} options - The options for registering the commands
+	 * @param {ApplicationCommandDataResolvable[]} options.commands - The commands to register
+	 * @param {string} [options.guildId] - The ID of the guild to register the commands for. If not provided, the commands will be registered globally.
+	 * @returns {Promise<void>}
+	 */
 	async registerCommands({ commands, guildId }: RegisterCommandOptions): Promise<void> {
 		if (guildId) {
 			const guild = this.guilds.cache.get(guildId);
@@ -109,6 +131,12 @@ export class ExtendedClient extends Client {
 		}
 	}
 
+	/**
+	 * Registers all commands and events in the bot
+	 * @description This method is called when the bot is ready. It registers all commands and events in the bot.
+	 * @example
+	 *
+	 */
 	async registerModules() {
 		// Commands
 		const slashCommands: ApplicationCommandDataResolvable[] = [];

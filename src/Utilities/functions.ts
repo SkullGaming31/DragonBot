@@ -7,6 +7,13 @@ export const cooldowns = new Map<string, Map<string, number>>(); // Key: command
 function isNumber(value: number | boolean): value is number {
 	return typeof value === 'number';
 }
+/**
+ * Check if a user is on cooldown for a specific command.
+ * 
+ * @param commandName The name of the command to check cooldown for.
+ * @param userId The ID of the user to check cooldown for.
+ * @returns A boolean indicating if the user is on cooldown for the command.
+ */
 export function isOnCooldown(commandName: string, userId: string): boolean {
 	const Cooldown = cooldowns.get(commandName)?.get(userId) ?? false;
 

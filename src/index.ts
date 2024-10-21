@@ -7,6 +7,10 @@ config();
 
 export const client = new ExtendedClient();
 
+/**
+ * The main function is the entry point of the bot. It connects to the discord servers, starts the bot, connects to the database, and sets up the process title to show the uptime of the bot.
+ * @throws {Error} - thrown if there is an error connecting to the database
+ */
 async function main() {
 	try {
 		await client.start();
