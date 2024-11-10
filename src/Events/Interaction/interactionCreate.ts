@@ -5,7 +5,7 @@ import SettingsModel from '../../Database/Schemas/settingsDB';
 import { Event } from '../../Structures/Event';
 import { ExtendedInteraction } from '../../Typings/Command';
 import { setCooldown } from '../../Utilities/functions';
-import { client } from '../../index';
+import { appInstance } from '../../index';
 import { UserModel } from '../../Database/Schemas/userModel';
 
 export default new Event<'interactionCreate'>('interactionCreate', async (interaction) => {
@@ -14,8 +14,9 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 
     // Handle chat input commands
     if (interaction.isCommand()) {
+        const client = appInstance.client;
         const commandName = interaction.commandName;
-        const command = client.commands.get(interaction.commandName);
+        const command = appInstance.client.commands.get(interaction.commandName);
 
         if (!command) {
             return interaction.reply({ content: 'You have used a non-existent command, please try another command', ephemeral: true });
