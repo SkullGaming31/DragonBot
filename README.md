@@ -131,6 +131,22 @@ Requirements
 npm run build
 ```
 
+build the docker image to use for docker desktop
+```bash
+docker build -t dragonbot .
+```
+
+create the volume
+```sh
+docker volume create dragonbot-data
+```
+
+run the bot in docker
+```bash
+docker run -d --name dragonbot-container --mount source=dragonbot-data,target=/app/data dragonbot:latest
+```
+
+
 --all your javascript files will be in a folder called dist host that on your
 discord bot host.
 
