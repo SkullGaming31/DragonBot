@@ -8,6 +8,7 @@ export default new Command({
 	BotPerms: ['BanMembers'],
 	defaultMemberPermissions: ['BanMembers'],
 	type: ApplicationCommandType.ChatInput,
+	Category: 'Moderator',
 	options: [
 		{
 			name: 'user',

@@ -7,6 +7,7 @@ export default new Command({
 	BotPerms: ['AddReactions'],
 	defaultMemberPermissions: ['ManageGuild'],
 	type: ApplicationCommandType.ChatInput,
+	Category: 'Moderator',
 	run: async ({ interaction }) => {
 		// Create an embed message
 		const embed = new EmbedBuilder()
@@ -36,7 +37,7 @@ export default new Command({
 			])
 			.setColor('Green');
 
-			const textChannel = interaction.channel as TextChannel;
+		const textChannel = interaction.channel as TextChannel;
 
 		// Send the embed message
 		const message = await textChannel.send({ embeds: [embed] });

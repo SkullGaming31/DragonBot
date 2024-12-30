@@ -8,8 +8,12 @@ import RouletteModel from '../../Database/Schemas/rouletteDB';
 export default new Command({
 	name: 'roulette',
 	description: 'Play a game of Russian roulette!',
+	UserPerms: ['SendMessages'],
+	BotPerms: ['SendMessages'],
+	defaultMemberPermissions: ['SendMessages'],
+	Category: 'Fun',
 	type: ApplicationCommandType.ChatInput,
-	
+
 	run: async ({ interaction }) => {
 		const { user, guild, channel } = interaction;
 		if (!user) return interaction.reply({ content: 'User not found!', ephemeral: true });
@@ -23,9 +27,9 @@ export default new Command({
 		const Economychannel = guild?.channels.cache.get(settingsDoc.EconChan);
 
 		if (!Economychannel || channel?.id !== settingsDoc.EconChan) {
-			return interaction.reply({ 
-				content: `Please use this command in the designated economy channel: ${channelMention(settingsDoc.EconChan)}`, 
-				ephemeral: true 
+			return interaction.reply({
+				content: `Please use this command in the designated economy channel: ${channelMention(settingsDoc.EconChan)}`,
+				ephemeral: true
 			});
 		}
 

@@ -5,16 +5,17 @@ import { Command } from '../../Structures/Command';
 export default new Command({
 	name: 'ping',
 	nameLocalizations: {
-		'en-US': 'ping'
+		'en-US': 'ping',
 	},
 	description: 'Returns Bot Latency in MilliSeconds',
 	descriptionLocalizations: {
-		'en-US': 'Returns Bot Latency in MilliSeconds!!!!'
+		'en-US': 'Returns Bot Latency in MilliSeconds!'
 	},
 	UserPerms: ['ManageMessages'],
 	BotPerms: ['ManageMessages'],
 	defaultMemberPermissions: ['ManageMessages'],
 	type: ApplicationCommandType.ChatInput,
+	Category: 'Developer',
 
 	run: async ({ interaction, client }) => {
 		const ping = client.ws.ping;
@@ -32,6 +33,6 @@ export default new Command({
 		await mongoose.connection.db?.admin().ping();
 		const mongoLatency = Date.now() - start;
 
-		await interaction.reply({ content: `Bot Uptime: \`${uptimeHours}h ${uptimeMinutes}m ${uptimeSeconds}s\`\nBot Ping: \`${ping}ms\`\nMongoDB Latency: \`${mongoLatency}ms\``, ephemeral: true });
+		await interaction.reply({ content: `Bot Uptime: \`${uptimeHours}h ${uptimeMinutes}m ${uptimeSeconds}s\`\nBot Ping: \`${ping}ms\`\nMongoDB Latency: \`${mongoLatency}ms\`!`, ephemeral: true });
 	}
 });

@@ -14,6 +14,8 @@ export default new Command({
     UserPerms: ['SendMessages'],
     BotPerms: ['SendMessages'],
     defaultMemberPermissions: ['SendMessages'],
+    type: ApplicationCommandType.ChatInput,
+    Category: 'Information',
     options: [
         {
             name: 'status',
@@ -68,10 +70,8 @@ export default new Command({
             ],
         },
     ],
-    type: ApplicationCommandType.ChatInput,
-
     run: async ({ interaction, client }) => {
-      await interaction.deferReply();
+        await interaction.deferReply();
         const subcommand = interaction.options.getSubcommand();
         const gameName = interaction.options.getString('gamename');
         const token = process.env.NITRADO_LONGLIFE_TOKEN as string;
@@ -129,8 +129,8 @@ export default new Command({
                         server.status === 'active'
                             ? 0x00ff00 // Green if online
                             : server.status === 'installing'
-                            ? 0xffff00 // Yellow if installing
-                            : 0xff0000 // Red for other statuses
+                                ? 0xffff00 // Yellow if installing
+                                : 0xff0000 // Red for other statuses
                     )
                     .addFields([
                         { name: 'Address', value: server.details.address, inline: true },

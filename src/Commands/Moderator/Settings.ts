@@ -9,6 +9,7 @@ export default new Command({
 	BotPerms: ['ManageChannels'],
 	defaultMemberPermissions: ['ManageChannels'],
 	type: ApplicationCommandType.ChatInput,
+	Category: 'Moderator',
 	options: [
 		{
 			name: 'admin',
@@ -139,23 +140,24 @@ export default new Command({
 				}
 				await data.save();
 			} else {
-				await settings.findOneAndUpdate({ 
-					GuildID: guild.id }, 
-				{ 
-					rulesChannel: RulesChannel?.id,
-					Welcome: Welcome,
-					WelcomeChannel: Welcomechan?.id,
-					PromotionChannel: NowLive?.id,
-					PunishmentChan: PunishmentChan?.id,
-					AdministratorRole: Administrator?.id,
-					ModeratorRole: Moderator?.id,
-					MemberRole: MemberRole?.id,
-					SuggestChan: SuggestionChan?.id,
-					EconChan: EconChannel?.id,
-					ModerationChannel: ModerationChannel?.id 
-				}, { 
-					new: true, 
-					upsert: true 
+				await settings.findOneAndUpdate({
+					GuildID: guild.id
+				},
+					{
+						rulesChannel: RulesChannel?.id,
+						Welcome: Welcome,
+						WelcomeChannel: Welcomechan?.id,
+						PromotionChannel: NowLive?.id,
+						PunishmentChan: PunishmentChan?.id,
+						AdministratorRole: Administrator?.id,
+						ModeratorRole: Moderator?.id,
+						MemberRole: MemberRole?.id,
+						SuggestChan: SuggestionChan?.id,
+						EconChan: EconChannel?.id,
+						ModerationChannel: ModerationChannel?.id
+					}, {
+					new: true,
+					upsert: true
 				});
 				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
 					console.log('updating document in database');

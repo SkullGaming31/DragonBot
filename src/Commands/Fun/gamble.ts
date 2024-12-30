@@ -7,6 +7,10 @@ export default new Command({
 	name: 'gamble',
 	description: 'Gamble your coins and have a chance to win more',
 	type: ApplicationCommandType.ChatInput,
+	UserPerms: ['SendMessages'],
+	BotPerms: ['SendMessages'],
+	defaultMemberPermissions: ['SendMessages'],
+	Category: 'Fun',
 	options: [
 		{
 			name: 'option',

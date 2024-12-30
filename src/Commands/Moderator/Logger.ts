@@ -9,6 +9,7 @@ export default new Command({
 	BotPerms: ['ManageGuild'],
 	defaultMemberPermissions: ['ManageGuild'],
 	type: ApplicationCommandType.ChatInput,
+	Category: 'Moderator',
 	options: [
 		{
 			name: 'enablelogs',

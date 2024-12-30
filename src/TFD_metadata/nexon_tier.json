@@ -1,0 +1,26 @@
+[
+    {
+        "tier_id": "Tier1",
+        "tier_name": "Normal"
+    },
+    {
+        "tier_id": "Tier2",
+        "tier_name": "Rare"
+    },
+    {
+        "tier_id": "Tier3",
+        "tier_name": "Ultimate"
+    },
+    {
+        "tier_id": "Tier4",
+        "tier_name": "Transcendent"
+    },
+    {
+        "tier_id": "TierAll",
+        "tier_name": "Tier: All"
+    },
+    {
+        "tier_id": "All",
+        "tier_name": "Tier: All"
+    }
+]

@@ -8,6 +8,7 @@ export default new Command({
 	UserPerms: ['ManageMessages'],
 	BotPerms: ['ManageMessages'],
 	type: ApplicationCommandType.ChatInput,
+	Category: 'Moderator',
 	options: [
 		{
 			name: 'user',

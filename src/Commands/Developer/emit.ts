@@ -8,6 +8,7 @@ export default new Command({
 	UserPerms: ['Administrator'],
 	BotPerms: ['ManageGuild'],
 	defaultMemberPermissions: ['Administrator'],
+	Category: 'Developer',
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{

@@ -9,6 +9,7 @@ export default new Command({
 	BotPerms: ['SendMessages'],
 	defaultMemberPermissions: ['SendMessages'],
 	type: ApplicationCommandType.ChatInput,
+	Category: 'Information',
 	run: async ({ interaction }) => {
 		try {
 			const { user, guild } = interaction;

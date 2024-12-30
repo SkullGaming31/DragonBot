@@ -1,0 +1,309 @@
+[
+    {
+        "fellow_id": "107200001",
+        "fellow_name": "Hagios Sheepdog",
+        "fellow_tier_id": "Tier1",
+        "fellow_detail": [
+            {
+                "fellow_level": 1,
+                "search_radius_value": 2000,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.01
+                    }
+                ]
+            },
+            {
+                "fellow_level": 2,
+                "search_radius_value": 2100,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.02
+                    }
+                ]
+            },
+            {
+                "fellow_level": 3,
+                "search_radius_value": 2300,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.03
+                    }
+                ]
+            },
+            {
+                "fellow_level": 4,
+                "search_radius_value": 2400,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.03
+                    }
+                ]
+            },
+            {
+                "fellow_level": 5,
+                "search_radius_value": 2600,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.04
+                    }
+                ]
+            },
+            {
+                "fellow_level": 6,
+                "search_radius_value": 2700,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.05
+                    }
+                ]
+            },
+            {
+                "fellow_level": 7,
+                "search_radius_value": 2800,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.06
+                    }
+                ]
+            },
+            {
+                "fellow_level": 8,
+                "search_radius_value": 3000,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.07
+                    }
+                ]
+            },
+            {
+                "fellow_level": 9,
+                "search_radius_value": 3100,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.08
+                    }
+                ]
+            },
+            {
+                "fellow_level": 10,
+                "search_radius_value": 3200,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.08
+                    }
+                ]
+            },
+            {
+                "fellow_level": 11,
+                "search_radius_value": 3400,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.09
+                    }
+                ]
+            },
+            {
+                "fellow_level": 12,
+                "search_radius_value": 3500,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.1
+                    }
+                ]
+            },
+            {
+                "fellow_level": 13,
+                "search_radius_value": 3700,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.11
+                    }
+                ]
+            },
+            {
+                "fellow_level": 14,
+                "search_radius_value": 3800,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.12
+                    }
+                ]
+            },
+            {
+                "fellow_level": 15,
+                "search_radius_value": 3900,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.13
+                    }
+                ]
+            },
+            {
+                "fellow_level": 16,
+                "search_radius_value": 4100,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.13
+                    }
+                ]
+            },
+            {
+                "fellow_level": 17,
+                "search_radius_value": 4200,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.14
+                    }
+                ]
+            },
+            {
+                "fellow_level": 18,
+                "search_radius_value": 4300,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.15
+                    }
+                ]
+            },
+            {
+                "fellow_level": 19,
+                "search_radius_value": 4500,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.16
+                    }
+                ]
+            },
+            {
+                "fellow_level": 20,
+                "search_radius_value": 4600,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.17
+                    }
+                ]
+            },
+            {
+                "fellow_level": 21,
+                "search_radius_value": 4800,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.18
+                    }
+                ]
+            },
+            {
+                "fellow_level": 22,
+                "search_radius_value": 4900,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.18
+                    }
+                ]
+            },
+            {
+                "fellow_level": 23,
+                "search_radius_value": 5000,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.19
+                    }
+                ]
+            },
+            {
+                "fellow_level": 24,
+                "search_radius_value": 5200,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.2
+                    }
+                ]
+            },
+            {
+                "fellow_level": 25,
+                "search_radius_value": 5300,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.21
+                    }
+                ]
+            },
+            {
+                "fellow_level": 26,
+                "search_radius_value": 5400,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.22
+                    }
+                ]
+            },
+            {
+                "fellow_level": 27,
+                "search_radius_value": 5600,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.23
+                    }
+                ]
+            },
+            {
+                "fellow_level": 28,
+                "search_radius_value": 5700,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.23
+                    }
+                ]
+            },
+            {
+                "fellow_level": 29,
+                "search_radius_value": 5900,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.24
+                    }
+                ]
+            },
+            {
+                "fellow_level": 30,
+                "search_radius_value": 6000,
+                "stat_effect": [
+                    {
+                        "stat_id": "105000176",
+                        "stat_value": 0.25
+                    }
+                ]
+            }
+        ]
+    }
+]

@@ -11,6 +11,7 @@ export default new Command({
 	UserPerms: ['Administrator'],
 	BotPerms: ['ManageMessages'],
 	defaultMemberPermissions: ['Administrator'],
+	Category: 'Developer',
 	type: ApplicationCommandType.ChatInput,
 	run: async ({ interaction }) => {
 		const { user } = interaction;

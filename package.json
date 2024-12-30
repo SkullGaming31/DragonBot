@@ -9,9 +9,6 @@
 	"maintainers": [
 		"SkullGaming31"
 	],
-	"engines": {
-		"node": "^20.16.0"
-	},
 	"repository": {
 		"directory": "public",
 		"type": "git",

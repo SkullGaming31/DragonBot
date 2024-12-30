@@ -9,6 +9,7 @@ export default new Command({
 	BotPerms: ['ManageChannels'],
 	defaultMemberPermissions: ['ManageChannels'],
 	type: ApplicationCommandType.ChatInput,
+	Category: 'Tickets',
 	options: [
 		{
 			name: 'channel',

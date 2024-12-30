@@ -15,6 +15,7 @@ export default new Command({
 	BotPerms: ['ModerateMembers'],
 	defaultMemberPermissions: ['ModerateMembers'],
 	type: ApplicationCommandType.ChatInput,
+	Category: 'Moderator',
 	options: [
 		{
 			name: 'option',
