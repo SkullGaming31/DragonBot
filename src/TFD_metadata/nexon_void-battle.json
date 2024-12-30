@@ -66,5 +66,13 @@
   {
     "void_battle_id": "652000009",
     "void_battle_name": "Gluttony"
+  },
+  {
+    "void_battle_id": "652000010",
+    "void_battle_name": "Death Stalker"
+  },
+  {
+    "void_battle_id": "653000001",
+    "void_battle_name": "Infernal Walker"
   }
 ]

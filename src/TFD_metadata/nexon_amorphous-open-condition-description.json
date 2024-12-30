@@ -1,0 +1,70 @@
+[
+    {
+        "amorphous_open_condition_id": "540000101:Normal",
+        "amorphous_open_condition_name": "[Common] Grave Walker"
+    },
+    {
+        "amorphous_open_condition_id": "540000302:Normal",
+        "amorphous_open_condition_name": "[Common] Stunning Beauty"
+    },
+    {
+        "amorphous_open_condition_id": "540000201:Normal",
+        "amorphous_open_condition_name": "[Common] Executioner"
+    },
+    {
+        "amorphous_open_condition_id": "540000301:Normal",
+        "amorphous_open_condition_name": "[Common] Dead Bride"
+    },
+    {
+        "amorphous_open_condition_id": "540000401:Normal",
+        "amorphous_open_condition_name": "[Common] Devourer"
+    },
+    {
+        "amorphous_open_condition_id": "540000203:Normal",
+        "amorphous_open_condition_name": "[Common] Pyromaniac"
+    },
+    {
+        "amorphous_open_condition_id": "540000102:Normal",
+        "amorphous_open_condition_name": "[Common] Swamp Walker"
+    },
+    {
+        "amorphous_open_condition_id": "540000501:Normal",
+        "amorphous_open_condition_name": "[Common] Hanged Man"
+    },
+    {
+        "amorphous_open_condition_id": "540000201:Hard",
+        "amorphous_open_condition_name": "[Hard] Executioner"
+    },
+    {
+        "amorphous_open_condition_id": "540000301:Hard",
+        "amorphous_open_condition_name": "[Hard] Dead Bride"
+    },
+    {
+        "amorphous_open_condition_id": "540000401:Hard",
+        "amorphous_open_condition_name": "[Hard] Devourer"
+    },
+    {
+        "amorphous_open_condition_id": "540000203:Hard",
+        "amorphous_open_condition_name": "[Hard] Pyromaniac"
+    },
+    {
+        "amorphous_open_condition_id": "540000102:Hard",
+        "amorphous_open_condition_name": "[Hard] Swamp Walker"
+    },
+    {
+        "amorphous_open_condition_id": "540000204:Hard",
+        "amorphous_open_condition_name": "[Hard] Obstructer"
+    },
+    {
+        "amorphous_open_condition_id": "540000103:Hard",
+        "amorphous_open_condition_name": "[Hard] Frost Walker"
+    },
+    {
+        "amorphous_open_condition_id": "540000601:Hard",
+        "amorphous_open_condition_name": "[Hard] Molten Fortress"
+    },
+    {
+        "amorphous_open_condition_id": "540000402:Hard",
+        "amorphous_open_condition_name": "[Hard] Gluttony"
+    }
+]

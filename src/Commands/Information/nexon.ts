@@ -16,7 +16,7 @@ import path from 'path';
 const moduleDataPath = path.join(__dirname, '../../TFD_metadata', 'nexon_module.json');
 const moduleData = JSON.parse(fs.readFileSync(moduleDataPath, 'utf-8'));
 
-const descendantDataPath = path.join(__dirname, '../../TFD_metadata', 'nexon_decendents.json');
+const descendantDataPath = path.join(__dirname, '../../TFD_metadata', 'nexon_descendant.json');
 const descendantData = JSON.parse(fs.readFileSync(descendantDataPath, 'utf-8'));
 
 const weaponDataPath = path.join(__dirname, '../../TFD_metadata', 'nexon_weapon.json');
@@ -141,6 +141,7 @@ export default new Command({
 	BotPerms: ['SendMessages'],
 	defaultMemberPermissions: ['SendMessages'],
 	type: ApplicationCommandType.ChatInput,
+	Category: 'Information',
 	options: [
 		{
 			name: 'get-ouid',
@@ -312,7 +313,10 @@ export default new Command({
 						{ value: '101000016', name: 'enzo' },
 						{ value: '101000017', name: 'yujin' },
 						{ value: '101000018', name: 'luna' },
-						{ value: '101000008', name: 'freyna' }
+						{ value: '101000008', name: 'freyna' },
+						{ value: '101000023', name: 'ultimate freyna' },
+						{ value: '101000025', name: 'ultimate sharen' },
+						{ value: '101000024', name: 'Keelan' }
 					]
 				},
 				{
@@ -464,7 +468,6 @@ export default new Command({
 					});
 
 					const {
-						ouid,
 						user_name,
 						descendant_id,
 						descendant_slot_id,
@@ -481,7 +484,6 @@ export default new Command({
 						.setImage(descendantImageUrl)
 						.setColor(0x1a73e8)
 						.addFields(
-							{ name: 'OUID', value: ouid, inline: true },
 							{ name: 'Descendant Name', value: getDescendantNameById(descendant_id), inline: true },
 							{ name: 'Descendant Slot ID', value: descendant_slot_id || 'None', inline: true },
 							{ name: 'Descendant Level', value: descendant_level.toString(), inline: true },
@@ -494,12 +496,12 @@ export default new Command({
 									name: `Module ${mod.module_slot_id}`,
 									value: `Name: ${getModuleNameById(mod.module_id)}\nEnchantment Level: ${mod.module_enchant_level}`,
 									inline: true,
-								}))
-								: { name: 'Modules', value: 'No modules equipped', inline: true }
+								})).sort((a: { name: string; }, b: { name: any; }) => a.name.localeCompare(b.name))
+								: { name: 'Modules', value: 'No modules equipped', inline: false }
 						)
 						.setTimestamp();
 
-					await interaction.reply({ embeds: [descendantEmbed], ephemeral: true });
+					await interaction.reply({ embeds: [descendantEmbed] });
 				} catch (error) {
 					console.error('Error fetching user descendant data:', error);
 					await interaction.reply({

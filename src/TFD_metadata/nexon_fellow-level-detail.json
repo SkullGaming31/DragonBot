@@ -1,0 +1,122 @@
+[
+    {
+        "fellow_level": 1,
+        "exp_per_level": 1000
+    },
+    {
+        "fellow_level": 2,
+        "exp_per_level": 1000
+    },
+    {
+        "fellow_level": 3,
+        "exp_per_level": 1000
+    },
+    {
+        "fellow_level": 4,
+        "exp_per_level": 1000
+    },
+    {
+        "fellow_level": 5,
+        "exp_per_level": 1200
+    },
+    {
+        "fellow_level": 6,
+        "exp_per_level": 1200
+    },
+    {
+        "fellow_level": 7,
+        "exp_per_level": 1200
+    },
+    {
+        "fellow_level": 8,
+        "exp_per_level": 1200
+    },
+    {
+        "fellow_level": 9,
+        "exp_per_level": 1200
+    },
+    {
+        "fellow_level": 10,
+        "exp_per_level": 1500
+    },
+    {
+        "fellow_level": 11,
+        "exp_per_level": 1500
+    },
+    {
+        "fellow_level": 12,
+        "exp_per_level": 1500
+    },
+    {
+        "fellow_level": 13,
+        "exp_per_level": 1500
+    },
+    {
+        "fellow_level": 14,
+        "exp_per_level": 1500
+    },
+    {
+        "fellow_level": 15,
+        "exp_per_level": 1800
+    },
+    {
+        "fellow_level": 16,
+        "exp_per_level": 1800
+    },
+    {
+        "fellow_level": 17,
+        "exp_per_level": 1800
+    },
+    {
+        "fellow_level": 18,
+        "exp_per_level": 1800
+    },
+    {
+        "fellow_level": 19,
+        "exp_per_level": 1800
+    },
+    {
+        "fellow_level": 20,
+        "exp_per_level": 2200
+    },
+    {
+        "fellow_level": 21,
+        "exp_per_level": 2200
+    },
+    {
+        "fellow_level": 22,
+        "exp_per_level": 2200
+    },
+    {
+        "fellow_level": 23,
+        "exp_per_level": 2200
+    },
+    {
+        "fellow_level": 24,
+        "exp_per_level": 2200
+    },
+    {
+        "fellow_level": 25,
+        "exp_per_level": 2500
+    },
+    {
+        "fellow_level": 26,
+        "exp_per_level": 2500
+    },
+    {
+        "fellow_level": 27,
+        "exp_per_level": 2500
+    },
+    {
+        "fellow_level": 28,
+        "exp_per_level": 2500
+    },
+    {
+        "fellow_level": 29,
+        "exp_per_level": 2500
+    },
+    {
+        "fellow_level": 30,
+        "exp_per_level": 0
+    }
+]

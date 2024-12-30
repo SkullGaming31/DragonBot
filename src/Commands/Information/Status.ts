@@ -10,7 +10,7 @@ export default new Command({
 	BotPerms: ['ManageMessages'],
 	defaultMemberPermissions: ['ManageMessages'],
 	type: ApplicationCommandType.ChatInput,
-
+	Category: 'Information',
 	run: async ({ interaction, client }) => {
 		if (!interaction.inGuild()) return;
 		await client.user?.fetch();

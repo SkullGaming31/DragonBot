@@ -9,6 +9,7 @@ export default new Command({
     UserPerms: ['SendMessages'],
     BotPerms: ['SendMessages'],
     defaultMemberPermissions: ['SendMessages'],
+    Category: 'Fun',
     type: ApplicationCommandType.ChatInput,
     options: [
         {

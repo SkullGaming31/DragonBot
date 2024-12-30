@@ -8,6 +8,8 @@ export default new Command({
 	description: 'Show the Leaderboards for the most amount of balance',
 	UserPerms: ['SendMessages'],
 	BotPerms: ['SendMessages'],
+	defaultMemberPermissions: ['SendMessages'],
+	Category: 'Fun',
 	options: [
 		{
 			name: 'limit',
@@ -16,7 +18,6 @@ export default new Command({
 			required: true
 		}
 	],
-	defaultMemberPermissions: ['SendMessages'],
 	type: ApplicationCommandType.ChatInput,
 	run: async ({ interaction }) => {
 		try {

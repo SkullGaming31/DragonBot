@@ -75,6 +75,7 @@ export default new Command({
 	UserPerms: ['ManageGuild'],
 	BotPerms: ['ManageMessages'],
 	defaultMemberPermissions: ['ManageGuild'],
+	Category: 'Developer',
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{

@@ -11,6 +11,7 @@ export default new Command({
 	BotPerms: ['ManageMessages'],
 	defaultMemberPermissions: ['ManageMessages'],
 	type: ApplicationCommandType.ChatInput,
+	Category: 'Tickets',
 	options: [
 		{
 			name: 'action',

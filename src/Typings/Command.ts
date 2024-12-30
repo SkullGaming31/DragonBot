@@ -20,5 +20,6 @@ export type CommandType = {
 	defaultMemberPermissions?: PermissionResolvable[];
 	Development?: boolean;
 	Cooldown?: number;
+	Category: string;
 	run: RunFunction;
 } & ChatInputApplicationCommandData

@@ -9,8 +9,9 @@ export default new Command({// TODO: Check to see if a econ channel has been set
 	UserPerms: ['SendMessages'],
 	BotPerms: ['SendMessages'],
 	defaultMemberPermissions: ['SendMessages'],
-	Cooldown: 30000,// set for 24 hours
+	Cooldown: 30000,
 	type: ApplicationCommandType.ChatInput,
+	Category: 'Fun',
 	run: async ({ interaction }) => {
 		const { guild } = interaction;
 		const user = interaction.user;

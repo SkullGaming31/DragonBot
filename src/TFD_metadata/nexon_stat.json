@@ -245,7 +245,7 @@
   },
   {
     "stat_id": "105000066",
-    "stat_name": "Firearm Critical Hit Resistance"
+    "stat_name": "Critical Hit Resistance"
   },
   {
     "stat_id": "105000069",
@@ -726,5 +726,49 @@
   {
     "stat_id": "105000220",
     "stat_name": "Projectile Piercing Defense"
+  },
+  {
+    "stat_id": "105000109:101000006",
+    "stat_name": "Max Electricity"
+  },
+  {
+    "stat_id": "105000110:101000009",
+    "stat_name": "Current Power of Life"
+  },
+  {
+    "stat_id": "105000109:101000009",
+    "stat_name": "Max Power of Life"
+  },
+  {
+    "stat_id": "105000110:101000006",
+    "stat_name": "Current Electricity"
+  },
+  {
+    "stat_id": "105000110:101000018",
+    "stat_name": "Current Inspiration Gauge"
+  },
+  {
+    "stat_id": "105000109:101000014",
+    "stat_name": "Max Magnetic Force"
+  },
+  {
+    "stat_id": "105000109:101000018",
+    "stat_name": "Max Inspiration Gauge"
+  },
+  {
+    "stat_id": "105000109:101000002",
+    "stat_name": "Max Void Energy"
+  },
+  {
+    "stat_id": "105000110:101000002",
+    "stat_name": "Current Void Energy"
+  },
+  {
+    "stat_id": "105000110:101000014",
+    "stat_name": "Current Magnetic Force"
+  },
+  {
+    "stat_id": "105000226",
+    "stat_name": "Superior Type Damage Modifier"
   }
 ]

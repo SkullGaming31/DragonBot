@@ -5,12 +5,12 @@ import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
 
 interface Participant {
-    userId: string; // User ID for future reference
-    username: string; // Username for display purposes
+	userId: string; // User ID for future reference
+	username: string; // Username for display purposes
 }
 
 type LootValue = {
-    [itemName: string]: number | Gems | Antique | Artwork | Cash;
+	[itemName: string]: number | Gems | Antique | Artwork | Cash;
 };
 
 const lootValues: LootValue = {
@@ -59,52 +59,52 @@ const lootValues: LootValue = {
 };
 
 interface Cash {
-    Bill1000: number;
-    Bill500: number;
-    Bill5000: number;
-    Bill10000: number;
-    Bill100000: number;
+	Bill1000: number;
+	Bill500: number;
+	Bill5000: number;
+	Bill10000: number;
+	Bill100000: number;
 }
 
 interface Artwork {
-    Paintings: number;
-    Sculptures: number;
-    Prints: number;
-    Photography: number;
-    Tapestry: number;
-    ArtisticInstallations: number;
-    DecorativeArtObjects: number;
+	Paintings: number;
+	Sculptures: number;
+	Prints: number;
+	Photography: number;
+	Tapestry: number;
+	ArtisticInstallations: number;
+	DecorativeArtObjects: number;
 }
 
 interface Antique {
-    RareCoins: number;
-    Currency: number;
-    Documents: number;
-    Artifacts: number;
-    Jewelry: number;
-    Timepieces: number;
-    Porcelain: number;
-    Ceramics: number;
-    Collectibles: number;
+	RareCoins: number;
+	Currency: number;
+	Documents: number;
+	Artifacts: number;
+	Jewelry: number;
+	Timepieces: number;
+	Porcelain: number;
+	Ceramics: number;
+	Collectibles: number;
 }
 
 interface Gems {
-    diamond: number;
-    ruby: number;
-    sapphire: number;
-    Emerald: number;
-    Aquamarine: number;
-    Topaz: number;
-    Opal: number;
-    Amethyst: number;
-    Garnet: number;
-    Pearl: number;
+	diamond: number;
+	ruby: number;
+	sapphire: number;
+	Emerald: number;
+	Aquamarine: number;
+	Topaz: number;
+	Opal: number;
+	Amethyst: number;
+	Garnet: number;
+	Pearl: number;
 }
 
 interface LootResult {
-    totalAmount: number;
-    items: string[];
-    message: string;
+	totalAmount: number;
+	items: string[];
+	message: string;
 }
 
 export default new Command({
@@ -113,6 +113,7 @@ export default new Command({
 	UserPerms: ['SendMessages'],
 	BotPerms: ['SendMessages'],
 	defaultMemberPermissions: ['SendMessages'],
+	Category: 'Fun',
 	type: ApplicationCommandType.ChatInput,
 	options: [
 		{
@@ -175,11 +176,11 @@ export default new Command({
 					username: user.username
 				};
 				participants.set(user.id, participant);
-        
+
 				// Calculate the odds of winning based on the number of participants
 				const successChance = baseChance + (participants.size * participantBonus);
 				const oddsOfWinning = Math.round(successChance * 100);
-        
+
 				const channel = reaction.message.channel as TextChannel;
 				if (channel) {
 					const participantJoinMessage = await channel.send({ content: `${userMention(user.id)} has joined the heist! Current odds of winning: ${oddsOfWinning}%` });
@@ -192,15 +193,15 @@ export default new Command({
 				if (!user.bot && reaction.emoji.name === '✅') {
 					if (participants.has(userId)) {
 						participants.delete(userId);
-        
+
 						const successChance = baseChance + (participants.size * participantBonus);
 						const oddsOfWinning = Math.round(successChance * 100);
-        
+
 						const channel = reaction.message.channel as TextChannel;
 						if (channel) {
 							await channel.send(`${userMention(userId)} has left the heist. Current odds of winning: ${oddsOfWinning}%`);
 						}
-        
+
 						if (participants.size === 0) {
 							channel.send('Not enough participants joined. Heist cancelled!');
 							heistInProgress = false;
@@ -289,7 +290,7 @@ export default new Command({
 					}
 				} else {
 					await interaction.editReply({ content: '**Heist completed!** The heist has failed, Everyone Loses' });
-				}          
+				}
 			});
 		} catch (error) {
 			console.error(error);

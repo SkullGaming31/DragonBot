@@ -11,6 +11,7 @@ export default new Command({
 	BotPerms: ['SendMessages'],
 	defaultMemberPermissions: ['SendMessages'],
 	Cooldown: 60000,
+	Category: 'Fun',
 	options: [
 		{
 			name: 'amount',
@@ -42,7 +43,7 @@ export default new Command({
 				}
 				economyChannel = guild?.channels.cache.get(settings.EconChan);
 			} else {
-			// No economy channel set, use the command channel
+				// No economy channel set, use the command channel
 				economyChannel = interaction.channel;
 			}
 			if (economyChannel) {

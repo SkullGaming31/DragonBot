@@ -11,6 +11,7 @@ export default new Command({
 	BotPerms: ['SendMessages'],
 	defaultMemberPermissions: ['SendMessages'],
 	type: ApplicationCommandType.ChatInput,
+	Category: 'Information',
 	options: [
 		{
 			name: 'message',
@@ -51,7 +52,7 @@ export default new Command({
 			// Set user's status if status is not null
 			if (status !== null) {
 				const userMember = await guild?.members.fetch({ withPresences: true, user: user.id });
-				if (userMember){
+				if (userMember) {
 					let presenceStatus: PresenceStatusData;
 					switch (status) {
 						case 'online':
@@ -77,7 +78,7 @@ export default new Command({
 					}
 				}
 			}
-			await interaction.reply({ content: 'AFK message set! I will reply with your message if you are tagged.', ephemeral: true });	
+			await interaction.reply({ content: 'AFK message set! I will reply with your message if you are tagged.', ephemeral: true });
 		} catch (error) {
 			console.error(error);
 		}
