@@ -1,4 +1,4 @@
-import { BaseInteraction, ChannelType, Colors, EmbedBuilder, GuildMember } from 'discord.js';
+import { BaseInteraction, ChannelType, Colors, EmbedBuilder, GuildMember, MessageFlags } from 'discord.js';
 import { Event } from '../../Structures/Event';
 // import settings from '../../Structures/Schemas/settingsDB';
 import DB, { Ticket } from '../../Database/Schemas/ticketDB';
@@ -26,18 +26,18 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 	// const moderatorRoleId = '708768425388015728';// mainServer
 
 	const isAdminOrModerator = member.permissions.has(adminRoleId) || member.permissions.has(moderatorRoleId);
-	if (!isAdminOrModerator) { return interaction.reply({ content: `you must have the <@&${adminRoleId}> or <@&${moderatorRoleId}> role to interact with these buttons`, ephemeral: true }); }
+	if (!isAdminOrModerator) { return interaction.reply({ content: `you must have the <@&${adminRoleId}> or <@&${moderatorRoleId}> role to interact with these buttons`, flags: MessageFlags.Ephemeral }); }
 
 	const embed = new EmbedBuilder().setColor(Colors.Blue);
 
 	DB.findOne({ ChannelID: channel?.id }, async (err: Error, docs: any) => {
 		if (err) throw err;
-		if (!docs) return interaction.reply({ content: 'no data was found related to this ticket, please delete it manually', ephemeral: true });
+		if (!docs) return interaction.reply({ content: 'no data was found related to this ticket, please delete it manually', flags: MessageFlags.Ephemeral });
 
 		switch (customId) {
 			case 'lock':
 				if (docs.Locked == true)
-					return interaction.reply({ content: 'this ticket is already Locked', ephemeral: true });
+					return interaction.reply({ content: 'this ticket is already Locked', flags: MessageFlags.Ephemeral });
 				await DB.updateOne({ ChannelID: channel?.id }, { Locked: true });
 				embed.setDescription('🔒 | this channel is now locked Pending Review');
 
@@ -53,7 +53,7 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 				break;
 			case 'unlock':
 				if (docs.Locked == false)
-					return interaction.reply({ content: 'this ticket is already unlocked', ephemeral: true });
+					return interaction.reply({ content: 'this ticket is already unlocked', flags: MessageFlags.Ephemeral });
 				await DB.updateOne({ ChannelID: channel?.id }, { Locked: false });
 				embed.setDescription('🔓 | this channel has been unlocked');
 				if (channel?.type === ChannelType.GuildText)
@@ -68,7 +68,7 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 				break;
 			case 'close':
 				if (docs.Closed)
-					return interaction.reply({ content: 'Ticket is already closed, please wait for it to be automatically deleted', ephemeral: true });
+					return interaction.reply({ content: 'Ticket is already closed, please wait for it to be automatically deleted', flags: MessageFlags.Ephemeral });
 				await DB.updateOne({ ChannelID: channel?.id }, { Closed: true });
 				// const Message = await guild.channels.cache.get(TicketSetup.Transcripts).send({ embeds: [embed.setTitle(`Transcript Type: ${docs.Type}\nID: ${docs.TicketID}`)], files: [attachments] });
 				await interaction.reply({ content: 'The channel will deleted in 10 seconds.', /* embeds: [embed.setDescription(`the transcript is now saved [TRANSCRIPT](${Message.url})`),], */ });
@@ -79,7 +79,7 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 				await DB.deleteOne({ ChannelID: channel?.id });
 				break;
 			case 'claim':
-				if (docs.Claimed == true) return interaction.reply({ content: `this ticket has already been claimed by <@${docs.ClaimedBy}>`, ephemeral: true });
+				if (docs.Claimed == true) return interaction.reply({ content: `this ticket has already been claimed by <@${docs.ClaimedBy}>`, flags: MessageFlags.Ephemeral });
 				await DB.updateOne({ ChannelID: channel?.id }, { Claimed: true, ClaimedBy: member.id });
 
 				embed.setDescription(`🛄 | this ticket is now claimed by ${member}`);

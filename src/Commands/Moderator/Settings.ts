@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, EmbedBuilder, channelMention, roleMention } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, EmbedBuilder, MessageFlags, channelMention, roleMention } from 'discord.js';
 import settings from '../../Database/Schemas/settingsDB';
 import { Command } from '../../Structures/Command';
 
@@ -117,7 +117,7 @@ export default new Command({
 				data = await settings.findOne({ GuildID: guild.id });
 			} catch (err) {
 				console.error('Error fetching data:', err);
-				return interaction.reply({ content: 'An error occurred.', ephemeral: true });
+				return interaction.reply({ content: 'An error occurred.', flags: MessageFlags.Ephemeral });
 			}
 
 			if (!data) {
@@ -219,7 +219,7 @@ export default new Command({
 					}
 				)
 				.setTimestamp();
-			await interaction.reply({ embeds: [embed], ephemeral: true });
+			await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 		} catch (error) {
 			console.error(error);
 		}

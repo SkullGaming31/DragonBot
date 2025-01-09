@@ -1,4 +1,4 @@
-import { ApplicationCommandType } from 'discord.js';
+import { ApplicationCommandType, MessageFlags } from 'discord.js';
 import mongoose from 'mongoose';
 import { Command } from '../../Structures/Command';
 
@@ -21,7 +21,7 @@ export default new Command({
 		const ping = client.ws.ping;
 		const uptime = process.uptime();
 		if (uptime < 42) {
-			await interaction.reply({ content: 'The bot has not been running for at least 42 seconds. Please wait for it to fully start before using this command.', ephemeral: true });
+			await interaction.reply({ content: 'The bot has not been running for at least 42 seconds. Please wait for it to fully start before using this command.', flags: MessageFlags.Ephemeral });
 			return; // Exit the command function
 		}
 		const uptimeHours = Math.floor(uptime / 3600);
@@ -33,6 +33,6 @@ export default new Command({
 		await mongoose.connection.db?.admin().ping();
 		const mongoLatency = Date.now() - start;
 
-		await interaction.reply({ content: `Bot Uptime: \`${uptimeHours}h ${uptimeMinutes}m ${uptimeSeconds}s\`\nBot Ping: \`${ping}ms\`\nMongoDB Latency: \`${mongoLatency}ms\`!`, ephemeral: true });
+		await interaction.reply({ content: `Bot Uptime: \`${uptimeHours}h ${uptimeMinutes}m ${uptimeSeconds}s\`\nBot Ping: \`${ping}ms\`\nMongoDB Latency: \`${mongoLatency}ms\`!`, flags: MessageFlags.Ephemeral });
 	}
 });

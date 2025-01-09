@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, AttachmentBuilder, channelMention, userMention } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, AttachmentBuilder, channelMention, MessageFlags, userMention } from 'discord.js';
 import { randomInt } from 'node:crypto';
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { IUser, UserModel } from '../../Database/Schemas/userModel';
@@ -30,9 +30,9 @@ export default new Command({
 
 
 			// Check if the dig amount is valid
-			if (!digAmount || digAmount <= 0) return interaction.reply({ content: 'Invalid bet amount, Usage:', ephemeral: true });
+			if (!digAmount || digAmount <= 0) return interaction.reply({ content: 'Invalid bet amount, Usage:', flags: MessageFlags.Ephemeral });
 
-			if (digAmount < 100 || digAmount > 5000) return interaction.reply({ content: 'Invalid bet amount. Minimum bet is 100 gold and maximum is 5000 gold.', ephemeral: true, });
+			if (digAmount < 100 || digAmount > 5000) return interaction.reply({ content: 'Invalid bet amount. Minimum bet is 100 gold and maximum is 5000 gold.', flags: MessageFlags.Ephemeral, });
 			// Check settings for economy channel
 			const settings = await SettingsModel.findOne({ GuildID: guild?.id });
 
@@ -48,14 +48,14 @@ export default new Command({
 			}
 			if (economyChannel) {
 				if (channel?.id !== economyChannel?.id) {
-					return interaction.reply({ content: `${userMention(user.id)}, You can only use this command in the economy spam channel ${channelMention(economyChannel.id)}`, ephemeral: true });
+					return interaction.reply({ content: `${userMention(user.id)}, You can only use this command in the economy spam channel ${channelMention(economyChannel.id)}`, flags: MessageFlags.Ephemeral });
 				}
 			}
 
 			// Check if the user has enough balance
 			const userDoc = await UserModel.findOne<IUser>({ guildID: guild?.id, id: user.id });
 			if (userDoc?.balance === undefined) return;
-			if (!userDoc || userDoc.balance < digAmount) { return interaction.reply({ content: 'You don\'t have enough balance to dig.', ephemeral: true }); }
+			if (!userDoc || userDoc.balance < digAmount) { return interaction.reply({ content: 'You don\'t have enough balance to dig.', flags: MessageFlags.Ephemeral }); }
 			// Deduct the dig amount from the user's balance
 			// await UserModel.updateOne({ id: user.id, balance: { $gte: digAmount } }, { $inc: { balance: -digAmount } });
 

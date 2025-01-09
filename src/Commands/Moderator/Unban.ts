@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, Colors, ComponentType, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, Colors, ComponentType, EmbedBuilder, MessageFlags } from 'discord.js';
 import { Command } from '../../Structures/Command';
 
 export default new Command({
@@ -20,7 +20,7 @@ export default new Command({
 	run: async ({ interaction }) => {
 		if (!interaction.inCachedGuild()) return;
 
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 		const { options, user, guild } = interaction;
 
 		const id = options.getString('user-id');

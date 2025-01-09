@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, MessageFlags } from 'discord.js';
 import { Command } from '../../Structures/Command';
 import { ExtendedClient } from '../../Structures/Client';
 
@@ -24,7 +24,7 @@ export default new Command({
         const command = (interaction.client as ExtendedClient).commands.get(commandName);
 
         if (!command) {
-            await interaction.reply({ content: `There is no command with name \`${commandName}\`!`, ephemeral: true });
+            await interaction.reply({ content: `There is no command with name \`${commandName}\`!`, flags: MessageFlags.Ephemeral });
         }
 
         try {
@@ -32,13 +32,13 @@ export default new Command({
             const newCommand = require(`../../Commands/${command?.Category}/${commandName}.ts`);
             console.log('New Command: ', newCommand.default);
             (interaction.client as ExtendedClient).commands.set(commandName, newCommand.default);
-            interaction.reply({ content: `Command \`${newCommand.default.name}\` was reloaded!`, ephemeral: true });
+            interaction.reply({ content: `Command \`${newCommand.default.name}\` was reloaded!`, flags: MessageFlags.Ephemeral });
         } catch (error) {
             if (error instanceof Error) {
                 await interaction.reply(`There was an error while reloading a command \`${command?.name}\``);
                 console.error(error);
             }
         }
-        // await interaction.reply({ content: `Command is currently under development`, ephemeral: true });
+        // await interaction.reply({ content: `Command is currently under development`, flags: MessageFlags.Ephemeral });
     }
 });

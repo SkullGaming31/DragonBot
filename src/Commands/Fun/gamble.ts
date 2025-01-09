@@ -1,5 +1,5 @@
 /* eslint-disable no-case-declarations */
-import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, MessageFlags } from 'discord.js';
 import { IUser, UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
 
@@ -56,7 +56,7 @@ export default new Command({
 					try {
 						const currentBalance = await UserModel.findOne({ guildID: guild.id, id: user.id });
 						if (!currentBalance || currentBalance.balance === undefined) return;
-						if (currentBalance.balance === 0) return interaction.reply({ content: 'You do not have any gold to gamble away', ephemeral: true });
+						if (currentBalance.balance === 0) return interaction.reply({ content: 'You do not have any gold to gamble away', flags: MessageFlags.Ephemeral });
 
 						const winProbability = member?.roles.cache.has('Twitch Subscriber') ?? false ? 0.25 : 0.2;
 						const isWin = Math.random() <= winProbability;
@@ -76,7 +76,7 @@ export default new Command({
 					try {
 						const currentBalance = await UserModel.findOne({ guildID: guild.id, id: user.id });
 						if (!currentBalance || currentBalance.balance === undefined) return;
-						if (currentBalance.balance === 0) return interaction.reply({ content: 'You do not have any gold to gamble away', ephemeral: true });
+						if (currentBalance.balance === 0) return interaction.reply({ content: 'You do not have any gold to gamble away', flags: MessageFlags.Ephemeral });
 
 						const percentage = Amount as number; // Assuming Amount is already validated as a number representing the percentage
 						if (percentage <= 0 || percentage > 100) return interaction.reply({ content: 'Please enter a valid percentage between 1 and 100.' });
@@ -98,7 +98,7 @@ export default new Command({
 					break;
 				case 'fixed number'://DONE !gamble [Amount] ex !gamble 500coins from your balance
 					const fixedAmount = Amount as number; // Assuming Amount is already validated as a number
-					if (userModel.balance < fixedAmount) return interaction.reply({ content: 'You can not cover that bet with your current Balance, please use ``/bal`` and try again', ephemeral: true });
+					if (userModel.balance < fixedAmount) return interaction.reply({ content: 'You can not cover that bet with your current Balance, please use ``/bal`` and try again', flags: MessageFlags.Ephemeral });
 
 					if (fixedAmount <= 0) await interaction.reply({ content: 'Please enter a positive amount to gamble.' });
 

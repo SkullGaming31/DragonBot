@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageFlags } from 'discord.js';
 import DB from '../../Database/Schemas/SuggestDB';
 import { Command } from '../../Structures/Command';
 import SettingsModel from '../../Database/Schemas/settingsDB';
@@ -70,8 +70,8 @@ export default new Command({
 		const featureChannel = data.SuggestChan || interaction.channel?.id;
 		if (!featureChannel) return;
 		const suggestionChannel = guild?.channels.cache.get(featureChannel);
-		if (channel?.id !== '1142639289264513115') return interaction.reply({ content: `❌ | you may only use this command in the suggestion channel ${suggestionChannel}`, ephemeral: true });
-		// if (guild?.id !== '1068285177891131422') return interaction.reply({ content: '❌ | you may only use this command in the Discord Bots Main Server', ephemeral: true });
+		if (channel?.id !== '1142639289264513115') return interaction.reply({ content: `❌ | you may only use this command in the suggestion channel ${suggestionChannel}`, flags: MessageFlags.Ephemeral });
+		// if (guild?.id !== '1068285177891131422') return interaction.reply({ content: '❌ | you may only use this command in the Discord Bots Main Server', flags: MessageFlags.Ephemeral });
 
 		try {
 			const M = await interaction.reply({ embeds: [Response], components: [Buttons], fetchReply: true });

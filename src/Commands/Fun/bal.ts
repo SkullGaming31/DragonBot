@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder, channelMention, userMention } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder, MessageFlags, channelMention, userMention } from 'discord.js';
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
@@ -33,7 +33,7 @@ export default new Command({
             const isOwner = commandUser?.id === guild?.ownerId;
 
             const settingsDoc = await SettingsModel.findOne({ GuildID: guild?.id });
-            if (!settingsDoc) return interaction.reply({ content: 'Unable to retrieve server settings. Please run the `/settings` command.', ephemeral: true });
+            if (!settingsDoc) return interaction.reply({ content: 'Unable to retrieve server settings. Please run the `/settings` command.', flags: MessageFlags.Ephemeral });
 
             let economyChannel;
             if (settingsDoc.EconChan) {
@@ -44,13 +44,13 @@ export default new Command({
             }
 
             if (economyChannel && economyChannel.id !== channel?.id) {
-                return interaction.reply({ content: `${userMention(user.id)}, You can only use this command in the economy channel ${channelMention(economyChannel.id)}`, ephemeral: true });
+                return interaction.reply({ content: `${userMention(user.id)}, You can only use this command in the economy channel ${channelMention(economyChannel.id)}`, flags: MessageFlags.Ephemeral });
             }
 
             // Check if the user is in the guild to access their roles
             if (targetUser && !guild) {
                 console.log('Guild is missing'); // Debug log
-                return interaction.reply({ content: 'This command can only be used in a guild.', ephemeral: true });
+                return interaction.reply({ content: 'This command can only be used in a guild.', flags: MessageFlags.Ephemeral });
             }
 
             const adminRoleId = settingsDoc.AdministratorRole as string;
@@ -60,7 +60,7 @@ export default new Command({
             const hasPermission = isOwner || (commandUser?.roles.cache.has(adminRoleId) || commandUser?.roles.cache.has(modRoleId));
 
             if (targetUser && !hasPermission) {
-                return interaction.reply({ content: 'You don\'t have permission to check other users\' balances.', ephemeral: true });
+                return interaction.reply({ content: 'You don\'t have permission to check other users\' balances.', flags: MessageFlags.Ephemeral });
             }
 
             // Find the user in the database (target user or the original user)
@@ -69,7 +69,7 @@ export default new Command({
 
             if (!userDoc) {
                 const message = `${targetUser ? userMention(targetUser.id) : 'You'} don't have an entry in the database yet. Use the \`/begin\` command to register!`;
-                return interaction.reply({ content: message, ephemeral: true });
+                return interaction.reply({ content: message, flags: MessageFlags.Ephemeral });
             }
 
             const targetUsername = targetUser ? targetUser.username : user.username;
@@ -111,7 +111,7 @@ export default new Command({
             await interaction.reply({ embeds: [embed] });
         } catch (error) {
             console.error('Error fetching user balance:', error);
-            await interaction.reply({ content: 'Oops! Something went wrong while checking the balance. Please try again later.', ephemeral: true });
+            await interaction.reply({ content: 'Oops! Something went wrong while checking the balance. Please try again later.', flags: MessageFlags.Ephemeral });
         }
     },
 });

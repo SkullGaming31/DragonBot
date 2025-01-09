@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, ChannelType, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, ChannelType, EmbedBuilder, MessageFlags } from 'discord.js';
 import ticket from '../../Database/Schemas/ticketSetupDB';
 import { Command } from '../../Structures/Command';
 
@@ -166,7 +166,7 @@ export default new Command({
 			if (ticketChannel?.type === ChannelType.GuildText) await ticketChannel.send({ embeds: [supportEmbed], components: [Buttons] });
 			if (reportChannel?.type === ChannelType.GuildText) await reportChannel.send({ embeds: [reportEmbed], components: [memberButton] });
 
-			await interaction.reply({ content: 'done', ephemeral: true });
+			await interaction.reply({ content: 'done', flags: MessageFlags.Ephemeral });
 		} catch (error) {
 			const errEmbed = new EmbedBuilder()
 				.setColor('Red')
@@ -176,7 +176,7 @@ export default new Command({
 			3. Make sure your button names do not exceed 200 characters.
 			4. Make sure your button emojis are actually emojis, not ids.`);
 			console.error(error);
-			await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+			await interaction.reply({ embeds: [errEmbed], flags: MessageFlags.Ephemeral });
 		}
 	}
 });

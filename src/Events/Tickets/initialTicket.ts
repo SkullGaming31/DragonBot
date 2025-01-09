@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, EmbedBuilder, MessageFlags } from 'discord.js';
 import DB from '../../Database/Schemas/ticketDB';
 import TicketSetup from '../../Database/Schemas/ticketSetupDB';
 import { Event } from '../../Structures/Event';
@@ -81,7 +81,7 @@ export default new Event('interactionCreate', async (interaction) => {
 						m.delete().catch((err: Error) => { console.error(err); });
 					}, 5000); // 1000ms = 1 second
 				}).catch((err: Error) => { console.error(err); });
-				await interaction.reply({ content: `${member} your ticket has been created: ${channel}`, ephemeral: true, });
+				await interaction.reply({ content: `${member} your ticket has been created: ${channel}`, flags: MessageFlags.Ephemeral, });
 			});
 	} catch (error) {
 		console.error(error);

@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, EmbedBuilder, MessageFlags } from 'discord.js';
 import { Command } from '../../Structures/Command';
 
 export default new Command({
@@ -41,9 +41,9 @@ export default new Command({
 			if (contactChannel?.type === ChannelType.GuildText) {
 				await interaction.reply({ embeds: [contactEmbed] });
 			}
-			await interaction.reply({ content: `${user.globalName}, your request has been submited and someone will get back to you as soon as possible.`, ephemeral: true });
+			await interaction.reply({ content: `${user.globalName}, your request has been submited and someone will get back to you as soon as possible.`, flags: MessageFlags.Ephemeral });
 		} else {
-			await interaction.reply({ embeds: [constructionEmbed], ephemeral: true });
+			await interaction.reply({ embeds: [constructionEmbed], flags: MessageFlags.Ephemeral });
 		}
 	}
 });

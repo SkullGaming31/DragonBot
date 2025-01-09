@@ -2,7 +2,7 @@ import { randomInt } from 'crypto'; // Import the randomInt function from the cr
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
-import { ApplicationCommandType, EmbedBuilder, userMention, channelMention } from 'discord.js';
+import { ApplicationCommandType, EmbedBuilder, userMention, channelMention, MessageFlags } from 'discord.js';
 import RouletteModel from '../../Database/Schemas/rouletteDB';
 
 export default new Command({
@@ -16,12 +16,12 @@ export default new Command({
 
 	run: async ({ interaction }) => {
 		const { user, guild, channel } = interaction;
-		if (!user) return interaction.reply({ content: 'User not found!', ephemeral: true });
+		if (!user) return interaction.reply({ content: 'User not found!', flags: MessageFlags.Ephemeral });
 
-		if (user.id === guild?.ownerId) return interaction.reply({ content: 'Sorry I cannot timeout the owner of the guild', ephemeral: true });
+		if (user.id === guild?.ownerId) return interaction.reply({ content: 'Sorry I cannot timeout the owner of the guild', flags: MessageFlags.Ephemeral });
 
 		const settingsDoc = await SettingsModel.findOne({ GuildID: guild?.id });
-		if (!settingsDoc) return interaction.reply({ content: 'Settings not found!', ephemeral: true });
+		if (!settingsDoc) return interaction.reply({ content: 'Settings not found!', flags: MessageFlags.Ephemeral });
 		if (settingsDoc.EconChan === undefined) return;
 
 		const Economychannel = guild?.channels.cache.get(settingsDoc.EconChan);
@@ -29,7 +29,7 @@ export default new Command({
 		if (!Economychannel || channel?.id !== settingsDoc.EconChan) {
 			return interaction.reply({
 				content: `Please use this command in the designated economy channel: ${channelMention(settingsDoc.EconChan)}`,
-				ephemeral: true
+				flags: MessageFlags.Ephemeral
 			});
 		}
 
