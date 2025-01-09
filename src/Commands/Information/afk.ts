@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, PresenceStatusData } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, MessageFlags, PresenceStatusData } from 'discord.js';
 import { Command } from '../../Structures/Command';
 import { IUser, UserModel } from '../../Database/Schemas/userModel';
 
@@ -78,7 +78,7 @@ export default new Command({
 					}
 				}
 			}
-			await interaction.reply({ content: 'AFK message set! I will reply with your message if you are tagged.', ephemeral: true });
+			await interaction.reply({ content: 'AFK message set! I will reply with your message if you are tagged.', flags: MessageFlags.Ephemeral });
 		} catch (error) {
 			console.error(error);
 		}

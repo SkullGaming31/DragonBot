@@ -1,4 +1,4 @@
-import { ApplicationCommandType, channelMention } from 'discord.js';
+import { ApplicationCommandType, channelMention, MessageFlags } from 'discord.js';
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
@@ -28,7 +28,7 @@ export default new Command({// TODO: Check to see if a econ channel has been set
 			if (econChannel === undefined) return;
 
 			if (interaction.channel?.id !== econChannel?.id) {
-				return interaction.reply({ content: `All economy commands should be used in ${channelMention(econChannel?.id)}. Please try again there.`, ephemeral: true });
+				return interaction.reply({ content: `All economy commands should be used in ${channelMention(econChannel?.id)}. Please try again there.`, flags: MessageFlags.Ephemeral });
 			}
 		}
 
@@ -41,7 +41,7 @@ export default new Command({// TODO: Check to see if a econ channel has been set
 
 			const timeLeftString = `${hours ? ` ${hours} hour${hours !== 1 ? 's' : ''}` : ''}${minutes ? ` ${minutes} minute${minutes !== 1 ? 's' : ''}` : ''}${seconds ? ` ${seconds} second${seconds !== 1 ? 's' : ''}` : ''}`;
 
-			return interaction.reply({ content: `You can claim your daily work reward again in ${timeLeftString}.`, ephemeral: true });
+			return interaction.reply({ content: `You can claim your daily work reward again in ${timeLeftString}.`, flags: MessageFlags.Ephemeral });
 		}
 
 		// Generate random amount of gold within a specified range

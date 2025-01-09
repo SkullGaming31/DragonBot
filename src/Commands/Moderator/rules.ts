@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageFlags } from 'discord.js';
 import { Command } from '../../Structures/Command';
 
 // Define an interface for the field object
@@ -134,32 +134,32 @@ export default new Command({
 		// 						if (member.roles.cache.has(roleId)) {
 		// 							try {
 		// 								await member.roles.remove(role);
-		// 								await interaction.reply({ content: 'Role removed successfully!', ephemeral: true });
+		// 								await interaction.reply({ content: 'Role removed successfully!', flags: MessageFlags.Ephemeral });
 		// 							} catch (error) {
 		// 								console.error('Error removing role:', error);
-		// 								await interaction.reply({ content: 'An error occurred while removing the role.', ephemeral: true });
+		// 								await interaction.reply({ content: 'An error occurred while removing the role.', flags: MessageFlags.Ephemeral });
 		// 							}
 		// 						} else {
 		// 							try {
 		// 								await member.roles.add(role);
-		// 								await interaction.reply({ content: 'Role assigned successfully!', ephemeral: true });
+		// 								await interaction.reply({ content: 'Role assigned successfully!', flags: MessageFlags.Ephemeral });
 		// 							} catch (error) {
 		// 								console.error('Error assigning role:', error);
-		// 								await interaction.reply({ content: 'An error occurred while assigning the role.', ephemeral: true });
+		// 								await interaction.reply({ content: 'An error occurred while assigning the role.', flags: MessageFlags.Ephemeral });
 		// 							}
 		// 						}
 		// 					} else {
-		// 						await interaction.reply({ content: 'Role not found in the server.', ephemeral: true });
+		// 						await interaction.reply({ content: 'Role not found in the server.', flags: MessageFlags.Ephemeral });
 		// 					}
 		// 				} else {
-		// 					await interaction.reply({ content: 'Member not found.', ephemeral: true });
+		// 					await interaction.reply({ content: 'Member not found.', flags: MessageFlags.Ephemeral });
 		// 				}
 		// 			} else {
 		// 				const owner = await interaction.guild?.fetchOwner({ cache: true });
 		// 				if (user.id !== owner?.id) {
-		// 					await interaction.reply({ content: 'Role ID not found in settings. Please contact an admin to assign the role.', ephemeral: true });
+		// 					await interaction.reply({ content: 'Role ID not found in settings. Please contact an admin to assign the role.', flags: MessageFlags.Ephemeral });
 		// 				} else {
-		// 					await interaction.reply({ content: 'Role ID not found in settings. Please use the `/settings` commands to set it', ephemeral: true });
+		// 					await interaction.reply({ content: 'Role ID not found in settings. Please use the `/settings` commands to set it', flags: MessageFlags.Ephemeral });
 		// 				}
 		// 			}
 		// 		}

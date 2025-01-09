@@ -1,4 +1,4 @@
-import { ApplicationCommandType } from 'discord.js';
+import { ApplicationCommandType, MessageFlags } from 'discord.js';
 import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
 
@@ -18,17 +18,17 @@ export default new Command({
 			const existingUser = await UserModel.findOne({ guildID: guild?.id, id: user.id });
 			console.log(`${guild?.id} : ${user.username}`);
 			if (existingUser) {
-				return interaction.reply({ content: 'You already have an entry in the database!', ephemeral: true });
+				return interaction.reply({ content: 'You already have an entry in the database!', flags: MessageFlags.Ephemeral });
 			}
 
 			// Create a new user entry with 0 balance
 			const newUser = new UserModel({ guildID: guild?.id, id: user.id, username: user.username, balance: 0 });
 			await newUser.save();
 
-			return interaction.reply({ content: 'Welcome! You have been added to the database and can now start earning gold!', ephemeral: true });
+			return interaction.reply({ content: 'Welcome! You have been added to the database and can now start earning gold!', flags: MessageFlags.Ephemeral });
 		} catch (error) {
 			console.error('Error creating user entry:', error);
-			return interaction.reply({ content: 'Oops! Something went wrong while creating your entry. Please try again later.', ephemeral: true });
+			return interaction.reply({ content: 'Oops! Something went wrong while creating your entry. Please try again later.', flags: MessageFlags.Ephemeral });
 		}
 	},
 });

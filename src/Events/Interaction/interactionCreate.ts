@@ -1,5 +1,4 @@
-import { CommandInteractionOptionResolver, ButtonBuilder, ButtonStyle, ActionRowBuilder, EmbedBuilder, RoleResolvable } from 'discord.js';
-import { MongooseError } from 'mongoose';
+import { CommandInteractionOptionResolver, EmbedBuilder, MessageFlags, RoleResolvable } from 'discord.js';
 import SuggestionModel, { ISuggestion } from '../../Database/Schemas/SuggestDB';
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { Event } from '../../Structures/Event';
@@ -19,7 +18,7 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
         const command = appInstance.client.commands.get(interaction.commandName);
 
         if (!command) {
-            return interaction.reply({ content: 'You have used a non-existent command, please try another command', ephemeral: true });
+            return interaction.reply({ content: 'You have used a non-existent command, please try another command', flags: MessageFlags.Ephemeral });
         }
 
         await command.run({
@@ -69,32 +68,32 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
                                 if (member.roles.cache.has(roleId)) {
                                     try {
                                         await member.roles.remove(role);
-                                        await interaction.reply({ content: 'Role removed successfully!', ephemeral: true });
+                                        await interaction.reply({ content: 'Role removed successfully!', flags: MessageFlags.Ephemeral });
                                     } catch (error) {
                                         console.error('Error removing role:', error);
-                                        await interaction.reply({ content: 'An error occurred while removing the role.', ephemeral: true });
+                                        await interaction.reply({ content: 'An error occurred while removing the role.', flags: MessageFlags.Ephemeral });
                                     }
                                 } else {
                                     try {
                                         await member.roles.add(role);
-                                        await interaction.reply({ content: 'Role assigned successfully!', ephemeral: true });
+                                        await interaction.reply({ content: 'Role assigned successfully!', flags: MessageFlags.Ephemeral });
                                     } catch (error) {
                                         console.error('Error assigning role:', error);
-                                        await interaction.reply({ content: 'An error occurred while assigning the role.', ephemeral: true });
+                                        await interaction.reply({ content: 'An error occurred while assigning the role.', flags: MessageFlags.Ephemeral });
                                     }
                                 }
                             } else {
-                                await interaction.reply({ content: 'Role not found in the server.', ephemeral: true });
+                                await interaction.reply({ content: 'Role not found in the server.', flags: MessageFlags.Ephemeral });
                             }
                         } else {
-                            await interaction.reply({ content: 'Member not found.', ephemeral: true });
+                            await interaction.reply({ content: 'Member not found.', flags: MessageFlags.Ephemeral });
                         }
                     } else {
                         const owner = await interaction.guild?.fetchOwner({ cache: true });
                         if (user.id !== owner?.id) {
-                            await interaction.reply({ content: 'Role ID not found in settings. Please contact an ``Admin`` to assign the role.', ephemeral: true });
+                            await interaction.reply({ content: 'Role ID not found in settings. Please contact an ``Admin`` to assign the role.', flags: MessageFlags.Ephemeral });
                         } else {
-                            await interaction.reply({ content: 'Role ID not found in settings. Please use the ``/settings`` command to set it', ephemeral: true });
+                            await interaction.reply({ content: 'Role ID not found in settings. Please use the ``/settings`` command to set it', flags: MessageFlags.Ephemeral });
                         }
                     }
                     break;
@@ -103,10 +102,10 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
                 case 'sugges-accept':
                 case 'sugges-decline': {
                     const { customId, message } = interaction;
-                    const data = await SuggestionModel.findOne({ guildId: guild?.id, messageId: message.id });
+                    const data = await SuggestionModel.findOne<ISuggestion>({ guildId: guild?.id, messageId: message.id });
 
                     if (!data) {
-                        await interaction.reply({ content: 'No data found in the Database', ephemeral: true });
+                        await interaction.reply({ content: 'No data found in the Database', flags: MessageFlags.Ephemeral });
                         return;
                     }
 
@@ -124,7 +123,7 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
                                 await SuggestionModel.deleteOne({ guildId: guild?.id, messageId: message.id });
                             }
 
-                            await interaction.reply({ content: 'Suggestion Accepted', ephemeral: true });
+                            await interaction.reply({ content: 'Suggestion Accepted', flags: MessageFlags.Ephemeral });
                             break;
                         }
 
@@ -136,7 +135,7 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
                                 await SuggestionModel.deleteOne({ guildId: guild?.id, messageId: message.id });
                             }
 
-                            await interaction.reply({ content: 'Suggestion Declined', ephemeral: true });
+                            await interaction.reply({ content: 'Suggestion Declined', flags: MessageFlags.Ephemeral });
                             break;
                         }
                     }
@@ -144,14 +143,14 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
                 }
 
                 default: {
-                    await interaction.reply({ content: `Unknown Button: ${interaction.customId}`, ephemeral: true });
+                    await interaction.reply({ content: `Unknown Button: ${interaction.customId}`, flags: MessageFlags.Ephemeral });
                     break;
                 }
             }
         } catch (error) {
             console.error('Error handling interaction:', error);
             if (!interaction.replied) {
-                await interaction.reply({ content: 'An error occurred while processing your request. Please try again later.', ephemeral: true });
+                await interaction.reply({ content: 'An error occurred while processing your request. Please try again later.', flags: MessageFlags.Ephemeral });
             } else if (interaction.deferred) {
                 await interaction.editReply({ content: 'An error occurred while processing your request. Please try again later.' });
             }

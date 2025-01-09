@@ -5,7 +5,7 @@
 	*
  */
 
-import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder, MessageFlags } from 'discord.js';
 import { Command } from '../../Structures/Command';
 import axios from 'axios';
 import tfd from '../../Database/Schemas/tfd_ouid';
@@ -387,15 +387,15 @@ export default new Command({
 						ouidEntry = new tfd({ OUID: ouid, username: userName });
 						await ouidEntry.save();
 
-						await interaction.reply({ content: `OUID saved: ${ouid}`, ephemeral: true });
+						await interaction.reply({ content: `OUID saved: ${ouid}`, flags: MessageFlags.Ephemeral });
 					} else {
-						await interaction.reply({ content: `OUID already exists: ${ouidEntry.OUID}`, ephemeral: true });
+						await interaction.reply({ content: `OUID already exists: ${ouidEntry.OUID}`, flags: MessageFlags.Ephemeral });
 					}
 				} catch (error) {
 					console.error('Error fetching OUID:', error);
 					await interaction.reply({
 						content: 'An error occurred while trying to retrieve the OUID.',
-						ephemeral: true,
+						flags: MessageFlags.Ephemeral,
 					});
 				}
 				break;
@@ -407,7 +407,7 @@ export default new Command({
 					if (!ouidEntry) {
 						return interaction.reply({
 							content: `No OUID found for username: ${userName}. Please use the \`get-ouid\` command first.`,
-							ephemeral: true,
+							flags: MessageFlags.Ephemeral,
 						});
 					}
 
@@ -442,12 +442,12 @@ export default new Command({
 						)
 						.setTimestamp();
 
-					await interaction.reply({ embeds: [userEmbed], ephemeral: true });
+					await interaction.reply({ embeds: [userEmbed], flags: MessageFlags.Ephemeral });
 				} catch (error) {
 					console.error('Error fetching user data:', error);
 					await interaction.reply({
 						content: 'An error occurred while trying to retrieve the user data.',
-						ephemeral: true,
+						flags: MessageFlags.Ephemeral,
 					});
 				}
 				break;
@@ -459,7 +459,7 @@ export default new Command({
 					if (!ouidEntry) {
 						return interaction.reply({
 							content: `No OUID found for username: ${userName}. Please use the \`get-ouid\` command first.`,
-							ephemeral: true,
+							flags: MessageFlags.Ephemeral,
 						});
 					}
 
@@ -506,7 +506,7 @@ export default new Command({
 					console.error('Error fetching user descendant data:', error);
 					await interaction.reply({
 						content: 'An error occurred while trying to retrieve the user descendant data.',
-						ephemeral: true,
+						flags: MessageFlags.Ephemeral,
 					});
 				}
 				break;
@@ -517,7 +517,7 @@ export default new Command({
 					if (!ouidEntry) {
 						return interaction.reply({
 							content: `No OUID found for username: ${userName}. Please use the \`get-ouid\` command first.`,
-							ephemeral: true,
+							flags: MessageFlags.Ephemeral,
 						});
 					}
 
@@ -570,12 +570,12 @@ export default new Command({
 						chunks.push(currentEmbed);
 					}
 
-					await interaction.reply({ embeds: chunks, ephemeral: true });
+					await interaction.reply({ embeds: chunks, flags: MessageFlags.Ephemeral });
 				} catch (error) {
 					console.error('Error fetching user weapon data:', error);
 					await interaction.reply({
 						content: 'An error occurred while trying to retrieve the user weapon data.',
-						ephemeral: true,
+						flags: MessageFlags.Ephemeral,
 					});
 				}
 				break;
@@ -586,7 +586,7 @@ export default new Command({
 					if (!ouidEntry) {
 						return interaction.reply({
 							content: `No OUID found for username: ${userName}. Please use the \`get-ouid\` command first.`,
-							ephemeral: true,
+							flags: MessageFlags.Ephemeral,
 						});
 					}
 
@@ -619,12 +619,12 @@ export default new Command({
 						)
 						.setTimestamp();
 
-					await interaction.reply({ embeds: [reactorEmbed], ephemeral: true });
+					await interaction.reply({ embeds: [reactorEmbed], flags: MessageFlags.Ephemeral });
 				} catch (error) {
 					console.error('Error fetching user reactor data:', error);
 					await interaction.reply({
 						content: 'An error occurred while trying to retrieve the user reactor data.',
-						ephemeral: true,
+						flags: MessageFlags.Ephemeral,
 					});
 				}
 				break;
@@ -635,7 +635,7 @@ export default new Command({
 					if (!ouidEntry) {
 						return interaction.reply({
 							content: `No OUID found for username: ${userName}. Please use the \`get-ouid\` command first.`,
-							ephemeral: true,
+							flags: MessageFlags.Ephemeral,
 						});
 					}
 
@@ -665,12 +665,12 @@ export default new Command({
 						);
 					});
 
-					await interaction.reply({ embeds: [externalComponentEmbed], ephemeral: true });
+					await interaction.reply({ embeds: [externalComponentEmbed], flags: MessageFlags.Ephemeral });
 				} catch (error) {
 					console.error('Error fetching external component data:', error);
 					await interaction.reply({
 						content: 'An error occurred while trying to retrieve the external component data.',
-						ephemeral: true,
+						flags: MessageFlags.Ephemeral,
 					});
 				}
 				break;
@@ -688,7 +688,7 @@ export default new Command({
 
 					if (!weaponId) {
 						// Handle the case where the weapon name is invalid
-						await interaction.reply({ content: `Weapon '${weaponName}' not found.`, ephemeral: true });
+						await interaction.reply({ content: `Weapon '${weaponName}' not found.`, flags: MessageFlags.Ephemeral });
 						return;
 					}
 
@@ -734,7 +734,7 @@ export default new Command({
 					});
 
 					// send both embeds as a reply to the user
-					await interaction.reply({ content: `Recommended Modules for battling \`${getVoidBattleNameById(voidBattleId)}\``, embeds: [descendantEmbed, weaponEmbed], ephemeral: true });
+					await interaction.reply({ content: `Recommended Modules for battling \`${getVoidBattleNameById(voidBattleId)}\``, embeds: [descendantEmbed, weaponEmbed], flags: MessageFlags.Ephemeral });
 				} catch (error: any) {
 					if (error.isAxiosError) {
 						console.error('Axios error:', error);
@@ -747,7 +747,7 @@ export default new Command({
 				break;
 			default:
 				console.log('Issue Detected with nexon sub command');
-				interaction.reply({ content: 'Issue detected with nexon sub commands', ephemeral: true });
+				interaction.reply({ content: 'Issue detected with nexon sub commands', flags: MessageFlags.Ephemeral });
 				break;
 		}
 	},

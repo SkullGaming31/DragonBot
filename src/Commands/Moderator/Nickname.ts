@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, Colors, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, Colors, EmbedBuilder, MessageFlags } from 'discord.js';
 import { Command } from '../../Structures/Command';
 
 export default new Command({
@@ -49,7 +49,7 @@ export default new Command({
 			.setColor(Colors.Red);
 		try {
 			await Target?.setNickname(setNickname, Reason);
-			await interaction.reply({ embeds: [embed], ephemeral: true });
+			await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 		} catch (error) {
 			console.error(error);
 			return;

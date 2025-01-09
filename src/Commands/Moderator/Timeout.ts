@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, Colors, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, Colors, EmbedBuilder, MessageFlags } from 'discord.js';
 import ms from 'ms';
 import Database from '../../Database/Schemas/Infractions';
 import { Command } from '../../Structures/Command';
@@ -57,22 +57,22 @@ export default new Command({
 
 		switch (Choice) {
 			case 'add':
-				if (Length === null) return interaction.reply({ content: 'You must provide a length of time to time someone out.(1s,1m,1h,1d)', ephemeral: true });
-				if (Reason.length > 512) return interaction.reply({ content: 'You can not use more then 512 Characters for your reasoning', ephemeral: true });
-				if (!Target) return interaction.reply({ content: 'The Member most likely left the server', ephemeral: true });
+				if (Length === null) return interaction.reply({ content: 'You must provide a length of time to time someone out.(1s,1m,1h,1d)', flags: MessageFlags.Ephemeral });
+				if (Reason.length > 512) return interaction.reply({ content: 'You can not use more then 512 Characters for your reasoning', flags: MessageFlags.Ephemeral });
+				if (!Target) return interaction.reply({ content: 'The Member most likely left the server', flags: MessageFlags.Ephemeral });
 
 				// eslint-disable-next-line no-case-declarations
 				const timeInMs = ms(Length) / 1000;
-				if (!timeInMs) return interaction.reply({ content: 'Please specify a valid time(1s,1m,1h,1d)', ephemeral: true });
-				if (!ms(Length) || ms(Length) > ms('28d')) return interaction.reply({ content: 'Time Provided is invalid or over the 28d limit', ephemeral: true });
+				if (!timeInMs) return interaction.reply({ content: 'Please specify a valid time(1s,1m,1h,1d)', flags: MessageFlags.Ephemeral });
+				if (!ms(Length) || ms(Length) > ms('28d')) return interaction.reply({ content: 'Time Provided is invalid or over the 28d limit', flags: MessageFlags.Ephemeral });
 
-				if (!Target.manageable || !Target.moderatable) return interaction.reply({ content: 'selected target is not moderatable by this bot', ephemeral: true });
-				if (member.roles.highest.position < Target.roles.highest.position) return interaction.reply({ content: 'selected member has a higher role position then you', ephemeral: true });
-				if (interaction.user.id === Target.user.id) return interaction.reply({ content: 'you can not timeout yourself', ephemeral: true });
+				if (!Target.manageable || !Target.moderatable) return interaction.reply({ content: 'selected target is not moderatable by this bot', flags: MessageFlags.Ephemeral });
+				if (member.roles.highest.position < Target.roles.highest.position) return interaction.reply({ content: 'selected member has a higher role position then you', flags: MessageFlags.Ephemeral });
+				if (interaction.user.id === Target.user.id) return interaction.reply({ content: 'you can not timeout yourself', flags: MessageFlags.Ephemeral });
 
 				try {
 					await Target?.timeout(timeInMs, Reason).catch(async (err: any) => {
-						await interaction.reply({ content: 'could not timeout the user due to an uncommon error', ephemeral: true });
+						await interaction.reply({ content: 'could not timeout the user due to an uncommon error', flags: MessageFlags.Ephemeral });
 						return console.error(err);
 					});
 
@@ -107,7 +107,7 @@ export default new Command({
 					 */
 				// eslint-disable-next-line no-case-declarations
 				const userData = await Database.findOne({ Guild: guild.id, User: Target?.id });
-				if (!userData) return interaction.reply({ content: `No infractions found for ${Target}`, ephemeral: true });
+				if (!userData) return interaction.reply({ content: `No infractions found for ${Target}`, flags: MessageFlags.Ephemeral });
 
 				// eslint-disable-next-line no-case-declarations
 				const databaseEmbed = new EmbedBuilder()

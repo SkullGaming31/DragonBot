@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, ComponentType } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, ComponentType, MessageFlags } from 'discord.js';
 import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
 
@@ -65,18 +65,18 @@ export default new Command({
         if (subcommand === 'add' || subcommand === 'remove') {
             if (!targetUser) {
                 console.error('Unexpected error: targetUser is null after non-null assertion.');
-                return interaction.reply({ content: 'An unexpected error occurred. Please try again later.', ephemeral: true });
+                return interaction.reply({ content: 'An unexpected error occurred. Please try again later.', flags: MessageFlags.Ephemeral });
             }
 
             // Validate amount
             if (amount === null || amount <= 0 || isNaN(amount)) {
-                return interaction.reply({ content: 'Please enter a valid positive amount of points.', ephemeral: true });
+                return interaction.reply({ content: 'Please enter a valid positive amount of points.', flags: MessageFlags.Ephemeral });
             }
 
             // Check if the target user is a guild member
             const guildMember = guild?.members.cache.get(targetUser.id);
             if (!guildMember) {
-                return interaction.reply({ content: 'The target user is not a member of this guild.', ephemeral: true });
+                return interaction.reply({ content: 'The target user is not a member of this guild.', flags: MessageFlags.Ephemeral });
             }
         }
 
@@ -107,12 +107,12 @@ export default new Command({
                 case 'remove':
                     let userToRemove = await UserModel.findOne({ guildID: guild?.id, id: targetUser?.id });
                     if (!userToRemove) {
-                        return interaction.reply({ content: 'The target user does not have an entry in the database.', ephemeral: true });
+                        return interaction.reply({ content: 'The target user does not have an entry in the database.', flags: MessageFlags.Ephemeral });
                     }
 
                     // Ensure the user has enough balance to remove the specified amount
                     if (userToRemove.balance < amount) {
-                        return interaction.reply({ content: `You are trying to remove more points than the user has. Current balance: ${userToRemove.balance}`, ephemeral: true });
+                        return interaction.reply({ content: `You are trying to remove more points than the user has. Current balance: ${userToRemove.balance}`, flags: MessageFlags.Ephemeral });
                     }
 
                     // Update the user's balance
@@ -139,16 +139,16 @@ export default new Command({
                     await interaction.reply({
                         content: 'Are you sure you want to purge all points from all users? This action cannot be undone.',
                         components: [row],
-                        ephemeral: true
+                        flags: MessageFlags.Ephemeral
                     });
                     break;
 
                 default:
-                    return interaction.reply({ content: 'Invalid subcommand.', ephemeral: true });
+                    return interaction.reply({ content: 'Invalid subcommand.', flags: MessageFlags.Ephemeral });
             }
         } catch (error) {
             console.error(`Error handling points:`, error);
-            await interaction.reply({ content: `An error occurred while processing the points. Please try again later.`, ephemeral: true });
+            await interaction.reply({ content: `An error occurred while processing the points. Please try again later.`, flags: MessageFlags.Ephemeral });
         }
     },
 });

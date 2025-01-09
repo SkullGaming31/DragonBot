@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, Colors, ComponentType, DiscordAPIError, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, Colors, ComponentType, DiscordAPIError, EmbedBuilder, MessageFlags } from 'discord.js';
 import ms from 'ms';
 import { Command } from '../../Structures/Command';
 
@@ -25,7 +25,7 @@ export default new Command({
 	],
 	run: async ({ interaction }) => {
 		if (!interaction.inCachedGuild()) return;
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
 		const { options, user, guild } = interaction;
 		const member = options.getMember('user');

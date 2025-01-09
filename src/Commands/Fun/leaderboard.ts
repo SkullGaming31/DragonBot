@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, Collection, EmbedBuilder, GuildMember, channelMention } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, Collection, EmbedBuilder, GuildMember, MessageFlags, channelMention } from 'discord.js';
 import { UserModel } from '../../Database/Schemas/userModel';
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { Command } from '../../Structures/Command';
@@ -25,7 +25,7 @@ export default new Command({
 			const settings = await SettingsModel.findOne({ GuildID: guild?.id });
 
 			if (!settings || settings.EconChan === undefined) {
-				return interaction.reply({ content: 'Settings data not found.', ephemeral: true });
+				return interaction.reply({ content: 'Settings data not found.', flags: MessageFlags.Ephemeral });
 			}
 
 			const adminRoleId = settings.AdministratorRole;
@@ -33,11 +33,11 @@ export default new Command({
 			const limit = options.getInteger('limit');
 
 			if (!limit || isNaN(limit) || limit <= 0) {
-				return interaction.reply({ content: 'Please provide a valid number for the limit.', ephemeral: true });
+				return interaction.reply({ content: 'Please provide a valid number for the limit.', flags: MessageFlags.Ephemeral });
 			}
 
 			if (!adminRoleId || !moderatorRoleId) {
-				return interaction.reply({ content: 'Missing admin or moderator role ID in settings.', ephemeral: true });
+				return interaction.reply({ content: 'Missing admin or moderator role ID in settings.', flags: MessageFlags.Ephemeral });
 			}
 
 			const adminMembers = guild?.members.cache.filter((member) => member.roles.cache.has(adminRoleId));
@@ -52,7 +52,7 @@ export default new Command({
 				.select({ id: 1, username: 1, balance: 1 }); // Optimize fields for performance
 
 			if (leaderboard.length === 0) {
-				return interaction.reply({ content: 'There are no users in the database yet!', ephemeral: true });
+				return interaction.reply({ content: 'There are no users in the database yet!', flags: MessageFlags.Ephemeral });
 			}
 
 			const embed = new EmbedBuilder().setTitle('Top Gold Leaders').setColor('Gold');
@@ -68,7 +68,7 @@ export default new Command({
 			if (economyChannel) {
 				if (economyChannel.id !== channel?.id) {
 					// If an economy channel is set and it's not the current channel:
-					return interaction.reply({ content: `Please use the ${channelMention(economyChannel?.id)} channel for economy commands.`, ephemeral: true });
+					return interaction.reply({ content: `Please use the ${channelMention(economyChannel?.id)} channel for economy commands.`, flags: MessageFlags.Ephemeral });
 				}
 			}
 
@@ -76,7 +76,7 @@ export default new Command({
 			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
 			console.error('Error fetching leaderboard:', error);
-			await interaction.reply({ content: 'Failed to retrieve the leaderboard. Please try again later.', ephemeral: true });
+			await interaction.reply({ content: 'Failed to retrieve the leaderboard. Please try again later.', flags: MessageFlags.Ephemeral });
 		}
 	},
 });

@@ -7,10 +7,10 @@ const lastPresenceMap: Map<string, Presence> = new Map();
 
 export default new Event<'presenceUpdate'>('presenceUpdate', async (oldPresence: Presence | null, newPresence: Presence) => {
 	// NOT CURRENTLY WORKING
-	
+
 	// try {
-	// 	console.log('Old Presence', oldPresence?.activities[0]);
-	// 	console.log('New Presence', newPresence?.activities[0]);
+	console.log('Old Presence', oldPresence);
+	console.log('New Presence', newPresence);
 
 	// 	// Check if the presence update is for a member
 	// 	if (!newPresence.member || !newPresence.guild) return;

@@ -1,4 +1,4 @@
-import { ApplicationCommandType, ChannelType, EmbedBuilder, version } from 'discord.js';
+import { ApplicationCommandType, ChannelType, EmbedBuilder, MessageFlags, version } from 'discord.js';
 import { connection } from 'mongoose';
 import os from 'os';
 import { Command } from '../../Structures/Command';
@@ -16,7 +16,7 @@ export default new Command({
 		await client.user?.fetch();
 		await client.application?.fetch();
 
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
 		const getChannelTypeSize = (type: ChannelType[]) => client.channels.cache.filter((channel) => type.includes(channel.type)).size;
 
