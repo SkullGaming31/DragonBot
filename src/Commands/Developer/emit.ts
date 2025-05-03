@@ -1,5 +1,6 @@
-/* eslint-disable no-case-declarations */
-import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, MessageFlags } from 'discord.js';
+/* eslint-disable no-unused-vars */
+
+import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, Guild, MessageFlags, PermissionsBitField, Role, RoleFlagsBitField, SnowflakeUtil } from 'discord.js';
 import { Command } from '../../Structures/Command';
 
 export default new Command({
@@ -95,15 +96,129 @@ export default new Command({
 					await interaction.reply({ content: 'Cannot emit event. Channel is null or not a text channel.', flags: MessageFlags.Ephemeral });
 				}
 				break;
-			case 'roleCreate':// dont know how to use this to test role create event
-				interaction.reply({ content: 'Not Currently Implemented', flags: MessageFlags.Ephemeral });
+			case 'roleCreate': {
+				if (!interaction.guild) return interaction.reply({
+					content: 'This command only works in servers',
+					flags: MessageFlags.Ephemeral
+				});
+
+				try {
+					// Create mock role data
+					const mockRoleData = {
+						id: SnowflakeUtil.generate(),
+						name: 'Test Role',
+						color: 0x5865F2,
+						permissions: '0',
+						position: 1,
+						managed: false,
+						mentionable: true,
+						hoist: false,
+					};
+
+					// Create partial role object
+					const mockRole = {
+						...mockRoleData,
+						guild: interaction.guild,
+						permissions: new PermissionsBitField(BigInt(mockRoleData.permissions)),
+						createdTimestamp: Date.now(),
+						editable: false,
+						hexColor: '#5865F2',
+						icon: null,
+						unicodeEmoji: null,
+						tags: [],
+						comparePositionTo: () => 1,
+						delete: () => Promise.resolve(mockRole),
+						edit: () => Promise.resolve(mockRole),
+						toJSON: () => mockRoleData,
+						toString: () => `<@&${mockRoleData.id}>`
+					} as unknown as Role;
+
+					// Emit event with type assertion
+					client.emit('roleCreate', mockRole);
+					await interaction.reply({
+						content: `✅ Emitted roleCreate event for ${mockRole.name}`,
+						flags: MessageFlags.Ephemeral
+					});
+				} catch (error) {
+					console.error('RoleCreate Test Error:', error);
+					await interaction.reply({
+						content: '❌ Failed to emit roleCreate event',
+						flags: MessageFlags.Ephemeral
+					});
+				}
 				break;
-			case 'roleDelete':// dont know how to use this to test role delete event
-				interaction.reply({ content: 'Not Currently Implemented', flags: MessageFlags.Ephemeral });
+			}
+			case 'roleDelete': {
+				if (!interaction.guild) return interaction.reply({
+					content: 'This command only works in servers',
+					flags: MessageFlags.Ephemeral
+				});
+
+				try {
+					const mockRole = createMockRole(interaction.guild);
+					client.emit('roleDelete', mockRole);
+					await interaction.reply({
+						content: `✅ Emitted roleDelete event for ${mockRole.name}`,
+						flags: MessageFlags.Ephemeral
+					});
+				} catch (error) {
+					console.error('roleDelete Test Error:', error);
+					await interaction.reply({
+						content: '❌ Failed to emit roleDelete event',
+						flags: MessageFlags.Ephemeral
+					});
+				}
 				break;
-			case 'roleUpdate':// dont know how to use this to test role update event
-				interaction.reply({ content: 'Not Currently Implemented', flags: MessageFlags.Ephemeral });
+			}
+			// Updated roleUpdate case
+			case 'roleUpdate':
+				interaction.reply({ content: 'This is not implemented yet!(No idea how to do it)', flags: MessageFlags.Ephemeral });
 				break;
+
+				function createMockRole(guild: Guild, id?: string): Role {
+					const mockRoleData = {
+						id: id || SnowflakeUtil.generate(),
+						name: 'Test Role',
+						color: 0x5865F2,
+						permissions: '0',
+						position: 1,
+						managed: false,
+						mentionable: false,
+						hoist: false,
+						icon: null,
+						unicode_emoji: null,
+						flags: 0
+					};
+
+					return {
+						...mockRoleData,
+						guild,
+						createdTimestamp: Date.now(),
+						createdAt: new Date(),
+						editable: false,
+						hexColor: '#5865F2',
+						permissions: new PermissionsBitField(BigInt(mockRoleData.permissions)),
+						comparePositionTo: function (this: Role, other: Role) {
+							return this.position - other.position;
+						},
+						equals: function (this: Role, other: Role) {
+							return this.id === other.id;
+						},
+						delete: function (this: Role) {
+							return Promise.resolve(this);
+						},
+						edit: function (this: Role) {
+							return Promise.resolve(this);
+						},
+						toJSON: () => mockRoleData,
+						toString: () => `<@&${mockRoleData.id}>`,
+						client: guild.client,
+						tags: [],
+						icon: null,
+						unicodeEmoji: null,
+						flags: new RoleFlagsBitField(0)
+					} as unknown as Role;
+				}
 		}
 	}
 });

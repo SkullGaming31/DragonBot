@@ -4,7 +4,7 @@ import { config } from 'dotenv';
 import { connectDatabase } from './Database';
 import { ExtendedClient } from './Structures/Client';
 import { checkVariables } from './Structures/checkVariables';
-import express, { Request, Response, Router } from 'express';
+import express, { Request, Response } from 'express';
 
 import Health from './routes/health';
 import apiV1Routes from './routes/apiv1';

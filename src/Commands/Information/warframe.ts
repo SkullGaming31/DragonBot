@@ -1,4 +1,4 @@
-/* eslint-disable no-case-declarations */
+ 
 import axios from 'axios';
 import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from 'discord.js';
 import { Command } from '../../Structures/Command';

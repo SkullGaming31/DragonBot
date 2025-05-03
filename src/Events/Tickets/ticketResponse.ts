@@ -30,6 +30,7 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 
 	const embed = new EmbedBuilder().setColor(Colors.Blue);
 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	DB.findOne({ ChannelID: channel?.id }, async (err: Error, docs: any) => {
 		if (err) throw err;
 		if (!docs) return interaction.reply({ content: 'no data was found related to this ticket, please delete it manually', flags: MessageFlags.Ephemeral });

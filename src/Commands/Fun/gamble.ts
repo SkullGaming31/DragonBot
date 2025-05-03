@@ -1,4 +1,4 @@
-/* eslint-disable no-case-declarations */
+ 
 import { ApplicationCommandOptionType, ApplicationCommandType, MessageFlags } from 'discord.js';
 import { IUser, UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';

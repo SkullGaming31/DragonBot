@@ -46,7 +46,7 @@ export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member) => {
 		if (data.Welcome === true) {
 			switch (guild.id) {
 				case '819180459950473236':
-					// eslint-disable-next-line no-case-declarations
+					 
 					const memberRole = guild.roles.cache.get('879461309870125147');
 					if (memberRole) guild.members.addRole({ user: member, role: memberRole, reason: 'Auto Role Assign' });
 					break;

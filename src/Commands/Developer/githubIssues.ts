@@ -64,11 +64,6 @@ interface Github {
 	state_reason: string[] | null;
 }
 
-enum EmbedColors {
-	Green = 'Green',
-	Red = 'Red',
-}
-
 export default new Command({
 	name: 'github',
 	description: 'Create a GitHub Issue',
@@ -139,7 +134,7 @@ export default new Command({
 				console.log('Github Response: ', response.data);
 				const successfulEmbed = new EmbedBuilder()
 					.setTitle(`${response.data.title}`)
-					.setColor(EmbedColors.Green)
+					.setColor('Green')
 					.setAuthor({ name: `${response.data.user.login}`, iconURL: `${response.data.user.avatar_url}` })
 					.setURL(`https://github.com/${owner}/${repo}/issues/${response.data.number}`)
 					.setTimestamp();

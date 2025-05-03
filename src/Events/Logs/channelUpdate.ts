@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 import { ChannelType, DMChannel, EmbedBuilder, GuildChannel, TextChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';

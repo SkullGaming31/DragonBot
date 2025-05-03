@@ -4,30 +4,30 @@ export interface ISettings extends Document {
 	GuildID: string;
 	AdministratorRole?: string;
 	ModeratorRole?: string;
-	MemberRole: string;
-	rulesChannel: string;
+	MemberRole?: string;
+	rulesChannel?: string;
 	Welcome?: boolean;
 	WelcomeChannel?: string;
 	PromotionChannel?: string;
 	punishmentChannel?: string;
 	SuggestChan?: string;
 	EconChan?: string;
-	ModerationChannel: string;
+	ModerationChannel?: string;
 }
 
 const settingsSchema = new Schema<ISettings>({
 	GuildID: { type: String, required: true, unique: true },
-	AdministratorRole: { type: String },
-	ModeratorRole: { type: String },
-	MemberRole: { type: String },
-	rulesChannel: { type: String },
+	AdministratorRole: { type: String, default: null },
+	ModeratorRole: { type: String, default: null },
+	MemberRole: { type: String, default: null },
+	rulesChannel: { type: String, default: null },
 	Welcome: { type: Boolean, default: false },
-	WelcomeChannel: { type: String },
-	PromotionChannel: { type: String },
-	punishmentChannel: { type: String },
-	SuggestChan: { type: String },
-	EconChan: { type: String },
-	ModerationChannel: { type: String }
+	WelcomeChannel: { type: String, default: null },
+	PromotionChannel: { type: String, default: null },
+	punishmentChannel: { type: String, default: null },
+	SuggestChan: { type: String, default: null },
+	EconChan: { type: String, default: null },
+	ModerationChannel: { type: String, default: null }
 });
 
 const SettingsModel = model<ISettings>('Settings', settingsSchema);
