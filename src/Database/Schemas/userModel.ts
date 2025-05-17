@@ -18,6 +18,7 @@ export interface IUser extends Document {
 	houseCooldown: Date | null;
 	policeAlertLevel: number
 	storeCooldown: Date | null;
+	lastRewardTime: number;
 }
 
 const userSchema = new Schema<IUser>({
@@ -36,7 +37,8 @@ const userSchema = new Schema<IUser>({
 	AFKstatus: { type: String, enum: ['online', 'idle', 'dnd', 'invisible', null] }, // Use enum to enforce valid status values
 	houseCooldown: { type: Date, default: null },
 	policeAlertLevel: { type: Number, default: 0 },
-	storeCooldown: { type: Date, default: null }
+	storeCooldown: { type: Date, default: null },
+	lastRewardTime: { type: Number, default: 0 }
 });
 
 export const UserModel = model<IUser>('Users', userSchema);

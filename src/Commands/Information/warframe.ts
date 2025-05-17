@@ -1,8 +1,7 @@
- 
+
 import axios from 'axios';
-import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder } from 'discord.js';
 import { Command } from '../../Structures/Command';
-import { sleep } from '../../Utilities/util';
 
 interface WarframeData {
 	uniqueName: string;
@@ -13,6 +12,8 @@ interface WarframeData {
 	armor: number;
 	power: number;
 	masteryReq: number;
+	buildPrice?: number;          // Prime-specific
+	buildQuantity?: number;       // Prime-specific
 	buildTime: number;
 	abilities: Abilities[];
 	components: Components[];
@@ -21,9 +22,10 @@ interface WarframeData {
 	description: string;
 	exalted: string[];
 	imageName: string;
-	introduced: Introduced[];
+	introduced: Introduced;
 	isPrime: boolean;
-	marketCost: number;
+	estimatedVaultDate?: string;  // Prime-specific
+	marketCost?: number;
 	masterable: boolean;
 	passiveDescription: string;
 	patchLogs: PatchLogs[];
@@ -37,6 +39,9 @@ interface WarframeData {
 	stamina: number;
 	tradable: boolean;
 	type: string;
+	vaultDate?: string;           // Prime-specific
+	vaulted?: boolean;            // Prime-specific
+	wikiAvailable?: boolean;      // Prime-specific
 	wikiaThumbnail: string;
 	wikiaUrl: string;
 }
@@ -86,6 +91,7 @@ interface Introduced {
 	parent: string;
 	date: string;
 }
+
 interface Components {
 	uniqueName: string;
 	name: string;
@@ -93,6 +99,8 @@ interface Components {
 	itemCount: number;
 	imageName: string;
 	tradable: boolean;
+	primeSellingPrice?: number;   // Prime-specific
+	ducats?: number;              // Prime-specific
 	masterable: boolean;
 	drops: Drops[];
 }
@@ -102,11 +110,14 @@ interface Drops {
 	location: string;
 	rarity: string;
 	type: string;
+	uniqueName?: string;          // Prime-specific (relic identifier)
 }
 
 interface Abilities {
+	uniqueName?: string;          // Prime-specific
 	name: string;
 	description: string;
+	imageName?: string;           // Prime-specific
 }
 
 export default new Command({
@@ -205,180 +216,127 @@ export default new Command({
 						const warframeUrl = `https://api.warframestat.us/warframes/search/${warframeName}`;
 						const response = await axios.get(warframeUrl);
 						const data = await response.data;
-						// console.log('response data: ', data);
+
 						if (!data || data.length === 0) {
 							return interaction.editReply({ content: `No Warframe found with the name "${warframeName}"` });
 						}
+
 						const warframeData: WarframeData = data[0];
-						// console.log('Warframe Component Data: ', warframeData.components);
 
-						if (warframeName?.endsWith('Prime')) return interaction.editReply({ content: 'I can not look up prime versions of warframes yet' });
-
-						// let prompted = false;
+						// Create component fields with appropriate display for Prime vs non-Prime
 						const componentFields = warframeData.components.map((component) => {
-							// Construct drops text based on prime status
 							let dropsText = '';
+
 							if (warframeData.isPrime) {
-								dropsText = component.drops.map((drop, index) => {
-									return `Drop ${index + 1}:\n${JSON.stringify(drop, null, 2)}`;
-								}).join('\n');
+								// Prime component display
+								dropsText = component.drops.map(drop => {
+									return `Relic: ${drop.location}\nRarity: ${drop.rarity}\nChance: ${drop.chance.toFixed(2)}%`;
+								}).join('\n\n');
+
+								return {
+									name: `${component.name} ${component.ducats ? `(${component.ducats} ducats)` : ''}`,
+									value: `Tradable: ${component.tradable ? 'Yes' : 'No'}\nDrops:\n${dropsText}`,
+									inline: false
+								};
 							} else {
-								dropsText = component.drops.map((drop) => {
-									return `${drop.type} (Rarity: ${drop.rarity}, Chance: ${drop.chance.toFixed(2)}%, Location: ${drop.location})`;
-								}).join('; ');
+								// Non-Prime component display
+								dropsText = component.drops.map(drop => {
+									return `${drop.location} (${drop.rarity}, ${drop.chance.toFixed(2)}%)`;
+								}).join('\n');
+
+								return {
+									name: component.name,
+									value: `Tradable: ${component.tradable ? 'Yes' : 'No'}\nDrops:\n${dropsText}`,
+									inline: false
+								};
 							}
-							return {
-								name: component.name,
-								value: `Tradeable: ${component.tradable} - Drops:\n${dropsText}`,
-								inline: false
-							};
 						});
+
+						// Create the embed
 						const warframeEmbed = new EmbedBuilder()
 							.setTitle(`${warframeData.name}`)
-							.setDescription(`${warframeData.components[0].description}`)
+							.setDescription(warframeData.description || 'No description available')
 							.addFields([
 								{
-									name: 'Armor: ',
-									value: `${warframeData.armor}`,
-									inline: false
-								},
-								{
-									name: 'Health: ',
+									name: 'Health',
 									value: `${warframeData.health}`,
-									inline: false
-								},
-								{
-									name: 'aura: ',
-									value: `${warframeData.aura}`,
-									inline: false
-								},
-								{
-									name: 'Build Time: ',
-									value: `${warframeData.buildTime}`,
 									inline: true
 								},
 								{
-									name: 'Tradeable: ',
-									value: `${warframeData.tradable}`,
+									name: 'Shield',
+									value: `${warframeData.shield}`,
 									inline: true
 								},
 								{
-									name: 'Masterable: ',
-									value: `${warframeData.masterable}`,
+									name: 'Armor',
+									value: `${warframeData.armor}`,
 									inline: true
 								},
 								{
-									name: 'Mastery Requirement: ',
+									name: 'Power',
+									value: `${warframeData.power}`,
+									inline: true
+								},
+								{
+									name: 'Aura Polarity',
+									value: `${warframeData.aura || 'None'}`,
+									inline: true
+								},
+								{
+									name: 'Polarities',
+									value: `${warframeData.polarities.join(', ') || 'None'}`,
+									inline: true
+								},
+								{
+									name: 'Mastery Requirement',
 									value: `${warframeData.masteryReq}`,
-									inline: false
-								},
-								{
-									name: 'Polarities: ',
-									value: `${warframeData.polarities.join(', ')}`,
 									inline: true
 								},
-								...componentFields,
+								{
+									name: 'Build Time',
+									value: formatTime(warframeData.buildTime),
+									inline: true
+								},
+								{
+									name: 'Tradable',
+									value: `${warframeData.tradable ? 'Yes' : 'No'}`,
+									inline: true
+								},
+								...componentFields
 							])
-							.setThumbnail(`${warframeData.wikiaThumbnail}`)
-							.setURL(`${warframeData.wikiaUrl}`)
+							.setThumbnail(warframeData.imageName || 'https://via.placeholder.com/150')
+							.setURL(warframeData.wikiaUrl)
 							.setTimestamp();
 
-						let message: string | string[] = '';
-						if (warframeData) {
-							const components = warframeData.components
-								.map((component) => {
-									const drops = component.drops
-										.map((drop) => {
-											return `${drop.type} (Rarity: ${drop.rarity}, Chance: ${drop.chance.toFixed(2)}%, Location: ${drop.location})`;
-										})
-										.join('; ');
-									return `${component.name} (Tradeable: ${component.tradable}) - Drops: ${drops}`;
-								})
-								.join('\n');
-
-							const buildTime = formatTime(warframeData.buildTime);
-							const polarities = warframeData.polarities.map(polarity => `${polarity}`).join(', ');
-
-							message = `Warframe: ${warframeData.name}\n - Aura: ${warframeData.aura},\n Build Time: ${buildTime}\n Components:\n${components}\n Tradable: ${warframeData.tradable}\n Masterable: ${warframeData.masterable}\n Mastery Requirement: ${warframeData.masteryReq}\n Polarities: ${polarities}\n Wiki: ${warframeData.wikiaUrl}`;
-						} else {
-							message = 'No data found for that Warframe.';
+						// Add Prime-specific fields if applicable
+						if (warframeData.isPrime) {
+							warframeEmbed.addFields([
+								{
+									name: 'Vault Status',
+									value: warframeData.vaulted ? `Vaulted (since ${warframeData.vaultDate})` : 'Unvaulted',
+									inline: true
+								},
+								{
+									name: 'Release Date',
+									value: warframeData.releaseDate,
+									inline: true
+								}
+							]);
 						}
 
-						// Check if message length exceeds Discord limit
-						if (message.length > 1024) {
-							// Creating buttons
-							const row = new ActionRowBuilder<ButtonBuilder>()
-								.addComponents(
-									new ButtonBuilder()
-										.setCustomId('yes')
-										.setLabel('yes')
-										.setStyle(ButtonStyle.Primary),
-									new ButtonBuilder()
-										.setCustomId('no')
-										.setLabel('no')
-										.setStyle(ButtonStyle.Danger)
-								);
-
-							// Sending the initial message with buttons
-							const initialMessage = await interaction.editReply({ content: 'The message is too long to be sent in chat. Do you want me to send it to you via whisper?', components: [row] });
-
-							const textChannel = interaction.channel as TextChannel;
-
-							// Await button interaction
-							const collector = textChannel.createMessageComponentCollector({
-								time: 30000, // 30 seconds
-								filter: (buttonInteraction) => buttonInteraction.customId === 'yes' || buttonInteraction.customId === 'no',
-							});
-
-							collector?.on('collect', async (buttonInteraction) => {
-								console.log('buttonInteraction Object: ', buttonInteraction); // Log the entire buttonInteraction object
-								console.log('Button Interaction customId: ', buttonInteraction.customId); // Log the customId of the clicked button
-								if (buttonInteraction.customId === 'yes') {
-									// create DM and send warframe Data
-									const tbd = await user.createDM();
-									// let messageChunks;
-
-									const messageChunks = Array.isArray(message) ? message.join('').match(/.{1,4000}/g) : message.match(/.{1,4000}/g);
-									if (messageChunks) {
-										for (const chunk of messageChunks) {
-											await tbd.send({ content: `${chunk}` }); // Send each chunk of the message
-											await sleep(3000); // Wait for 3 seconds before sending the next chunk (rate limiting)
-										}
-										// If message is an array, join it into a single string
-										// messageChunks = message.join('').match(/.{1,4000}/g);
-									} else {
-										// If message is a string, split it into chunks
-										console.log('No message chunks to send');
-										// messageChunks = message.match(/.{1,4000}/g);
-									}
-
-									if (messageChunks) {
-										for (const chunk of messageChunks) {
-											await tbd.send({ content: `${chunk}` });
-											await sleep(3000); // Wait for 3 seconds before sending the next chunk
-										}
-										if (!buttonInteraction.replied) {
-											await buttonInteraction.update({ content: 'The information has been sent to your DMs.', components: [] });
-										}
-									} else {
-										console.log('No message chunks to send');
-									}
-								} else if (buttonInteraction.customId === 'no') {
-									if (!buttonInteraction.replied) {
-										await buttonInteraction.update({ content: 'You chose not to receive the information via whisper.', components: [] });
-									}
-								}
-							});
-
-							collector?.on('end', async (_, reason) => {
-								// console.log(reason); // Log the reason why the collector ended
-								if (reason === 'time') {
-									await initialMessage.edit({ content: 'You took too long to respond. The buttons have expired.', components: [] });
-								}
-							});
-						} else {
-							await interaction.editReply({ /*content: message,*/ embeds: [warframeEmbed] });
+						// Handle abilities if they exist
+						if (warframeData.abilities && warframeData.abilities.length > 0) {
+							warframeEmbed.addFields(
+								warframeData.abilities.map(ability => ({
+									name: ability.name,
+									value: ability.description,
+									inline: false
+								}))
+							);
 						}
+
+						// Send the embed
+						await interaction.editReply({ embeds: [warframeEmbed] });
 						break;
 					case 'item':
 						try {

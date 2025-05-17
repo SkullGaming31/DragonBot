@@ -4,8 +4,6 @@ import glob from 'glob';
 import { Agent } from 'undici';
 import { promisify } from 'util';
 const PG = promisify(glob);
-import fs from 'fs';
-import path from 'path';
 
 import { CommandType } from '../Typings/Command';
 import { RegisterCommandOptions } from '../Typings/client';
@@ -36,6 +34,7 @@ export class ExtendedClient extends Client {
 				GatewayIntentBits.GuildWebhooks,
 				GatewayIntentBits.GuildMessageReactions,
 				GatewayIntentBits.GuildPresences,
+				GatewayIntentBits.GuildMessagePolls
 			],
 			partials: [
 				Partials.Channel,
@@ -44,7 +43,8 @@ export class ExtendedClient extends Client {
 				Partials.Message,
 				Partials.Reaction,
 				Partials.ThreadMember,
-				Partials.User
+				Partials.User,
+				Partials.SoundboardSound
 			],
 			allowedMentions: { parse: ['everyone', 'roles', 'users'] },
 			makeCache: Options.cacheWithLimits({

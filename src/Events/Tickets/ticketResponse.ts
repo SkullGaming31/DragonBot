@@ -71,8 +71,7 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 				if (docs.Closed)
 					return interaction.reply({ content: 'Ticket is already closed, please wait for it to be automatically deleted', flags: MessageFlags.Ephemeral });
 				await DB.updateOne({ ChannelID: channel?.id }, { Closed: true });
-				// const Message = await guild.channels.cache.get(TicketSetup.Transcripts).send({ embeds: [embed.setTitle(`Transcript Type: ${docs.Type}\nID: ${docs.TicketID}`)], files: [attachments] });
-				await interaction.reply({ content: 'The channel will deleted in 10 seconds.', /* embeds: [embed.setDescription(`the transcript is now saved [TRANSCRIPT](${Message.url})`),], */ });
+				await interaction.reply({ content: 'The channel will deleted in 10 seconds.' });
 				setTimeout(async () => {
 					await channel?.delete().catch((err: Error) => { console.error(err); });
 				}, 10 * 1000);
