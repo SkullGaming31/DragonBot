@@ -31,6 +31,10 @@ Below are suggested features and improvements you can add to DragonBot. Each ite
 
 10. Economy upgrades & marketplace DONE
     - Extend economy (bank accounts, interest, item marketplace, gifting) and add safe concurrency handling and tests for transactions.
+      - Implemented in commit 98a7593 ("feat(market): add marketplace commands, listing view/remove, tests, and CI test reporter").
+         This change implements the in-repo marketplace (create/buy/list/remove) and associated tests.
+      
+         Closes #65
 
 11. Analytics & command usage telemetry
     - Collect anonymized command usage metrics, guild-specific stats, and expose an admin-only endpoint for the dashboard to visualize activity.
