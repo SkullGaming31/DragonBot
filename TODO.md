@@ -45,6 +45,4 @@ Below are suggested features and improvements you can add to DragonBot. Each ite
     - Add integrations for Twitch stream announcements, YouTube uploads, and generic webhooks with templated messages and rate-limits.
 
 
-Start with templates first (recommended) or go straight to transcript saving?
-For transcripts: save into the Ticket DB (text) and also post the transcript to the configured Transcripts channel (ticketSetup already captures a Transcripts channel). Is that ok?
-Template content: do you want full button definitions saved (so templates can also change buttons), or just embed description + title (simpler)? I suggest starting with description + optional buttons (names only or name+emoji string) — we can extend later.
+Ticket Transcript saving? DONE

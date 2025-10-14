@@ -83,7 +83,40 @@ export default new Command({
           const embed = new EmbedBuilder();
           if (template.Title) embed.setTitle(template.Title);
           if (template.Description) embed.setDescription(template.Description);
-          await channel.send({ embeds: [embed] }).catch(() => null);
+
+          let templateRow = null;
+          if (template.Buttons && template.Buttons.length) {
+            const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = await import('discord.js');
+            templateRow = new ActionRowBuilder<import('discord.js').ButtonBuilder>();
+            const defs = template.Buttons;
+            if (defs.length % 2 === 0 && defs.every(d => typeof d === 'string')) {
+              for (let i = 0; i < defs.length; i += 2) {
+                const label = defs[i];
+                const emoji = defs[i + 1];
+                if (!label) continue;
+                const btn = new ButtonBuilder().setCustomId(`tpl_${label.replace(/\s+/g, '_').toLowerCase()}`).setLabel(label).setStyle(ButtonStyle.Primary);
+                if (emoji) btn.setEmoji(emoji as any);
+                templateRow.addComponents(btn);
+              }
+            } else {
+              for (const entry of defs) {
+                let label = entry as string;
+                let emoji: string | undefined;
+                if (entry.includes('|')) {
+                  [label, emoji] = entry.split('|').map(s => s.trim());
+                } else if (entry.includes(',')) {
+                  [label, emoji] = entry.split(',').map(s => s.trim());
+                }
+                if (!label) continue;
+                const btn = new ButtonBuilder().setCustomId(`tpl_${label.replace(/\s+/g, '_').toLowerCase()}`).setLabel(label).setStyle(ButtonStyle.Primary);
+                if (emoji) btn.setEmoji(emoji as any);
+                templateRow.addComponents(btn);
+              }
+            }
+          }
+
+          const components = templateRow ? [templateRow] : undefined;
+          await channel.send({ embeds: [embed], components }).catch(() => null);
           return interaction.reply({ content: `Applied template ${name} to ${channel}.`, flags: MessageFlags.Ephemeral });
         }
         return interaction.reply({ content: 'Channel must be a text channel.', flags: MessageFlags.Ephemeral });

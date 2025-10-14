@@ -35,3 +35,33 @@ export function setCooldown(commandName: string, userId: string, Cooldown: numbe
 
 	// console.log(`Setting cooldown for ${commandName} by ${Cooldown} milliseconds.`);
 }
+
+// Safely reply to an interaction: tries reply/editReply/followUp and catches known Discord errors
+export async function safeInteractionReply(interaction: any, options: any) {
+	try {
+		if (!interaction.replied && !interaction.deferred) {
+			return await interaction.reply(options as any);
+		}
+
+		if (interaction.deferred) {
+			return await interaction.editReply(typeof options === 'string' ? { content: options } : { content: options.content ?? '' });
+		}
+
+		// Already replied
+		return await interaction.followUp(options as any);
+	} catch (err: any) {
+		const code = err?.code;
+		// Ignore unknown interaction / already acknowledged
+		if (code === 10062 || code === 40060) {
+			console.warn('Ignored interaction API error', code, err?.message);
+			return;
+		}
+		// Fallback: try to send message to channel
+		try {
+			if (interaction.channel && 'send' in interaction.channel) {
+				const content = typeof options === 'string' ? options : (options.content ?? '');
+				await interaction.channel.send(content);
+			}
+		} catch (_) { /* ignore */ }
+	}
+}
