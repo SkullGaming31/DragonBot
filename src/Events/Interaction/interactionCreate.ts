@@ -159,16 +159,44 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 				}
 
 				default: {
-					await interaction.reply({ content: `Unknown Button: ${interaction.customId}`, flags: MessageFlags.Ephemeral });
-					break;
+					// Unknown button: don't reply here so other listeners (ticket handlers, etc.) can handle it.
+					return;
+					// break; (unreachable)
 				}
 			}
 		} catch (error) {
+			// Handle certain Discord API interaction errors quietly: these commonly occur when
+			// the interaction has expired (10062) or already acknowledged (40060).
+			const errCode = (error as any)?.code;
+			if (errCode === 10062 || errCode === 40060) {
+				console.warn('Ignored Discord interaction error', errCode, (error as any)?.message ?? error);
+				return;
+			}
 			console.error('Error handling interaction:', error);
-			if (!interaction.replied) {
-				await interaction.reply({ content: 'An error occurred while processing your request. Please try again later.', flags: MessageFlags.Ephemeral });
-			} else if (interaction.deferred) {
-				await interaction.editReply({ content: 'An error occurred while processing your request. Please try again later.' });
+			const fallbackMsg = { content: 'An error occurred while processing your request. Please try again later.', ephemeral: true };
+			try {
+				if (!interaction.replied && !interaction.deferred) {
+					await interaction.reply(fallbackMsg as any);
+				} else if (interaction.deferred) {
+					await interaction.editReply({ content: fallbackMsg.content });
+				} else {
+					// Already replied — try followUp, but catch if not allowed
+					try {
+						await interaction.followUp(fallbackMsg as any);
+					} catch (followErr) {
+						console.warn('followUp failed for interaction:', followErr);
+						// Last resort: send message to the channel if possible
+						if (interaction.channel && 'send' in interaction.channel) {
+							try { await interaction.channel.send(fallbackMsg.content); } catch { /* ignore */ }
+						}
+					}
+				}
+			} catch (replyErr) {
+				console.error('Failed to send error reply to interaction:', replyErr);
+				// Fallback: send message in channel if available
+				if (interaction.channel && 'send' in interaction.channel) {
+					try { await interaction.channel.send(fallbackMsg.content); } catch { /* ignore */ }
+				}
 			}
 		}
 	}

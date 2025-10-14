@@ -8,7 +8,7 @@ Below are suggested features and improvements you can add to DragonBot. Each ite
 2. Reaction roles manager
    - Implement a reaction-roles UI command to create/manage role reactions, support multi-role messages, and persistent storage in DB.
 
-3. Ticketing improvements (transcripts + templates)
+3. Ticketing improvements (transcripts + templates) IN PROGRESS
    - Add ticket templates, automatic transcript generation and saving to DB or file storage, and ticket assignment/CLAIM features for support staff.
 
 4. Guild dashboard (Vue) with OAuth
@@ -23,7 +23,7 @@ Below are suggested features and improvements you can add to DragonBot. Each ite
 7. Scheduled reminders & events
    - Add a scheduler for reminders/events with human-friendly time parsing, recurring events, and DM/ping options for attendees.
 
-8. Starboard & message highlights
+8. Starboard & message highlights DONE
    - Implement starboard or reaction-based highlight channels, with thresholds, exclusions, and duplicate detection.
 
 9. Invite tracking & welcome rewards
@@ -45,3 +45,4 @@ Below are suggested features and improvements you can add to DragonBot. Each ite
     - Add integrations for Twitch stream announcements, YouTube uploads, and generic webhooks with templated messages and rate-limits.
 
 
+Ticket Transcript saving? DONE

@@ -1,6 +1,8 @@
 import { ChannelType, Message, userMention } from 'discord.js';
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { UserModel } from '../../Database/Schemas/userModel';
+import TicketModel from '../../Database/Schemas/ticketDB';
+import TicketSetupModel from '../../Database/Schemas/ticketSetupDB';
 import { Event } from '../../Structures/Event';
 
 const BASE_CURRENCY_CHANCE = 0.1;
@@ -105,10 +107,18 @@ export default new Event('messageCreate', async (message: Message) => {
 			// Notify user about earned currency
 			const econChannel = settings?.EconChan ? guild.channels.cache.get(settings.EconChan) : undefined;
 
-			const channelForNotification = econChannel || message.channel;
+			// If message is in a ticket channel or inside the ticket category, don't post economy notifications directly there.
+			// Prefer the configured econ channel; if none, skip notification to avoid spam in tickets.
+			const ticketEntry = await TicketModel.findOne({ ChannelID: channel.id }).exec();
+			const ticketSetup = await TicketSetupModel.findOne({ GuildID: guild.id }).exec();
+			const isInTicketCategory = ticketSetup?.Category && channel.parentId === ticketSetup.Category;
+			const isTicketChannel = !!ticketEntry || !!isInTicketCategory;
+
+			let channelForNotification = econChannel || undefined;
+			if (!channelForNotification && !isTicketChannel && channel.type === ChannelType.GuildText) channelForNotification = message.channel as any;
 
 			await new Promise((resolve) => setTimeout(resolve, 1000)); // Delay 1 second
-			if (channelForNotification.type === ChannelType.GuildText) await channelForNotification.send({ content: notificationMessage });
+			if (channelForNotification && channelForNotification.type === ChannelType.GuildText) await channelForNotification.send({ content: notificationMessage });
 		} catch (error) {
 			console.error('Error updating user currency:', error);
 		}
