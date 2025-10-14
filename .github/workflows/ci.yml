@@ -71,6 +71,24 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install libssl1.1 (required by mongodb binaries)
+        # mongodb-memory-server spawns mongod which may require OpenSSL 1.1 (libcrypto.so.1.1)
+        # Ubuntu 22.04 runners don't ship libssl1.1 by default; fetch a compatible deb and install.
+        run: |
+          set -e
+          sudo apt-get update
+          sudo apt-get install -y wget ca-certificates || true
+          # Try download from security.ubuntu; fallback to archive if needed.
+          wget -qO /tmp/libssl1.1.deb "http://security.ubuntu.com/ubuntu/pool/main/o/openssl1.1/libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb" || true
+          if [ ! -s /tmp/libssl1.1.deb ]; then
+            wget -qO /tmp/libssl1.1.deb "http://archive.ubuntu.com/ubuntu/pool/main/o/openssl1.1/libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb"
+          fi
+          if [ -s /tmp/libssl1.1.deb ]; then
+            sudo dpkg -i /tmp/libssl1.1.deb || sudo apt-get install -f -y
+          else
+            echo "Warning: libssl1.1 package not downloaded; mongodb-memory-server may fail to start"
+          fi
+
       - name: Typecheck (if available)
         run: npm run typecheck --if-present
 
