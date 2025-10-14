@@ -72,4 +72,78 @@ describe('Ticket interaction handlers', () => {
     expect((safeInteractionReply as any)).toHaveBeenCalled();
     expect((DB.deleteOne as any)).toHaveBeenCalledWith({ ChannelID: channel.id });
   });
+
+  it('handles lock button: sets Locked true and edits permissions for members', async () => {
+    const docs = { TicketID: 'T-456', MembersID: ['U1', 'U2'], Locked: false } as any;
+    (DB.findOne as any).mockImplementation(() => ({ exec: async () => docs }));
+    (DB.updateOne as any).mockResolvedValue({});
+
+    const permissionEdit = vi.fn();
+    const channel = { id: 'C2', type: 0, permissionOverwrites: { edit: permissionEdit } } as any;
+    const guild = { id: 'G2' } as any;
+
+    const interaction: any = {
+      isButton: () => true,
+      inCachedGuild: () => true,
+      guild,
+      customId: 'lock',
+      channel,
+      member: { permissions: { has: () => true }, id: 'U1' }
+    };
+
+    await (ticketEvent as any).run(interaction);
+
+    expect((DB.updateOne as any)).toHaveBeenCalledWith({ ChannelID: channel.id }, { Locked: true });
+    // permissionOverwrites.edit should be called for each member
+    expect(permissionEdit).toHaveBeenCalled();
+    expect((safeInteractionReply as any)).toHaveBeenCalled();
+  });
+
+  it('handles unlock button: sets Locked false and restores permissions', async () => {
+    const docs = { TicketID: 'T-789', MembersID: ['U1'], Locked: true } as any;
+    (DB.findOne as any).mockImplementation(() => ({ exec: async () => docs }));
+    (DB.updateOne as any).mockResolvedValue({});
+
+    const permissionEdit = vi.fn();
+    const channel = { id: 'C3', type: 0, permissionOverwrites: { edit: permissionEdit } } as any;
+    const guild = { id: 'G3' } as any;
+
+    const interaction: any = {
+      isButton: () => true,
+      inCachedGuild: () => true,
+      guild,
+      customId: 'unlock',
+      channel,
+      member: { permissions: { has: () => true }, id: 'U1' }
+    };
+
+    await (ticketEvent as any).run(interaction);
+
+    expect((DB.updateOne as any)).toHaveBeenCalledWith({ ChannelID: channel.id }, { Locked: false });
+    expect(permissionEdit).toHaveBeenCalled();
+    expect((safeInteractionReply as any)).toHaveBeenCalled();
+  });
+
+  it('handles claim button: sets Claimed true and records ClaimedBy', async () => {
+    const docs = { TicketID: 'T-999', Claimed: false } as any;
+    (DB.findOne as any).mockImplementation(() => ({ exec: async () => docs }));
+    (DB.updateOne as any).mockResolvedValue({});
+
+    const channel = { id: 'C4' } as any;
+    const guild = { id: 'G4' } as any;
+
+    const interaction: any = {
+      isButton: () => true,
+      inCachedGuild: () => true,
+      guild,
+      customId: 'claim',
+      channel,
+      member: { permissions: { has: () => true }, id: 'CLAIMER#1', toString: () => '<@CLAIMER#1>' }
+    };
+
+    await (ticketEvent as any).run(interaction);
+
+    expect((DB.updateOne as any)).toHaveBeenCalledWith({ ChannelID: channel.id }, { Claimed: true, ClaimedBy: interaction.member.id });
+    expect((safeInteractionReply as any)).toHaveBeenCalled();
+  });
 });
