@@ -89,6 +89,11 @@ export default new Command({
 						inline: true
 					},
 					{
+						name: 'Bank',
+						value: `${userDoc.bank || 0} gold`,
+						inline: true
+					},
+					{
 						name: 'Inventory',
 						value: `${userDoc.inventory?.length ? userDoc.inventory.join('\n') : 'Empty'}`, // Check length and join if exists, otherwise show "Empty"
 						inline: true
