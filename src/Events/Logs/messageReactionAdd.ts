@@ -12,6 +12,8 @@ export default new Event<'messageReactionAdd'>('messageReactionAdd', async (reac
     }
     if (!msg || !msg.guild) return;
     if ((user as User).bot) return; // ignore bot reactions
+    // Prevent users from reacting to their own messages to inflate star counts
+    if ((user as User).id && msg.author?.id && (user as User).id === msg.author.id) return;
 
     const guildId = msg.guild.id;
     const config = await StarboardModel.findOne({ guildId }).exec();
@@ -44,7 +46,7 @@ export default new Event<'messageReactionAdd'>('messageReactionAdd', async (reac
 
     // build embed
     const embed = new EmbedBuilder()
-      .setAuthor({ name: msg.author?.tag ?? 'Unknown', iconURL: msg.author?.displayAvatarURL() })
+      .setAuthor({ name: msg.author?.bot ? msg.author.tag : ((msg.author as any)?.globalName || msg.author?.username || msg.author?.tag || 'Unknown'), iconURL: msg.author?.displayAvatarURL() })
       .setTimestamp(msg.createdAt);
 
     // Only set description when there's non-empty content (EmbedBuilder rejects empty strings)

@@ -109,7 +109,7 @@ export default new Command({
 					// Update database
 					const newInfraction = {
 						IssuerID: member.id,
-						IssuerTag: member.user.globalName || member.user.username,
+						IssuerTag: member.user.bot ? member.user.tag : (member.user.globalName || member.user.username || member.user.tag),
 						Reason: Reason,
 						Date: Date.now()
 					};

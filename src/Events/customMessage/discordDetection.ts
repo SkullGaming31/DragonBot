@@ -41,7 +41,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 		const discordLinkDetection = new EmbedBuilder()
 			.setTitle('Discord Link Detected')
 			.setColor('Red')
-			.setAuthor({ name: `${author.globalName || author.tag}`, iconURL: author.displayAvatarURL({ size: 512 }) })
+			.setAuthor({ name: author.bot ? author.tag : (author.globalName || author.username || author.tag), iconURL: author.displayAvatarURL({ size: 512 }) })
 			.setThumbnail(author.displayAvatarURL({ forceStatic: true, size: 512 }))
 			.setFooter({ text: `guild: ${guild.name}` })
 			.setTimestamp();

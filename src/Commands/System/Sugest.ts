@@ -59,7 +59,7 @@ export default new Command({
 		const Response = new EmbedBuilder()
 			.setTitle('NEW FEATURE REQUEST')
 			.setColor('Blue')
-			.setAuthor({ name: `${user.globalName || user.username}`, iconURL: user.displayAvatarURL({ size: 512 }) })
+			.setAuthor({ name: user.bot ? user.tag : (user.globalName || user.username || user.tag), iconURL: user.displayAvatarURL({ size: 512 }) })
 			.setDescription(Description)
 			.addFields(
 				{ name: 'Name', value: Name },

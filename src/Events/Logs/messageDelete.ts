@@ -22,7 +22,7 @@ export default new Event<'messageDelete'>('messageDelete', async (message: Messa
 	const messageContent = (message as Message | PartialMessage).content || 'None';
 
 	// Get the author's name (including discriminator for users, tag for bots)
-	const authorName = author?.bot ? author.tag : author?.globalName || 'Unknown';
+	const authorName = author?.bot ? author.tag : (author?.globalName || author?.username || 'Unknown');
 
 	// Truncate the message content to fit within Discord's embed field limit
 	const truncatedContent = messageContent.slice(0, 1024); // Truncate to 1024 characters

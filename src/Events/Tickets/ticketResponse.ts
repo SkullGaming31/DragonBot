@@ -100,7 +100,9 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 						const escapeHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 						const rows = ordered.map(m => {
 							const time = new Date(m.createdTimestamp).toLocaleString();
-							const author = escapeHtml(`${m.author.tag} (${m.author.id})`);
+							const authorNameRaw = (m.author as any);
+							const authorName = m.author.bot ? m.author.tag : (authorNameRaw.globalName || m.author.username || m.author.tag);
+							const author = escapeHtml(`${authorName} (${m.author.id})`);
 							const content = escapeHtml(m.content ?? '');
 							const attachments = m.attachments.map(a => `<a href="${a.url}">${escapeHtml(a.name || a.url)}</a>`).join(' ');
 							return `<div class="msg"><div class="meta"><span class="time">${time}</span> <span class="author">${author}</span></div><div class="content">${content}</div>${attachments ? `<div class="attachments">${attachments}</div>` : ''}</div>`;

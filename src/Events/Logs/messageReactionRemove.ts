@@ -11,6 +11,8 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
     }
     if (!msg || !msg.guild) return;
     if ((user as User).bot) return;
+    // Ignore removals made by the message author (they shouldn't be able to self-star)
+    if ((user as User).id && msg.author?.id && (user as User).id === msg.author.id) return;
 
     const guildId = msg.guild.id;
     const config = await StarboardModel.findOne({ guildId }).exec();
@@ -48,7 +50,7 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
         const starMsg = await channel.messages.fetch(mapping.starboardMessageId).catch(() => null);
         if (starMsg) {
           const embed = new EmbedBuilder()
-            .setAuthor({ name: msg.author?.tag ?? 'Unknown', iconURL: msg.author?.displayAvatarURL() })
+            .setAuthor({ name: msg.author?.bot ? msg.author.tag : ((msg.author as any)?.globalName || msg.author?.username || msg.author?.tag || 'Unknown'), iconURL: msg.author?.displayAvatarURL() })
             .setTimestamp(msg.createdAt);
 
           const content = (msg.content ?? '').toString().trim();

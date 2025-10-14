@@ -1,4 +1,4 @@
- 
+
 import crypto from 'crypto';
 import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder } from 'discord.js';
 import DB from '../../Database/Schemas/WarnDB';
@@ -120,7 +120,7 @@ export default new Command({
 				// Logic for checking warnings
 				const userWarnings = await DB.findOne({ GuildID: guild.id, UserID: Target?.id });
 				if (!userWarnings || userWarnings.Warnings.length === 0) {
-					interaction.reply({ content: `No warnings found for ${Target?.tag}.` });
+					interaction.reply({ content: `No warnings found for ${Target?.bot ? Target?.tag : ((Target as any)?.globalName || Target?.tag || Target?.username)}.` });
 				} else {
 					const warningEmbed = new EmbedBuilder()
 						.setTitle(`${Target?.globalName}'s Warnings`)
