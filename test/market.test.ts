@@ -114,7 +114,8 @@ describe('Marketplace commands', () => {
     };
 
     const { interaction, reply } = makeInteractionMock(opts);
-    await (await import('../src/Commands/Fun/market-list')).default.run({ interaction } as any);
+    const marketListMod = await import('../src/Commands/Fun/market-list');
+    await (marketListMod.default as any).run({ interaction } as any);
 
     expect(reply).toHaveBeenCalled();
     const arg = reply.mock.calls[0][0];
@@ -136,14 +137,16 @@ describe('Marketplace commands', () => {
     // attempt remove by non-seller
     let opts = { guild: { id: guildId }, user: { id: other }, options: { getString: (k: string) => String(listing._id) } };
     let mock = makeInteractionMock(opts);
-    await (await import('../src/Commands/Fun/market-remove')).default.run({ interaction: mock.interaction } as any);
+    const marketRemoveMod = await import('../src/Commands/Fun/market-remove');
+    await (marketRemoveMod.default as any).run({ interaction: mock.interaction } as any);
     expect(mock.reply).toHaveBeenCalled();
     expect((mock.reply.mock.calls[0][0] as any).content).toMatch(/Only the seller/);
 
     // remove by seller
     opts = { guild: { id: guildId }, user: { id: seller }, options: { getString: (k: string) => String(listing._id) } };
     mock = makeInteractionMock(opts);
-    await (await import('../src/Commands/Fun/market-remove')).default.run({ interaction: mock.interaction } as any);
+    const marketRemoveMod2 = await import('../src/Commands/Fun/market-remove');
+    await (marketRemoveMod2.default as any).run({ interaction: mock.interaction } as any);
     expect(mock.reply).toHaveBeenCalled();
     expect((mock.reply.mock.calls[0][0] as any).content).toMatch(/removed/);
 
