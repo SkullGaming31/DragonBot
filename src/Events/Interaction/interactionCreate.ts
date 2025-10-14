@@ -21,7 +21,7 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 			return interaction.reply({ content: 'You have used a non-existent command, please try another command', flags: MessageFlags.Ephemeral });
 		}
 
-		console.log('[Interaction] executing command:', command.name, 'command object id:', command);
+		// console.log('[Interaction] executing command:', command.name, 'command object id:', command);
 		try {
 			await command.run({
 				args: interaction.options as CommandInteractionOptionResolver,
