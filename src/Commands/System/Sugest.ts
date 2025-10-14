@@ -40,55 +40,99 @@ export default new Command({
 		}
 	],
 	run: async ({ interaction }) => {
+		console.log('Feature command initiated');
 		const { options, channel, guild, member, user } = interaction;
 
-		const Name = options.getString('name');
-		const Type = options.getString('type');
-		const Description = options.getString('description');
+		// Validate guild exists
+		if (!guild) {
+			if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') { console.log('No guild found'); }
 
+			return interaction.reply({ content: '❌ This command can only be used in a server.', flags: MessageFlags.Ephemeral });
+		}
+
+		// Get suggestion details
+		const Name = options.getString('name', true);
+		const Type = options.getString('type', true);
+		const Description = options.getString('description', true);
+
+		// Create Response Embed
 		const Response = new EmbedBuilder()
 			.setTitle('NEW FEATURE REQUEST')
 			.setColor('Blue')
-			.setAuthor({ name: `${user.globalName || user.username}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` })
+			.setAuthor({ name: `${user.globalName || user.username}`, iconURL: user.displayAvatarURL({ size: 512 }) })
 			.setDescription(Description)
 			.addFields(
-				{ name: 'Name', value: `${Name}` },
-				{ name: 'Type', value: `${Type}` },
+				{ name: 'Name', value: Name },
+				{ name: 'Type', value: Type },
 				{ name: 'Status', value: 'Pending...' }
 			)
 			.setTimestamp();
 
-		const data = await SettingsModel.findOne({ GuildID: guild?.id });
-		if (!data || data.SuggestChan === undefined) return;
-
-		const Buttons = new ActionRowBuilder<ButtonBuilder>();
-		Buttons.addComponents(
+		// Create buttons
+		const Buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			new ButtonBuilder().setCustomId('sugges-accept').setLabel('✅ Accept').setStyle(ButtonStyle.Primary),
 			new ButtonBuilder().setCustomId('sugges-decline').setLabel('⛔ Decline').setStyle(ButtonStyle.Danger)
 		);
 
-		const featureChannel = data.SuggestChan || interaction.channel?.id;
-		if (!featureChannel) return;
-		const suggestionChannel = guild?.channels.cache.get(featureChannel);
-		if (channel?.id !== '1142639289264513115') return interaction.reply({ content: `❌ | you may only use this command in the suggestion channel ${suggestionChannel}`, flags: MessageFlags.Ephemeral });
-		// if (guild?.id !== '1068285177891131422') return interaction.reply({ content: '❌ | you may only use this command in the Discord Bots Main Server', flags: MessageFlags.Ephemeral });
-
 		try {
-			const M = await interaction.reply({ embeds: [Response], components: [Buttons], fetchReply: true });
+			// Check for configured suggestion channel
+			const data = await SettingsModel.findOne({ GuildID: guild.id });
+			const featureChannelId = data?.SuggestChan;
+			const targetChannel = featureChannelId ? guild.channels.cache.get(featureChannelId) : channel;
 
-			await DB.create({
-				guildId: guild?.id, messageId: M.id,
-				details: [
-					{
-						MemberID: member.id,
-						Title: Type,
-						Name: Name
-					}
-				]
+			// Validate target channel
+			if (!targetChannel?.isSendable()) {
+				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') { console.log('Invalid target channel'); }
+
+				return interaction.reply({ content: '❌ Could not find a valid channel to send the suggestion.', flags: MessageFlags.Ephemeral });
+			}
+
+			// Check if command is in correct channel (if configured)
+			if (featureChannelId && channel?.id !== featureChannelId) {
+				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') { console.log('Command used in wrong channel'); }
+
+				return interaction.reply({ content: `❌ Please use this command in the suggestions channel: <#${featureChannelId}>`, flags: MessageFlags.Ephemeral });
+			}
+
+			// Send the suggestion
+			if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') { console.log('Attempting to send suggestion'); }
+
+			const M = await targetChannel.send({
+				embeds: [Response],
+				components: [Buttons],
+				poll: {
+					question: { text: `Would you like to to see this feature in the ${Type} Bot` },
+					answers: [
+						{ text: 'Yes' },
+						{ text: 'No' },
+						{ text: 'no opinion on this' }
+					],
+					duration: 10,
+					allowMultiselect: false
+				},
+				options: { withResponse: true }
 			});
-		} catch (error) {
-			console.error(error);
+			// Create database entry
+			await DB.create({
+				guildId: guild.id,
+				messageId: M.id,
+				details: [{
+					MemberID: member.id,
+					Title: Type,
+					Name: Name,
+					Description: Description
+				}]
+			});
+
+			// Respond to user
+			if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') { console.log('Sending success response'); }
+
+			await interaction.reply({ content: `✅ Your suggestion has been submitted${featureChannelId ? '' : ' in this channel'}!`, flags: MessageFlags.Ephemeral });
+
+		} catch (error: unknown) {
+			if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') { console.error('Error in feature command:', error); }
+
+			await interaction.reply({ content: '❌ Failed to submit your suggestion. Please try again.', flags: MessageFlags.Ephemeral });
 		}
 	}
-
 });

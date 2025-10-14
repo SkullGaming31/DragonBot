@@ -1,4 +1,4 @@
-/* eslint-disable no-case-declarations */
+ 
 import { MessageReaction, PartialMessageReaction, PartialUser, Role, User } from 'discord.js';
 import { Event } from '../../Structures/Event';
 

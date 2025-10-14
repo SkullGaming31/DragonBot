@@ -3,6 +3,7 @@ import axios from 'axios';
 import { ApplicationCommandType, EmbedBuilder } from 'discord.js';
 import { IjokeAPI } from '../../Interfaces/jokesInterface';
 import { Command } from '../../Structures/Command';
+// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 axios.defaults;
 
 export default new Command({
@@ -16,6 +17,7 @@ export default new Command({
 	run: async ({ interaction }) => {
 		const { user } = interaction;
 		await interaction.deferReply();
+
 		const jokeURL = 'https://official-joke-api.appspot.com/random_joke';
 		const jokeAPI = await axios.get<IjokeAPI>(jokeURL, {
 			headers: {
@@ -50,8 +52,8 @@ export default new Command({
 			await mDEL.delete();
 			const m = await interaction.followUp({ embeds: [embed] });
 			const r = await interaction.fetchReply(m.id);
-			await r.react('🤣');
-			await r.react('😆');
+			await r.react('👍');
+			await r.react('👎');
 		}, 2000);
 	}
 });

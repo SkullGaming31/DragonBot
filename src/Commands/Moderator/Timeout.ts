@@ -1,12 +1,7 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, Colors, EmbedBuilder, MessageFlags } from 'discord.js';
-import ms from 'ms';
+import ms, { StringValue } from 'ms';
 import Database from '../../Database/Schemas/Infractions';
 import { Command } from '../../Structures/Command';
-
-/**
- * TODO:
- * list out all infraction for a user with reasons
- */
 
 export default new Command({
 	name: 'timeout',
@@ -49,85 +44,145 @@ export default new Command({
 		if (!interaction.inCachedGuild()) return;
 
 		const { options, guild, member } = interaction;
-
 		const Choice = options.getString('option');
 		const Target = options.getMember('target');
 		const Length = options.getString('length');
 		const Reason = options.getString('reason') || 'No Reason Provided';
 
 		switch (Choice) {
-			case 'add':
-				if (Length === null) return interaction.reply({ content: 'You must provide a length of time to time someone out.(1s,1m,1h,1d)', flags: MessageFlags.Ephemeral });
-				if (Reason.length > 512) return interaction.reply({ content: 'You can not use more then 512 Characters for your reasoning', flags: MessageFlags.Ephemeral });
-				if (!Target) return interaction.reply({ content: 'The Member most likely left the server', flags: MessageFlags.Ephemeral });
+			case 'add': {
+				// Validate length first
+				if (!Length) return interaction.reply({
+					content: 'You must provide a length of time to time someone out.(1s,1m,1h,1d)',
+					flags: MessageFlags.Ephemeral
+				});
 
-				// eslint-disable-next-line no-case-declarations
-				const timeInMs = ms(Length) / 1000;
-				if (!timeInMs) return interaction.reply({ content: 'Please specify a valid time(1s,1m,1h,1d)', flags: MessageFlags.Ephemeral });
-				if (!ms(Length) || ms(Length) > ms('28d')) return interaction.reply({ content: 'Time Provided is invalid or over the 28d limit', flags: MessageFlags.Ephemeral });
+				// Validate time format
+				const timeFormatRegex = /^[1-9]\d*[smhd]$/;
+				if (!timeFormatRegex.test(Length)) {
+					return interaction.reply({
+						content: 'Invalid time format. Use 1s, 1m, 1h, or 1d',
+						flags: MessageFlags.Ephemeral
+					});
+				}
 
-				if (!Target.manageable || !Target.moderatable) return interaction.reply({ content: 'selected target is not moderatable by this bot', flags: MessageFlags.Ephemeral });
-				if (member.roles.highest.position < Target.roles.highest.position) return interaction.reply({ content: 'selected member has a higher role position then you', flags: MessageFlags.Ephemeral });
-				if (interaction.user.id === Target.user.id) return interaction.reply({ content: 'you can not timeout yourself', flags: MessageFlags.Ephemeral });
+				// Convert to milliseconds
+				const durationMs = ms(Length as StringValue);
+				if (!durationMs || durationMs > ms('28d')) {
+					return interaction.reply({
+						content: 'Invalid duration or exceeds 28-day limit',
+						flags: MessageFlags.Ephemeral
+					});
+				}
+
+				// Validate other parameters
+				if (Reason.length > 512) return interaction.reply({
+					content: 'Reason cannot exceed 512 characters',
+					flags: MessageFlags.Ephemeral
+				});
+
+				if (!Target) return interaction.reply({
+					content: 'Target member not found',
+					flags: MessageFlags.Ephemeral
+				});
+
+				// Permission checks
+				if (!Target.manageable || !Target.moderatable) return interaction.reply({
+					content: 'Cannot moderate this user',
+					flags: MessageFlags.Ephemeral
+				});
+
+				if (member.roles.highest.position <= Target.roles.highest.position) return interaction.reply({
+					content: 'Target has equal or higher role position',
+					flags: MessageFlags.Ephemeral
+				});
+
+				if (interaction.user.id === Target.user.id) return interaction.reply({
+					content: 'You cannot timeout yourself',
+					flags: MessageFlags.Ephemeral
+				});
 
 				try {
-					await Target?.timeout(timeInMs, Reason).catch(async (err: any) => {
-						await interaction.reply({ content: 'could not timeout the user due to an uncommon error', flags: MessageFlags.Ephemeral });
-						return console.error(err);
-					});
+					// Apply timeout
+					await Target.timeout(durationMs, Reason);
 
+					// Update database
 					const newInfraction = {
 						IssuerID: member.id,
-						IssuerTag: member.user.username,
+						IssuerTag: member.user.globalName || member.user.username,
 						Reason: Reason,
 						Date: Date.now()
 					};
+
 					let userData = await Database.findOne({ Guild: guild.id, User: Target.id });
-					if (!userData) userData = await Database.create({ Guild: guild.id, User: Target.id, Infractions: [newInfraction] });
-					else userData.Infractions.push(newInfraction) && await userData.save();
 
+					if (!userData) {
+						userData = await Database.create({
+							Guild: guild.id,
+							User: Target.id,
+							Infractions: [newInfraction]
+						});
+					} else {
+						userData.Infractions.push(newInfraction);
+						await userData.save();
+					}
 
+					// Create embed with human-readable duration
+					const durationDisplay = ms(durationMs, { long: true });
 					const timedoutEmbed = new EmbedBuilder()
-						.setTitle(`${Target?.displayName}`)
+						.setTitle(`${Target.displayName} Timed Out`)
 						.addFields(
-							{ name: 'Timed Out for: ', value: `\`${timeInMs}\``, inline: false },
-							{ name: 'Reason: ', value: `\`${Reason}\``, inline: false },
-							{ name: 'Infraction Count: ', value: `\`${userData.Infractions.length} infractions recorded\``, inline: false }
+							{ name: 'Duration', value: `\`${durationDisplay}\``, inline: true },
+							{ name: 'Reason', value: `\`${Reason}\``, inline: true },
+							{ name: 'Total Infractions', value: `\`${userData.Infractions.length}\``, inline: true }
 						)
-						.setColor(Colors.Red);
+						.setColor(Colors.Red)
+						.setTimestamp();
+
 					return interaction.reply({ embeds: [timedoutEmbed] });
 
 				} catch (error) {
-					console.error(error);
-					return;
+					console.error('Timeout Error:', error);
+					return interaction.reply({
+						content: 'Failed to timeout user due to an error',
+						flags: MessageFlags.Ephemeral
+					});
 				}
-			case 'check':
-				/**
-					 * Pull Infraction Data(Object Array) from database and display in databaseEmbed
-					 */
-				// eslint-disable-next-line no-case-declarations
-				const userData = await Database.findOne({ Guild: guild.id, User: Target?.id });
-				if (!userData) return interaction.reply({ content: `No infractions found for ${Target}`, flags: MessageFlags.Ephemeral });
+			}
 
-				// eslint-disable-next-line no-case-declarations
+			case 'check': {
+				if (!Target) return interaction.reply({
+					content: 'User not found',
+					flags: MessageFlags.Ephemeral
+				});
+
+				const userData = await Database.findOne({
+					Guild: guild.id,
+					User: Target.id
+				});
+
+				if (!userData?.Infractions.length) return interaction.reply({
+					content: `No infractions found for ${Target.user.globalName}`,
+					flags: MessageFlags.Ephemeral
+				});
+
+				const infractionsList = userData.Infractions
+					.map((inf, index) =>
+						`**#${index + 1}** - ${ms(Date.now() - inf.Date, { long: true })} ago\n` +
+						`**Moderator:** ${inf.IssuerTag}\n` +
+						`**Reason:** ${inf.Reason}`
+					)
+					.join('\n\n');
+
 				const databaseEmbed = new EmbedBuilder()
-					.setTitle('Display Data from Database')
-					.setDescription(`${userData?.Infractions.forEach((data: any) => {
-						data;
-						/**
-						 * Check Structures/Schemas/Infractions.ts for full details
-						 * Infractions object[]
-						 * Includes-
-						 * IssuerID: string,
-							 IssuerTag: string,
-							 Reason: string,
-							 Date: Date.now()
-						 */
-						// eslint-disable-next-line indent
-						console.log({ data });
-					})}`);
-				interaction.reply({ embeds: [databaseEmbed] });
-				break;
+					.setTitle(`${Target.user.globalName}'s Infractions`)
+					.setDescription(infractionsList)
+					.setColor(Colors.Orange)
+					.setFooter({ text: `Total Infractions: ${userData.Infractions.length}` })
+					.setTimestamp();
+
+				return interaction.reply({ embeds: [databaseEmbed] });
+			}
 		}
 	}
 });

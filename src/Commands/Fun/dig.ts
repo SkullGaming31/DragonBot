@@ -1,23 +1,56 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, AttachmentBuilder, channelMention, MessageFlags, userMention } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, channelMention, EmbedBuilder, MessageFlags, userMention } from 'discord.js';
 import { randomInt } from 'node:crypto';
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { IUser, UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
 
+// Cache types mirroring Vigor's progression
+const CACHE_TIERS = {
+	COMMON: {
+		name: 'Common Cache',
+		chance: 0.6,
+		rewards: {
+			gold: [100, 200] as [number, number]
+		},
+		// image: 'common-cache.png'
+	},
+	MILITARY: {
+		name: 'Military Crate',
+		chance: 0.3,
+		rewards: {
+			gold: [250, 500] as [number, number]
+		},
+		// image: 'military-crate.png'
+	},
+	LUXURY: {
+		name: 'Luxury Case',
+		chance: 0.1,
+		rewards: {
+			gold: [750, 1500] as [number, number]
+		},
+		// image: 'luxury-case.png'
+	}
+};
+
 export default new Command({
 	name: 'dig',
-	description: 'Dig up caches and earn points but watch out for the bombs',
+	description: 'Scavenge for supply caches - Vigor style!',
 	UserPerms: ['SendMessages'],
 	BotPerms: ['SendMessages'],
 	defaultMemberPermissions: ['SendMessages'],
-	Cooldown: 60000,
+	Cooldown: 21600000, // 6 hours
 	Category: 'Fun',
 	options: [
 		{
-			name: 'amount',
-			description: 'Choose the amount to bet',
-			type: ApplicationCommandOptionType.Number,
-			required: true
+			name: 'location',
+			description: 'Choose your digging zone',
+			type: ApplicationCommandOptionType.String,
+			required: true,
+			choices: [
+				{ name: 'Forest (Safe)', value: 'forest' },
+				{ name: 'Ruins (Risky)', value: 'ruins' },
+				{ name: 'Radiation Zone (Dangerous)', value: 'radiation' }
+			]
 		}
 	],
 	type: ApplicationCommandType.ChatInput,
@@ -25,84 +58,140 @@ export default new Command({
 		try {
 			const { options, user, channel, guild } = interaction;
 
-			// Parse the dig amount from the arguments
-			const digAmount = options.getNumber('amount');
+			const zone = options.getString('location') as 'forest' | 'ruins' | 'radiation';
 
-
-			// Check if the dig amount is valid
-			if (!digAmount || digAmount <= 0) return interaction.reply({ content: 'Invalid bet amount, Usage:', flags: MessageFlags.Ephemeral });
-
-			if (digAmount < 100 || digAmount > 5000) return interaction.reply({ content: 'Invalid bet amount. Minimum bet is 100 gold and maximum is 5000 gold.', flags: MessageFlags.Ephemeral, });
-			// Check settings for economy channel
+			// Validate environment
 			const settings = await SettingsModel.findOne({ GuildID: guild?.id });
+			const economyChannel = settings?.EconChan ? guild?.channels.cache.get(settings.EconChan) : interaction.channel;
+			if (!economyChannel) {
+				return interaction.reply({
+					content: '❌ Economy system not properly configured!',
+					flags: MessageFlags.Ephemeral
+				});
+			}
 
-			let economyChannel;
-			if (settings && settings.EconChan) {
-				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
-					console.log('econchannelid: ', economyChannel);
-				}
-				economyChannel = guild?.channels.cache.get(settings.EconChan);
+			if (channel?.id !== economyChannel?.id) {
+				return interaction.reply({
+					content: `${userMention(user.id)}, Scavenge operations restricted to ${channelMention(economyChannel?.id)}`,
+					flags: MessageFlags.Ephemeral
+				});
+			}
+
+			// Get player profile
+			const userDoc = await UserModel.findOne<IUser>({
+				guildID: guild?.id,
+				id: user.id
+			});
+
+			const now = Date.now();
+			const cooldownEnd = userDoc?.cooldowns?.dig || 0;
+
+			if (now < cooldownEnd) {
+				const remaining = cooldownEnd - now;
+				const hours = Math.floor(remaining / 3600000);
+				const minutes = Math.floor((remaining % 3600000) / 60000);
+
+				return interaction.reply({
+					content: `⏳ You need to let your team rest! Come back in \`${hours}h ${minutes}m\``,
+					flags: MessageFlags.Ephemeral
+				});
+			}
+
+			// Zone-specific modifiers
+			let tierModifier = 1;
+			if (zone === 'ruins') tierModifier = 1.3;
+			if (zone === 'radiation') tierModifier = 1.7;
+
+			// Determine found cache
+			const roll = Math.random();
+			let foundTier;
+
+			if (roll < CACHE_TIERS.LUXURY.chance * tierModifier) {
+				foundTier = CACHE_TIERS.LUXURY;
+			} else if (roll < CACHE_TIERS.MILITARY.chance * tierModifier) {
+				foundTier = CACHE_TIERS.MILITARY;
 			} else {
-				// No economy channel set, use the command channel
-				economyChannel = interaction.channel;
-			}
-			if (economyChannel) {
-				if (channel?.id !== economyChannel?.id) {
-					return interaction.reply({ content: `${userMention(user.id)}, You can only use this command in the economy spam channel ${channelMention(economyChannel.id)}`, flags: MessageFlags.Ephemeral });
-				}
+				foundTier = CACHE_TIERS.COMMON;
 			}
 
-			// Check if the user has enough balance
-			const userDoc = await UserModel.findOne<IUser>({ guildID: guild?.id, id: user.id });
-			if (userDoc?.balance === undefined) return;
-			if (!userDoc || userDoc.balance < digAmount) { return interaction.reply({ content: 'You don\'t have enough balance to dig.', flags: MessageFlags.Ephemeral }); }
-			// Deduct the dig amount from the user's balance
-			// await UserModel.updateOne({ id: user.id, balance: { $gte: digAmount } }, { $inc: { balance: -digAmount } });
+			// Generate loot
+			const loot = {
+				gold: randomInt(...foundTier.rewards.gold)
+			};
 
-			// Generate a random number between 1-3 to decide how many bombs are in play
-			const numBombs = randomInt(1, 4);
+			// Update inventory
+			await UserModel.updateOne(
+				{ guildID: guild?.id, id: user.id },
+				{
+					$inc: { balance: loot.gold },
+					$set: { 'cooldowns.dig': Date.now() + 21600000 } // 6 hours
+				},
+				{ upsert: true }
+			);
 
-			// Generate an array of holes with the specified number of bombs
-			const holes: string[] = [];
-			for (let i = 0; i < 5; i++) {
-				if (i < numBombs) {
-					holes.push('bomb');
-					continue;
-				}
-				holes.push('empty');
+			// Build response
+			const locationMessages = {
+				forest: ['Peaceful woodland foraging', 'Quiet forest scavenging'],
+				ruins: ['Urban ruin exploration', 'Abandoned building search'],
+				radiation: ['Hot zone excavation', 'Glowing crater digging']
+			};
+
+			// Helper function inside the command
+			function createProgressBar(current: number, max: number): string {
+				const filledBlocks = Math.round((current / max) * 10);
+				return `[${'◼'.repeat(filledBlocks)}${'◻'.repeat(10 - filledBlocks)}]`;
 			}
 
-			// Shuffle the holes randomly
-			for (let i = holes.length - 1; i > 0; i--) {
-				const j = randomInt(0, i + 1);
-				[holes[i], holes[j]] = [holes[j], holes[i]];
-			}
+			// Flavor text variations
+			const findVerbs = [
+				'Unearthed', 'Discovered', 'Excavated',
+				'Uncovered', 'Secured', 'Salvaged',
+				'Retrieved', 'Reclaimed', 'Exhumed',
+				'Recovered'
+			];
 
-			// Check if the user dug up a bomb
-			if (holes[0] === 'bomb') {
-				await UserModel.updateOne({ guildID: guild?.id, id: user.id }, { $inc: { balance: -digAmount } });
-				const badLuckMessages = [
-					'You dug up a bomb and lost ${digAmount} gold. There were ${numBombs} bombs in play. Better luck next time!',
-					'Oops! You hit a bomb and lost ${digAmount} gold. Try again soon!',
-					'Seems like you triggered a buried treasure! Unfortunately, it was a bomb. Don\'t give up, ${username}!',
-					'Looks like today isn\'t your lucky day. You dug up a bomb and lost ${digAmount} gold. There were ${numBombs} bombs in play, Keep digging!',
-					'you avoid digging up the cache to follow a modvlog to a shed which he drops a grenade on you, you lost ${digAmount}'
-				];
+			// Inside your command handler after determining foundTier
+			const verb = findVerbs[Math.floor(Math.random() * findVerbs.length)];
+			const maxPossibleGold = CACHE_TIERS.LUXURY.rewards.gold[1];
 
-				const imagePath = 'C:/Development/DragonBot/assets/bomb-fuse.png';
-				const bomb = new AttachmentBuilder(imagePath);
-				// const embed = new EmbedBuilder().setImage(`attachment://${imagePath}`);
+			const embed = new EmbedBuilder()
+				.setColor(
+					foundTier === CACHE_TIERS.LUXURY ? '#ffd700' :
+						foundTier === CACHE_TIERS.MILITARY ? '#c0c0c0' :
+							'#2ecc71' // Common tier color
+				)
+				.setTitle(`${zone.toUpperCase()} OPERATION`)
+				.setDescription(
+					`**${verb}:** ${foundTier.name}\n\n` +
+					`💰 **Gold Found:** ${loot.gold.toLocaleString()}\n` +
+					`📊 **Yield Quality:** ${createProgressBar(loot.gold, maxPossibleGold)}\n\n` +
+					'⏳ Next scavenge available in 6 hours'
+				)
+				.addFields({
+					name: 'Zone Modifiers',
+					value: zone === 'radiation' ? '☢️ High Risk/High Reward' :
+						zone === 'ruins' ? '🏚️ Moderate Risk' :
+							'🌳 Low Risk',
+					inline: true
+				})
+				// .setImage(`attachment://${foundTier.image}`)
+				.setFooter({
+					text: `Total Balance: ${((userDoc?.balance || 0) + loot.gold).toLocaleString()}g`,
+					iconURL: user.displayAvatarURL()
+				});
 
-				const randomIndex = Math.floor(Math.random() * badLuckMessages.length);
-				const randomMessage = badLuckMessages[randomIndex].replace('${digAmount}', digAmount.toString()).replace('${username}', user.username).replace('${numBombs}', numBombs.toString());
-				return interaction.reply({ content: randomMessage, files: [bomb] });
-			}
-			// If the user didn't dig up a bomb, award them with a prize
-			const prizeAmount = Math.floor(Math.random() * (digAmount * 2)) + digAmount;
-			await UserModel.updateOne({ guildID: guild?.id, id: user.id }, { $inc: { balance: prizeAmount } });
-			return interaction.reply({ content: `${userMention(user.id)}, You dug up the cache and won ${prizeAmount} gold! You successfully avoided ${numBombs} bombs!` });
+			return interaction.reply({
+				content: `🏕️ ${locationMessages[zone][Math.floor(Math.random() * locationMessages[zone].length)]}`,
+				embeds: [embed],
+				// files: [attachment]
+			});
+
 		} catch (error) {
-			console.error(error);
+			console.error('Dig Command Error:', error);
+			await interaction.reply({
+				content: '⚠️ Equipment failure - scavenge aborted',
+				ephemeral: true
+			});
 		}
 	}
 });

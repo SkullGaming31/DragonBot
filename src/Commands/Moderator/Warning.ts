@@ -1,4 +1,4 @@
-/* eslint-disable no-case-declarations */
+ 
 import crypto from 'crypto';
 import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder } from 'discord.js';
 import DB from '../../Database/Schemas/WarnDB';

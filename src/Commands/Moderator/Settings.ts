@@ -123,26 +123,24 @@ export default new Command({
 			if (!data) {
 				data = new settings({
 					GuildID: guild.id,
-					rulesChannel: RulesChannel?.id,
-					Welcome: Welcome,
-					WelcomeChannel: Welcomechan?.id,
-					PromotionChannel: NowLive?.id,
-					PunishmentChan: PunishmentChan?.id,
-					AdministratorRole: Administrator?.id,
-					ModeratorRole: Moderator?.id,
-					MemberRole: MemberRole?.id,
-					SuggestChan: SuggestionChan?.id,
-					EconChan: EconChannel?.id,
-					ModerationChannel: ModerationChannel?.id
+					rulesChannel: RulesChannel?.id ?? null,
+					Welcome: Welcome ?? null,
+					WelcomeChannel: Welcomechan?.id ?? null,
+					PromotionChannel: NowLive?.id ?? null,
+					PunishmentChan: PunishmentChan?.id ?? null,
+					AdministratorRole: Administrator?.id ?? null,
+					ModeratorRole: Moderator?.id ?? null,
+					MemberRole: MemberRole?.id ?? null,
+					SuggestChan: SuggestionChan?.id ?? null,
+					EconChan: EconChannel?.id ?? null,
+					ModerationChannel: ModerationChannel?.id ?? null
 				});
 				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
 					console.log('Created new document in database');
 				}
 				await data.save();
 			} else {
-				await settings.findOneAndUpdate({
-					GuildID: guild.id
-				},
+				await settings.findOneAndUpdate({ GuildID: guild.id },
 					{
 						rulesChannel: RulesChannel?.id,
 						Welcome: Welcome,
@@ -155,10 +153,11 @@ export default new Command({
 						SuggestChan: SuggestionChan?.id,
 						EconChan: EconChannel?.id,
 						ModerationChannel: ModerationChannel?.id
-					}, {
-					new: true,
-					upsert: true
-				});
+					},
+					{
+						new: true,
+						upsert: true
+					});
 				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
 					console.log('updating document in database');
 				}
@@ -194,7 +193,7 @@ export default new Command({
 					},
 					{
 						name: 'Member Role',
-						value: MemberRole ? roleMention(MemberRole.id) : 'NONE',
+						value: MemberRole ? roleMention(MemberRole.id) : 'None',
 						inline: false
 					},
 					{

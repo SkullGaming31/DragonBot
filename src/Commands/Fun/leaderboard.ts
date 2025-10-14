@@ -14,8 +14,7 @@ export default new Command({
 		{
 			name: 'limit',
 			description: 'The amount of users to show on the leaderboard',
-			type: ApplicationCommandOptionType.Integer,
-			required: true
+			type: ApplicationCommandOptionType.Integer
 		}
 	],
 	type: ApplicationCommandType.ChatInput,
@@ -30,7 +29,7 @@ export default new Command({
 
 			const adminRoleId = settings.AdministratorRole;
 			const moderatorRoleId = settings.ModeratorRole;
-			const limit = options.getInteger('limit');
+			const limit = options.getInteger('limit') || 10;
 
 			if (!limit || isNaN(limit) || limit <= 0) {
 				return interaction.reply({ content: 'Please provide a valid number for the limit.', flags: MessageFlags.Ephemeral });
@@ -55,7 +54,7 @@ export default new Command({
 				return interaction.reply({ content: 'There are no users in the database yet!', flags: MessageFlags.Ephemeral });
 			}
 
-			const embed = new EmbedBuilder().setTitle('Top Gold Leaders').setColor('Gold');
+			const embed = new EmbedBuilder().setTitle(`Top ${limit} Gold Leaders`).setColor('Gold');
 
 			let i = 1;
 			for (const user of leaderboard) {
@@ -63,7 +62,7 @@ export default new Command({
 				embed.addFields([{ name: `${i++}. ${user.username}`, value: `Balance: ${balanceValue}` }]);
 			}
 
-			const economyChannel = guild?.channels.cache.get(settings.EconChan);
+			const economyChannel = guild?.channels.cache.get(settings.EconChan) || interaction.channel;
 
 			if (economyChannel) {
 				if (economyChannel.id !== channel?.id) {
