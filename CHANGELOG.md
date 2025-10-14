@@ -1,3 +1,17 @@
+# Changelog
+
+All notable changes to this repository will be documented in this file.
+
+## [Unreleased]
+
+- Add repository Copilot instructions and a strict guidance note to avoid `any` in source code. (commit bba711c)
+- CI: Run test job in `node:18-bullseye` container to ensure OpenSSL 1.1 is available for mongodb-memory-server (commit 187f04e)
+- Marketplace feature: added marketplace commands (create/buy/list/remove), listing schema, tests, and CI test reporter (commit 98a7593)
+- Documentation: updated TODO and referenced marketplace implementation (commit f1e958b)
+
+---
+
+_This changelog is maintained manually. For details, see the commit history._
 2025-10-14 — Ticket & Interaction improvements, transcript saving, economy suppression, tests
 
 - Refactored ticket interaction handling to async/await and hardened replies:
