@@ -131,6 +131,60 @@ Requirements
 npm run build
 ```
 
+## Developer setup (quick)
+
+Clone and install dependencies:
+
+```pwsh
+git clone https://github.com/SkullGaming31/DragonBot.git
+cd DragonBot
+npm ci
+```
+
+Run the bot in development mode (hot reload via ts-node):
+
+```pwsh
+npm run dev
+```
+
+Build for production output (compiled JS in `dist/`):
+
+```pwsh
+npm run build
+npm start
+```
+
+### Environment variables
+
+The repo uses an intentionally misspelled environment variable key: `Enviroment` (values: `dev | prod | debug`). Do not rename it without updating `src/Structures/Client.ts` and other consumers. Check `.env.example` for a full list, but key vars include:
+
+- `Enviroment` — `dev` | `prod` | `debug`
+- `DEV_DISCORD_BOT_TOKEN` — token for dev bot login
+- `DISCORD_BOT_TOKEN` — token for production bot login
+- `DEV_DISCORD_GUILD_ID` — guild id used when registering commands in dev
+
+### Tests & CI
+
+Run the test suite locally with Vitest:
+
+```pwsh
+npm test
+```
+
+Notes:
+- Many tests use `mongodb-memory-server`. To exercise MongoDB transactions the tests start a replica set (`MongoMemoryReplSet`). Keep replica-set tests short (use `count:1`) to save time.
+- On CI, runners may lack OpenSSL 1.1 required by MongoDB binaries. The repo's workflow runs the Tests job in the `node:18-bullseye` container so `libcrypto.so.1.1` is available. See `.github/workflows/ci.yml`.
+
+### Coding conventions & tips
+
+- Prefer `unknown` over `any`. Use runtime narrowing (see `src/Utilities/functions.ts`) and add minimal runtime guards if you accept external data.
+- Use `safeInteractionReply` (`src/Utilities/functions.ts`) for replies to interactions to avoid duplicate-reply errors and to provide robust fallbacks.
+- Commands live in `src/Commands/<Category>/` and export a `CommandType` (`src/Typings/Command.ts`). The `run` function receives `{ client, interaction, args }` where `interaction` is `ExtendedInteraction`.
+- Events live in `src/Events/*` and implement the `Event` contract (`src/Structures/Event.ts`). `ExtendedClient.registerModules()` auto-loads commands and events.
+
+If you change command registration behaviour or the `Enviroment` variable, coordinate with the repository owner — these are sensitive to production/dev command registration.
+
+
 build the docker image to use for docker desktop
 ```bash
 docker build -t dragonbot .
