@@ -114,11 +114,19 @@ export default new Event('messageCreate', async (message: Message) => {
 			const isInTicketCategory = ticketSetup?.Category && channel.parentId === ticketSetup.Category;
 			const isTicketChannel = !!ticketEntry || !!isInTicketCategory;
 
-			let channelForNotification = econChannel || undefined;
-			if (!channelForNotification && !isTicketChannel && channel.type === ChannelType.GuildText) channelForNotification = message.channel as any;
+			let channelForNotification = econChannel;
+			if (!channelForNotification && !isTicketChannel && channel.type === ChannelType.GuildText) channelForNotification = channel;
 
 			await new Promise((resolve) => setTimeout(resolve, 1000)); // Delay 1 second
-			if (channelForNotification && channelForNotification.type === ChannelType.GuildText) await channelForNotification.send({ content: notificationMessage });
+			if (channelForNotification && typeof (channelForNotification as unknown as { send?: unknown }).send === 'function') {
+				const sendFn = (channelForNotification as unknown as { send: (payload: unknown) => Promise<unknown> }).send;
+				try {
+					const _payload = { content: notificationMessage };
+					await sendFn(_payload);
+				} catch (sendErr) {
+					console.warn('Failed to send economy notification:', sendErr);
+				}
+			}
 		} catch (error) {
 			console.error('Error updating user currency:', error);
 		}

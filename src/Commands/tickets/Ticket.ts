@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, Colors, EmbedBuilder, MessageFlags } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, Colors, EmbedBuilder } from 'discord.js';
 import { MongooseError } from 'mongoose';
 import DB from '../../Database/Schemas/ticketDB';
 import { Command } from '../../Structures/Command';
@@ -43,13 +42,11 @@ export default new Command({
 
 		switch (Action) {
 			case 'add':
-				DB.findOne({ GuildID: guildId, ChannelID: channel?.id }, async (err: MongooseError, docs: { MembersID: string[]; save: () => void; }) => {
-					if (err) throw err.message;
-					if (!docs) return interaction.reply({
-						embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], flags: MessageFlags.Ephemeral
-					});
+				DB.findOne({ GuildID: guildId, ChannelID: channel?.id }, async (err: MongooseError | null, docs: { MembersID: string[]; save: () => void; } | null) => {
+					if (err) throw err;
+					if (!docs) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], ephemeral: true });
 					if (docs.MembersID.includes(Member?.id)) return interaction.reply({
-						embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this member is already added to this ticket')], flags: MessageFlags.Ephemeral
+						embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this member is already added to this ticket')], ephemeral: true
 					});
 					docs.MembersID.push(Member?.id);
 					if (channel?.type === ChannelType.GuildText)
@@ -59,29 +56,18 @@ export default new Command({
 							ReadMessageHistory: true,
 							AttachFiles: true
 						});
-					interaction.reply({
-						content: `${Member}`, embeds: [embed.setColor(Colors.Green).setDescription(`✅ | ${Member} has been added to the ticket`)]
-					});
+					interaction.reply({ content: `${Member}`, embeds: [embed.setColor(Colors.Green).setDescription(`✅ | ${Member} has been added to the ticket`)] });
 					docs.save();
 				});
 				break;
 			case 'remove':
-				DB.findOne({ GuildID: guildId, ChannelID: channel?.id }, async (err: any, docs: { MembersID: { includes: (arg0: string) => any; remove: (arg0: string) => void; }; save: () => void; }) => {
+				DB.findOne({ GuildID: guildId, ChannelID: channel?.id }, async (err: MongooseError | null, docs: { MembersID: string[]; save: () => void; } | null) => {
 					if (err) throw err;
-					if (!docs) return interaction.reply({
-						embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], flags: MessageFlags.Ephemeral
-					});
-					if (!docs.MembersID.includes(Member?.id)) return interaction.reply({
-						embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this member is not in this ticket')], flags: MessageFlags.Ephemeral
-					});
-					docs.MembersID.remove(Member?.id);
-					if (channel?.type === ChannelType.GuildText)
-						channel?.permissionOverwrites.edit(Member?.id, {
-							ViewChannel: false,
-						});
-					interaction.reply({
-						embeds: [embed.setColor(Colors.Green).setDescription(`✅ | ${Member} has been removed from the ticket`)]
-					});
+					if (!docs) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], ephemeral: true });
+					if (!docs.MembersID.includes(Member?.id)) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this member is not in this ticket')], ephemeral: true });
+					docs.MembersID = docs.MembersID.filter(id => id !== Member?.id);
+					if (channel?.type === ChannelType.GuildText) channel?.permissionOverwrites.edit(Member?.id, { ViewChannel: false });
+					interaction.reply({ embeds: [embed.setColor(Colors.Green).setDescription(`✅ | ${Member} has been removed from the ticket`)] });
 					docs.save();
 				});
 				break;

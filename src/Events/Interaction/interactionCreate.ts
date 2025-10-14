@@ -3,7 +3,7 @@ import SuggestionModel, { ISuggestion } from '../../Database/Schemas/SuggestDB';
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { Event } from '../../Structures/Event';
 import { ExtendedInteraction } from '../../Typings/Command';
-import { setCooldown } from '../../Utilities/functions';
+import { safeInteractionReply, setCooldown } from '../../Utilities/functions';
 import { appInstance } from '../../index';
 import { UserModel } from '../../Database/Schemas/userModel';
 
@@ -69,11 +69,9 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 
 				case 'accept': {
 					// Check if the interaction is in the "rules" channel
-					const data = settings?.rulesChannel;
-					const rulesChannelId = data;
-					if (interaction.channelId !== rulesChannelId) return;
+					const rulesChannelId = settings?.rulesChannel;
+					if (interaction.channelId !== rulesChannelId) break;
 
-					// Get the role ID from settings
 					const roleId: RoleResolvable | undefined = settings?.MemberRole;
 
 					if (roleId) {
@@ -165,39 +163,14 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 				}
 			}
 		} catch (error) {
-			// Handle certain Discord API interaction errors quietly: these commonly occur when
-			// the interaction has expired (10062) or already acknowledged (40060).
-			const errCode = (error as any)?.code;
+			const e = error as unknown as { code?: number; message?: string };
+			const errCode = e?.code;
 			if (errCode === 10062 || errCode === 40060) {
-				console.warn('Ignored Discord interaction error', errCode, (error as any)?.message ?? error);
+				console.warn('Ignored Discord interaction error', errCode, e?.message ?? error);
 				return;
 			}
 			console.error('Error handling interaction:', error);
-			const fallbackMsg = { content: 'An error occurred while processing your request. Please try again later.', ephemeral: true };
-			try {
-				if (!interaction.replied && !interaction.deferred) {
-					await interaction.reply(fallbackMsg as any);
-				} else if (interaction.deferred) {
-					await interaction.editReply({ content: fallbackMsg.content });
-				} else {
-					// Already replied — try followUp, but catch if not allowed
-					try {
-						await interaction.followUp(fallbackMsg as any);
-					} catch (followErr) {
-						console.warn('followUp failed for interaction:', followErr);
-						// Last resort: send message to the channel if possible
-						if (interaction.channel && 'send' in interaction.channel) {
-							try { await interaction.channel.send(fallbackMsg.content); } catch { /* ignore */ }
-						}
-					}
-				}
-			} catch (replyErr) {
-				console.error('Failed to send error reply to interaction:', replyErr);
-				// Fallback: send message in channel if available
-				if (interaction.channel && 'send' in interaction.channel) {
-					try { await interaction.channel.send(fallbackMsg.content); } catch { /* ignore */ }
-				}
-			}
+			await safeInteractionReply(interaction, { content: 'An error occurred while processing your request. Please try again later.', ephemeral: true });
 		}
 	}
 });

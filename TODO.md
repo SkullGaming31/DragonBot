@@ -8,7 +8,7 @@ Below are suggested features and improvements you can add to DragonBot. Each ite
 2. Reaction roles manager
    - Implement a reaction-roles UI command to create/manage role reactions, support multi-role messages, and persistent storage in DB.
 
-3. Ticketing improvements (transcripts + templates) IN PROGRESS
+3. Ticketing improvements (transcripts + templates) DONE
    - Add ticket templates, automatic transcript generation and saving to DB or file storage, and ticket assignment/CLAIM features for support staff.
 
 4. Guild dashboard (Vue) with OAuth
@@ -29,7 +29,7 @@ Below are suggested features and improvements you can add to DragonBot. Each ite
 9. Invite tracking & welcome rewards
    - Track who invited new members, show leaderboard of top inviters, and implement configurable welcome rewards/roles.
 
-10. Economy upgrades & marketplace
+10. Economy upgrades & marketplace DONE
     - Extend economy (bank accounts, interest, item marketplace, gifting) and add safe concurrency handling and tests for transactions.
 
 11. Analytics & command usage telemetry
@@ -43,26 +43,3 @@ Below are suggested features and improvements you can add to DragonBot. Each ite
 
 14. Integrations (Twitch, YouTube, Webhooks)
     - Add integrations for Twitch stream announcements, YouTube uploads, and generic webhooks with templated messages and rate-limits.
-
-/bank /bal commands
-Key differences and why both are useful
-
-Accessibility
-bal (wallet): instant spend (buy, gamble, tip). Represented today by UserModel.balance.
-bank: stored funds that require a withdraw action to use.
-
-Purpose
-bal: transactional day-to-day currency.
-bank: savings, long-term storage, or escrow for marketplace transactions.
-Mechanics you can apply to bank
-Interest: periodic jobs credit a percent to bank.
-Protection: immune to some game penalties (rob, tax) unless explicitly targeted.
-Limits / cooldowns: withdrawals can have limits or delays.
-Security/hold: can be escrowed for marketplace purchases.
-
-UX
-/bal should show both wallet and bank (e.g., “Wallet: 500g — Bank: 2,300g”).
-Add /deposit <amount> and /withdraw <amount> commands (or aliases dep/wd).
-Accounting & safety
-Single-document updates with guarded queries ({ balance: { $gte: amount } }) are safe for moving money out of balance.
-Multi-document ops (transfer buyer → seller and decrement listing) should use transactions or careful ordering with retries.

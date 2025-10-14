@@ -22,16 +22,22 @@ apiV1Routes.get('/stats', (req: Request, res: Response) => {
 		});
 	} catch (err) {
 		res.status(500).json({ error: 'Unable to fetch stats' });
+		console.error(err);
 	}
 });
 
 // Minimal commands endpoint for dashboard command listing
 apiV1Routes.get('/commands', (req: Request, res: Response) => {
 	try {
-		const commands = Array.from(appInstance.client.commands.values()).map((c: any) => ({ name: c.name, description: c.description }));
+		type CommandDescriptor = { name?: string; description?: string };
+		const commands = Array.from(appInstance.client.commands.values()).map((c: unknown) => {
+			const cmd = c as CommandDescriptor;
+			return { name: cmd.name ?? 'unknown', description: cmd.description ?? '' };
+		});
 		res.json(commands);
 	} catch (err) {
 		res.status(500).json({ error: 'Unable to fetch commands' });
+		console.error(err);
 	}
 });
 

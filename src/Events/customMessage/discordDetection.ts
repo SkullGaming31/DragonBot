@@ -26,8 +26,12 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 		// Ensure we have a GuildMember object
 		if (!member) {
 			try {
-				member = await guild.members.fetch(author.id).catch(() => null as any);
-			} catch { }
+				member = await guild.members.fetch(author.id).catch(() => null);
+			} catch (fetchErr) {
+				// Log fetch error and continue; member may remain undefined
+				 
+				console.warn('[discordDetection] failed to fetch member:', fetchErr);
+			}
 		}
 
 		// Improved regex: don't accidentally capture trailing punctuation-only matches
