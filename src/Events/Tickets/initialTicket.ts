@@ -1,6 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, EmbedBuilder, MessageFlags } from 'discord.js';
 import DB from '../../Database/Schemas/ticketDB';
 import TicketSetup from '../../Database/Schemas/ticketSetupDB';
+import TemplateModel from '../../Database/Schemas/ticketTemplateDB';
 import { Event } from '../../Structures/Event';
 
 export default new Event('interactionCreate', async (interaction) => {
@@ -46,14 +47,17 @@ export default new Event('interactionCreate', async (interaction) => {
 					Type: customId,
 					Claimed: false,
 				});
-				const embed = new EmbedBuilder()
-					.setAuthor({ name: `${guild.name} | Ticket: ${ID}` })
-					.setDescription('Please wait patiently for a response from the staff team, in the mean time, please Describe your issue in as much detail as possible')
-					.setColor('Blue')
-					.setFooter({ text: 'the buttons below are staff only buttons' });
+				// Try to apply a template: prefer a template matching the button type, otherwise use guild default
+				const template = (await TemplateModel.findOne({ GuildID: guild.id, Type: customId }).exec())
+					|| (await TemplateModel.findOne({ GuildID: guild.id, IsDefault: true }).exec());
 
-				const Buttons = new ActionRowBuilder<ButtonBuilder>();
-				Buttons.addComponents(
+				const embed = new EmbedBuilder().setAuthor({ name: `${guild.name} | Ticket: ${ID}` }).setColor('Blue').setFooter({ text: 'the buttons below are staff only buttons' });
+				if (template?.Title) embed.setTitle(template.Title);
+				if (template?.Description) embed.setDescription(template.Description);
+
+				// Staff-only buttons (always present)
+				const staffButtons = new ActionRowBuilder<ButtonBuilder>();
+				staffButtons.addComponents(
 					new ButtonBuilder()
 						.setCustomId('close')
 						.setLabel('Save And Close Ticket')
@@ -75,7 +79,48 @@ export default new Event('interactionCreate', async (interaction) => {
 						.setStyle(ButtonStyle.Secondary)
 						.setEmoji('🛄')
 				);
-				await channel.send({ embeds: [embed], components: [Buttons], });
+
+				// Template buttons (optional) - attempt to parse stored button definitions
+				let templateRow: ActionRowBuilder<ButtonBuilder> | null = null;
+				if (template?.Buttons && template.Buttons.length) {
+					templateRow = new ActionRowBuilder<ButtonBuilder>();
+					const defs = template.Buttons;
+					// Support two storage formats: alternating [label, emoji, label, emoji] or single 'label|emoji' entries
+					if (defs.length % 2 === 0 && defs.every(d => typeof d === 'string')) {
+						// treat as alternating label/emoji pairs
+						for (let i = 0; i < defs.length; i += 2) {
+							const label = defs[i];
+							const emoji = defs[i + 1];
+							if (!label) continue;
+							templateRow.addComponents(
+								new ButtonBuilder()
+									.setCustomId(`tpl_${label.replace(/\s+/g, '_').toLowerCase()}`)
+									.setLabel(label)
+									.setStyle(ButtonStyle.Primary)
+							);
+						}
+					} else {
+						for (const entry of defs) {
+							let label = entry as string;
+							let emoji: string | undefined;
+							if (entry.includes('|')) {
+								[label, emoji] = entry.split('|').map(s => s.trim());
+							} else if (entry.includes(',')) {
+								[label, emoji] = entry.split(',').map(s => s.trim());
+							}
+							if (!label) continue;
+							templateRow.addComponents(
+								new ButtonBuilder()
+									.setCustomId(`tpl_${label.replace(/\s+/g, '_').toLowerCase()}`)
+									.setLabel(label)
+									.setStyle(ButtonStyle.Primary)
+							);
+						}
+					}
+				}
+
+				const components = templateRow ? [templateRow, staffButtons] : [staffButtons];
+				await channel.send({ embeds: [embed], components }).catch(() => null);
 				await channel.send({ content: `${member} here is your ticket` }).then((m) => {
 					setTimeout(() => {
 						m.delete().catch((err: Error) => { console.error(err); });
