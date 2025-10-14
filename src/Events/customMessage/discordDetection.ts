@@ -1,135 +1,135 @@
 import { randomBytes } from 'crypto';
 import { ChannelType, EmbedBuilder, Message } from 'discord.js';
-import WarningDB from '../../Database/Schemas/WarnDB'; // Update the import to your new WarningDB schema
+import WarningDB from '../../Database/Schemas/WarnDB'; // Warning schema
 import DB from '../../Database/Schemas/settingsDB';
 import { Event } from '../../Structures/Event';
 
 export default new Event<'messageCreate'>('messageCreate', async (message: Message) => {
 	try {
 		if (!message.guild) return;
-		const { channel, author, member, guild } = message;
+		const { channel, author, guild } = message;
+		let member = message.member;
+
 		if (author.bot) return;
 
-		// If the user is an admin, don't delete their message
-		if (process.env.Enviroment !== 'dev' && process.env.Enviroment !== 'debug') {
-			if (author.id === guild?.ownerId) return;
-		}
-		if (channel.id === '959693430647308292' || channel.id === '959693430647308292') return;
+		// Exempt channels can be configured via environment or fall back to the legacy ID
+		const EXEMPT_CHANNELS = (process.env.EXEMPT_CHANNELS || '959693430647308292').split(',').map((c) => c.trim());
+		if (EXEMPT_CHANNELS.includes(channel.id)) return;
 
-		// Find or create a document for the user in the database
-		let userWarning = await WarningDB.findOne({ GuildID: guild.id, UserID: author.id });
+		// Don't moderate guild owner in prod
+		if (!['dev', 'debug'].includes(process.env.Enviroment || '') && author.id === guild?.ownerId) return;
+
+		// Load settings early
 		const SettingsDB = await DB.findOne({ GuildID: guild.id });
-
 		if (!SettingsDB) return;
 
-		// If the document doesn't exist, create it with a warning count of 0
-		if (!userWarning) {
-			userWarning = await WarningDB.create({
-				GuildID: guild.id,
-				UserID: author.id,
-				Warnings: [],
-			});
+		// Ensure we have a GuildMember object
+		if (!member) {
+			try {
+				member = await guild.members.fetch(author.id).catch(() => null as any);
+			} catch { }
 		}
 
-		// Get the user's current warning count from the database
-		const warningCount = userWarning.Warnings.length;
-		console.log('WarningCount outside switch: ', warningCount);
+		// Improved regex: don't accidentally capture trailing punctuation-only matches
+		const discordInviteRegex = /(discord\.(?:gg|com|io|me|gift)\/\S+|discordapp\.com\/invite\/\S+)/i;
+		const content = message.content || '';
+		const isDiscordInvite = discordInviteRegex.test(content);
 
-		const discordInviteRegex = /(discord\.(gg|com|io|me|gift)\/.+|discordapp\.com\/invite\/.+)/gi;
-		const isDiscordInvite = discordInviteRegex.test(message.content);
-		// if (member?.permissions.has('ManageMessages')) return;
+		if (!isDiscordInvite) return;
 
-		if (isDiscordInvite) {
-			const discordLinkDetection = new EmbedBuilder()
-				.setTitle('Discord Link Detected')
-				.setColor('Red')
-				.setAuthor({ name: `${author.globalName || author.tag}`, iconURL: author.displayAvatarURL({ size: 512 }) })
-				.setThumbnail(author.displayAvatarURL({ forceStatic: true, size: 512 }))
-				.setFooter({ text: `guild: ${guild.name}` })
-				.setTimestamp();
+		// Build embed to DM / display
+		const discordLinkDetection = new EmbedBuilder()
+			.setTitle('Discord Link Detected')
+			.setColor('Red')
+			.setAuthor({ name: `${author.globalName || author.tag}`, iconURL: author.displayAvatarURL({ size: 512 }) })
+			.setThumbnail(author.displayAvatarURL({ forceStatic: true, size: 512 }))
+			.setFooter({ text: `guild: ${guild.name}` })
+			.setTimestamp();
 
-			let warningMessage = '';
+		// Fetch current warnings (read-only) to decide punishment level
+		const existing = await WarningDB.findOne({ GuildID: guild.id, UserID: author.id }).lean();
+		const warningCount = existing?.Warnings?.length ?? 0;
+		console.log('[discordDetection] warningCount:', warningCount, 'user:', author.id);
 
-			if (channel.id === '959693430647308292' || channel.id === '959693430647308292') {
-				return;
-			} else if (channel.type === ChannelType.GuildText) {
+		// Decide punishment and attempt operations safely
+		let warningMessage = 'This is a warning for posting Discord invite links.';
 
-				switch (warningCount) {
-					case 0:
-						// First warning
-						warningMessage = 'This is your first warning. Please do not post Discord links in this server.';
-						break;
-					case 1:
-						// Second warning
-						warningMessage = 'This is your 2nd warning. Please do not post Discord links in this server. you have been muted for 5 minutes';
-						if (member?.moderatable) {
-							// Send a DM to the user
-							await member?.timeout(300000, 'posted link for a discord server after being warned');// 5 minutes = 300000
-							await member?.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] })
-								.catch((error) => {
-									console.error(`Failed to send a DM to ${author.globalName}: ${error.message}`);
-								});
+		if (channel.type === ChannelType.GuildText) {
+			switch (warningCount) {
+				case 0:
+					warningMessage = 'This is your first warning. Please do not post Discord links in this server.';
+					break;
+				case 1:
+					warningMessage = 'Second warning: you will be timed out for 5 minutes.';
+					if (member?.moderatable) {
+						try {
+							await member.timeout(5 * 60 * 1000, 'Posted Discord invite after warning');
+						} catch (err) {
+							console.error('[discordDetection] timeout failed:', err);
 						}
-						break;
-					case 2:
-						// Third warning
-						warningMessage = 'This is your 3rd warning. DO NOT post Discord links in the server. you have been kicked from the server with the possiblity to rejoin';
-						if (member?.kickable) {
-							// Send a DM to the user
-							await member?.kick('Posted a discord link after being warned twice for posting links');
-							await member?.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] })
-								.catch((error) => {
-									console.error(`Failed to send a DM to ${author.globalName}: ${error.message}`);
-								});
+					}
+					break;
+				case 2:
+					warningMessage = 'Third warning: you will be kicked.';
+					if (member?.kickable) {
+						try {
+							await member.kick('Posted Discord invite after multiple warnings');
+						} catch (err) {
+							console.error('[discordDetection] kick failed:', err);
 						}
-						break;
-					case 3:
-						// Third warning
-						warningMessage = 'This is your 3rd warning. DO NOT post Discord links in the server. you have been Banned from the server with no possiblity to rejoin the server with this account';
-						if (member?.bannable) {
-							// Send a DM to the user
-							await member?.ban({ reason: 'Posting discord links after being told 3 times not to post them', deleteMessageSeconds: 5 });
-							await member?.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] })
-								.catch((error) => {
-									console.error(`Failed to send a DM to ${author.globalName}: ${error.message}`);
-								});
+					}
+					break;
+				default:
+					warningMessage = 'You have exceeded the maximum number of warnings and may be banned.';
+					if (member?.bannable) {
+						try {
+							await member.ban({ reason: 'Repeatedly posting Discord invite links', deleteMessageSeconds: 5 });
+						} catch (err) {
+							console.error('[discordDetection] ban failed:', err);
 						}
-						break;
-					default:
-						console.log('WarningCount:', warningCount);
-						break;
-				}
+					}
+					break;
+			}
 
-				// Create a new warning object
-				const newWarning = {
-					WarningID: generateUniqueID(),
-					Reason: 'Posting Discord Links',
-					Source: 'bot'
-				};
+			// Create a new warning object and push to DB (upsert pattern)
+			const newWarning = {
+				WarningID: generateUniqueID(),
+				Reason: 'Posting Discord Links',
+				Source: 'bot',
+				Date: new Date()
+			};
 
-				// Add the new warning to the user's warnings array
-				userWarning.Warnings.push(newWarning);
+			try {
+				await WarningDB.updateOne(
+					{ GuildID: guild.id, UserID: author.id },
+					{ $push: { Warnings: newWarning } },
+					{ upsert: true }
+				);
+			} catch (err) {
+				console.error('[discordDetection] failed to update WarningDB:', err);
+			}
 
-				// Save the updated warnings array to the database
-				await userWarning.save();
-
-				// Send the warning message in the channel
-				console.log('Warning Message:', warningMessage);
+			// Notify the user in-channel and attempt to DM
+			try {
 				await message.reply({ content: `${author}`, embeds: [discordLinkDetection.setDescription(warningMessage)] });
-				// Attempt to delete the message
-				console.log('Before message deletion');
-				await message.delete()
-					.then(() => {
-						console.log('Message deleted successfully');
-					})
-					.catch((error) => {
-						console.error(`Failed to delete message: ${error.message}`);
-					});
-				console.log('After message deletion');
+			} catch (err) {
+				console.error('[discordDetection] failed to send channel reply:', err);
+			}
+
+			try {
+				await message.delete();
+			} catch (err) {
+				console.error('[discordDetection] failed to delete message:', err);
+			}
+
+			try {
+				await author.send({ embeds: [discordLinkDetection.setDescription(warningMessage)] });
+			} catch (err) {
+				console.error('[discordDetection] failed to DM user:', err);
 			}
 		}
 	} catch (error) {
-		console.error(error);
+		console.error('[discordDetection] unexpected error:', error);
 	}
 });
 

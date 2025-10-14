@@ -123,10 +123,10 @@ export class ExtendedClient extends Client {
 			slashCommands.push(command);
 		});
 
-		this.on('ready', () => {
+		this.on('clientReady', () => {
 			switch (process.env.Enviroment) {
 				case 'dev':
-					this.registerCommands({ commands: slashCommands, guildId: '959693430227894292' });
+					this.registerCommands({ commands: slashCommands, guildId: process.env.DEV_DISCORD_GUILD_ID });
 					console.log('Environment: ', process.env.Enviroment);
 					break;
 				case 'prod':
@@ -143,7 +143,7 @@ export class ExtendedClient extends Client {
 
 		eventFiles.forEach(async (filePath: string) => {
 			const event: Event<keyof ClientEvents> = await this.importFile(filePath);
-			if (event.event === 'ready') {
+			if (event.event === 'clientReady') {
 				this.once(event.event, event.run);
 			} else {
 				this.on(event.event, event.run);

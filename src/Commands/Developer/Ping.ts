@@ -2,6 +2,8 @@ import { ApplicationCommandType, MessageFlags, TextDisplayBuilder } from 'discor
 import mongoose from 'mongoose';
 import { Command } from '../../Structures/Command';
 
+console.log('[Ping] module loaded:', __filename);
+
 // Constants
 const MIN_UPTIME_SECONDS = 42;
 
@@ -35,10 +37,14 @@ export default new Command({
 		const { hours, minutes, seconds } = formatUptime(uptime);
 		const mongoLatency = await measureMongoLatency();
 
-		const messageResponse = new TextDisplayBuilder().setContent(`Bot Uptime: \`${hours}h ${minutes}m ${seconds}s\`\n` + `Bot Ping: \`${ping}ms\`\n` + `MongoDB Latency: \`${mongoLatency}ms\`!`);
+		const builtContent = `Bot Uptime: \`${hours}h ${minutes}m ${seconds}s\`\n` + `Bot Ping: \`${ping}ms\`\n` + `MongoDB Latency: \`${mongoLatency}ms\`!!!`;
+		const messageResponse = new TextDisplayBuilder().setContent(builtContent);
+
+		console.log('[Ping.run] built content:', builtContent);
 
 		// Send response
 		await interaction.reply({ flags: MessageFlags.IsComponentsV2, components: [messageResponse] });
+		console.log('[Ping.run] replied to interaction', interaction.id, 'with ping:', ping);
 	}
 });
 

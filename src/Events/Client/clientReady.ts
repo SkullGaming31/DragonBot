@@ -1,7 +1,7 @@
 import { ActivityType, Client, Guild } from 'discord.js';
 import { Event } from '../../Structures/Event';
 
-export default new Event<'ready'>('ready', async (client: Client) => {
+export default new Event<'clientReady'>('clientReady', async (client: Client) => {
 	const { user, guilds } = client;
 	console.log(`${user?.tag} is online`);
 	const Enviroment = process.env.Enviroment;

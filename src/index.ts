@@ -45,4 +45,8 @@ class App {
 
 export const appInstance = new App();
 
-appInstance.start();
+// Only start the app automatically when this file is the main module.
+// This prevents the app from auto-starting when imported for testing or debugging.
+if (typeof require !== 'undefined' && require.main === module) {
+	appInstance.start();
+}

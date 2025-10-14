@@ -20,13 +20,13 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 	// console.log('Bot:', bot);
 
 	if (!bot) {
-		console.log('Bot not found in the guild.');
+		// console.log('Bot not found in the guild.');
 		return;
 	}
 
 	if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
 		if (author.bot) {
-			console.log('Message is from a bot.');
+			// console.log('Message is from a bot.');
 			return;
 		}
 	}
