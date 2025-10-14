@@ -11,13 +11,13 @@ export interface TicketTemplate extends Document {
 }
 
 const templateSchema = new Schema<TicketTemplate>({
-  GuildID: { type: String, required: true },
-  Name: { type: String, required: true },
-  Type: { type: String, required: false },
-  Title: { type: String, required: false },
-  Description: { type: String, required: false },
-  Buttons: { type: [String], required: false },
-  IsDefault: { type: Boolean, required: false, default: false }
+	GuildID: { type: String, required: true },
+	Name: { type: String, required: true },
+	Type: { type: String, required: false },
+	Title: { type: String, required: false },
+	Description: { type: String, required: false },
+	Buttons: { type: [String], required: false },
+	IsDefault: { type: Boolean, required: false, default: false }
 });
 
 const templateModel = model<TicketTemplate>('TicketTemplate', templateSchema);

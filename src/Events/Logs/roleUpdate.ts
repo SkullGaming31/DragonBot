@@ -5,7 +5,7 @@ import DB from '../../Database/Schemas/LogsChannelDB'; // DB
 import { Event } from '../../Structures/Event';
 
 export default new Event('roleUpdate', async (oldRole: Role, newRole: Role) => {
-	const { guild, name, color } = newRole;
+	const { guild, name } = newRole;
 
 	// Check if the roles are identical
 	if (oldRole.equals(newRole)) return;

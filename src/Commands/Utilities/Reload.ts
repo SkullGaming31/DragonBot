@@ -1,4 +1,5 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, MessageFlags } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord.js';
+import type { ApplicationCommandDataResolvable } from 'discord.js';
 import path from 'path';
 import fs from 'fs';
 import { pathToFileURL } from 'url';
@@ -36,7 +37,7 @@ export default new Command({
 		const command = client.commands.get(commandName);
 
 		if (!command) {
-			await interaction.reply({ content: `There is no command with name \`${commandName}\`!`, flags: MessageFlags.Ephemeral });
+			await interaction.reply({ content: `There is no command with name \`${commandName}\`!`, ephemeral: true });
 			return;
 		}
 
@@ -48,67 +49,81 @@ export default new Command({
 			if (fs.existsSync(tsPath)) commandFilePath = tsPath;
 			else if (fs.existsSync(jsPath)) commandFilePath = jsPath;
 			else {
-				await interaction.reply({ content: `Command file not found for \`${command.name}\`.`, flags: MessageFlags.Ephemeral });
+				await interaction.reply({ content: `Command file not found for \`${command.name}\`.`, ephemeral: true });
 				return;
 			}
 
 			// Try clearing common require cache entries if present (works for CJS runtimes)
-			try { delete require.cache[require.resolve(commandFilePath)]; } catch { }
+			try { delete require.cache[require.resolve(commandFilePath)]; } catch { /* ignore if not present */ }
 
 			console.log('[Reload] resolved commandFilePath:', commandFilePath);
 
 			// Load the module. For TypeScript runtime (ts-node) require() works best for .ts files.
-			let newCommand: any;
+			type CommandLike = {
+				name?: string;
+				description?: string;
+				type?: number;
+				options?: unknown[];
+				defaultMemberPermissions?: unknown;
+				nameLocalizations?: unknown;
+				descriptionLocalizations?: unknown;
+				Category?: string;
+			};
+
+			let newCommandModule: unknown;
 			const ext = path.extname(commandFilePath).toLowerCase();
 			if (ext === '.ts') {
 				// Use require so ts-node's register handles TypeScript files
 				try {
-					const imported = require(commandFilePath);
-					newCommand = imported?.default ?? imported;
+
+					newCommandModule = require(commandFilePath);
 				} catch (err) {
 					console.error('Require failed for .ts file, falling back to dynamic import', err);
 					const imported = await import(pathToFileURL(commandFilePath).href + `?update=${Date.now()}`);
-					newCommand = imported?.default ?? imported;
+					newCommandModule = imported;
 				}
 			} else {
 				// For .js files use a proper file URL (works on Windows)
 				const fileUrl = pathToFileURL(commandFilePath).href + `?update=${Date.now()}`;
 				console.log('[Reload] importing via file URL:', fileUrl);
 				const imported = await import(fileUrl);
-				newCommand = imported?.default ?? imported;
+				newCommandModule = imported;
 			}
 
-			if (!newCommand || !newCommand.name) {
-				await interaction.reply({ content: `Reloaded module did not export a valid command.`, flags: MessageFlags.Ephemeral });
+			const maybeModule = newCommandModule as unknown;
+			const candidate: CommandLike = ((maybeModule as { default?: unknown }).default ?? maybeModule) as CommandLike;
+			if (!candidate || !candidate.name) {
+				await interaction.reply({ content: 'Reloaded module did not export a valid command.', ephemeral: true });
 				return;
 			}
 
 			// Update in-memory command collection
-			client.commands.set(newCommand.name, newCommand);
+			// candidate is validated above; cast to the internal Command type for storage
+			client.commands.set(candidate.name as string, candidate as unknown as import('../../Typings/Command').CommandType);
 
 			// If dry-run, show the JSON that would be registered and skip REST calls
 			if (dryRun) {
 				const json = {
-					name: newCommand.name,
-					description: newCommand.description || 'No description',
-					type: newCommand.type ?? 1,
-					options: newCommand.options ?? []
+					name: candidate.name,
+					description: candidate.description ?? 'No description',
+					type: candidate.type ?? 1,
+					options: candidate.options ?? []
 				};
-				await interaction.reply({ content: `Dry run - command JSON:\n\n\`\`\`json\n${JSON.stringify(json, null, 2)}\n\`\`\``, flags: MessageFlags.Ephemeral });
+				await interaction.reply({ content: `Dry run - command JSON:\n\n\`\`\`json\n${JSON.stringify(json, null, 2)}\n\`\`\``, ephemeral: true });
 				return;
 			}
 
 			// Re-register the full command set with Discord so the updated command is applied
 			// Build the ApplicationCommandData array from the in-memory commands collection
-			const allCommands = Array.from(client.commands.values()).map((cmd: any) => ({
-				name: cmd.name,
-				description: cmd.description || 'No description',
-				type: cmd.type ?? 1,
-				options: cmd.options ?? [],
-				defaultMemberPermissions: cmd.defaultMemberPermissions ?? undefined,
-				nameLocalizations: cmd.nameLocalizations ?? undefined,
-				descriptionLocalizations: cmd.descriptionLocalizations ?? undefined
-			}));
+			const allCommands = Array.from(client.commands.values()).map((cmd) => ({
+				name: (cmd as CommandLike).name,
+				description: (cmd as CommandLike).description ?? 'No description',
+				type: (cmd as CommandLike).type ?? 1,
+				options: (cmd as CommandLike).options ?? [],
+				defaultMemberPermissions: (cmd as CommandLike).defaultMemberPermissions ?? undefined,
+				nameLocalizations: (cmd as CommandLike).nameLocalizations ?? undefined,
+				descriptionLocalizations: (cmd as CommandLike).descriptionLocalizations ?? undefined
+			})) as unknown as ApplicationCommandDataResolvable[];
 
 			// Use the guild where the reload was invoked for fastest propagation. Fall back to env-configured dev guild if available.
 			const targetGuildId = interaction.guildId ?? (process.env.Enviroment === 'dev' ? process.env.DEV_DISCORD_GUILD_ID : undefined);
@@ -117,11 +132,11 @@ export default new Command({
 				guildId: targetGuildId
 			});
 
-			await interaction.reply({ content: `Command \`${newCommand.name}\` was reloaded and the command set was re-registered.`, flags: MessageFlags.Ephemeral });
+			await interaction.reply({ content: `Command \`${candidate.name}\` was reloaded and the command set was re-registered.`, ephemeral: true });
 		} catch (error) {
 			console.error('Error reloading command:', error);
 			if (error instanceof Error) {
-				await interaction.reply({ content: `There was an error while reloading a command \`${command.name}\`. See logs.`, flags: MessageFlags.Ephemeral });
+				await interaction.reply({ content: `There was an error while reloading a command \`${command.name}\`. See logs.`, ephemeral: true });
 			}
 		}
 		// await interaction.reply({ content: `Command is currently under development`, flags: MessageFlags.Ephemeral });

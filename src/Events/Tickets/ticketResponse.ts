@@ -1,7 +1,8 @@
-import { BaseInteraction, ChannelType, Colors, EmbedBuilder, GuildMember, MessageFlags, Collection, Message } from 'discord.js';
+ 
+import { BaseInteraction, ChannelType, Colors, EmbedBuilder, Collection, Message } from 'discord.js';
 import { Event } from '../../Structures/Event';
 // import settings from '../../Structures/Schemas/settingsDB';
-import DB, { Ticket } from '../../Database/Schemas/ticketDB';
+import DB from '../../Database/Schemas/ticketDB';
 import ticket from '../../Database/Schemas/ticketSetupDB';
 import { safeInteractionReply } from '../../Utilities/functions';
 
@@ -84,7 +85,7 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 						let lastId: string | undefined = undefined;
 						const CAP = 5000; // hard limit of messages to fetch
 						while (allMessages.length < CAP) {
-							const fetchOptions: any = { limit: 100 };
+							const fetchOptions: { limit: number; before?: string } = { limit: 100 };
 							if (lastId) fetchOptions.before = lastId;
 							const batch = (await channel.messages.fetch(fetchOptions)) as unknown as Collection<string, Message>;
 							if (!batch.size) break;
@@ -100,9 +101,10 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 						const escapeHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 						const rows = ordered.map(m => {
 							const time = new Date(m.createdTimestamp).toLocaleString();
-							const authorNameRaw = (m.author as any);
-							const authorName = m.author.bot ? m.author.tag : (authorNameRaw.globalName || m.author.username || m.author.tag);
-							const author = escapeHtml(`${authorName} (${m.author.id})`);
+							const authorRaw = m.author as unknown as { globalName?: string; username?: string; tag: string; id: string; bot?: boolean };
+							const authorNameCandidate = authorRaw.globalName ?? (authorRaw.username ?? authorRaw.tag);
+							const authorName = authorRaw.bot ? authorRaw.tag : authorNameCandidate;
+							const author = escapeHtml(`${authorName} (${authorRaw.id})`);
 							const content = escapeHtml(m.content ?? '');
 							const attachments = m.attachments.map(a => `<a href="${a.url}">${escapeHtml(a.name || a.url)}</a>`).join(' ');
 							return `<div class="msg"><div class="meta"><span class="time">${time}</span> <span class="author">${author}</span></div><div class="content">${content}</div>${attachments ? `<div class="attachments">${attachments}</div>` : ''}</div>`;
@@ -117,9 +119,15 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 						</style></head><body><h1>Transcript - ${escapeHtml(String(docs.TicketID || channel?.id))}</h1>${rows.join('\n')}</body></html>`;
 
 						const target = await guild.channels.fetch(transcriptChannelId).catch(() => null);
-						if (target && 'send' in target) {
+						if (target && typeof (target as unknown as { send?: unknown })['send'] === 'function') {
 							const filename = `transcript-${docs.TicketID || channel?.id}.html`;
-							await (target as any).send({ files: [{ attachment: Buffer.from(html, 'utf8'), name: filename }] }).catch((err: any) => { console.error('Failed to upload transcript file:', err); });
+							try {
+
+								const sendFn = (target as unknown as { send?: (..._args: unknown[]) => Promise<unknown> }).send;
+								if (sendFn) await sendFn.call(target, { files: [{ attachment: Buffer.from(html, 'utf8'), name: filename }] });
+							} catch (uploadErr) {
+								console.error('Failed to upload transcript file:', uploadErr);
+							}
 						}
 					}
 				} catch (e) {

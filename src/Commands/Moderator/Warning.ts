@@ -1,6 +1,6 @@
 
 import crypto from 'crypto';
-import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder, User } from 'discord.js';
 import DB from '../../Database/Schemas/WarnDB';
 import { Command } from '../../Structures/Command';
 
@@ -82,7 +82,7 @@ export default new Command({
 		if (!interaction.inCachedGuild()) return;
 
 		const { options, guild, member } = interaction;
-		const Target = options.getUser('target');
+		const Target = options.getUser('target') as User | null;
 		const Reason = options.getString('reason') || 'No Reason Provided';
 		const warningID = options.getString('warning_id');
 
@@ -120,7 +120,8 @@ export default new Command({
 				// Logic for checking warnings
 				const userWarnings = await DB.findOne({ GuildID: guild.id, UserID: Target?.id });
 				if (!userWarnings || userWarnings.Warnings.length === 0) {
-					interaction.reply({ content: `No warnings found for ${Target?.bot ? Target?.tag : ((Target as any)?.globalName || Target?.tag || Target?.username)}.` });
+					const display = Target ? (Target.bot ? Target.tag : (Target.username ?? Target.tag)) : 'that user';
+					interaction.reply({ content: `No warnings found for ${display}.` });
 				} else {
 					const warningEmbed = new EmbedBuilder()
 						.setTitle(`${Target?.globalName}'s Warnings`)

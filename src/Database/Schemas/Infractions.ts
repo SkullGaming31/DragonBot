@@ -1,5 +1,5 @@
 // Update your Infractions schema file
-import { model, Schema, Document, Model, Types } from 'mongoose';
+import { model, Schema, Document } from 'mongoose';
 
 // Define interface for individual infraction
 export interface Infraction {

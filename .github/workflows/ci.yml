@@ -1,20 +1,21 @@
 name: CI
-permissions:
-  contents: read
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, feature/** ]
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
-  test:
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [18.x]
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,13 +24,94 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.node-version }}-
 
       - name: Install dependencies
         run: npm ci
 
+      - name: Run linter (if available)
+        run: npm run lint --if-present
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Restore node modules cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.node-version }}-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install libssl1.1 (required by mongodb binaries)
+        # mongodb-memory-server spawns mongod which may require OpenSSL 1.1 (libcrypto.so.1.1)
+        # Ubuntu 22.04 runners don't ship libssl1.1 by default; fetch a compatible deb and install.
+        run: |
+          set -e
+          sudo apt-get update
+          sudo apt-get install -y wget ca-certificates || true
+          # Try download from security.ubuntu; fallback to archive if needed.
+          wget -qO /tmp/libssl1.1.deb "http://security.ubuntu.com/ubuntu/pool/main/o/openssl1.1/libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb" || true
+          if [ ! -s /tmp/libssl1.1.deb ]; then
+            wget -qO /tmp/libssl1.1.deb "http://archive.ubuntu.com/ubuntu/pool/main/o/openssl1.1/libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb"
+          fi
+          if [ -s /tmp/libssl1.1.deb ]; then
+            sudo dpkg -i /tmp/libssl1.1.deb || sudo apt-get install -f -y
+          else
+            echo "Warning: libssl1.1 package not downloaded; mongodb-memory-server may fail to start"
+          fi
+
       - name: Typecheck (if available)
         run: npm run typecheck --if-present
 
-      - name: Run tests
-        run: npm run test --if-present
+      - name: Run tests (vitest)
+        env:
+          CI: true
+        run: |
+          # Use fewer workers to be gentle on CI runners and reduce memory pressure
+          npx vitest --run --reporter=dot --maxWorkers=2
+
+      - name: Run tests with JUnit reporter (artifact)
+        env:
+          CI: true
+        run: |
+          # Produce JUnit XML for test reporting
+          npx vitest --run --reporter junit --reporter-options "output=vitest-junit.xml" --maxWorkers=2 || true
+
+      - name: Upload JUnit test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitest-junit
+          path: vitest-junit.xml
+
+# Note: to test MongoDB transactions in CI, run mongodb-memory-server in replica-set mode or use a hosted
+# MongoDB with transactions enabled in a separate job. Replica-set setup increases CI runtime.
