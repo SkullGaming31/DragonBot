@@ -8,6 +8,7 @@ const PG = promisify(glob);
 import { CommandType } from '../Typings/Command';
 import { RegisterCommandOptions } from '../Typings/client';
 import { Event } from './Event';
+import { error as logError, info as logInfo } from '../Utilities/logger';
 config();
 
 export class ExtendedClient extends Client {
@@ -95,11 +96,24 @@ export class ExtendedClient extends Client {
 				console.log(`Guild ${guildId} not found`);
 				return;
 			}
-			const commandsList = await guild.commands.set(commands);
-			console.log(`Commands registered for guild ${guildId}: ${commandsList.size}`);
+			try {
+				const commandsList = await guild.commands.set(commands);
+				console.log(`Commands registered for guild ${guildId}: ${commandsList.size}`);
+				logInfo('registerCommands: registered guild commands', { guildId, count: commandsList.size });
+			} catch (err) {
+				// Log the error and continue - do not crash the process on Discord API errors
+				console.error('Failed to register guild commands', err);
+				logError('registerCommands: failed to register guild commands', { error: (err as Error)?.message ?? err, guildId });
+			}
 		} else {
-			const commandsList = await this.application?.commands.set(commands);
-			console.log(`Global commands registered: ${commandsList?.size}`);
+			try {
+				const commandsList = await this.application?.commands.set(commands);
+				console.log(`Global commands registered: ${commandsList?.size}`);
+				logInfo('registerCommands: registered global commands', { count: commandsList?.size });
+			} catch (err) {
+				console.error('Failed to register global commands', err);
+				logError('registerCommands: failed to register global commands', { error: (err as Error)?.message ?? err });
+			}
 		}
 	}
 
@@ -114,23 +128,29 @@ export class ExtendedClient extends Client {
 		const slashCommands: ApplicationCommandDataResolvable[] = [];
 		const commandFiles = await PG(`${__dirname}/../Commands/*/*{.ts,.js}`, {});
 
-		commandFiles.forEach(async (filePath: string) => {
+		// Load commands sequentially to avoid race conditions and detect duplicates
+		for (const filePath of commandFiles) {
 			const command: CommandType = await this.importFile(filePath);
-
-			if (!command.name) return;
-
+			if (!command || !command.name) continue;
+			if (this.commands.has(command.name)) {
+				console.warn(`Duplicate command name detected: ${command.name} (from ${filePath}) - skipping`);
+				continue;
+			}
 			this.commands.set(command.name, command);
-			slashCommands.push(command);
-		});
+			// `command` should be compatible with ApplicationCommandDataResolvable
+			slashCommands.push(command as unknown as ApplicationCommandDataResolvable);
+		}
 
 		this.on('clientReady', () => {
+			// Deduplicate commands by name before sending to Discord's API
+			const dedupedCommands = Array.from(new Map(slashCommands.map((c: any) => [c.name, c])).values());
 			switch (process.env.Enviroment) {
 				case 'dev':
-					this.registerCommands({ commands: slashCommands, guildId: process.env.DEV_DISCORD_GUILD_ID });
+					this.registerCommands({ commands: dedupedCommands, guildId: process.env.DEV_DISCORD_GUILD_ID });
 					console.log('Environment: ', process.env.Enviroment);
 					break;
 				case 'prod':
-					this.registerCommands({ commands: slashCommands, guildId: undefined });
+					this.registerCommands({ commands: dedupedCommands, guildId: undefined });
 					console.log('Environment: ', process.env.Enviroment);
 					break;
 				default:

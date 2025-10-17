@@ -3,21 +3,26 @@ import { MongooseError } from 'mongoose';
 
 import settings from '../../Database/Schemas/settingsDB';
 import { Event } from '../../Structures/Event';
+import { error as logError, info as logInfo } from '../../Utilities/logger';
 
 export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member) => {
-	const { guild, user } = member;
+	const guild = member.guild;
+	const user = member.user ?? undefined;
+	if (!guild) return;
 
-	const data = await settings.findOne({ GuildID: guild.id }).catch((err: MongooseError) => { console.error(err.message); });
-	if (data?.WelcomeChannel === undefined) return;
-	const logsChannelOBJ = guild.channels.cache.get(data.WelcomeChannel) as TextBasedChannel | undefined;
+	let data;
+	try {
+		data = await settings.findOne({ GuildID: guild.id });
+	} catch (err) {
+		logError('guildMemberAdd: failed to read settingsDB', { error: (err as Error)?.message ?? err });
+		return;
+	}
+
+	if (!data || data?.WelcomeChannel === undefined) return;
+
+	let logsChannelOBJ = guild.channels.cache.get(data.WelcomeChannel) as TextBasedChannel | undefined;
+	if (!logsChannelOBJ) logsChannelOBJ = (await guild.channels.fetch(data.WelcomeChannel).catch(() => undefined)) as TextBasedChannel | undefined;
 	if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
-
-	// let messageToSend: string;
-	// if (guild.rulesChannel) {
-	// 	messageToSend = `Welcome to ${guild.name}'s server! Please read the rules in <#${guild.rulesChannelId}>.`;
-	// } else {
-	// 	messageToSend = `Welcome to ${guild.name}'s server!`;
-	// }
 
 	const rulesChannel = channelMention(guild.rulesChannelId || '');
 	const messageToSend = guild.rulesChannel ? `Welcome to ${guild.name}'s server! Please read the rules in ${rulesChannel}. dont forget to pop into the introduction channel and introduce yourself to everyone` : `Welcome to ${guild.name}'s server!`;
@@ -25,12 +30,12 @@ export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member) => {
 	const embed = new EmbedBuilder()
 		.setTitle('New Member')
 		.setDescription(messageToSend)
-		.setAuthor({ name: `${user.globalName}`, iconURL: user.displayAvatarURL({ size: 512 }) })
+		.setAuthor({ name: `${user?.globalName ?? 'Unknown'}`, iconURL: user?.displayAvatarURL({ size: 512 }) })
 		.setColor('Blue')
 		.addFields([
 			{
 				name: 'Account Created: ',
-				value: `<t:${Math.floor(user.createdTimestamp / 1000)}:R>`,
+				value: `<t:${Math.floor((user?.createdTimestamp ?? Date.now()) / 1000)}:R>`,
 				inline: true,
 			},
 			{
@@ -39,29 +44,28 @@ export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member) => {
 				inline: true,
 			},
 		])
-		.setThumbnail(guild.iconURL({ size: 512 }))
 		.setFooter({ text: `UserID: ${member.id}` })
 		.setTimestamp();
+
+	const icon = guild.iconURL({ size: 512 });
+	if (typeof icon === 'string') embed.setThumbnail(icon);
+
 	try {
-		if (data.Welcome === true) {
-			switch (guild.id) {
-				case '819180459950473236':
-					 
+		if (data.Welcome === true && logsChannelOBJ) {
+			// Keep historical auto-role logic intact (legacy behavior)
+			try {
+				if (guild.id === '819180459950473236') {
 					const memberRole = guild.roles.cache.get('879461309870125147');
 					if (memberRole) guild.members.addRole({ user: member, role: memberRole, reason: 'Auto Role Assign' });
-					break;
-			}
-			if (guild.id === '819180459950473236') {
-				const memberRole = guild.roles.cache.get('879461309870125147');
-				if (memberRole) {
-					guild.members.addRole({ user: member, role: memberRole, reason: 'Auto Role Assign' });
-				} else {
-					console.error(`Error finding Role ${memberRole}`);
 				}
+			} catch (err) {
+				logError('guildMemberAdd: auto-role failed', { error: (err as Error)?.message ?? err });
 			}
+
 			await logsChannelOBJ.send({ content: `Welcome ${member}`, embeds: [embed] });
+			logInfo('guildMemberAdd: sent welcome message', { guild: guild.id, user: user?.id });
 		}
 	} catch (error) {
-		console.error(error);
+		logError('guildMemberAdd: failed to send welcome embed', { error: (error as Error)?.message ?? error });
 	}
 });

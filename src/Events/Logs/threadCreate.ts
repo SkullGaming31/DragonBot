@@ -3,22 +3,56 @@ import { MongooseError } from 'mongoose';
 
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import { Event } from '../../Structures/Event';
+import { error as logError, info, warn } from '../../Utilities/logger';
 
 export default new Event<'threadCreate'>('threadCreate', async (thread: AnyThreadChannel, newlyCreated: boolean) => {
-	const { guild } = thread;
+	const { guild, id, name } = thread;
 
-	const data = await ChanLogger.findOne({ Guild: guild.id }).catch((err: MongooseError) => console.error(err.message));
+	let data;
+	try {
+		data = await ChanLogger.findOne({ Guild: guild.id });
+	} catch (err) {
+		logError('threadCreate: failed to read ChanLogger', { err: (err as MongooseError).message });
+		return;
+	}
+
 	if (!data || data.enableLogs === false) return;
 
 	const logsChannelID = data.Channel;
-	if (logsChannelID === undefined) return;
-	const logsChannelObj = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
-	if (!logsChannelObj || logsChannelObj.type !== ChannelType.GuildText) return;
+	if (!logsChannelID) return;
+
+	let logsChannelObj = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
+	if (!logsChannelObj) {
+		try {
+			const fetched = await guild.channels.fetch(logsChannelID).catch(() => undefined);
+			logsChannelObj = fetched as TextBasedChannel | undefined;
+		} catch (err) {
+			logError('threadCreate: failed to fetch logs channel', { err: String(err) });
+			return;
+		}
+	}
+
+	if (!logsChannelObj || logsChannelObj.type !== ChannelType.GuildText) {
+		warn('threadCreate: logs channel invalid or not a text channel', { guildId: guild.id, logsChannelID });
+		return;
+	}
 
 	const embed = new EmbedBuilder()
 		.setColor('Green')
-		.setDescription(`A thread has been created named: ${thread}, **${thread.name}**, Newly Created: ${newlyCreated ? 'Yes' : 'No'}`)
+		.setTitle('Thread created')
+		.addFields(
+			{ name: 'Name', value: name ?? 'unknown', inline: true },
+			{ name: 'ID', value: id, inline: true },
+			{ name: 'Newly Created', value: newlyCreated ? 'Yes' : 'No', inline: true }
+		)
 		.setTimestamp();
 
-	await logsChannelObj.send({ embeds: [embed] });
+	try {
+		if ('send' in (logsChannelObj as any) && typeof (logsChannelObj as any).send === 'function') {
+			await (logsChannelObj as any).send({ embeds: [embed] });
+			info('threadCreate: logged thread create', { guildId: guild.id, threadId: id });
+		}
+	} catch (err) {
+		logError('threadCreate: failed to send log message', { err: String(err), guildId: guild.id, threadId: id });
+	}
 });

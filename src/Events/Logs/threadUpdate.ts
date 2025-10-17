@@ -3,20 +3,41 @@ import { MongooseError } from 'mongoose';
 
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import { Event } from '../../Structures/Event';
+import { error as logError, info as logInfo } from '../../Utilities/logger';
 
 export default new Event<'threadUpdate'>('threadUpdate', async (oldThread: AnyThreadChannel, newThread: AnyThreadChannel) => {
 	const { guild } = newThread;
 
-	const data = await ChanLogger.findOne({ Guild: guild.id }).catch((err: MongooseError) => console.error(err.message));
+	let data;
+	try {
+		data = await ChanLogger.findOne({ Guild: guild.id });
+	} catch (err) {
+		logError('threadUpdate: failed to read LogsChannelDB', { error: (err as Error)?.message ?? err });
+		return;
+	}
 	if (!data || data.enableLogs === false) return;
 
 	const logsChannelID = data.Channel;
 	if (logsChannelID === undefined) return;
-	const logsChannelObj = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
-	if (!logsChannelObj || logsChannelObj.type !== ChannelType.GuildText) return;
+	let logsChannelObj = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
+	if (!logsChannelObj) {
+		try {
+			// try fetch as fallback
+			logsChannelObj = (await guild.channels.fetch(logsChannelID).catch(() => undefined)) as TextBasedChannel | undefined;
+		} catch (err) {
+			logError('threadUpdate: failed to fetch logs channel', { error: (err as Error)?.message ?? err });
+			return;
+		}
+	}
+	if (!logsChannelObj || logsChannelObj.type !== ChannelType.GuildText || typeof (logsChannelObj as unknown as { send?: unknown }).send !== 'function') return;
 
 	//#region Variables
-	const threadStarter = await oldThread.fetchOwner({ cache: true });
+	let threadStarter;
+	try {
+		threadStarter = await oldThread.fetchOwner({ cache: true }).catch(() => undefined);
+	} catch (err) {
+		logError('threadUpdate: failed to fetch thread owner', { error: (err as Error)?.message ?? err });
+	}
 	//#endregion
 
 	const embed = new EmbedBuilder()
@@ -25,16 +46,21 @@ export default new Event<'threadUpdate'>('threadUpdate', async (oldThread: AnyTh
 		.addFields([
 			{
 				name: 'Thread Starter:',
-				value: `${threadStarter?.user?.globalName}`,
+				value: `${threadStarter?.user?.globalName ?? 'Unknown'}`,
 				inline: false
 			},
 			{
 				name: 'Thread Name:',
-				value: `${oldThread.name} : ${newThread.name}`,
+				value: `${oldThread.name} → ${newThread.name}`,
 				inline: false
 			}
 		])
 		.setTimestamp();
 
-	await logsChannelObj.send({ embeds: [embed] });
+	try {
+		await logsChannelObj.send({ embeds: [embed] });
+		logInfo('threadUpdate: sent thread update log', { guild: guild.id, thread: newThread.id });
+	} catch (err) {
+		logError('threadUpdate: failed to send embed', { error: (err as Error)?.message ?? err });
+	}
 });

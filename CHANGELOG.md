@@ -37,3 +37,21 @@ _This changelog is maintained manually. For details, see the commit history._
 Notes:
 - Replaced a temporary ticket-template implementation per user request; templates were created earlier on a feature branch but removed.
 - Recommended follow-ups: add tests for lock/unlock/claim flows, transcript file-size handling (compression/external storage), and replace deprecated ephemeral usage with MessageFlags.
+
+2025-10-17 — Market consolidation, economy hardening, logging & health updates
+
+- Marketplace consolidation: replaced several separate market commands with a single subcommand-based command `src/Commands/Fun/market.ts` supporting `create`, `list`, `remove`, and `buy` subcommands. Tests updated to exercise the consolidated command. (see `test/market.test.ts`)
+
+- Database schema hardening: added normalization hooks to `src/Database/Schemas/userModel.ts` to coerce `balance` and `bank` to integers (Math.floor) to prevent floating-point artifacts from being persisted. This mitigates fractional-economy issues seen when some commands produced non-integer updates.
+
+- Event logging & utilities: hardened many event handlers to use a centralized logger and safer channel fetching (e.g., `guildBanAdd`, `guildCreate`, starboard handlers). Added `src/Utilities/logger.ts` improvements and switched event handlers to catch DB read/fetch errors and log them instead of throwing.
+
+- API & process improvements: added an Express health route `src/routes/health.ts` with caching and checks for Discord gateway and MongoDB connectivity; added graceful shutdown handlers in `src/index.ts` to close the bot and HTTP server on signals and to log unhandled rejections/uncaught exceptions.
+
+- Test & compatibility work: updated `test/market.test.ts` to use the consolidated `market` command and adjusted option shapes; ensured the vitest suite passes locally (all tests green).
+
+- Backwards-compat stubs: the legacy market module paths were wrapped with lightweight shims that delegate to the consolidated `market.ts` to avoid breaking imports while reducing command registrations.
+
+Notes:
+- The schema hooks prevent future float persistence but do not retroactively sanitize remote DB documents; consider running a migration to floor existing balances if needed.
+- Follow-up tasks: remove legacy files entirely when ready and add explicit tests to ensure the command registration deduplication in `src/Structures/Client.ts` behaves as expected.

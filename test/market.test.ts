@@ -3,8 +3,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import { ListingModel } from '../src/Database/Schemas/marketListing';
 import { UserModel } from '../src/Database/Schemas/userModel';
-import marketCreateCmd from '../src/Commands/Fun/market-create';
-import marketBuyCmd from '../src/Commands/Fun/market-buy';
+import marketCmd from '../src/Commands/Fun/market';
 
 let replset: MongoMemoryReplSet;
 
@@ -52,8 +51,10 @@ describe('Marketplace commands', () => {
       }
     };
 
+    // ensure subcommand is 'create' for the consolidated market command
+    (opts.options as any).getSubcommand = () => 'create';
     const { interaction } = makeInteractionMock(opts);
-    await (marketCreateCmd as any).run({ interaction });
+    await (marketCmd as any).run({ interaction });
 
     const doc = await ListingModel.findOne({ guildID: guildId, sellerID: userId }).lean().exec();
     expect(doc).toBeTruthy();
@@ -77,13 +78,16 @@ describe('Marketplace commands', () => {
       guild: { id: guildId },
       user: { id: buyerId },
       options: {
-        getString: (k: string) => (k === 'listing' ? String(listing._id) : ''),
-        getNumber: (k: string) => (k === 'qty' ? 1 : undefined)
+        getString: (k: string) => (k === 'id' ? String(listing._id) : ''),
+        getNumber: (k: string) => (k === 'quantity' ? 1 : undefined)
       }
     };
 
+    // set subcommand to 'buy'
+    (opts.options as any).getSubcommand = () => 'buy';
+
     const { interaction } = makeInteractionMock(opts);
-    await (marketBuyCmd as any).run({ interaction });
+    await (marketCmd as any).run({ interaction });
 
     // verify post-conditions
     const updatedBuyer = await UserModel.findOne({ guildID: guildId, id: buyerId }).lean().exec();
@@ -113,9 +117,10 @@ describe('Marketplace commands', () => {
       }
     };
 
+    // set subcommand to 'list' and call consolidated market command
+    (opts.options as any).getSubcommand = () => 'list';
     const { interaction, reply } = makeInteractionMock(opts);
-    const marketListMod = await import('../src/Commands/Fun/market-list');
-    await (marketListMod.default as any).run({ interaction } as any);
+    await (marketCmd as any).run({ interaction } as any);
 
     expect(reply).toHaveBeenCalled();
     const arg = reply.mock.calls[0][0];
@@ -136,17 +141,18 @@ describe('Marketplace commands', () => {
 
     // attempt remove by non-seller
     let opts = { guild: { id: guildId }, user: { id: other }, options: { getString: (k: string) => String(listing._id) } };
+    // legacy tests expect the old module; use consolidated market 'remove' subcommand
+    (opts.options as any).getSubcommand = () => 'remove';
     let mock = makeInteractionMock(opts);
-    const marketRemoveMod = await import('../src/Commands/Fun/market-remove');
-    await (marketRemoveMod.default as any).run({ interaction: mock.interaction } as any);
+    await (marketCmd as any).run({ interaction: mock.interaction } as any);
     expect(mock.reply).toHaveBeenCalled();
     expect((mock.reply.mock.calls[0][0] as any).content).toMatch(/Only the seller/);
 
     // remove by seller
     opts = { guild: { id: guildId }, user: { id: seller }, options: { getString: (k: string) => String(listing._id) } };
+    (opts.options as any).getSubcommand = () => 'remove';
     mock = makeInteractionMock(opts);
-    const marketRemoveMod2 = await import('../src/Commands/Fun/market-remove');
-    await (marketRemoveMod2.default as any).run({ interaction: mock.interaction } as any);
+    await (marketCmd as any).run({ interaction: mock.interaction } as any);
     expect(mock.reply).toHaveBeenCalled();
     expect((mock.reply.mock.calls[0][0] as any).content).toMatch(/removed/);
 

@@ -1,0 +1,100 @@
+2025-10-17T04:33:12.279Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2025-10-17T04:33:12.282Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2025-10-17T04:34:49.048Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T04:34:49.048Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T04:34:53.688Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2025-10-17T04:34:53.692Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2025-10-17T04:36:19.393Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:36:21.428Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2025-10-17T04:36:21.431Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2025-10-17T04:36:22.041Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T04:36:22.580Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T04:36:24.191Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:37:39.318Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:37:39.695Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:37:41.773Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2025-10-17T04:37:41.776Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2025-10-17T04:37:42.544Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T04:37:43.452Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T04:39:10.037Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2025-10-17T04:39:10.033Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2025-10-17T04:39:10.412Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:39:11.141Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T04:39:11.638Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T04:39:12.787Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:40:37.087Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2025-10-17T04:40:37.091Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2025-10-17T04:40:37.793Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:40:38.227Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T04:40:38.694Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:40:39.826Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:40:40.329Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T04:40:46.964Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:41:19.290Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:41:22.160Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2025-10-17T04:41:22.157Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2025-10-17T04:41:23.805Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T04:41:23.831Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T04:41:24.128Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:41:25.451Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:41:25.471Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:41:25.860Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:43:15.873Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:43:16.896Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2025-10-17T04:43:16.900Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2025-10-17T04:43:17.643Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T04:43:18.363Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:43:18.480Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:43:19.235Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T04:43:19.951Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T04:43:20.074Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:28:37.718Z [INFO] registerCommands: registered guild commands {"guildId":"959693430227894292","count":44}
+2025-10-17T05:34:24.704Z [INFO] channelCreate: logged new channel {"guildId":"959693430227894292","channelId":"1428617124250648617"}
+2025-10-17T05:34:39.927Z [INFO] channelDelete: logged deleted channel {"guildId":"959693430227894292","channelId":"1428617124250648617"}
+2025-10-17T05:36:38.636Z [INFO] guildMemberAdd: sent welcome message {"guild":"959693430227894292","user":"353674019943219204"}
+2025-10-17T05:40:42.222Z [INFO] Received SIGINT, shutting down... 
+2025-10-17T05:45:12.654Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2025-10-17T05:45:12.658Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2025-10-17T05:45:13.067Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:45:13.825Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T05:45:14.353Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T05:45:14.795Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:45:15.481Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:45:15.978Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:45:16.575Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:47:10.424Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2025-10-17T05:47:10.427Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2025-10-17T05:47:11.033Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:47:12.075Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T05:47:12.667Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:47:12.684Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T05:47:13.847Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:47:14.336Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:47:14.344Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:49:51.963Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2025-10-17T05:49:51.967Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2025-10-17T05:49:52.672Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:49:53.123Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T05:49:54.407Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:49:54.791Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T05:49:54.831Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:49:56.186Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:49:56.574Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:57:55.012Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T05:57:55.105Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2025-10-17T05:57:55.108Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2025-10-17T05:57:56.638Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:57:56.731Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:57:56.938Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T05:57:58.326Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:57:58.602Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T05:57:59.558Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T06:01:17.490Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2025-10-17T06:01:17.494Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2025-10-17T06:01:18.222Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T06:01:18.712Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T06:01:19.109Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2025-10-17T06:01:19.872Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T06:01:20.366Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T06:01:20.715Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2025-10-17T06:01:21.529Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}

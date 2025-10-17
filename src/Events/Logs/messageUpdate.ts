@@ -3,39 +3,49 @@ import { MongooseError } from 'mongoose';
 
 import ChanLogger from '../../Database/Schemas/LogsChannelDB'; // DB
 import { Event } from '../../Structures/Event';
+import { error as logError, info as logInfo } from '../../Utilities/logger';
 
 export default new Event<'messageUpdate'>('messageUpdate', async (oldMessage: Message | PartialMessage, newMessage: Message | PartialMessage) => {
 	if (!newMessage.inGuild()) return;
-	const { author, channel, guild } = newMessage;
-	if (author?.bot) return;
+	const guild = newMessage.guild as NonNullable<typeof newMessage.guild>;
+	const author = (newMessage as Message).author ?? undefined;
+	const channel = newMessage.channel ?? undefined;
+	if ((author as any)?.bot) return;
 
-	const data = await ChanLogger.findOne({ Guild: guild.id }).catch((err: MongooseError) => { console.error(err.message); });
+	let data;
+	try {
+		data = await ChanLogger.findOne({ Guild: guild.id });
+	} catch (err) {
+		logError('messageUpdate: failed to read LogsChannelDB', { error: (err as Error)?.message ?? err });
+		return;
+	}
 
 	if (!data || data.enableLogs === false) return;
 
 	const logsChannelID = data.Channel;
 	if (logsChannelID === undefined) return;
-	const logsChannelOBJ = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
+	let logsChannelOBJ = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
+	if (!logsChannelOBJ) logsChannelOBJ = (await guild.channels.fetch(logsChannelID).catch(() => undefined)) as TextBasedChannel | undefined;
 	if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
 	if (channel.id === data.Channel) return;
 
-	if (oldMessage.content === newMessage.content) return;
+	const oldContent = oldMessage.content ?? '';
+	const newContent = newMessage.content ?? '';
+	if (oldContent === newContent) return;
 
 	const Count = 1950;
-
-	if (oldMessage.content?.length === undefined) return;
-	const Original = oldMessage.content?.slice(0, Count) + (oldMessage.content?.length > Count ? ' ...' : '');
-	const Edited = newMessage.content?.slice(0, Count) + (newMessage.content.length > Count ? ' ...' : '');
+	const Original = oldContent.slice(0, Count) + (oldContent.length > Count ? ' ...' : '');
+	const Edited = newContent.slice(0, Count) + (newContent.length > Count ? ' ...' : '');
 
 	const log = new EmbedBuilder()
 		.setColor('Yellow')
-		.setDescription(`📘 A [message](${newMessage.url} by ${author} was **edited** in ${channel}.\n
-				**Original**:\n ${Original} \n**Edited**: \n ${Edited}`)
-		.setFooter({ text: `Member: ${author?.globalName} | ID: ${author?.id}` });
+		.setDescription(`\ud83d\udcd8 A [message](${(newMessage as Message).url ?? 'unknown'}) by ${author} was **edited** in ${channel}.\\n\\n**Original**:\\n ${Original} \\n+**Edited**: \\n+ ${Edited}`)
+		.setFooter({ text: `Member: ${(author as any)?.globalName ?? (author as any)?.username ?? 'Unknown'} | ID: ${(author as any)?.id ?? 'Unknown'}` });
 
 	try {
 		await logsChannelOBJ.send({ embeds: [log] });
+		logInfo('messageUpdate: sent edit log', { guild: guild.id, channel: channel?.id, author: (author as any)?.id });
 	} catch (error) {
-		console.error(error);
+		logError('messageUpdate: failed to send embed', { error: (error as Error)?.message ?? error });
 	}
 });

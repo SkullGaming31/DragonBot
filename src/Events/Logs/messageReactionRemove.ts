@@ -1,7 +1,8 @@
- 
+
 import { MessageReaction, User, TextChannel, EmbedBuilder, PartialMessageReaction, PartialUser } from 'discord.js';
 import StarboardModel from '../../Database/Schemas/starboardDB';
 import { Event } from '../../Structures/Event';
+import { error as logError, info as logInfo } from '../../Utilities/logger';
 
 export default new Event<'messageReactionRemove'>('messageReactionRemove', async (reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) => {
 	try {
@@ -10,7 +11,6 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 		if ('partial' in msg && msg.partial) {
 			const fetchFn = (msg as unknown as { fetch?: unknown })['fetch'];
 			if (typeof fetchFn === 'function') {
-
 				const _fetch = fetchFn as (..._args: unknown[]) => Promise<unknown>;
 				await _fetch.call(msg).catch(() => null);
 			}
@@ -21,7 +21,13 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 		if ((user as User).id && msg.author?.id && (user as User).id === msg.author.id) return;
 
 		const guildId = msg.guild.id;
-		const config = await StarboardModel.findOne({ guildId }).exec();
+		let config;
+		try {
+			config = await StarboardModel.findOne({ guildId }).exec();
+		} catch (err) {
+			logError('messageReactionRemove: failed to read StarboardModel', { error: (err as Error)?.message ?? err });
+			return;
+		}
 		if (!config) return;
 
 		// if channel is ignored
@@ -67,7 +73,7 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 					const content = (msg.content ?? '').toString().trim();
 					if (content.length > 0) embed.setDescription(content.slice(0, 2048));
 					const channelName = msg.channel && 'name' in msg.channel && msg.channel.name ? msg.channel.name : 'unknown';
-					embed.setFooter({ text: `💫 ${count} | in #${channelName} • ${msg.id}` });
+					embed.setFooter({ text: `\ud83d\udcab ${count} | in #${channelName} \u2022 ${msg.id}` });
 					if (msg.attachments.size > 0) {
 						const first = msg.attachments.first();
 						if (first && first.contentType?.startsWith('image')) embed.setImage(first.url);
@@ -76,9 +82,10 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 					await starMsg.edit({ embeds: [embed] });
 					mapping.count = count;
 					await config.save();
+					logInfo('messageReactionRemove: updated starboard message', { guildId, messageId: msg.id, count });
 				}
 			} catch (err) {
-				console.error('Failed to update starboard message on reaction remove:', err);
+				logError('messageReactionRemove: Failed to update starboard message on reaction remove', { error: (err as Error)?.message ?? err });
 			}
 			return;
 		}
@@ -89,19 +96,20 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 			try {
 				starMsg = await channel.messages.fetch(mapping.starboardMessageId).catch(() => null);
 			} catch (err) {
-				console.error('Error fetching starboard message for delete:', err);
+				logError('messageReactionRemove: Error fetching starboard message for delete', { error: (err as Error)?.message ?? err });
 				starMsg = null;
 			}
 			if (starMsg) {
-				try { await starMsg.delete(); } catch (delErr) { console.warn('Failed to delete starboard message:', delErr); }
+				try { await starMsg.delete(); } catch (delErr) { logError('messageReactionRemove: Failed to delete starboard message', { error: (delErr as Error)?.message ?? delErr }); }
 			}
 			// remove mapping
 			config.posts.splice(postIndex, 1);
 			await config.save();
+			logInfo('messageReactionRemove: removed starboard mapping', { guildId, messageId: msg.id });
 		} catch (err) {
-			console.error('Failed to remove starboard post when reactions dropped:', err);
+			logError('messageReactionRemove: Failed to remove starboard post when reactions dropped', { error: (err as Error)?.message ?? err });
 		}
 	} catch (err) {
-		console.error('Starboard reaction remove handler error:', err);
+		logError('Starboard reaction remove handler error', { error: (err as Error)?.message ?? err });
 	}
 });

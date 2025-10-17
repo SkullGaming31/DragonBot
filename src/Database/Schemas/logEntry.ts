@@ -8,10 +8,10 @@ export interface LogEntryDocument extends Document {
 }
 
 const LogEntrySchema = new Schema<LogEntryDocument>({
-  level: { type: String, required: true, enum: ['info', 'warn', 'error', 'debug'] },
-  message: { type: String, required: true },
-  meta: { type: Schema.Types.Mixed, required: false },
-  createdAt: { type: Date, default: () => new Date() },
+	level: { type: String, required: true, enum: ['info', 'warn', 'error', 'debug'] },
+	message: { type: String, required: true },
+	meta: { type: Schema.Types.Mixed, required: false },
+	createdAt: { type: Date, default: () => new Date() },
 });
 
 const modelName = 'LogEntry';

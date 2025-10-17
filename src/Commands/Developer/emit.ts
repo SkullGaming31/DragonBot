@@ -49,9 +49,27 @@ export default new Command({
 				await interaction.reply({ content: 'Emitted the event!', flags: MessageFlags.Ephemeral });
 				break;
 			case 'guildMemberUpdate':
-				// Emit the guildMemberUpdate event with the simulated data
-				client.emit('guildMemberUpdate', member, member);
-				await interaction.reply({ content: 'Dont Know how to do this command!', flags: MessageFlags.Ephemeral });
+				// Emit the guildMemberUpdate event with a lightweight old/new member pair
+				{
+					// build minimal old/new member objects using interaction.member when available
+					const guild = interaction.guild;
+					const baseMember = (interaction.member ?? {}) as any;
+					const oldMember = {
+						...baseMember,
+						nickname: (baseMember as any).nickname ?? null,
+						roles: { cache: new Map(((baseMember as any).roles?.cache) ?? []) },
+						user: (baseMember as any).user ?? { id: (baseMember as any).id ?? 'u-test', globalName: (baseMember as any).displayName ?? 'TestUser', displayAvatarURL: () => null },
+						guild,
+					} as any;
+					const newMember = {
+						...oldMember,
+						nickname: ((oldMember.nickname ?? '') + '_edited') as any,
+						roles: oldMember.roles,
+					};
+					client.emit('guildMemberUpdate', oldMember, newMember);
+					await interaction.reply({ content: 'Emitted guildMemberUpdate with a simulated old/new member', flags: MessageFlags.Ephemeral });
+				}
+				break;
 				break;
 			case 'guildCreate':
 				if (guild) {
@@ -171,9 +189,19 @@ export default new Command({
 				break;
 			}
 			// Updated roleUpdate case
-			case 'roleUpdate':
-				interaction.reply({ content: 'This is not implemented yet!(No idea how to do it)', flags: MessageFlags.Ephemeral });
+			case 'roleUpdate': {
+				try {
+					// create two mock roles (old and new) using helper
+					const oldRole = createMockRole(interaction.guild as Guild);
+					const newRole = { ...oldRole, name: `${oldRole.name}_updated` } as Role;
+					client.emit('roleUpdate', oldRole, newRole);
+					await interaction.reply({ content: `✅ Emitted roleUpdate event for ${oldRole.name} -> ${newRole.name}`, flags: MessageFlags.Ephemeral });
+				} catch (error) {
+					console.error('roleUpdate Test Error:', error);
+					await interaction.reply({ content: '❌ Failed to emit roleUpdate event', flags: MessageFlags.Ephemeral });
+				}
 				break;
+			}
 
 				function createMockRole(guild: Guild, id?: string): Role {
 					const mockRoleData = {

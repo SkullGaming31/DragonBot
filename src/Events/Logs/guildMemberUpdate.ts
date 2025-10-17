@@ -3,94 +3,100 @@ import { MongooseError } from 'mongoose';
 
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import { Event } from '../../Structures/Event';
+import { error as logError, info as logInfo } from '../../Utilities/logger';
 
 export default new Event('guildMemberUpdate', async (oldMember: GuildMember | PartialGuildMember, newMember: GuildMember) => {
-	// console.log('oldMember: ', oldMember);
-	// console.log('newMember: ', newMember);
+	const guild = newMember.guild;
 
-	const data = await ChanLogger.findOne({ Guild: newMember.guild.id }).catch((err: MongooseError) => { console.error(err.message); });
+	let data;
+	try {
+		data = await ChanLogger.findOne({ Guild: guild.id });
+	} catch (err) {
+		logError('guildMemberUpdate: failed to read LogsChannelDB', { error: (err as Error)?.message ?? err });
+		return;
+	}
 
 	if (!data || data.enableLogs === false) return;
 
 	const logsChannelID = data?.Channel;
 	if (logsChannelID === undefined) return;
-	const logsChannelOBJ = newMember.guild.channels.cache.get(logsChannelID) as TextBasedChannel | null;
+	let logsChannelOBJ = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
+	if (!logsChannelOBJ) logsChannelOBJ = (await guild.channels.fetch(logsChannelID).catch(() => undefined)) as TextBasedChannel | undefined;
 	if (!logsChannelOBJ) return;
 
-	const oldRoles = oldMember.roles.cache.map(r => r.id);
-	const newRoles = newMember.roles.cache.map(r => r.id);
+	const oldRoles = Array.isArray((oldMember as any).roles?.cache?.array?.())
+		? (oldMember as any).roles.cache.map((r: any) => r.id)
+		: ((oldMember as any).roles?.cache ? Array.from((oldMember as any).roles.cache.values()).map((r: any) => r.id) : []);
+	const newRoles = newMember.roles?.cache ? Array.from(newMember.roles.cache.values()).map(r => r.id) : [];
 
-	const Embed = new EmbedBuilder().setTitle(`${newMember.guild.name}[empty]`).setTimestamp();
+	const Embed = new EmbedBuilder().setTitle(`${guild.name} | Member Update`).setTimestamp();
 
 	if (oldRoles.length > newRoles.length) { // removing a role
 		const RoleIDs = Unique(oldRoles, newRoles);
 		let description = '';
 		RoleIDs.forEach(roleId => {
-			const Role = newMember.guild.roles.cache.get(roleId.toString());
+			const Role = guild.roles.cache.get(roleId.toString());
 			if (Role) {
 				description += `\`${newMember.user.globalName}\` has lost the role \`${Role.name}\`\n`;
 			}
 		});
 		if (description && logsChannelOBJ.type === ChannelType.GuildText) {
-			logsChannelOBJ.send({
-				embeds: [
-					Embed
-						// .setTitle(`${newMember.guild.name} | Member Update`)
-						.setDescription(description)
-						.setColor('Red'),
-				],
-			});
+			try {
+				await logsChannelOBJ.send({ embeds: [Embed.setDescription(description).setColor('Red')] });
+				logInfo('guildMemberUpdate: role removed', { guild: guild.id, member: newMember.id, roles: RoleIDs });
+			} catch (err) {
+				logError('guildMemberUpdate: failed to send role-removed embed', { error: (err as Error)?.message ?? err });
+			}
 		}
 	}
 	if (oldRoles.length < newRoles.length) { // adding a role
 		const addedRoles = AddedRoles(oldRoles, newRoles);
-		// console.log('Added roles:', addedRoles); // Debugging statement
 		let description = '';
 		addedRoles.forEach(roleId => {
-			const Role = newMember.guild.roles.cache.get(roleId.toString());
-			// console.log('Role:', Role); // Debugging statement
+			const Role = guild.roles.cache.get(roleId.toString());
 			if (Role) {
 				description += `\`${newMember.user.globalName}\` has got the role \`${Role.name}\`\n`;
 			}
 		});
 		if (description && logsChannelOBJ.type === ChannelType.GuildText) {
-			logsChannelOBJ.send({
-				embeds: [
-					Embed
-						// .setTitle(`${newMember.guild.name} | Member Update`)
-						.setDescription(description)
-						.setColor('Green'),
-				],
-			}).catch(error => console.error('Error sending message:', error)); // Error handling
+			try {
+				await logsChannelOBJ.send({ embeds: [Embed.setDescription(description).setColor('Green')] });
+				logInfo('guildMemberUpdate: role added', { guild: guild.id, member: newMember.id, roles: addedRoles });
+			} catch (err) {
+				logError('guildMemberUpdate: failed to send role-added embed', { error: (err as Error)?.message ?? err });
+			}
 		}
 	}
 
-	if (newMember.nickname !== oldMember.nickname) {
-		if (logsChannelOBJ.type === ChannelType.GuildText)
-			return logsChannelOBJ.send({
-				embeds: [
-					// Embed.setTitle(`${newMember.guild.name} | Nickname Update`),
-					Embed.setDescription(`${newMember.user.globalName}'s nickname has been changed from: \`${oldMember.nickname}\` to: \`${newMember.nickname}\``),
-				],
-			});
+	if (newMember.nickname !== (oldMember as any).nickname) {
+		if (logsChannelOBJ.type === ChannelType.GuildText) {
+			try {
+				await logsChannelOBJ.send({ embeds: [Embed.setDescription(`${newMember.user.globalName}'s nickname has been changed from: \`${(oldMember as any).nickname}\` to: \`${newMember.nickname}\``)] });
+				logInfo('guildMemberUpdate: nickname changed', { guild: guild.id, member: newMember.id });
+			} catch (err) {
+				logError('guildMemberUpdate: failed to send nickname embed', { error: (err as Error)?.message ?? err });
+			}
+		}
 	}
-	if (!oldMember.premiumSince && newMember.premiumSince) {
-		if (logsChannelOBJ.type === ChannelType.GuildText)
-			return logsChannelOBJ.send({
-				embeds: [
-					// Embed.setTitle(`${newMember.guild.name} | Boost Detected`),
-					Embed.setDescription(`\`${newMember.user.globalName}\` has started boosting the server`),
-				],
-			});
+	if (!(oldMember as any).premiumSince && newMember.premiumSince) {
+		if (logsChannelOBJ.type === ChannelType.GuildText) {
+			try {
+				await logsChannelOBJ.send({ embeds: [Embed.setDescription(`\`${newMember.user.globalName}\` has started boosting the server`)] });
+				logInfo('guildMemberUpdate: started boosting', { guild: guild.id, member: newMember.id });
+			} catch (err) {
+				logError('guildMemberUpdate: failed to send boost embed', { error: (err as Error)?.message ?? err });
+			}
+		}
 	}
-	if (!newMember.premiumSince && oldMember.premiumSince) {
-		if (logsChannelOBJ.type === ChannelType.GuildText)
-			return logsChannelOBJ.send({
-				embeds: [
-					// Embed.setTitle(`${newMember.guild.name} | Unboost Detected`),
-					Embed.setDescription(`${newMember.user.globalName} has stopped boosting the server`),
-				],
-			});
+	if (!newMember.premiumSince && (oldMember as any).premiumSince) {
+		if (logsChannelOBJ.type === ChannelType.GuildText) {
+			try {
+				await logsChannelOBJ.send({ embeds: [Embed.setDescription(`${newMember.user.globalName} has stopped boosting the server`)] });
+				logInfo('guildMemberUpdate: stopped boosting', { guild: guild.id, member: newMember.id });
+			} catch (err) {
+				logError('guildMemberUpdate: failed to send unboost embed', { error: (err as Error)?.message ?? err });
+			}
+		}
 	}
 });
 

@@ -3,29 +3,40 @@ import { MongooseError } from 'mongoose';
 
 import ChanLogger from '../../Database/Schemas/LogsChannelDB'; // DB
 import { Event } from '../../Structures/Event';
+import { error as logError, info as logInfo } from '../../Utilities/logger';
 
 export default new Event<'messageDelete'>('messageDelete', async (message: Message | PartialMessage) => {
 	if (!message.guild) return;
 
-	const { guild, author, channel } = message;
-	const data = await ChanLogger.findOne({ Guild: guild.id }).catch((err: MongooseError) => { console.error(err.message); });
+	const guild = message.guild;
+	const author = (message as Message).author ?? undefined;
+	const channel = message.channel ?? undefined;
+
+	let data;
+	try {
+		data = await ChanLogger.findOne({ Guild: guild.id });
+	} catch (err) {
+		logError('messageDelete: failed to read LogsChannelDB', { error: (err as Error)?.message ?? err });
+		return;
+	}
 
 	if (!data || data?.enableLogs === false) return;
 
 	const logsChannelID = data.Channel;
 	if (logsChannelID === undefined) return;
-	const logsChannelOBJ = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
+	let logsChannelOBJ = guild.channels.cache.get(logsChannelID) as TextBasedChannel | undefined;
+	if (!logsChannelOBJ) logsChannelOBJ = (await guild.channels.fetch(logsChannelID).catch(() => undefined)) as TextBasedChannel | undefined;
 	if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
-	if (channel.id === data.Channel) return;
+	if (channel?.id === data.Channel) return;
 
 	// Get the message content or use 'None' if it's empty or undefined
 	const messageContent = (message as Message | PartialMessage).content || 'None';
 
 	// Get the author's name (including discriminator for users, tag for bots)
-	const authorName = author?.bot ? author.tag : (author?.globalName || author?.username || 'Unknown');
+	const authorName = (author as any)?.bot ? (author as any).tag : ((author as any)?.globalName || (author as any)?.username || 'Unknown');
 
 	// Truncate the message content to fit within Discord's embed field limit
-	const truncatedContent = messageContent.slice(0, 1024); // Truncate to 1024 characters
+	const truncatedContent = String(messageContent).slice(0, 1024); // Truncate to 1024 characters
 
 	const logsEmbed = new EmbedBuilder()
 		.setTitle('Discord Event[messageDelete]')
@@ -33,20 +44,26 @@ export default new Event<'messageDelete'>('messageDelete', async (message: Messa
 		.setColor('Red')
 		.addFields([
 			{ name: 'User', value: authorName },
-			{ name: '🚨 | Deleted Message: ', value: truncatedContent },
+			{ name: '\ud83d\udea8 | Deleted Message: ', value: truncatedContent },
 			{ name: 'Channel', value: `${channel}` },
 		])
-		.setURL(`${message.url}`)
-		.setFooter({ text: `UserID: ${author?.id ?? 'Unknown'}` })
+		.setFooter({ text: `UserID: ${(author as any)?.id ?? 'Unknown'}` })
 		.setTimestamp();
 
-	if (message.attachments.size >= 1) {
-		logsEmbed.addFields({ name: 'Attachments:', value: `${message.attachments.map((a) => a.url)}`, inline: true });
+	// set URL only when available
+	const messageUrl = (message as Message).url;
+	if (typeof messageUrl === 'string') logsEmbed.setURL(messageUrl);
+
+	if ((message as Message).attachments && (message as Message).attachments.size >= 1) {
+		try {
+			logsEmbed.addFields({ name: 'Attachments:', value: `${(message as Message).attachments.map((a) => a.url)}`, inline: true });
+		} catch { }
 	}
 
 	try {
-		await logsChannelOBJ.send({ embeds: [logsEmbed] }).catch((err) => { console.error(err.type + ':' + err.message); });
+		await logsChannelOBJ.send({ embeds: [logsEmbed] });
+		logInfo('messageDelete: sent delete log', { guild: guild.id, channel: channel?.id, author: (author as any)?.id });
 	} catch (err) {
-		console.error(err);
+		logError('messageDelete: failed to send embed', { error: (err as Error)?.message ?? err });
 	}
 });

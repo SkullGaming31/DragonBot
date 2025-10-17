@@ -1,7 +1,8 @@
- 
+
 import { MessageReaction, User, TextChannel, EmbedBuilder, PartialMessageReaction, PartialUser } from 'discord.js';
 import StarboardModel from '../../Database/Schemas/starboardDB';
 import { Event } from '../../Structures/Event';
+import { error as logError, info as logInfo } from '../../Utilities/logger';
 
 export default new Event<'messageReactionAdd'>('messageReactionAdd', async (reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) => {
 	try {
@@ -9,10 +10,8 @@ export default new Event<'messageReactionAdd'>('messageReactionAdd', async (reac
 		const msg = reaction.message;
 		// if the message is a partial, try to fetch the full message
 		if ('partial' in msg && msg.partial) {
-			// if partial, try to fetch the full message
 			const fetchFn = (msg as unknown as { fetch?: unknown })['fetch'];
 			if (typeof fetchFn === 'function') {
-
 				const _fetch = fetchFn as (..._args: unknown[]) => Promise<unknown>;
 				await _fetch.call(msg).catch(() => null);
 			}
@@ -23,7 +22,13 @@ export default new Event<'messageReactionAdd'>('messageReactionAdd', async (reac
 		if ((user as User).id && msg.author?.id && (user as User).id === msg.author.id) return;
 
 		const guildId = msg.guild.id;
-		const config = await StarboardModel.findOne({ guildId }).exec();
+		let config;
+		try {
+			config = await StarboardModel.findOne({ guildId }).exec();
+		} catch (err) {
+			logError('messageReactionAdd: failed to read StarboardModel', { error: (err as Error)?.message ?? err });
+			return;
+		}
 		if (!config) return;
 
 		// if channel is ignored
@@ -67,7 +72,7 @@ export default new Event<'messageReactionAdd'>('messageReactionAdd', async (reac
 
 		// Ensure footer channel name is non-empty
 		const channelName = msg.channel && 'name' in msg.channel && msg.channel.name ? msg.channel.name : 'unknown';
-		embed.setFooter({ text: `💫 ${count} | in #${channelName} • ${msg.id}` });
+		embed.setFooter({ text: `\ud83d\udcab ${count} | in #${channelName} \u2022 ${msg.id}` });
 
 		if (msg.attachments.size > 0) {
 			const first = msg.attachments.first();
@@ -81,16 +86,17 @@ export default new Event<'messageReactionAdd'>('messageReactionAdd', async (reac
 				try {
 					starMsg = await channel.messages.fetch(post.starboardMessageId).catch(() => null);
 				} catch (err) {
-					console.error('Error fetching starboard message:', err);
+					logError('messageReactionAdd: Error fetching starboard message', { error: (err as Error)?.message ?? err });
 					starMsg = null;
 				}
 				if (starMsg) {
 					await starMsg.edit({ embeds: [embed] });
 					post.count = count;
 					await config.save();
+					logInfo('messageReactionAdd: updated starboard message', { guildId, messageId: msg.id, count });
 				}
 			} catch (err) {
-				console.error('Failed to update starboard message:', err);
+				logError('messageReactionAdd: Failed to update starboard message', { error: (err as Error)?.message ?? err });
 			}
 		} else {
 			// create new starboard post
@@ -98,11 +104,12 @@ export default new Event<'messageReactionAdd'>('messageReactionAdd', async (reac
 				const sent = await channel.send({ embeds: [embed] });
 				config.posts.push({ originalMessageId: msg.id, starboardMessageId: sent.id, count: count });
 				await config.save();
+				logInfo('messageReactionAdd: created starboard message', { guildId, messageId: msg.id, count });
 			} catch (err) {
-				console.error('Failed to send starboard message:', err);
+				logError('messageReactionAdd: Failed to send starboard message', { error: (err as Error)?.message ?? err });
 			}
 		}
 	} catch (err) {
-		console.error('Starboard reaction add handler error:', err);
+		logError('Starboard reaction add handler error', { error: (err as Error)?.message ?? err });
 	}
 });
