@@ -125,10 +125,18 @@ export default new Command({
 		bulletPositions.forEach(pos => chamber[pos] = '💀');
 		chamber[chamberPosition] = isFatal ? '💥' : '💰';
 
-		// Calculate rewards
-		const baseMultiplier = 1 + (totalBullets * 0.6);
-		const winMultiplier = baseMultiplier * highRollerBonus;
-		// const winnings = Math.round(betAmount * winMultiplier);
+		// Calculate rewards using integer math to avoid fractional payouts.
+		// Represent multipliers as numerator/denominator pairs.
+		// baseMultiplier = 1 + totalBullets * 0.6  -> numerator = 10 + totalBullets*6, denominator = 10
+		const baseMultiplierNum = 10 + (totalBullets * 6);
+		const baseMultiplierDen = 10;
+
+		// highRollerBonus of 1.5 becomes bonusNum/bonusDen = 3/2, otherwise 1/1
+		const bonusNum = highRollerBonus === 1.5 ? 3 : 1;
+		const bonusDen = highRollerBonus === 1.5 ? 2 : 1;
+
+		const winNum = baseMultiplierNum * bonusNum; // combined numerator
+		const winDen = baseMultiplierDen * bonusDen; // combined denominator
 
 		// Build embed
 		const embed = new EmbedBuilder()
@@ -138,7 +146,7 @@ export default new Command({
 				`**Chamber:** ${chamber.join(' ')}`,
 				`**Bet:** ${betAmount} gold`,
 				`**Bullets:** ${totalBullets}/6 (${Math.round((totalBullets / 6) * 100)}% risk)`,
-				`**Multiplier:** ${winMultiplier.toFixed(1)}x`
+				`**Multiplier:** ${(winNum / winDen).toFixed(1)}x`
 			].join('\n'));
 
 		if (isFatal) {
@@ -169,10 +177,8 @@ export default new Command({
 				jackpotWon = true;
 			}
 
-			// Calculate regular winnings
-			const baseMultiplier = 1 + (totalBullets * 0.6);
-			const winMultiplier = baseMultiplier * highRollerBonus;
-			let winnings = Math.round(betAmount * winMultiplier);
+			// Calculate regular winnings using integer math and floor the result
+			let winnings = Math.floor((betAmount * winNum) / winDen);
 
 			// Add jackpot if won
 			if (jackpotWon) {
@@ -187,9 +193,10 @@ export default new Command({
 			userDoc.balance += winnings;
 			rouletteDoc.streak = (rouletteDoc.streak || 0) + 1;
 
-			// Streak bonus
-			const streakBonus = Math.min(rouletteDoc.streak * 0.1, 1.0);
-			userDoc.balance += Math.round(winnings * streakBonus);
+			// Streak bonus (10% per streak, capped at 100%) computed with integer math
+			const streakPercent = Math.min((rouletteDoc.streak || 0) * 10, 100);
+			const streakGain = Math.floor((winnings * streakPercent) / 100);
+			userDoc.balance += streakGain;
 
 			embed.addFields({
 				name: '🎉 Victory! 🎉',
@@ -197,7 +204,7 @@ export default new Command({
 				value: [
 					`Won ${winnings} gold!`,
 					jackpotWon ? '(Includes jackpot!)' : '',
-					streakBonus > 0 && `+${Math.round(streakBonus * 100)}% streak bonus`,
+					streakPercent > 0 && `+${streakPercent}% streak bonus`,
 					randomChoice([
 						'Lady Luck smiles upon you!',
 						'The bullets were blanks!',
