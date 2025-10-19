@@ -53,7 +53,7 @@ userSchema.pre('save', function (this: Document & Partial<IUser>, next) {
 		if (typeof this.bank === 'number') {
 			this.bank = Math.floor(this.bank);
 		}
-	} catch (_err) {
+	} catch {
 		// swallow errors to avoid blocking saves; logging is left to callers
 	}
 	next();
@@ -78,16 +78,17 @@ userSchema.post('findOneAndUpdate', async (doc: Document & Partial<IUser> | null
 			try {
 				// Attempt to access a model-like constructor from the document in a typed way
 				const maybeCtor = (doc as unknown as { constructor?: unknown }).constructor;
-				const ctor = maybeCtor as unknown as { findByIdAndUpdate?: (id: unknown, update: Partial<IUser>) => { exec?: () => Promise<unknown> } } | undefined;
+				 
+				const ctor = maybeCtor as unknown as { findByIdAndUpdate?: (_: unknown, _u: Partial<IUser>) => Promise<unknown> } | undefined;
 				const id = (doc as unknown as { _id?: unknown })._id;
 				if (ctor?.findByIdAndUpdate && id !== undefined) {
-					await ctor.findByIdAndUpdate(id, { balance: doc.balance, bank: doc.bank }).exec?.();
+					await ctor.findByIdAndUpdate(id, { balance: doc.balance, bank: doc.bank }).catch(() => undefined);
 				}
-			} catch (_e) {
+			} catch {
 				// ignore persistence failures
 			}
 		}
-	} catch (_e) {
+	} catch {
 		// ignore
 	}
 });

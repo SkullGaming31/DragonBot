@@ -49,7 +49,9 @@ export default new Event<'threadCreate'>('threadCreate', async (thread: AnyThrea
 		.setTimestamp();
 
 	try {
-		const possibleSender = logsChannelObj as unknown as { send?: (...args: unknown[]) => Promise<unknown> } | undefined;
+
+		 
+		const possibleSender = logsChannelObj as unknown as { send?: (..._args: unknown[]) => Promise<unknown> } | undefined;
 		if (possibleSender && typeof possibleSender.send === 'function') {
 			await possibleSender.send({ embeds: [embed] });
 			info('threadCreate: logged thread create', { guildId: guild.id, threadId: id });

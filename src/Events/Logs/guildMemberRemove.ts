@@ -1,5 +1,4 @@
 import { ChannelType, EmbedBuilder, TextBasedChannel } from 'discord.js';
-import { MongooseError } from 'mongoose';
 
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import settings from '../../Database/Schemas/settingsDB';

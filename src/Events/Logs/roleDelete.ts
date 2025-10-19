@@ -47,7 +47,10 @@ export default new Event<'roleDelete'>('roleDelete', async (role: Role) => {
 		.setTimestamp();
 
 	try {
-		const possibleSender = logsChannelOBJ as unknown as { send?: (...args: unknown[]) => Promise<unknown> } | undefined;
+
+
+		 
+		const possibleSender = logsChannelOBJ as unknown as { send?: (..._args: unknown[]) => Promise<unknown> } | undefined;
 		if (possibleSender && typeof possibleSender.send === 'function') {
 			await possibleSender.send({ embeds: [embed] });
 			info('roleDelete: logged role delete', { guildId: guild.id, roleId: id });

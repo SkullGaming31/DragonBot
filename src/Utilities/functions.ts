@@ -1,4 +1,4 @@
- 
+
 import { CommandInteraction, Interaction } from 'discord.js';
 
 // Map to store cooldowns for commands
@@ -36,6 +36,7 @@ export type ReplyableInteraction = {
 
 // _args name is intentionally unused in type-level callable signatures
 
+ 
 type AsyncCallable = (..._args: unknown[]) => Promise<unknown> | unknown;
 
 export async function safeInteractionReply(

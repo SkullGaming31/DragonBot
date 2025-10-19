@@ -1,4 +1,4 @@
- 
+
 import { BaseInteraction, ChannelType, Colors, EmbedBuilder, Collection, Message } from 'discord.js';
 import { Event } from '../../Structures/Event';
 // import settings from '../../Structures/Schemas/settingsDB';
@@ -123,6 +123,7 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 							const filename = `transcript-${docs.TicketID || channel?.id}.html`;
 							try {
 
+								 
 								const sendFn = (target as unknown as { send?: (..._args: unknown[]) => Promise<unknown> }).send;
 								if (sendFn) await sendFn.call(target, { files: [{ attachment: Buffer.from(html, 'utf8'), name: filename }] });
 							} catch (uploadErr) {

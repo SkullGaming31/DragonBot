@@ -18,6 +18,7 @@ export default new Event('roleCreate', async (role: Role) => {
 
 	if (!data || data.enableLogs === false) return;
 
+
 	const logsChannelID = data?.Channel;
 	if (!logsChannelID) return;
 
@@ -47,7 +48,10 @@ export default new Event('roleCreate', async (role: Role) => {
 		.setTimestamp();
 
 	try {
-		const possibleSender = logsChannelOBJ as unknown as { send?: (...args: unknown[]) => Promise<unknown> } | undefined;
+
+
+		 
+		const possibleSender = logsChannelOBJ as unknown as { send?: (..._args: unknown[]) => Promise<unknown> } | undefined;
 		if (possibleSender && typeof possibleSender.send === 'function') {
 			await possibleSender.send({ embeds: [embed] });
 			info('roleCreate: logged role create', { guildId: guild.id, roleId: id });

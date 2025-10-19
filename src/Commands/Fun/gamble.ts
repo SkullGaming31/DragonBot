@@ -40,8 +40,8 @@ export default new Command({
 			let userModel: IUser | null;
 			try {
 				userModel = await UserModel.findOne<IUser>({ guildID: guild?.id, id: user.id });
-			} catch (error) {
-				// console.error('Error retrieving user from database:', error);
+			} catch {
+				// console.error('Error retrieving user from database');
 				await interaction.reply({ content: 'An error occurred while retrieving user information.' });
 				return;
 			}
@@ -70,8 +70,8 @@ export default new Command({
 						const finalResponse = isWin ? `Congratulations! You risked it all and won ${gambled} gold!` : `Sorry, you lost ${gambled} gold.`;
 
 						await interaction.reply({ content: finalResponse });
-					} catch (error) {
-						console.error(error);
+					} catch (_error) {
+						console.error(_error);
 					}
 					break;
 				case 'percentage': //DONE !gamble [percentage] ex !gamble 20% of your balance
@@ -100,8 +100,8 @@ export default new Command({
 						const finalResponse = isWin ? `Congratulations! You risked ${percentage}% of your balance and won ${abs} gold!` : `Sorry, you lost ${abs} gold (${percentage}% of your balance).`;
 
 						await interaction.reply({ content: finalResponse });
-					} catch (error) {
-						console.error(error);
+					} catch (_error) {
+						console.error(_error);
 					}
 					break;
 				case 'fixed number'://DONE !gamble [Amount] ex !gamble 500coins from your balance
@@ -122,8 +122,8 @@ export default new Command({
 						await UserModel.findOneAndUpdate({ guildID: guild.id, id: user.id }, { $inc: { balance: deltaFixed } });
 						const response = isWinFixed ? `Congratulations! You won ${fixedAmount} gold.` : `Sorry, you lost ${fixedAmount} gold.`;
 						await interaction.reply({ content: response });
-					} catch (error) {
-						console.error(error);
+					} catch (_error) {
+						console.error(_error);
 					}
 					break;
 				default:

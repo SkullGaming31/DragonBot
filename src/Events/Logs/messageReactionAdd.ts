@@ -12,6 +12,8 @@ export default new Event<'messageReactionAdd'>('messageReactionAdd', async (reac
 		if ('partial' in msg && msg.partial) {
 			const fetchFn = (msg as unknown as { fetch?: unknown })['fetch'];
 			if (typeof fetchFn === 'function') {
+
+				 
 				const _fetch = fetchFn as (..._args: unknown[]) => Promise<unknown>;
 				await _fetch.call(msg).catch(() => null);
 			}
@@ -43,6 +45,8 @@ export default new Event<'messageReactionAdd'>('messageReactionAdd', async (reac
 
 		const fetched = reactionEntry && typeof (reactionEntry as unknown as { fetch?: unknown })['fetch'] === 'function'
 
+
+			 
 			? await ((reactionEntry as unknown as { fetch: (..._args: unknown[]) => Promise<unknown> }).fetch().catch(() => null)) as unknown as { count?: number }
 			: null;
 		const count = (typeof reaction.count === 'number' ? reaction.count : (fetched && typeof fetched.count === 'number' ? fetched.count : 0));

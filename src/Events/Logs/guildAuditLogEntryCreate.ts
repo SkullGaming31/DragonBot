@@ -1,4 +1,4 @@
-import { ChannelType, EmbedBuilder, Guild, GuildAuditLogsEntry, TextBasedChannel } from 'discord.js';
+import { ChannelType, EmbedBuilder, Guild, GuildAuditLogsEntry } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
@@ -48,14 +48,18 @@ export default new Event<'guildAuditLogEntryCreate'>('guildAuditLogEntryCreate',
 		.setTimestamp();
 
 	try {
-		const possibleSender = logsChannelObj as unknown as { send?: (...args: unknown[]) => Promise<unknown> } | undefined;
+
+
+
+		 
+		const possibleSender = logsChannelObj as unknown as { send?: (..._args: unknown[]) => Promise<unknown> } | undefined;
 		if (possibleSender && typeof possibleSender.send === 'function') {
 			await possibleSender.send({ embeds: [embed] });
 			info('guildAuditLogEntryCreate: logged audit entry', { guildId: guild.id, actionType: String(actionType) });
 		} else {
 			warn('guildAuditLogEntryCreate: logs channel has no send() method', { guildId: guild.id, logsChannelID });
 		}
-	} catch (err) {
-		logError('guildAuditLogEntryCreate: failed to send log message', { err: String(err), guildId: guild.id });
+	} catch (_err) {
+		logError('guildAuditLogEntryCreate: failed to send log message', { err: String(_err), guildId: guild.id });
 	}
 });

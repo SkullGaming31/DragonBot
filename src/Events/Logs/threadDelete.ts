@@ -51,7 +51,9 @@ export default new Event<'threadDelete'>('threadDelete', async (thread: AnyThrea
 		.setTimestamp();
 
 	try {
-		const possibleSender = logsChannelObj as unknown as { send?: (...args: unknown[]) => Promise<unknown> } | undefined;
+
+		 
+		const possibleSender = logsChannelObj as unknown as { send?: (..._args: unknown[]) => Promise<unknown> } | undefined;
 		if (possibleSender && typeof possibleSender.send === 'function') {
 			await possibleSender.send({ embeds: [embed] });
 			info('threadDelete: logged thread delete', { guildId: guild.id, threadId: id });
