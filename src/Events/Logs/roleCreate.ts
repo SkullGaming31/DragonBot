@@ -1,7 +1,6 @@
 import { ChannelType, EmbedBuilder, Role, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
-/* eslint-disable @typescript-eslint/no-explicit-any -- quickfix: replace any with proper types later */
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import { Event } from '../../Structures/Event';
 import { error as logError, info, warn } from '../../Utilities/logger';
@@ -27,8 +26,8 @@ export default new Event('roleCreate', async (role: Role) => {
 		try {
 			const fetched = await guild.channels.fetch(logsChannelID).catch(() => undefined);
 			logsChannelOBJ = fetched as TextBasedChannel | undefined;
-		} catch (err) {
-			logError('roleCreate: failed to fetch logs channel', { err: String(err) });
+		} catch (_err) {
+			logError('roleCreate: failed to fetch logs channel', { err: String(_err) });
 			return;
 		}
 	}
@@ -48,8 +47,9 @@ export default new Event('roleCreate', async (role: Role) => {
 		.setTimestamp();
 
 	try {
-		if ('send' in (logsChannelOBJ as any) && typeof (logsChannelOBJ as any).send === 'function') {
-			await (logsChannelOBJ as any).send({ embeds: [embed] });
+		const possibleSender = logsChannelOBJ as unknown as { send?: (...args: unknown[]) => Promise<unknown> } | undefined;
+		if (possibleSender && typeof possibleSender.send === 'function') {
+			await possibleSender.send({ embeds: [embed] });
 			info('roleCreate: logged role create', { guildId: guild.id, roleId: id });
 		}
 	} catch (err) {

@@ -1,5 +1,4 @@
-import { ChannelType, EmbedBuilder, Message, PartialMessage, TextBasedChannel } from 'discord.js';
-/* eslint-disable @typescript-eslint/no-explicit-any -- quickfix: replace any with proper types later */
+import { ChannelType, EmbedBuilder, Message, PartialMessage, TextBasedChannel, User } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
 import ChanLogger from '../../Database/Schemas/LogsChannelDB'; // DB
@@ -10,14 +9,15 @@ export default new Event<'messageUpdate'>('messageUpdate', async (oldMessage: Me
 	if (!newMessage.inGuild()) return;
 	const guild = newMessage.guild as NonNullable<typeof newMessage.guild>;
 	const author = (newMessage as Message).author ?? undefined;
+	const authorUser = author as User | undefined;
 	const channel = newMessage.channel ?? undefined;
-	if ((author as any)?.bot) return;
+	if (authorUser?.bot) return;
 
 	let data;
 	try {
 		data = await ChanLogger.findOne({ Guild: guild.id });
-	} catch (err) {
-		logError('messageUpdate: failed to read LogsChannelDB', { error: (err as Error)?.message ?? err });
+	} catch (_err) {
+		logError('messageUpdate: failed to read LogsChannelDB', { error: (_err as Error)?.message ?? _err });
 		return;
 	}
 
@@ -40,12 +40,12 @@ export default new Event<'messageUpdate'>('messageUpdate', async (oldMessage: Me
 
 	const log = new EmbedBuilder()
 		.setColor('Yellow')
-		.setDescription(`\ud83d\udcd8 A [message](${(newMessage as Message).url ?? 'unknown'}) by ${author} was **edited** in ${channel}.\\n\\n**Original**:\\n ${Original} \\n+**Edited**: \\n+ ${Edited}`)
-		.setFooter({ text: `Member: ${(author as any)?.globalName ?? (author as any)?.username ?? 'Unknown'} | ID: ${(author as any)?.id ?? 'Unknown'}` });
+		.setDescription(`\ud83d\udcd8 A [message](${(newMessage as Message).url ?? 'unknown'}) by ${authorUser?.tag ?? 'unknown'} was **edited** in ${channel}.\\n\\n**Original**:\\n ${Original} \\n+**Edited**: \\n+ ${Edited}`)
+		.setFooter({ text: `Member: ${authorUser?.globalName ?? authorUser?.username ?? 'Unknown'} | ID: ${authorUser?.id ?? 'Unknown'}` });
 
 	try {
 		await logsChannelOBJ.send({ embeds: [log] });
-		logInfo('messageUpdate: sent edit log', { guild: guild.id, channel: channel?.id, author: (author as any)?.id });
+		logInfo('messageUpdate: sent edit log', { guild: guild.id, channel: channel?.id, author: authorUser?.id });
 	} catch (error) {
 		logError('messageUpdate: failed to send embed', { error: (error as Error)?.message ?? error });
 	}

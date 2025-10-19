@@ -1,5 +1,5 @@
 import { AnyThreadChannel, ChannelType, EmbedBuilder, TextBasedChannel } from 'discord.js';
-/* eslint-disable @typescript-eslint/no-explicit-any -- quickfix: replace any with proper types later */
+// Removed quickfix any disable
 import { MongooseError } from 'mongoose';
 
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
@@ -27,8 +27,8 @@ export default new Event<'threadCreate'>('threadCreate', async (thread: AnyThrea
 		try {
 			const fetched = await guild.channels.fetch(logsChannelID).catch(() => undefined);
 			logsChannelObj = fetched as TextBasedChannel | undefined;
-		} catch (err) {
-			logError('threadCreate: failed to fetch logs channel', { err: String(err) });
+		} catch (_err) {
+			logError('threadCreate: failed to fetch logs channel', { err: String(_err) });
 			return;
 		}
 	}
@@ -49,8 +49,9 @@ export default new Event<'threadCreate'>('threadCreate', async (thread: AnyThrea
 		.setTimestamp();
 
 	try {
-		if ('send' in (logsChannelObj as any) && typeof (logsChannelObj as any).send === 'function') {
-			await (logsChannelObj as any).send({ embeds: [embed] });
+		const possibleSender = logsChannelObj as unknown as { send?: (...args: unknown[]) => Promise<unknown> } | undefined;
+		if (possibleSender && typeof possibleSender.send === 'function') {
+			await possibleSender.send({ embeds: [embed] });
 			info('threadCreate: logged thread create', { guildId: guild.id, threadId: id });
 		}
 	} catch (err) {

@@ -1,5 +1,5 @@
-import { ChannelType, EmbedBuilder, Message, PartialMessage, TextBasedChannel } from 'discord.js';
-/* eslint-disable @typescript-eslint/no-explicit-any -- quickfix: replace any with proper types later */
+import { ChannelType, EmbedBuilder, Message, PartialMessage, TextBasedChannel, User } from 'discord.js';
+// Removed eslint-disable for no-explicit-any
 import { MongooseError } from 'mongoose';
 
 import ChanLogger from '../../Database/Schemas/LogsChannelDB'; // DB
@@ -16,8 +16,8 @@ export default new Event<'messageDelete'>('messageDelete', async (message: Messa
 	let data;
 	try {
 		data = await ChanLogger.findOne({ Guild: guild.id });
-	} catch (err) {
-		logError('messageDelete: failed to read LogsChannelDB', { error: (err as Error)?.message ?? err });
+	} catch (_err) {
+		logError('messageDelete: failed to read LogsChannelDB', { error: (_err as Error)?.message ?? _err });
 		return;
 	}
 
@@ -34,7 +34,8 @@ export default new Event<'messageDelete'>('messageDelete', async (message: Messa
 	const messageContent = (message as Message | PartialMessage).content || 'None';
 
 	// Get the author's name (including discriminator for users, tag for bots)
-	const authorName = (author as any)?.bot ? (author as any).tag : ((author as any)?.globalName || (author as any)?.username || 'Unknown');
+	const authorUser = author as User | undefined;
+	const authorName = authorUser?.bot ? authorUser.tag : (authorUser?.globalName ?? authorUser?.username ?? 'Unknown');
 
 	// Truncate the message content to fit within Discord's embed field limit
 	const truncatedContent = String(messageContent).slice(0, 1024); // Truncate to 1024 characters
@@ -48,7 +49,7 @@ export default new Event<'messageDelete'>('messageDelete', async (message: Messa
 			{ name: '\ud83d\udea8 | Deleted Message: ', value: truncatedContent },
 			{ name: 'Channel', value: `${channel}` },
 		])
-		.setFooter({ text: `UserID: ${(author as any)?.id ?? 'Unknown'}` })
+		.setFooter({ text: `UserID: ${authorUser?.id ?? 'Unknown'}` })
 		.setTimestamp();
 
 	// set URL only when available
@@ -63,7 +64,7 @@ export default new Event<'messageDelete'>('messageDelete', async (message: Messa
 
 	try {
 		await logsChannelOBJ.send({ embeds: [logsEmbed] });
-		logInfo('messageDelete: sent delete log', { guild: guild.id, channel: channel?.id, author: (author as any)?.id });
+		logInfo('messageDelete: sent delete log', { guild: guild.id, channel: channel?.id, author: authorUser?.id });
 	} catch (err) {
 		logError('messageDelete: failed to send embed', { error: (err as Error)?.message ?? err });
 	}

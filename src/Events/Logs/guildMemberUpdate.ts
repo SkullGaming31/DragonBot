@@ -1,5 +1,4 @@
 import { ChannelType, EmbedBuilder, GuildMember, PartialGuildMember, TextBasedChannel } from 'discord.js';
-/* eslint-disable @typescript-eslint/no-explicit-any -- quickfix: replace any with proper types later */
 import { MongooseError } from 'mongoose';
 
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
@@ -12,8 +11,8 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 	let data;
 	try {
 		data = await ChanLogger.findOne({ Guild: guild.id });
-	} catch (err) {
-		logError('guildMemberUpdate: failed to read LogsChannelDB', { error: (err as Error)?.message ?? err });
+	} catch (_err) {
+		logError('guildMemberUpdate: failed to read LogsChannelDB', { error: (_err as Error)?.message ?? _err });
 		return;
 	}
 
@@ -25,9 +24,22 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 	if (!logsChannelOBJ) logsChannelOBJ = (await guild.channels.fetch(logsChannelID).catch(() => undefined)) as TextBasedChannel | undefined;
 	if (!logsChannelOBJ) return;
 
-	const oldRoles = Array.isArray((oldMember as any).roles?.cache?.array?.())
-		? (oldMember as any).roles.cache.map((r: any) => r.id)
-		: ((oldMember as any).roles?.cache ? Array.from((oldMember as any).roles.cache.values()).map((r: any) => r.id) : []);
+	// Safely extract role IDs from oldMember (which may be PartialGuildMember)
+	let oldRoles: string[] = [];
+	const oldRolesCache = (oldMember as PartialGuildMember & { roles?: { cache?: Iterable<{ id: string }> } })?.roles?.cache;
+	if (oldRolesCache) {
+		try {
+			const maybeArrayFn = (oldRolesCache as unknown as { array?: () => unknown })?.array;
+			if (typeof maybeArrayFn === 'function') {
+				const arr = maybeArrayFn.call(oldRolesCache) as Array<{ id: string }>;
+				oldRoles = arr.map(r => r.id);
+			} else {
+				oldRoles = Array.from(oldRolesCache as Iterable<{ id: string }>).map(r => r.id);
+			}
+		} catch {
+			oldRoles = [];
+		}
+	}
 	const newRoles = newMember.roles?.cache ? Array.from(newMember.roles.cache.values()).map(r => r.id) : [];
 
 	const Embed = new EmbedBuilder().setTitle(`${guild.name} | Member Update`).setTimestamp();
@@ -69,17 +81,19 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 		}
 	}
 
-	if (newMember.nickname !== (oldMember as any).nickname) {
+	const oldNickname = (oldMember as PartialGuildMember)?.nickname ?? null;
+	if (newMember.nickname !== oldNickname) {
 		if (logsChannelOBJ.type === ChannelType.GuildText) {
 			try {
-				await logsChannelOBJ.send({ embeds: [Embed.setDescription(`${newMember.user.globalName}'s nickname has been changed from: \`${(oldMember as any).nickname}\` to: \`${newMember.nickname}\``)] });
+				await logsChannelOBJ.send({ embeds: [Embed.setDescription(`${newMember.user.globalName}'s nickname has been changed from: \`${oldNickname}\` to: \`${newMember.nickname}\``)] });
 				logInfo('guildMemberUpdate: nickname changed', { guild: guild.id, member: newMember.id });
 			} catch (err) {
 				logError('guildMemberUpdate: failed to send nickname embed', { error: (err as Error)?.message ?? err });
 			}
 		}
 	}
-	if (!(oldMember as any).premiumSince && newMember.premiumSince) {
+	const oldPremiumSince = (oldMember as PartialGuildMember)?.premiumSince ?? null;
+	if (!oldPremiumSince && newMember.premiumSince) {
 		if (logsChannelOBJ.type === ChannelType.GuildText) {
 			try {
 				await logsChannelOBJ.send({ embeds: [Embed.setDescription(`\`${newMember.user.globalName}\` has started boosting the server`)] });
@@ -89,7 +103,7 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 			}
 		}
 	}
-	if (!newMember.premiumSince && (oldMember as any).premiumSince) {
+	if (!newMember.premiumSince && oldPremiumSince) {
 		if (logsChannelOBJ.type === ChannelType.GuildText) {
 			try {
 				await logsChannelOBJ.send({ embeds: [Embed.setDescription(`${newMember.user.globalName} has stopped boosting the server`)] });

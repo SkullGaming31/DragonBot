@@ -5,7 +5,6 @@ import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import { Event } from '../../Structures/Event';
 import { error as logError, info, warn } from '../../Utilities/logger';
 
-/* eslint-disable @typescript-eslint/no-explicit-any -- quickfix: replace anys with proper types later */
 export default new Event<'guildAuditLogEntryCreate'>('guildAuditLogEntryCreate', async (auditLogEntry: GuildAuditLogsEntry, guild: Guild) => {
 	let data;
 	try {
@@ -25,8 +24,8 @@ export default new Event<'guildAuditLogEntryCreate'>('guildAuditLogEntryCreate',
 		try {
 			const fetched = await guild.channels.fetch(logsChannelID).catch(() => undefined);
 			logsChannelObj = fetched ?? undefined;
-		} catch (err) {
-			logError('guildAuditLogEntryCreate: failed to fetch logs channel', { err: String(err) });
+		} catch (_err) {
+			logError('guildAuditLogEntryCreate: failed to fetch logs channel', { err: String(_err) });
 			return;
 		}
 	}
@@ -43,14 +42,15 @@ export default new Event<'guildAuditLogEntryCreate'>('guildAuditLogEntryCreate',
 		.addFields(
 			{ name: 'Action', value: String(actionType), inline: true },
 			{ name: 'By', value: (executor && executor.tag) || 'Unknown', inline: true },
-			{ name: 'Target', value: (target && 'id' in (target as any) ? (target as any).id : 'Unknown'), inline: true }
+			{ name: 'Target', value: (target && typeof target === 'object' && 'id' in (target as object) ? (target as { id?: string }).id ?? 'Unknown' : 'Unknown'), inline: true }
 		)
 		.setDescription(reason ?? 'No reason provided')
 		.setTimestamp();
 
 	try {
-		if ('send' in (logsChannelObj as any) && typeof (logsChannelObj as any).send === 'function') {
-			await (logsChannelObj as any).send({ embeds: [embed] });
+		const possibleSender = logsChannelObj as unknown as { send?: (...args: unknown[]) => Promise<unknown> } | undefined;
+		if (possibleSender && typeof possibleSender.send === 'function') {
+			await possibleSender.send({ embeds: [embed] });
 			info('guildAuditLogEntryCreate: logged audit entry', { guildId: guild.id, actionType: String(actionType) });
 		} else {
 			warn('guildAuditLogEntryCreate: logs channel has no send() method', { guildId: guild.id, logsChannelID });
