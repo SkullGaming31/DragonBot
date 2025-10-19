@@ -1,4 +1,4 @@
- 
+
 import { ApplicationCommandOptionType, ApplicationCommandType, MessageFlags } from 'discord.js';
 import { IUser, UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
@@ -33,8 +33,8 @@ export default new Command({
 	run: async ({ interaction }) => {
 		try {
 			const { options, member, user, guild } = interaction;
-			const Amount = options.getNumber('amount') || -1;
-			const Options = options.getString('option');
+			const Amount = options.getNumber('amount');
+			const Options = options.getString('option') || '';
 
 			// Retrieve user from database 
 			let userModel: IUser | null;
@@ -61,11 +61,13 @@ export default new Command({
 						const winProbability = member?.roles.cache.has('Twitch Subscriber') ?? false ? 0.25 : 0.2;
 						const isWin = Math.random() <= winProbability;
 
-						const winAmount = isWin ? currentBalance?.balance * 2 : -currentBalance?.balance; // Update balance based on win/loss
+						// Use integer math only. Winning pays double the gambled amount (net profit = balance)
+						const gambled = Math.floor(currentBalance.balance);
+						const winAmount = isWin ? gambled : -gambled; // $inc will add/subtract the gambled amount
 
 						await UserModel.findOneAndUpdate({ guildID: guild.id, id: user.id }, { $inc: { balance: winAmount } });
 
-						const finalResponse = isWin ? `Congratulations! You risked it all and won ${winAmount} gold!` : `Sorry, you lost ${winAmount} gold.`;
+						const finalResponse = isWin ? `Congratulations! You risked it all and won ${gambled} gold!` : `Sorry, you lost ${gambled} gold.`;
 
 						await interaction.reply({ content: finalResponse });
 					} catch (error) {
@@ -78,18 +80,24 @@ export default new Command({
 						if (!currentBalance || currentBalance.balance === undefined) return;
 						if (currentBalance.balance === 0) return interaction.reply({ content: 'You do not have any gold to gamble away', flags: MessageFlags.Ephemeral });
 
-						const percentage = Amount as number; // Assuming Amount is already validated as a number representing the percentage
+						if (typeof Amount !== 'number') return interaction.reply({ content: 'Please provide a percentage as the amount (1-100).' });
+						const percentageRaw = Math.floor(Amount);
+						const percentage = percentageRaw;
 						if (percentage <= 0 || percentage > 100) return interaction.reply({ content: 'Please enter a valid percentage between 1 and 100.' });
 
-						const amountToGamble = currentBalance.balance * (percentage / 100); // Calculate the amount to gamble based on the percentage
+						// Compute gamble amount using integer math (floor to avoid fractional coins)
+						const amountToGamble = Math.floor((currentBalance.balance * percentage) / 100);
+						if (amountToGamble <= 0) return interaction.reply({ content: 'The percentage you provided is too small to gamble any coins.' });
+
 						const winProbability = member?.roles.cache.has('Twitch Subscriber') ?? false ? 0.25 : 0.2;
 						const isWin = Math.random() <= winProbability;
 
-						const winAmount = isWin ? Number((amountToGamble * 2).toFixed(2)) : Number((-amountToGamble).toFixed(2)); // Update balance based on win/loss
+						const delta = isWin ? amountToGamble : -amountToGamble;
 
-						await UserModel.findOneAndUpdate({ guildID: guild.id, id: user.id }, { $inc: { balance: winAmount }, });
+						await UserModel.findOneAndUpdate({ guildID: guild.id, id: user.id }, { $inc: { balance: delta } });
 
-						const finalResponse = isWin ? `Congratulations! You risked ${percentage}% of your balance and won ${winAmount} gold!` : `Sorry, you lost ${percentage}% of your balance, resulting in ${winAmount} gold loss.`;
+						const abs = Math.abs(delta);
+						const finalResponse = isWin ? `Congratulations! You risked ${percentage}% of your balance and won ${abs} gold!` : `Sorry, you lost ${abs} gold (${percentage}% of your balance).`;
 
 						await interaction.reply({ content: finalResponse });
 					} catch (error) {
@@ -97,21 +105,22 @@ export default new Command({
 					}
 					break;
 				case 'fixed number'://DONE !gamble [Amount] ex !gamble 500coins from your balance
-					const fixedAmount = Amount as number; // Assuming Amount is already validated as a number
+					const fixedRaw = Amount;
+					if (typeof fixedRaw !== 'number') return interaction.reply({ content: 'Please provide a valid amount to gamble.' });
+					const fixedAmount = Math.floor(fixedRaw);
+					if (fixedAmount <= 0) return interaction.reply({ content: 'Please enter a positive amount to gamble.' });
 					if (userModel.balance < fixedAmount) return interaction.reply({ content: 'You can not cover that bet with your current Balance, please use ``/bal`` and try again', flags: MessageFlags.Ephemeral });
 
-					if (fixedAmount <= 0) await interaction.reply({ content: 'Please enter a positive amount to gamble.' });
-
 					// Check if user has the "Twitch Subscriber" role
-					const hasTwitchSubscriberRole = member?.roles.cache.has('Twitch Subscriber') ?? false; // Check for role and handle potential undefined member or role cache
+					const hasTwitchSubscriberRole = member?.roles.cache.has('Twitch Subscriber') ?? false;
 
-					const winProbability = hasTwitchSubscriberRole ? 0.25 : 0.2;
-					const isWin = Math.random() <= winProbability;
-					const winAmount = isWin ? fixedAmount * 2 : -fixedAmount; // Calculate win/loss amount
+					const winProb = hasTwitchSubscriberRole ? 0.25 : 0.2;
+					const isWinFixed = Math.random() <= winProb;
+					const deltaFixed = isWinFixed ? fixedAmount : -fixedAmount;
 
 					try {
-						await UserModel.findOneAndUpdate({ guildID: guild.id, id: user.id }, { $inc: { balance: winAmount } });
-						const response = isWin ? `Congratulations! You won ${winAmount} gold.` : `Sorry, you lost ${winAmount} gold.`;
+						await UserModel.findOneAndUpdate({ guildID: guild.id, id: user.id }, { $inc: { balance: deltaFixed } });
+						const response = isWinFixed ? `Congratulations! You won ${fixedAmount} gold.` : `Sorry, you lost ${fixedAmount} gold.`;
 						await interaction.reply({ content: response });
 					} catch (error) {
 						console.error(error);
