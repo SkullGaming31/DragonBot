@@ -56,8 +56,10 @@ export default new Event('roleUpdate', async (oldRole: Role, newRole: Role) => {
 		.setTimestamp();
 
 	try {
-		if ('send' in (logsChannelOBJ as any) && typeof (logsChannelOBJ as any).send === 'function') {
-			await (logsChannelOBJ as any).send({ embeds: [embed] });
+		// Narrow: ensure logsChannelOBJ has a send function before calling
+		const possibleSender = logsChannelOBJ as unknown as { send?: (...args: unknown[]) => Promise<unknown> } | undefined;
+		if (possibleSender && typeof possibleSender.send === 'function') {
+			await possibleSender.send({ embeds: [embed] });
 			info('roleUpdate: logged role update', { guildId: guild.id, roleId: newRole.id });
 		}
 	} catch (err) {

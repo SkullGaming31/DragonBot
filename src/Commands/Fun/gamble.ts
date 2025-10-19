@@ -20,8 +20,8 @@ export default new Command({
 			choices: [
 				{ name: 'fixed number', value: 'fixed number' },
 				{ name: 'percentage', value: 'percentage' },
-				{ name: 'all', value: 'all' },
-			]
+				{ name: 'all', value: 'all' }
+			],
 		},
 		{
 			name: 'amount',
@@ -41,7 +41,7 @@ export default new Command({
 			try {
 				userModel = await UserModel.findOne<IUser>({ guildID: guild?.id, id: user.id });
 			} catch (error) {
-				console.error('Error retrieving user from database:', error);
+				// console.error('Error retrieving user from database:', error);
 				await interaction.reply({ content: 'An error occurred while retrieving user information.' });
 				return;
 			}

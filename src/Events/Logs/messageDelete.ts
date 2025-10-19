@@ -1,4 +1,5 @@
 import { ChannelType, EmbedBuilder, Message, PartialMessage, TextBasedChannel } from 'discord.js';
+/* eslint-disable @typescript-eslint/no-explicit-any -- quickfix: replace any with proper types later */
 import { MongooseError } from 'mongoose';
 
 import ChanLogger from '../../Database/Schemas/LogsChannelDB'; // DB
@@ -57,7 +58,7 @@ export default new Event<'messageDelete'>('messageDelete', async (message: Messa
 	if ((message as Message).attachments && (message as Message).attachments.size >= 1) {
 		try {
 			logsEmbed.addFields({ name: 'Attachments:', value: `${(message as Message).attachments.map((a) => a.url)}`, inline: true });
-		} catch { }
+		} catch (_err) { /* ignore attachment rendering errors */ }
 	}
 
 	try {

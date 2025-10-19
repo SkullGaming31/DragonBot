@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape -- quickfix: regex literal contains escaped slashes for readability */
 import { ChannelType, EmbedBuilder, Message, PermissionsBitField } from 'discord.js';
 import settings from '../../Database/Schemas/settingsDB';
 import { Event } from '../../Structures/Event';
@@ -106,7 +107,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 			// Check for threshold and take action if exceeded
 			if (currentState.count >= LINK_THRESHOLD) {
 				// Attempt to fetch the member if not cached
-				let kickMember = guild.members.cache.get(author.id) || (await guild.members.fetch(author.id).catch(() => null));
+				const kickMember = guild.members.cache.get(author.id) || (await guild.members.fetch(author.id).catch(() => null));
 
 				if (kickMember) {
 					const punishmentChannel = guild.channels.cache.get(punishmentChannelId) || (await guild.channels.fetch(punishmentChannelId).catch(() => null));

@@ -1,6 +1,7 @@
 import { ChannelType, EmbedBuilder, Role, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
+/* eslint-disable @typescript-eslint/no-explicit-any -- quickfix: replace any with proper types later */
 import ChanLogger from '../../Database/Schemas/LogsChannelDB'; // DB
 import { Event } from '../../Structures/Event';
 import { error as logError, info, warn } from '../../Utilities/logger';

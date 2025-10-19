@@ -5,8 +5,9 @@ import {
   MessageFlags
 } from 'discord.js';
 import { Command } from '../../Structures/Command';
-import { ListingModel } from '../../Database/Schemas/marketListing';
+import { ListingModel, IListing } from '../../Database/Schemas/marketListing';
 import { UserModel } from '../../Database/Schemas/userModel';
+import { FilterQuery } from 'mongoose';
 
 export default new Command({
   name: 'market',
@@ -72,7 +73,8 @@ export default new Command({
 
       if (sub === 'list') {
         const seller = interaction.options.getString('seller');
-        const query: any = { guildID: guildId, active: true };
+        // Use a typed query shape matching the Listing model
+        const query: FilterQuery<IListing> = { guildID: guildId, active: true };
         if (seller) query.sellerID = seller;
 
         const listings = await ListingModel.find(query).sort({ createdAt: -1 }).limit(50).lean().exec();

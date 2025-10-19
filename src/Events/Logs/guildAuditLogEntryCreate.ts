@@ -5,6 +5,7 @@ import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import { Event } from '../../Structures/Event';
 import { error as logError, info, warn } from '../../Utilities/logger';
 
+/* eslint-disable @typescript-eslint/no-explicit-any -- quickfix: replace anys with proper types later */
 export default new Event<'guildAuditLogEntryCreate'>('guildAuditLogEntryCreate', async (auditLogEntry: GuildAuditLogsEntry, guild: Guild) => {
 	let data;
 	try {

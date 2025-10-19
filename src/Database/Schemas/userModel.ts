@@ -44,16 +44,16 @@ const userSchema = new Schema<IUser>({
 });
 
 // Ensure balances are stored as integers to avoid floating point artifacts
-userSchema.pre('save', function (next) {
+userSchema.pre('save', function (this: Document & Partial<IUser>, next) {
 	try {
-		if (typeof (this as any).balance === 'number') {
+		if (typeof this.balance === 'number') {
 			// Floor to avoid giving fractional remainders to users
-			(this as any).balance = Math.floor((this as any).balance);
+			this.balance = Math.floor(this.balance);
 		}
-		if (typeof (this as any).bank === 'number') {
-			(this as any).bank = Math.floor((this as any).bank);
+		if (typeof this.bank === 'number') {
+			this.bank = Math.floor(this.bank);
 		}
-	} catch (err) {
+	} catch (_err) {
 		// swallow errors to avoid blocking saves; logging is left to callers
 	}
 	next();
@@ -61,27 +61,33 @@ userSchema.pre('save', function (next) {
 
 // After findOneAndUpdate (and similar), make sure the returned doc's balance/bank are integers
 // and persist the rounded values back to the database if needed.
-userSchema.post('findOneAndUpdate', async function (doc) {
+userSchema.post('findOneAndUpdate', async (doc: Document & Partial<IUser> | null) => {
 	try {
 		if (!doc) return;
 		let changed = false;
-		if (typeof (doc as any).balance === 'number' && !Number.isInteger((doc as any).balance)) {
-			(doc as any).balance = Math.floor((doc as any).balance);
+		if (typeof doc.balance === 'number' && !Number.isInteger(doc.balance)) {
+			doc.balance = Math.floor(doc.balance);
 			changed = true;
 		}
-		if (typeof (doc as any).bank === 'number' && !Number.isInteger((doc as any).bank)) {
-			(doc as any).bank = Math.floor((doc as any).bank);
+		if (typeof doc.bank === 'number' && !Number.isInteger(doc.bank)) {
+			doc.bank = Math.floor(doc.bank);
 			changed = true;
 		}
 		if (changed) {
 			// Persist the rounded values back to the DB
 			try {
-				await (doc as any).constructor.findByIdAndUpdate((doc as any)._id, { balance: (doc as any).balance, bank: (doc as any).bank }).exec();
-			} catch (e) {
+				// Attempt to access a model-like constructor from the document in a typed way
+				const maybeCtor = (doc as unknown as { constructor?: unknown }).constructor;
+				const ctor = maybeCtor as unknown as { findByIdAndUpdate?: (id: unknown, update: Partial<IUser>) => { exec?: () => Promise<unknown> } } | undefined;
+				const id = (doc as unknown as { _id?: unknown })._id;
+				if (ctor?.findByIdAndUpdate && id !== undefined) {
+					await ctor.findByIdAndUpdate(id, { balance: doc.balance, bank: doc.bank }).exec?.();
+				}
+			} catch (_e) {
 				// ignore persistence failures
 			}
 		}
-	} catch (e) {
+	} catch (_e) {
 		// ignore
 	}
 });

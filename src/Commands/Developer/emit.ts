@@ -53,20 +53,30 @@ export default new Command({
 				{
 					// build minimal old/new member objects using interaction.member when available
 					const guild = interaction.guild;
-					const baseMember = (interaction.member ?? {}) as any;
+
+					const baseMember = (interaction.member ?? {}) as unknown;
+					type MemberLike = {
+						nickname?: string | null;
+						roles?: { cache?: Iterable<[string, unknown]> };
+						user?: { id?: string; globalName?: string; displayAvatarURL?: () => string | null };
+						id?: string;
+						displayName?: string;
+					};
+					const bm = baseMember as MemberLike;
 					const oldMember = {
-						...baseMember,
-						nickname: (baseMember as any).nickname ?? null,
-						roles: { cache: new Map(((baseMember as any).roles?.cache) ?? []) },
-						user: (baseMember as any).user ?? { id: (baseMember as any).id ?? 'u-test', globalName: (baseMember as any).displayName ?? 'TestUser', displayAvatarURL: () => null },
+						...bm,
+						nickname: bm.nickname ?? null,
+						roles: { cache: new Map((bm.roles?.cache as Iterable<[string, unknown]>) ?? []) },
+						user: bm.user ?? { id: bm.id ?? 'u-test', globalName: bm.displayName ?? 'TestUser', displayAvatarURL: () => null },
 						guild,
-					} as any;
+					} as MemberLike & { guild?: Guild };
 					const newMember = {
 						...oldMember,
-						nickname: ((oldMember.nickname ?? '') + '_edited') as any,
+						nickname: (oldMember.nickname ?? '') + '_edited',
 						roles: oldMember.roles,
-					};
-					client.emit('guildMemberUpdate', oldMember, newMember);
+					} as MemberLike & { guild?: Guild };
+					// Use a narrow emit signature to avoid using `any` while still calling the event
+					(client as unknown as { emit: (...args: unknown[]) => boolean }).emit('guildMemberUpdate', oldMember, newMember);
 					await interaction.reply({ content: 'Emitted guildMemberUpdate with a simulated old/new member', flags: MessageFlags.Ephemeral });
 				}
 				break;

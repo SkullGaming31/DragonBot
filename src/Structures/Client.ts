@@ -143,7 +143,7 @@ export class ExtendedClient extends Client {
 
 		this.on('clientReady', () => {
 			// Deduplicate commands by name before sending to Discord's API
-			const dedupedCommands = Array.from(new Map(slashCommands.map((c: any) => [c.name, c])).values());
+			const dedupedCommands = Array.from(new Map(slashCommands.map((c: ApplicationCommandDataResolvable & { name?: string }) => [c.name ?? '', c])).values());
 			switch (process.env.Enviroment) {
 				case 'dev':
 					this.registerCommands({ commands: dedupedCommands, guildId: process.env.DEV_DISCORD_GUILD_ID });
