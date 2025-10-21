@@ -52,6 +52,22 @@ Notes:
 
 - Backwards-compat stubs: the legacy market module paths were wrapped with lightweight shims that delegate to the consolidated `market.ts` to avoid breaking imports while reducing command registrations.
 
+
+
 Notes:
 - The schema hooks prevent future float persistence but do not retroactively sanitize remote DB documents; consider running a migration to floor existing balances if needed.
 - Follow-up tasks: remove legacy files entirely when ready and add explicit tests to ensure the command registration deduplication in `src/Structures/Client.ts` behaves as expected.
+
+# Starboard & Message Highlights — Design Notes
+
+This draft file tracks the Starboard MVP design and scope before implementation on `feature/starboard`.
+
+Planned MVP:
+- Mongoose schema: `src/Database/Schemas/starboardDB.ts` (guildId, channelId, emoji, threshold, ignoredChannels, posts[])
+- Event handlers: `messageReactionAdd`, `messageReactionRemove` (create/update/remove mapping)
+- Commands: `/starboard set-channel`, `/starboard set-threshold` (owner or manage guild)
+- Tests: unit tests for threshold logic, integration tests with mock DB
+
+Implementation notes:
+- Use `guild.commands` registration for slash commands in dev environment.
+- Keep updates idempotent and use upsert to store mapping.

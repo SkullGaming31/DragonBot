@@ -43,6 +43,9 @@ const userSchema = new Schema<IUser>({
 	lastRewardTime: { type: Number, default: 0 }
 });
 
+// Compound index to speed up lookups by guild+user and ensure single document per user per guild
+userSchema.index({ guildID: 1, id: 1 }, { unique: true });
+
 // Ensure balances are stored as integers to avoid floating point artifacts
 userSchema.pre('save', function (this: Document & Partial<IUser>, next) {
 	try {
@@ -78,7 +81,7 @@ userSchema.post('findOneAndUpdate', async (doc: Document & Partial<IUser> | null
 			try {
 				// Attempt to access a model-like constructor from the document in a typed way
 				const maybeCtor = (doc as unknown as { constructor?: unknown }).constructor;
-				 
+
 				const ctor = maybeCtor as unknown as { findByIdAndUpdate?: (_: unknown, _u: Partial<IUser>) => Promise<unknown> } | undefined;
 				const id = (doc as unknown as { _id?: unknown })._id;
 				if (ctor?.findByIdAndUpdate && id !== undefined) {

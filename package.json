@@ -55,6 +55,7 @@
 		"@types/express": "^5.0.1",
 		"@types/express-session": "^1.18.1",
 		"@types/glob": "^8.1.0",
+		"@types/helmet": "^0.0.48",
 		"@types/ms": "^2.1.0",
 		"@types/node": "^22.15.3",
 		"eslint": "^9.25.1",
