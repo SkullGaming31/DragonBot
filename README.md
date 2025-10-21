@@ -137,7 +137,6 @@ Clone and install dependencies:
 
 ```pwsh
 git clone https://github.com/SkullGaming31/DragonBot.git
-cd DragonBot
 npm ci
 ```
 
