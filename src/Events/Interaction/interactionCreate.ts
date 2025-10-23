@@ -47,120 +47,13 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 		}
 	}
 
-	// Handle button interactions
+	// Handle button interactions by delegating to registered button handlers
 	if (interaction.isButton()) {
 		try {
-			switch (interaction.customId) {
-				case 'grab':
-					break;
-				case 'confirm_purge': {
-					await interaction.deferUpdate();
-					const result = await UserModel.updateMany({ guildID: interaction.guild?.id }, { $set: { balance: 0 } });
-					const updatedCount = result.modifiedCount;
-					await interaction.editReply({ content: `Successfully purged all user balances to 0. Total entries updated: ${updatedCount}`, components: [] });
-					break;
-				}
-
-				case 'cancel_purge': {
-					await interaction.deferUpdate();
-					await interaction.editReply({ content: 'Purge action has been canceled.', components: [] });
-					break;
-				}
-
-				case 'accept': {
-					// Check if the interaction is in the "rules" channel
-					const rulesChannelId = settings?.rulesChannel;
-					if (interaction.channelId !== rulesChannelId) break;
-
-					const roleId: RoleResolvable | undefined = settings?.MemberRole;
-
-					if (roleId) {
-						const member = interaction.guild?.members.cache.get(user?.id);
-						if (member) {
-							const role = interaction.guild?.roles.cache.get(roleId);
-							if (role) {
-								if (member.roles.cache.has(roleId)) {
-									try {
-										await member.roles.remove(role);
-										await interaction.reply({ content: 'Role removed successfully!', flags: MessageFlags.Ephemeral });
-									} catch (error) {
-										console.error('Error removing role:', error);
-										await interaction.reply({ content: 'An error occurred while removing the role.', flags: MessageFlags.Ephemeral });
-									}
-								} else {
-									try {
-										await member.roles.add(role);
-										await interaction.reply({ content: 'Role assigned successfully!', flags: MessageFlags.Ephemeral });
-									} catch (error) {
-										console.error('Error assigning role:', error);
-										await interaction.reply({ content: 'An error occurred while assigning the role.', flags: MessageFlags.Ephemeral });
-									}
-								}
-							} else {
-								await interaction.reply({ content: 'Role not found in the server.', flags: MessageFlags.Ephemeral });
-							}
-						} else {
-							await interaction.reply({ content: 'Member not found.', flags: MessageFlags.Ephemeral });
-						}
-					} else {
-						const owner = await interaction.guild?.fetchOwner({ cache: true });
-						if (user.id !== owner?.id) {
-							await interaction.reply({ content: 'Role ID not found in settings. Please contact an ``Admin`` to assign the role.', flags: MessageFlags.Ephemeral });
-						} else {
-							await interaction.reply({ content: 'Role ID not found in settings. Please use the ``/settings`` command to set it', flags: MessageFlags.Ephemeral });
-						}
-					}
-					break;
-				}
-
-				case 'sugges-accept':
-				case 'sugges-decline': {
-					const { customId, message } = interaction;
-					const data = await SuggestionModel.findOne<ISuggestion>({ guildId: guild?.id, messageId: message.id });
-
-					if (!data) {
-						await interaction.reply({ content: 'No data found in the Database', flags: MessageFlags.Ephemeral });
-						return;
-					}
-
-					const embed = message.embeds[0];
-					if (!embed) return;
-
-					switch (customId) {
-						case 'sugges-accept': {
-							embed.fields[2] = { name: 'Status: ', value: 'Accepted', inline: true };
-							await message.edit({ embeds: [EmbedBuilder.from(embed).setColor('Green').setTimestamp()], components: [] });
-
-							if (embed.fields[1].value === 'Discord' && embed.fields[2].value === 'Accepted') {
-								await SuggestionModel.deleteOne({ guildId: guild?.id, messageId: message.id });
-							} else {
-								await SuggestionModel.deleteOne({ guildId: guild?.id, messageId: message.id });
-							}
-
-							await interaction.reply({ content: 'Suggestion Accepted', flags: MessageFlags.Ephemeral });
-							break;
-						}
-
-						case 'sugges-decline': {
-							embed.fields[2] = { name: 'Status: ', value: 'Declined', inline: true };
-							await message.edit({ embeds: [EmbedBuilder.from(embed).setColor('Red').setTimestamp()], components: [] });
-
-							if (embed.fields[2].value === 'Declined') {
-								await SuggestionModel.deleteOne({ guildId: guild?.id, messageId: message.id });
-							}
-
-							await interaction.reply({ content: 'Suggestion Declined', flags: MessageFlags.Ephemeral });
-							break;
-						}
-					}
-					break;
-				}
-
-				default: {
-					// Unknown button: don't reply here so other listeners (ticket handlers, etc.) can handle it.
-					return;
-					// break; (unreachable)
-				}
+			const btn = appInstance.client.buttons.get(interaction.customId);
+			if (btn) {
+				await btn.run({ client: appInstance.client, interaction });
+				return;
 			}
 		} catch (error) {
 			const e = error as unknown as { code?: number; message?: string };

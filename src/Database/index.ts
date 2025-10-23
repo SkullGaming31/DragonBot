@@ -35,7 +35,7 @@ export class MongoDBConnectionError extends Error {
 export const connectDatabase = async (): Promise<void> => {
 	// Set mongoose debug mode based on environment
 	const isDev = process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug';
-	mongoose.set('debug', isDev);
+	mongoose.set('debug', false);
 
 	// MongoDB connection URIs
 	const uri = isDev ? process.env.MONGO_DEV_URI : process.env.MONGO_DATABASE_URI;

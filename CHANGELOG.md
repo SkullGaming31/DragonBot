@@ -14,6 +14,11 @@ All notable changes to this repository will be documented in this file.
 - Dashboard scaffold: minimal Next.js dashboard scaffold added for issue #59 (OAuth + NextAuth template and `issues/59.md`).
 - Express API hardening: protected `/api/v1` with API key support and added common security headers and rate limiting in `src/index.ts`.
 
+- Buttons: moved inline button logic into dedicated handlers under `src/Buttons/` and added a generic button loader. Added handlers: `accept`, `sugges-accept`, `sugges-decline`, and `sampleConfirm`. `testbutton` command added to create test buttons.
+- Accept button: made role toggle reliable by fetching the guild member before checking roles; added concise role-toggle logging to the configured logs channel.
+- Suggestions: moved accept/decline logic into `src/Buttons/suggesAccept.ts` and `src/Buttons/suggesDecline.ts` with safer embed-field updates.
+- Logging: hardened `guildMemberUpdate` to avoid throwing when partial member data is present and to prefer concise logs when prior role state is unavailable.
+
 ---
 
 _This changelog is maintained manually. For details, see the commit history._

@@ -39,7 +39,11 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 			oldRoles = [];
 		}
 	}
-	const newRoles = newMember.roles?.cache ? Array.from(newMember.roles.cache.values()).map(r => r.id) : [];
+	let newRoles = newMember.roles?.cache ? Array.from(newMember.roles.cache.values()).map(r => r.id) : [];
+
+	// ensure role id arrays contain only valid strings
+	oldRoles = oldRoles.filter(r => typeof r === 'string' && r.length > 0);
+	newRoles = newRoles.filter(r => typeof r === 'string' && r.length > 0);
 
 	const Embed = new EmbedBuilder().setTitle(`${guild.name} | Member Update`).setTimestamp();
 
@@ -47,9 +51,12 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 		const RoleIDs = Unique(oldRoles, newRoles);
 		let description = '';
 		RoleIDs.forEach(roleId => {
-			const Role = guild.roles.cache.get(roleId.toString());
+			if (!roleId) return;
+			const rid = typeof roleId === 'string' ? roleId : String(roleId);
+			const Role = guild.roles.cache.get(rid);
 			if (Role) {
-				description += `\`${newMember.user.globalName}\` has lost the role \`${Role.name}\`\n`;
+				const username = newMember.user.globalName ?? newMember.user.username ?? 'Unknown';
+				description += `\`${username}\` has lost the role \`${Role.name}\`\n`;
 			}
 		});
 		if (description && logsChannelOBJ.type === ChannelType.GuildText) {
@@ -65,9 +72,12 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 		const addedRoles = AddedRoles(oldRoles, newRoles);
 		let description = '';
 		addedRoles.forEach(roleId => {
-			const Role = guild.roles.cache.get(roleId.toString());
+			if (!roleId) return;
+			const rid = typeof roleId === 'string' ? roleId : String(roleId);
+			const Role = guild.roles.cache.get(rid);
 			if (Role) {
-				description += `\`${newMember.user.globalName}\` has got the role \`${Role.name}\`\n`;
+				const username = newMember.user.globalName ?? newMember.user.username ?? 'Unknown';
+				description += `\`${username}\` has got the role \`${Role.name}\`\n`;
 			}
 		});
 		if (description && logsChannelOBJ.type === ChannelType.GuildText) {
@@ -76,6 +86,18 @@ export default new Event('guildMemberUpdate', async (oldMember: GuildMember | Pa
 				logInfo('guildMemberUpdate: role added', { guild: guild.id, member: newMember.id, roles: addedRoles });
 			} catch (err) {
 				logError('guildMemberUpdate: failed to send role-added embed', { error: (err as Error)?.message ?? err });
+			}
+		}
+	}
+
+	// If oldRoles was empty (partial member) but newRoles changed, send concise log rather than enumerating
+	if (oldRoles.length === 0 && newRoles.length > 0) {
+		if (logsChannelOBJ.type === ChannelType.GuildText) {
+			try {
+				await logsChannelOBJ.send({ embeds: [Embed.setDescription(`${newMember.user.globalName ?? newMember.user.username ?? newMember.id} roles updated`).setColor('Yellow')] });
+				logInfo('guildMemberUpdate: roles updated (partial oldMember)', { guild: guild.id, member: newMember.id });
+			} catch (err) {
+				logError('guildMemberUpdate: failed to send concise role-updated embed', { error: (err as Error)?.message ?? err });
 			}
 		}
 	}
@@ -118,5 +140,5 @@ function Unique(firstArray: string[], secondArray: string[]) {
 	return firstArray.filter(role => !secondArray.includes(role));
 }
 function AddedRoles(oldRoles: string[], newRoles: string[]) {
-	return newRoles.filter(role => !oldRoles.includes(role.toString()));
+	return newRoles.filter(role => !oldRoles.includes(role));
 }

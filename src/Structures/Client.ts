@@ -6,6 +6,7 @@ import { promisify } from 'util';
 const PG = promisify(glob);
 
 import { CommandType } from '../Typings/Command';
+import { ButtonType } from '../Typings/Button';
 import { RegisterCommandOptions } from '../Typings/client';
 import { Event } from './Event';
 import { error as logError, info as logInfo } from '../Utilities/logger';
@@ -13,6 +14,7 @@ config();
 
 export class ExtendedClient extends Client {
 	commands: Collection<string, CommandType> = new Collection();
+	buttons: Collection<string, ButtonType> = new Collection();
 
 	/**
 	 * Constructs a new ExtendedClient instance.
@@ -160,6 +162,19 @@ export class ExtendedClient extends Client {
 
 		// Events
 		const eventFiles = await PG(`${__dirname}/../Events/*/*{.ts,.js}`);
+
+		// Buttons
+		const buttonFiles = await PG(`${__dirname}/../Buttons/*{.ts,.js}`);
+
+		for (const filePath of buttonFiles) {
+			const btn: ButtonType = await this.importFile(filePath);
+			if (!btn || !btn.customId) continue;
+			if (this.buttons.has(btn.customId)) {
+				console.warn(`Duplicate button customId detected: ${btn.customId} (from ${filePath}) - skipping`);
+				continue;
+			}
+			this.buttons.set(btn.customId, btn);
+		}
 
 		eventFiles.forEach(async (filePath: string) => {
 			const event: Event<keyof ClientEvents> = await this.importFile(filePath);
