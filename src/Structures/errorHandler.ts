@@ -10,8 +10,8 @@ async function errorHandler(): Promise<void> {
 	process.on('unhandledRejection', async (reason: unknown, promise: Promise<unknown>) => {
 		logError('Unhandled Rejection', { reason, promise: String(promise) });
 		const context: ErrorContext = { promise };
-		// also write an info entry
-		await info('Unhandled Rejection observed', { reason: String(reason) });
+		// also write an info entry and attach context to note it's used
+		await info('Unhandled Rejection observed', { reason: String(reason), contextUsed: Boolean(context.promise) });
 	});
 
 	process.on('uncaughtException', async (err: Error, origin: NodeJS.UncaughtExceptionOrigin) => {
@@ -40,8 +40,9 @@ async function errorHandler(): Promise<void> {
 	});
 
 	process.on('multipleResolves', async (type, promise, reason) => {
+		// include the promise as string to avoid unused variable lint warnings
 		warn('Multiple resolves', { type, promise: String(promise), reason: String(reason) });
-		await info('Multiple resolves detected', { type });
+		await info('Multiple resolves detected', { type, hadPromise: Boolean(promise) });
 	});
 }
 

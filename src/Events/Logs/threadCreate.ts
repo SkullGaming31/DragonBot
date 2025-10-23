@@ -1,3 +1,4 @@
+ 
 import { AnyThreadChannel, ChannelType, EmbedBuilder, TextBasedChannel } from 'discord.js';
 // Removed quickfix any disable
 import { MongooseError } from 'mongoose';
@@ -5,6 +6,7 @@ import { MongooseError } from 'mongoose';
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import { Event } from '../../Structures/Event';
 import { error as logError, info, warn } from '../../Utilities/logger';
+
 
 export default new Event<'threadCreate'>('threadCreate', async (thread: AnyThreadChannel, newlyCreated: boolean) => {
 	const { guild, id, name } = thread;
@@ -50,7 +52,7 @@ export default new Event<'threadCreate'>('threadCreate', async (thread: AnyThrea
 
 	try {
 
-		 
+
 		const possibleSender = logsChannelObj as unknown as { send?: (..._args: unknown[]) => Promise<unknown> } | undefined;
 		if (possibleSender && typeof possibleSender.send === 'function') {
 			await possibleSender.send({ embeds: [embed] });

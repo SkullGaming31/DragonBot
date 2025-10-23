@@ -121,8 +121,8 @@ export default new Event('messageCreate', async (message: Message) => {
 			if (channelForNotification && typeof (channelForNotification as unknown as { send?: unknown }).send === 'function') {
 				const sendFn = (channelForNotification as unknown as { send: (payload: unknown) => Promise<unknown> }).send;
 				try {
-					const _payload = { content: notificationMessage };
-					await sendFn(_payload);
+					const payload = { content: notificationMessage };
+					await sendFn(payload);
 				} catch (sendErr) {
 					console.warn('Failed to send economy notification:', sendErr);
 				}

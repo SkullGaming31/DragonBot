@@ -1,9 +1,11 @@
+ 
 import { ChannelType, EmbedBuilder, Role, TextBasedChannel } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
 import DB from '../../Database/Schemas/LogsChannelDB'; // DB
 import { Event } from '../../Structures/Event';
 import { error as logError, info, warn } from '../../Utilities/logger';
+
 
 export default new Event('roleUpdate', async (oldRole: Role, newRole: Role) => {
 	const { guild } = newRole;
@@ -59,7 +61,7 @@ export default new Event('roleUpdate', async (oldRole: Role, newRole: Role) => {
 		// Narrow: ensure logsChannelOBJ has a send function before calling
 
 
-		 
+
 		const possibleSender = logsChannelOBJ as unknown as { send?: (..._args: unknown[]) => Promise<unknown> } | undefined;
 		if (possibleSender && typeof possibleSender.send === 'function') {
 			await possibleSender.send({ embeds: [embed] });

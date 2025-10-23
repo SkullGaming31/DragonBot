@@ -21,7 +21,7 @@ export default defineConfig([
 			'semi': ['error', 'always'],
 			'prefer-arrow-callback': 'error',
 			'prefer-const': 'error',
-			'no-unused-vars': 'warn',
+			'no-unused-vars': 'off',
 			'no-case-declarations': 'off',
 			'@typescript-eslint/no-unused-vars': 'off',
 			'@typescript-eslint/no-require-imports': 'off'

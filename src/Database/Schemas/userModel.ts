@@ -1,3 +1,4 @@
+ 
 import { PresenceStatusData } from 'discord.js';
 import { Document, Schema, model } from 'mongoose';
 
@@ -82,7 +83,9 @@ userSchema.post('findOneAndUpdate', async (doc: Document & Partial<IUser> | null
 				// Attempt to access a model-like constructor from the document in a typed way
 				const maybeCtor = (doc as unknown as { constructor?: unknown }).constructor;
 
-				const ctor = maybeCtor as unknown as { findByIdAndUpdate?: (_: unknown, _u: Partial<IUser>) => Promise<unknown> } | undefined;
+				// Narrow constructor shape without introducing named unused params
+				// Narrow constructor shape without naming unused parameters
+				const ctor = maybeCtor as unknown as { findByIdAndUpdate?: (...args: unknown[]) => Promise<unknown> } | undefined;
 				const id = (doc as unknown as { _id?: unknown })._id;
 				if (ctor?.findByIdAndUpdate && id !== undefined) {
 					await ctor.findByIdAndUpdate(id, { balance: doc.balance, bank: doc.bank }).catch(() => undefined);

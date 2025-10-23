@@ -1,104 +1,41 @@
- 
-import { MessageReaction, PartialMessageReaction, PartialUser, Role, User } from 'discord.js';
+
+import { MessageReaction, PartialMessageReaction, PartialUser, User } from 'discord.js';
 import { Event } from '../../Structures/Event';
+import ReactionRoleModel from '../../Database/Schemas/reactionRole';
+
+function normalizeEmojiIdentifier(emoji: { id: string | null; name: string | null }) {
+	// custom emoji: name:id, unicode: name only
+	if (emoji.id) return `${emoji.name}:${emoji.id}`;
+	return emoji.name ?? '';
+}
 
 export default new Event<'messageReactionAdd'>('messageReactionAdd', async (reaction: MessageReaction | PartialMessageReaction, reactionUser: User | PartialUser) => {
 	let messageReaction: MessageReaction;
 	if (reaction.partial) {
-		// If the reaction is partial, fetch it to get the complete reaction object
 		messageReaction = await reaction.fetch();
 	} else {
 		messageReaction = reaction;
 	}
 
-	// Fetch the member who reacted
-	const member = await messageReaction.message.guild?.members.fetch(reactionUser.id);
-	if (!member) {
-		console.log('Member not found');
-		return;
-	}
+	const guild = messageReaction.message.guild;
+	if (!guild) return;
 
-	switch (messageReaction.emoji.name) {
-		case '✅': {
-			// const settings = await SettingsModel.findOne({ GuildID: reaction.message.guild?.id });
-			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'Verified');
-			if (!role) {
-				console.log('Role not found');
-				return;
-			}
-			if (messageReaction.message.id !== '1244988959055024152' || messageReaction.message.channelId !== reaction.message.guild?.rulesChannelId) return;
+	const member = await guild.members.fetch(reactionUser.id).catch(() => null);
+	if (!member) return;
 
-			await member.roles.add(role);
-			break;
-		}
-		case '📋': {
-			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'Announcements');
-			if (!role) {
-				console.log('Role not found');
-				return;
-			}
+	const emojiId = normalizeEmojiIdentifier(messageReaction.emoji);
 
-			// Add the role to the member
-			await member.roles.add(role);
-			break;
-		}
-		case '⛵': {
-			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'SoT');
-			if (!role) {
-				console.log('Role not found');
-				return;
-			}
+	// Find mappings for this message and emoji
+	const mappings = await ReactionRoleModel.find({ guildId: guild.id, messageId: messageReaction.message.id, emoji: emojiId }).lean();
+	if (!mappings || mappings.length === 0) return;
 
-			await member.roles.add(role);
-			break;
-		}
-		case '🚀': {
-			// Fetch the role you want to give (replace 'ROLE_NAME' with the name of the role)
-			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'Space Engineers');
-			if (!role) {
-				console.log('Role not found');
-				return;
-			}
-			// Add the role to the member
-			await member.roles.add(role);
-			break;
-		}
-		case '7️⃣': {
-			// Fetch the role you want to give (replace 'ROLE_NAME' with the name of the role)
-			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === '7DTD');
-			if (!role) {
-				console.log('Role not found');
-				return;
-			}
-			// Add the role to the member
-			await member.roles.add(role);
-			break;
-		}
-		case '🥷': {
-			// Fetch the role you want to give (replace 'ROLE_NAME' with the name of the role)
-			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'Warframe');
-			if (!role) {
-				console.log('Role not found');
-				return;
-			}
-
-			// Add the role to the member
-			await member.roles.add(role);
-			break;
-		}
-		case ':‼': {// :bangbang:
-			// Fetch the role you want to give (replace 'ROLE_NAME' with the name of the role)
-			const role: Role | undefined = messageReaction.message.guild?.roles.cache.find(role => role.name === 'TFD');
-			if (!role) {
-				console.log('Role not found');
-				return;
-			}
-
-			// Add the role to the member
-			await member.roles.add(role);
-			break;
+	for (const map of mappings) {
+		try {
+			await member.roles.add(map.roleId, 'reaction-role add');
+		} catch (err) {
+			// ignore role add errors for now, but log
+			// eslint-disable-next-line no-console
+			console.error('Failed to add reaction role', { err: (err as Error)?.message ?? err, guildId: guild.id, roleId: map.roleId });
 		}
 	}
-	// console.log('Message Reaction Object: ', messageReaction);
-	// console.log('User Object', reactionUser);
 });

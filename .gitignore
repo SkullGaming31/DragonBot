@@ -1,6 +1,9 @@
 /node_modules
 /dist
 .env
-devLogs/
-.devLogs/
+/devLogs
+./src/devLogs/
 NOTES.txt
+/scripts
+coverage/
+.vscode

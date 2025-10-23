@@ -1,3 +1,4 @@
+ 
 import { ChannelType, EmbedBuilder, Guild, GuildAuditLogsEntry } from 'discord.js';
 import { MongooseError } from 'mongoose';
 
@@ -51,7 +52,8 @@ export default new Event<'guildAuditLogEntryCreate'>('guildAuditLogEntryCreate',
 
 
 
-		 
+
+		// _args is intentionally unused; typed for clarity
 		const possibleSender = logsChannelObj as unknown as { send?: (..._args: unknown[]) => Promise<unknown> } | undefined;
 		if (possibleSender && typeof possibleSender.send === 'function') {
 			await possibleSender.send({ embeds: [embed] });

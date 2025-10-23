@@ -1,8 +1,10 @@
 
+ 
 import { MessageReaction, User, TextChannel, EmbedBuilder, PartialMessageReaction, PartialUser } from 'discord.js';
 import StarboardModel from '../../Database/Schemas/starboardDB';
 import { Event } from '../../Structures/Event';
 import { error as logError, info as logInfo } from '../../Utilities/logger';
+
 
 export default new Event<'messageReactionRemove'>('messageReactionRemove', async (reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) => {
 	try {
@@ -12,7 +14,7 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 			const fetchFn = (msg as unknown as { fetch?: unknown })['fetch'];
 			if (typeof fetchFn === 'function') {
 
-				 
+
 				const _fetch = fetchFn as (..._args: unknown[]) => Promise<unknown>;
 				await _fetch.call(msg).catch(() => null);
 			}
@@ -44,7 +46,7 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 
 
 
-			 
+
 			? await ((reactionEntry as unknown as { fetch: (..._args: unknown[]) => Promise<unknown> }).fetch().catch(() => null)) as unknown as { count?: number }
 			: null;
 		const count = (typeof reaction.count === 'number' ? reaction.count : (fetched && typeof fetched.count === 'number' ? fetched.count : 0));

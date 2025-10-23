@@ -1,6 +1,7 @@
 {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "vscode.typescript-language-features",
+
     "editor.indentSize": "tabSize",
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features"
@@ -16,12 +17,6 @@
         "editor.suggest.insertMode": "replace",
         "cSpell.fixSpellingWithRenameProvider": false
     },
-    "cSpell.words": [
-        "AUTORESTART",
-        "dragonbot",
-        "Enviroment",
-        "moderatable",
-        "timedout"
-    ],
-    "editor.tabSize": 2
+    "editor.tabSize": 2,
+    "files.eol": "\n"
 }

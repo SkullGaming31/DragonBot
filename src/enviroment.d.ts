@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+
 declare global {
 	namespace NodeJS {
 		interface ProcessEnv {
@@ -12,10 +12,6 @@ declare global {
 			DEV_DISCORD_CLIENT_ID: string;
 			DEV_DISCORD_CLIENT_SECRET: string;
 			DEV_DISCORD_REDIRECT_URL: string;
-			DEV_ERROR_LOGS_CHANNEL: string;
-			DEV_NOW_LIVE_CHANNEL: string;
-			DEV_DISCORD_ERR_WEBHOOK_ID: string;
-			DEV_DISCORD_ERR_WEBHOOK_TOKEN: string;
 			Enviroment: 'dev' | 'prod' | 'debug';
 			PORT: number;
 			MONGO_DATABASE_URI: string;
@@ -23,10 +19,6 @@ declare global {
 			DEV_MONGO_DATABASE_USERNAME: string;
 			DEV_MONGO_DATABASE_PASSWORD: string;
 			DEV_MONGO_DATABASE_NAME: string;
-			OAUTH_CLIENT_ID: string;
-			OAUTH_CLIENT_SECRET: string;
-			OAUTH_REDIRECT_URL: string;
-			NEXON_API_KEY: string;
 		}
 	}
 }

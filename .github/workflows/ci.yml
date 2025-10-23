@@ -82,7 +82,7 @@ jobs:
           CI: true
         run: |
           # Use fewer workers to be gentle on CI runners and reduce memory pressure
-          npx vitest --run --reporter=dot --maxWorkers=2
+          npx vitest --run --reporter=dot --maxWorkers=2 --coverage
 
       - name: Run tests with JUnit reporter (artifact)
         env:
@@ -90,6 +90,10 @@ jobs:
         run: |
           # Produce JUnit XML for test reporting
           npx vitest --run --reporter junit --reporter-options "output=vitest-junit.xml" --maxWorkers=2 || true
+
+      - name: Check coverage thresholds
+        run: |
+          node ./scripts/check-coverage.js
 
       - name: Upload JUnit test report
         if: always()

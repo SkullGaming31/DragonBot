@@ -41,9 +41,9 @@ type AsyncCallable = (...args: unknown[]) => Promise<unknown> | unknown;
 
 export async function safeInteractionReply(
 	interaction: CommandInteraction | Interaction | ReplyableInteraction,
-	_options: unknown
+	options: unknown
 ) {
-	const replyOpts = typeof _options === 'string' ? { content: _options, ephemeral: true } : _options;
+	const replyOpts = typeof options === 'string' ? { content: options, ephemeral: true } : options;
 
 	try {
 		// prefer interaction.reply when available and not already replied/deferred
@@ -91,9 +91,9 @@ export async function safeInteractionReply(
 			const channel = (interaction as unknown as { channel?: unknown }).channel;
 			if (channel && typeof (channel as Record<string, unknown>)['send'] === 'function') {
 				let content = '';
-				if (typeof _options === 'string') content = _options;
-				else if (_options && typeof _options === 'object' && 'content' in (_options as Record<string, unknown>) && typeof (_options as Record<string, unknown>)['content'] === 'string') {
-					content = (_options as Record<string, unknown>)['content'] as string;
+				if (typeof options === 'string') content = options;
+				else if (options && typeof options === 'object' && 'content' in (options as Record<string, unknown>) && typeof (options as Record<string, unknown>)['content'] === 'string') {
+					content = (options as Record<string, unknown>)['content'] as string;
 				}
 				const sendFn = (channel as unknown as { send?: AsyncCallable }).send;
 				if (sendFn) await sendFn.call(channel, content);

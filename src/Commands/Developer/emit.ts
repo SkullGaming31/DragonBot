@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+ 
 
 import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, Guild, MessageFlags, PermissionsBitField, Role, RoleFlagsBitField, SnowflakeUtil } from 'discord.js';
 import { Command } from '../../Structures/Command';
