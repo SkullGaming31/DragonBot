@@ -31,7 +31,7 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 		try {
 			await member.roles.remove(map.roleId, 'reaction-role remove');
 		} catch (err) {
-			// eslint-disable-next-line no-console
+			 
 			console.error('Failed to remove reaction role', { err: (err as Error)?.message ?? err, guildId: guild.id, roleId: map.roleId });
 		}
 	}

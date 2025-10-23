@@ -19,6 +19,9 @@ All notable changes to this repository will be documented in this file.
 - Suggestions: moved accept/decline logic into `src/Buttons/suggesAccept.ts` and `src/Buttons/suggesDecline.ts` with safer embed-field updates.
 - Logging: hardened `guildMemberUpdate` to avoid throwing when partial member data is present and to prefer concise logs when prior role state is unavailable.
 
+- Tests: added unit tests for button handlers (`test/buttons/sampleConfirm.test.ts`, `test/buttons/accept.test.ts`) that mock interactions and DB lookups to validate add/remove behavior.
+- Lint: addressed `@typescript-eslint/no-explicit-any` issues in button and developer test files by using `TextChannel`/`APIEmbedField` instead of `any` casts.
+
 ---
 
 _This changelog is maintained manually. For details, see the commit history._

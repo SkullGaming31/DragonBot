@@ -34,7 +34,7 @@ export default new Event<'messageReactionAdd'>('messageReactionAdd', async (reac
 			await member.roles.add(map.roleId, 'reaction-role add');
 		} catch (err) {
 			// ignore role add errors for now, but log
-			// eslint-disable-next-line no-console
+			 
 			console.error('Failed to add reaction role', { err: (err as Error)?.message ?? err, guildId: guild.id, roleId: map.roleId });
 		}
 	}

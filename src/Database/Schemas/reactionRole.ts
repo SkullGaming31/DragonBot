@@ -10,12 +10,12 @@ export interface IReactionRole {
 }
 
 const ReactionRoleSchema = new mongoose.Schema<IReactionRole>({
-  guildId: { type: String, required: true, index: true },
-  channelId: { type: String, required: true },
-  messageId: { type: String, required: true, index: true },
-  emoji: { type: String, required: true },
-  roleId: { type: String, required: true },
-  label: { type: String },
+	guildId: { type: String, required: true, index: true },
+	channelId: { type: String, required: true },
+	messageId: { type: String, required: true, index: true },
+	emoji: { type: String, required: true },
+	roleId: { type: String, required: true },
+	label: { type: String },
 });
 
 export default mongoose.models.ReactionRole || mongoose.model<IReactionRole>('ReactionRole', ReactionRoleSchema);
