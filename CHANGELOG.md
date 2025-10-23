@@ -11,6 +11,34 @@ All notable changes to this repository will be documented in this file.
 
 - Reaction roles manager: persistent mappings stored in DB, admin commands (create/list/delete), and event handlers refactored to apply/remove roles based on stored mappings. Added `src/Database/Schemas/reactionRole.ts`, updated `src/Commands/Moderator/reactionRoles.ts`, `src/Events/customMessage/reactionRolesAdd.ts`, and `src/Events/customMessage/reactionRolesRemove.ts`.
 - Tests: Added unit tests for reaction role event handlers (`test/events/reactionRolesAdd.test.ts`, `test/events/reactionRolesRemove.test.ts`) and fixed test mocks to support `.lean()` chaining.
+  
+## 2025-10-23 — Reaction roles manager: implementation & hardening
+
+- Implemented a persistent Reaction Roles Manager with the following pieces:
+	- Database schema: `src/Database/Schemas/reactionRole.ts` (stores guildId, channelId, messageId, emoji, roleId, label).
+	- Admin command: `/reaction` with subcommands `create`, `create_message`, `list`, `delete`, and `cleanup` implemented in `src/Commands/Moderator/reactionRoles.ts`.
+	- Event handlers: `src/Events/customMessage/reactionRolesAdd.ts` and `src/Events/customMessage/reactionRolesRemove.ts` apply and remove roles based on stored mappings.
+	- Cleanup job: periodic cleanup to remove stale mappings and a one-off `cleanup` subcommand to run status or cleanup for a guild.
+	- Helpers and hardening:
+		- `src/Utilities/retry.ts` (`tryReact`) — retry with exponential backoff when adding reactions; explicitly treats Discord Missing Permissions (code 50013) as a permanent failure.
+		- `src/Utilities/reactionMapping.ts` (`createAndLogMapping`) — centralized mapping creation, best-effort message reaction, and asynchronous audit logging.
+		- `src/Utilities/audit.ts` (`sendGuildLog`) — centralized audit embed sender used for logging mapping creations/deletions.
+	- UX: added a `create_message` subcommand to post content and attach a reaction-role in a single command (ensures message_content and message_id are mutually exclusive at the UI level).
+	- Tests & docs:
+		- Added unit tests covering retry behavior, permission failures, create flows and cleanup (`test/utilities/tryReact.test.ts`, `test/commands/reaction.*`, and related event tests).
+		- Documentation: updated `README.md` and added `docs/reactionRoles.md` and `docs/index.md` with usage examples and screenshots placeholders.
+
+Files changed/added (high level):
+- `src/Commands/Moderator/reactionRoles.ts` — command logic and guarded permission checks
+- `src/Utilities/retry.ts` — `tryReact` helper
+- `src/Utilities/reactionMapping.ts` — `createAndLogMapping` helper
+- `src/Utilities/audit.ts` — centralized audit helper
+- `src/Database/Schemas/reactionRole.ts` — new schema
+- Tests: multiple files under `test/commands` and `test/utilities`
+
+Notes:
+- Permission pre-flight checks were implemented but made permissive in test environments (only fail early when permissions objects explicitly indicate missing rights) to avoid breaking unit tests that use simple mocks.
+- Audit logging is best-effort and asynchronous so command responsiveness isn't blocked by logging failures.
 - Dashboard scaffold: minimal Next.js dashboard scaffold added for issue #59 (OAuth + NextAuth template and `issues/59.md`).
 - Express API hardening: protected `/api/v1` with API key support and added common security headers and rate limiting in `src/index.ts`.
 

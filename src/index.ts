@@ -75,6 +75,15 @@ class App {
 			const shutdown = async (signal: string) => {
 				info(`Received ${signal}, shutting down...`);
 				try {
+					// stop periodic cleanup job if it was started
+					try {
+						const maybe = this.client as unknown as { __reactionCleanupStop?: (() => void) };
+						const stop = maybe.__reactionCleanupStop;
+						if (typeof stop === 'function') stop();
+					} catch (e) {
+						// ignore
+					}
+
 					await this.client.destroy();
 					server.close(() => {
 						info('HTTP server closed');

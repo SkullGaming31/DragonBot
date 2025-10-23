@@ -52,8 +52,13 @@ export default new Command({
 			await mDEL.delete();
 			const m = await interaction.followUp({ embeds: [embed] });
 			const r = await interaction.fetchReply(m.id);
-			await r.react('👍');
-			await r.react('👎');
+			try {
+				const { tryReact } = await import('../../Utilities/retry');
+				await tryReact(r as unknown, '👍').catch(() => null);
+				await tryReact(r as unknown, '👎').catch(() => null);
+			} catch {
+				// ignore
+			}
 		}, 2000);
 	}
 });

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="160" viewBox="0 0 600 160">
+  <rect width="100%" height="100%" fill="#ffffff" />
+  <text x="16" y="32" fill="#111827" font-family="Segoe UI, Roboto, sans-serif" font-size="18">Reaction Roles — Example</text>
+  <rect x="16" y="44" width="568" height="92" fill="#f3f4f6" stroke="#e5e7eb" rx="6"/>
+  <text x="28" y="80" fill="#374151" font-family="monospace" font-size="13">/reaction create channel:#announcements message_id:123456789012345678 emoji:✅ role:@Member</text>
+  <text x="28" y="104" fill="#6b7280" font-family="monospace" font-size="12">Expected (ephemeral): "Created mapping with id &lt;mappingId&gt;"</text>
+</svg>

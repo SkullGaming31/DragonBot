@@ -1,6 +1,7 @@
 import { ChannelType, EmbedBuilder, Message, PartialMessage, TextBasedChannel, User } from 'discord.js';
 
 import ChanLogger from '../../Database/Schemas/LogsChannelDB'; // DB
+import ReactionRoleModel from '../../Database/Schemas/reactionRole';
 import { Event } from '../../Structures/Event';
 import { error as logError, info as logInfo } from '../../Utilities/logger';
 
@@ -10,6 +11,18 @@ export default new Event<'messageDelete'>('messageDelete', async (message: Messa
 	const guild = message.guild;
 	const author = (message as Message).author ?? undefined;
 	const channel = message.channel ?? undefined;
+
+	// Cleanup reaction-role mappings that referenced this message (best-effort)
+	try {
+		if ((message as Message).id) {
+			const deleted = await ReactionRoleModel.deleteMany({ guildId: guild.id, messageId: (message as Message).id }) as { deletedCount?: number } | null;
+			if (deleted && typeof deleted.deletedCount === 'number' && deleted.deletedCount > 0) {
+				logInfo('messageDelete: removed stale reaction-role mappings', { guildId: guild.id, messageId: (message as Message).id, deleted: deleted.deletedCount });
+			}
+		}
+	} catch (err) {
+		logError('messageDelete: failed to cleanup reaction-role mappings', { error: (err as Error)?.message ?? String(err), guildId: guild.id, messageId: (message as Message).id });
+	}
 
 	let data;
 	try {
@@ -60,9 +73,22 @@ export default new Event<'messageDelete'>('messageDelete', async (message: Messa
 		} catch { /* ignore attachment rendering errors */ }
 	}
 
+
+
+	// second best-effort cleanup (if any remain)
 	try {
-		await logsChannelOBJ.send({ embeds: [logsEmbed] });
-		logInfo('messageDelete: sent delete log', { guild: guild.id, channel: channel?.id, author: authorUser?.id });
+		const deleted = await ReactionRoleModel.deleteMany({ guildId: guild.id, messageId: (message as Message).id }) as { deletedCount?: number } | null;
+		if (deleted && typeof deleted.deletedCount === 'number' && deleted.deletedCount > 0) {
+			logInfo('messageDelete: removed stale reaction-role mappings', { guildId: guild.id, messageId: (message as Message).id, deleted: deleted.deletedCount });
+		}
+	} catch (err) {
+		logError('messageDelete: failed to cleanup reaction-role mappings', { error: (err as Error)?.message ?? String(err), guildId: guild.id, messageId: (message as Message).id });
+	}
+
+	try {
+		const { sendGuildLog } = await import('../../Utilities/audit');
+		const sent = await sendGuildLog(guild, logsEmbed, channel?.id);
+		if (sent) logInfo('messageDelete: sent delete log', { guild: guild.id, channel: channel?.id, author: authorUser?.id });
 	} catch (err) {
 		logError('messageDelete: failed to send embed', { error: (err as Error)?.message ?? err });
 	}

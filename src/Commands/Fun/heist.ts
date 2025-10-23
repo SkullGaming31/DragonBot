@@ -162,7 +162,12 @@ export default new Command({
 
 			const heistMessage = await interaction.editReply({ content: '**Heist starting in 60 seconds! React with ✅ to participate.**' });
 			const heistMessageDetails = await heistMessage.fetch();
-			await heistMessageDetails.react('✅');
+			try {
+				const { tryReact } = await import('../../Utilities/retry');
+				await tryReact(heistMessageDetails as unknown, '✅').catch(() => null);
+			} catch {
+				// ignore
+			}
 
 			const collector = heistMessageDetails.createReactionCollector({
 				filter: (reaction, user) => !user.bot && reaction.emoji.name === '✅',

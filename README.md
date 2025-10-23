@@ -51,6 +51,7 @@ guilds
   <summary>Table of Contents</summary>
   <ol>
     <li>
+    <li><a href="docs/reactionRoles.md">Reaction Roles Manager</a></li>
       <a href="#about-the-project">About The Project</a>
       <ul>
         <li><a href="#built-with">Built With</a></li>
@@ -89,7 +90,37 @@ This is the Discord Bot for my personal Discord Server<br />
 - [TypeScript](https://www.typescriptlang.org/)
 - [Mongoose](https://mongodb.com)
 
+## Reaction Roles Manager (quick note)
+
+- The bot includes a Reaction Roles Manager (see `docs/reactionRoles.md`). It exposes two ways to create mappings:
+  - `/reaction create` — attach a mapping to an existing message by ID.
+  - `/reaction create_message` — post a message into the specified channel and create the mapping using that new message's ID (convenience subcommand).
+
+See `docs/reactionRoles.md` for examples, formats, and troubleshooting tips.
+
 <p align="right">(<a href="#top">back to top</a>)</p>
+
+## Reaction Roles — Usage examples
+
+Quick copy/paste commands (run as an admin in a server where the bot is installed):
+
+- Create mapping on an existing message:
+
+  /reaction create channel:#announcements message_id:123456789012345678 emoji:✅ role:@Member
+
+  Expected (ephemeral) reply: "Created mapping with id <mappingId>"
+
+- Create a message and mapping in a single command:
+
+  /reaction create_message channel:#announcements message_content:"Welcome! React to get Member role" emoji:✅ role:@Member
+
+  Expected (ephemeral) reply: "Created mapping with id <mappingId>"
+
+Screenshot placeholder:
+
+![Reaction roles example placeholder](./docs/images/reaction_roles_example.svg)
+
+Add `docs/images/reaction_roles_example.svg` to show a usage screenshot; a lightweight placeholder SVG is included in the repository.
 
 <!-- GETTING STARTED -->
 
