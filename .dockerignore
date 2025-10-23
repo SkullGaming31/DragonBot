@@ -12,3 +12,6 @@ dist/
 
 # Ignore the logs directory
 logs/
+
+./src/devLogs/
+./devLogs/

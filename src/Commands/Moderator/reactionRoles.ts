@@ -66,7 +66,7 @@ export default new Command({
 		if (sub === 'create') {
 			const channel = interaction.options.getChannel('channel', true) as TextChannel;
 			const messageIdOption = interaction.options.getString('message_id', false);
-			let messageId = messageIdOption ?? '';
+			const messageId = messageIdOption ?? '';
 
 			const emoji = interaction.options.getString('emoji', true);
 			const role = interaction.options.getRole('role', true);
@@ -77,7 +77,7 @@ export default new Command({
 				const me = interaction.guild?.members?.me;
 				const perms = me ? channel.permissionsFor(me) : null;
 				// Only fail early when we have a permissions object and it explicitly lacks required perms.
-				if (perms && typeof (perms as any).has === 'function' && !perms.has(['ViewChannel', 'ReadMessageHistory', 'AddReactions'])) {
+				if (perms && typeof (perms as unknown as { has?: unknown }).has === 'function' && !(perms as unknown as { has: (p: unknown) => boolean }).has(['ViewChannel', 'ReadMessageHistory', 'AddReactions'])) {
 					return interaction.reply({ content: 'I do not have sufficient permissions in the target channel (need View Channel, Read Message History, Add Reactions).', ephemeral: true });
 				}
 				// role hierarchy: bot must be higher than target role
@@ -91,12 +91,12 @@ export default new Command({
 			// If this was the create_message subcommand, the code below will handle creating the message
 
 			// Permission/visibility checks (only enforce when host channel object exposes these properties)
-			if (typeof (channel as any).viewable === 'boolean' && !(channel as any).viewable) {
+			if (typeof (channel as unknown as { viewable?: unknown }).viewable === 'boolean' && !(channel as unknown as { viewable?: boolean }).viewable) {
 				return interaction.reply({ content: 'I cannot view that channel. Check my channel permissions.', ephemeral: true });
 			}
-			if (typeof (channel as any).permissionsFor === 'function') {
-				const perms = (channel as any).permissionsFor(interaction.client.user!);
-				if (perms && typeof perms.has === 'function' && !perms.has('AddReactions')) {
+			if (typeof (channel as unknown as { permissionsFor?: unknown }).permissionsFor === 'function') {
+				const perms = (channel as unknown as { permissionsFor: (u: unknown) => unknown }).permissionsFor(interaction.client.user!);
+				if (perms && typeof (perms as unknown as { has?: unknown }).has === 'function' && !(perms as unknown as { has: (p: unknown) => boolean }).has('AddReactions')) {
 					return interaction.reply({ content: 'I need the Add Reactions permission in the target channel to pre-populate the emoji.', ephemeral: true });
 				}
 			}
@@ -131,7 +131,7 @@ export default new Command({
 				const me = interaction.guild?.members?.me;
 				const perms = me ? channel.permissionsFor(me) : null;
 				// Only fail early when we have a permissions object and it explicitly lacks required perms.
-				if (perms && typeof (perms as any).has === 'function' && !perms.has(['ViewChannel', 'SendMessages', 'AddReactions'])) {
+				if (perms && typeof (perms as unknown as { has?: unknown }).has === 'function' && !(perms as unknown as { has: (p: unknown) => boolean }).has(['ViewChannel', 'SendMessages', 'AddReactions'])) {
 					return interaction.reply({ content: 'I do not have sufficient permissions in the target channel (need View Channel, Send Messages, Add Reactions).', ephemeral: true });
 				}
 				if (interaction.guild && me && role && (me.roles?.highest?.position ?? 0) <= (role?.position ?? 0)) {
@@ -145,12 +145,12 @@ export default new Command({
 			let sentMessageId = '';
 			let sentMessage: unknown = undefined;
 			// Pre-flight permission checks before sending (only enforce when channel exposes checks)
-			if (typeof (channel as any).viewable === 'boolean' && !(channel as any).viewable) {
+			if (typeof (channel as unknown as { viewable?: unknown }).viewable === 'boolean' && !(channel as unknown as { viewable?: boolean }).viewable) {
 				return interaction.reply({ content: 'I cannot view that channel. Check my channel permissions.', ephemeral: true });
 			}
-			if (typeof (channel as any).permissionsFor === 'function') {
-				const perms = (channel as any).permissionsFor(interaction.client.user!);
-				if (perms && typeof perms.has === 'function' && !perms.has('SendMessages')) {
+			if (typeof (channel as unknown as { permissionsFor?: unknown }).permissionsFor === 'function') {
+				const perms = (channel as unknown as { permissionsFor: (u: unknown) => unknown }).permissionsFor(interaction.client.user!);
+				if (perms && typeof (perms as unknown as { has?: unknown }).has === 'function' && !(perms as unknown as { has: (p: unknown) => boolean }).has('SendMessages')) {
 					return interaction.reply({ content: 'I need Send Messages permission in the target channel to create the message.', ephemeral: true });
 				}
 			}
@@ -158,12 +158,12 @@ export default new Command({
 			try {
 				const sent = await channel.send(String(messageContent));
 				// Narrow to check id exists
-				if (sent && typeof (sent as any).id === 'string') {
-					sentMessageId = (sent as any).id;
+				if (sent && typeof (sent as unknown as { id?: unknown }).id === 'string') {
+					sentMessageId = (sent as unknown as { id: string }).id;
 					sentMessage = sent;
 				} else if (sent && 'id' in (sent as object)) {
 					// fallback
-					sentMessageId = String((sent as unknown as { id: unknown }).id ?? '');
+					sentMessageId = String((sent as unknown as { id?: unknown }).id ?? '');
 					sentMessage = sent;
 				} else {
 					throw new Error('Failed to determine sent message id');
