@@ -9,6 +9,11 @@ All notable changes to this repository will be documented in this file.
 - Marketplace feature: added marketplace commands (create/buy/list/remove), listing schema, tests, and CI test reporter (commit 98a7593)
 - Documentation: updated TODO and referenced marketplace implementation (commit f1e958b)
 
+- Reaction roles manager: persistent mappings stored in DB, admin commands (create/list/delete), and event handlers refactored to apply/remove roles based on stored mappings. Added `src/Database/Schemas/reactionRole.ts`, updated `src/Commands/Moderator/reactionRoles.ts`, `src/Events/customMessage/reactionRolesAdd.ts`, and `src/Events/customMessage/reactionRolesRemove.ts`.
+- Tests: Added unit tests for reaction role event handlers (`test/events/reactionRolesAdd.test.ts`, `test/events/reactionRolesRemove.test.ts`) and fixed test mocks to support `.lean()` chaining.
+- Dashboard scaffold: minimal Next.js dashboard scaffold added for issue #59 (OAuth + NextAuth template and `issues/59.md`).
+- Express API hardening: protected `/api/v1` with API key support and added common security headers and rate limiting in `src/index.ts`.
+
 ---
 
 _This changelog is maintained manually. For details, see the commit history._
