@@ -4,6 +4,6 @@
 /devLogs
 ./src/devLogs/
 NOTES.txt
-/scripts
+/scripts/supervisor-run.js
 coverage/
 .vscode
