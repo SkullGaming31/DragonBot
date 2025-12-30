@@ -80,7 +80,7 @@ guilds
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
 This is the Discord Bot for my personal Discord Server<br />
-[SkullGamingHQ Hub](https://discord.com/invite/6TGV75sDjW)
+[Dragon's Den](https://discord.com/invite/6TGV75sDjW)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -286,11 +286,11 @@ Distributed under the MIT License. checkout LICENSE.md
 
 ## Contact
 
-Corey - [@skullgaming31](https://twitter.com/skullgaminghq) -
+Corey - [@skullgaming31](https://twitter.com/canadiendragon) -
 skullgamingg31@gmail.com
 
 Project Link:
-[SkullGamingHQ Hub in Typescript](https://github.com/skullgaming31/dragonbot)
+[Dragon's Den in Typescript](https://github.com/skullgaming31/dragonbot)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
