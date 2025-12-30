@@ -62,6 +62,19 @@ export default new Command({
 					],
 				},
 				{
+					name: 'clear',
+					description: 'Remove all warnings for a user',
+					type: ApplicationCommandOptionType.Subcommand,
+					options: [
+						{
+							name: 'target',
+							description: 'Select a target',
+							type: ApplicationCommandOptionType.User,
+							required: true,
+						},
+					],
+				},
+				{
 					name: 'check',
 					description: 'Check the warnings for a user',
 					type: ApplicationCommandOptionType.Subcommand,
@@ -114,6 +127,30 @@ export default new Command({
 						content: `Warning with ID \`${warningID}\` removed for ${Target?.globalName}. New warning count: ${userWarningsToRemove.Warnings.length}.`,
 					});
 				}
+				break;
+
+			case 'clear':
+				// Remove all warnings for a target user
+				if (!member?.permissions.has('ManageMessages')) {
+					interaction.reply({ content: 'You do not have permission to clear warnings.' });
+					return;
+				}
+				if (!Target) {
+					interaction.reply({ content: 'Target user not found.' });
+					return;
+				}
+
+				{
+					const userWarningsToClear = await DB.findOne({ GuildID: guild.id, UserID: Target.id });
+					if (!userWarningsToClear || !Array.isArray(userWarningsToClear.Warnings) || userWarningsToClear.Warnings.length === 0) {
+						interaction.reply({ content: `No warnings found for ${Target?.globalName}.` });
+						return;
+					}
+					const removedCount = userWarningsToClear.Warnings.length;
+					await DB.deleteOne({ GuildID: guild.id, UserID: Target.id });
+					interaction.reply({ content: `Removed ${removedCount} warning(s) for ${Target?.globalName}.` });
+				}
+
 				break;
 
 			case 'check':

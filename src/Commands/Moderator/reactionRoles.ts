@@ -18,11 +18,12 @@ export default new Command({
 			description: 'Create a reaction role mapping on an existing message',
 			type: ApplicationCommandOptionType.Subcommand,
 			options: [
+				// Place required options first per Discord validation rules
 				{ name: 'channel', description: 'Channel containing the message', type: ApplicationCommandOptionType.Channel, required: true },
-				{ name: 'message_id', description: 'Message ID to attach the reaction role to', type: ApplicationCommandOptionType.String, required: false },
-				// message_content moved to a separate subcommand `create_message` to make the UI explicit
 				{ name: 'emoji', description: 'Emoji (unicode or custom like name:id)', type: ApplicationCommandOptionType.String, required: true },
 				{ name: 'role', description: 'Role to assign', type: ApplicationCommandOptionType.Role, required: true },
+				// Optional parameters after required ones
+				{ name: 'message_id', description: 'Message ID to attach the reaction role to', type: ApplicationCommandOptionType.String, required: false },
 				{ name: 'label', description: 'Optional label', type: ApplicationCommandOptionType.String, required: false },
 			],
 		},

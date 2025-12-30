@@ -1,6 +1,8 @@
 /* eslint-disable no-useless-escape -- quickfix: regex literal contains escaped slashes for readability */
 import { ChannelType, EmbedBuilder, Message, PermissionsBitField } from 'discord.js';
 import settings from '../../Database/Schemas/settingsDB';
+import AutoModModel from '../../Database/Schemas/autoMod';
+import { postPunishment, tryKick } from '../../Utilities/moderation';
 import { Event } from '../../Structures/Event';
 import { info as logInfo, warn as logWarn, error as logError } from '../../Utilities/logger';
 
@@ -49,8 +51,9 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 	const promotionChannelId = settingsData.PromotionChannel;
 	const punishmentChannelId = settingsData.punishmentChannel ?? '';
 
-	// Skip processing if not in the promotion channel or message doesn't contain a link-like token
-	if (channel.id !== promotionChannelId) return;
+	// Skip processing when message is posted in the promotion channel (links are allowed there).
+	// If no promotionChannelId is configured, enforcement will apply across all channels.
+	if (promotionChannelId && channel.id === promotionChannelId) return;
 
 	// Quick check for link-like content
 	if (!content || !/(https?:\/\/|www\.|\.[a-z]{2,}\b)/i.test(content)) return;
@@ -78,7 +81,9 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 
 	// Function to handle invalid link detection
 	const handleInvalidLink = async () => {
-		const channelMention = guild.channels.cache.get(promotionChannelId)?.toString() ?? `#${promotionChannelId}`;
+		const channelMention = promotionChannelId
+			? (guild.channels.cache.get(promotionChannelId)?.toString() ?? `#${promotionChannelId}`)
+			: 'the promotion channel';
 		const linkDetectionEmbed = new EmbedBuilder()
 			.setTitle('Link Detected')
 			.setDescription(`:x: ${author.username} **Links are only allowed in ${channelMention}**`)
@@ -121,25 +126,14 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 						.setThumbnail(author.displayAvatarURL({ size: 512 }) ?? undefined)
 						.setTimestamp();
 
-					// Try sending punishment message and then kick
+					// Post punishment embed (best-effort) and attempt safe kick
 					try {
-						if (punishmentChannel && punishmentChannel.type === ChannelType.GuildText) {
-							await punishmentChannel.send({ embeds: [punishmentEmbed] });
-						} else if (defaultPunishmentChannel && defaultPunishmentChannel.type === ChannelType.GuildText) {
-							await defaultPunishmentChannel.send({ embeds: [punishmentEmbed] });
-						} else {
-							logWarn('twitchDetection: no suitable channel for punishment messages', { guild: guild.id });
-						}
-					} catch (err) {
-						logWarn('twitchDetection: sending punishment message failed', { guild: guild.id, user: author.id, error: (err as Error)?.message ?? err });
-					}
+						await postPunishment(guild, punishmentEmbed, ['959693430647308295']).catch(() => null);
+					} catch { /* swallow */ }
 
 					try {
-						await kickMember.kick('Link spam');
-						logInfo('twitchDetection: kicked member for link spam', { guild: guild.id, user: author.id });
-					} catch (err) {
-						logWarn('twitchDetection: failed to kick member', { guild: guild.id, user: author.id, error: (err as Error)?.message ?? err });
-					}
+						await tryKick(kickMember, 'Link spam');
+					} catch { /* swallow */ }
 				}
 
 				// Delete original message if appropriate
@@ -152,9 +146,46 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 		}
 	};
 
-	// If any extracted link is not allowed, handle it
-	const anyNotAllowed = found.some((u) => !isLinkAllowed(u));
-	if (anyNotAllowed) await handleInvalidLink();
+	// Consult AutoMod config for link spam thresholds and ignored lists (optional)
+	let autoModConfig = null;
+	try {
+		autoModConfig = await AutoModModel.findOne({ guildId: guild.id }).lean().catch(() => null);
+	} catch (err) {
+		logWarn('twitchDetection: failed to read automod config', { guild: guild.id, error: (err as Error)?.message ?? err });
+	}
+
+	// honor ignored channels/users/roles
+	if (autoModConfig) {
+		if (autoModConfig.ignoredChannels?.includes(channel.id)) return;
+		if (autoModConfig.ignoredUsers?.includes(author.id)) return;
+		if (member && member.roles && member.roles.cache) {
+			const memberRoles = member.roles.cache.map(r => r.id);
+			if (memberRoles.some(r => autoModConfig.ignoredRoles?.includes(r))) return;
+		}
+	}
+
+	// If promotionChannelId is set, links posted outside that channel are disallowed (enforce on any link).
+	const isInPromotionChannel = promotionChannelId ? channel.id === promotionChannelId : false;
+
+	if (!isInPromotionChannel) {
+		// Any link posted outside the promotion channel is invalid — enforce immediately
+		await handleInvalidLink();
+	} else {
+		// Inside the promotion channel use the whitelist + cooldown logic
+		const anyNotAllowed = found.some((u) => !isLinkAllowed(u));
+		if (anyNotAllowed) {
+			// override threshold if automod config provides spam threshold
+			if (autoModConfig && autoModConfig.rules && autoModConfig.rules.spam && typeof autoModConfig.rules.spam.threshold === 'number') {
+				// use the automod spam threshold as a multiplier to link threshold (simple policy)
+				const overrideThreshold = Math.max(1, Math.floor(autoModConfig.rules.spam.threshold));
+				if ((linkCooldowns.get(author.id)?.count ?? 0) + 1 >= overrideThreshold) {
+					await handleInvalidLink();
+				}
+			} else {
+				await handleInvalidLink();
+			}
+		}
+	}
 
 	// Clean up expired cooldown windows
 	const state = linkCooldowns.get(author.id);
