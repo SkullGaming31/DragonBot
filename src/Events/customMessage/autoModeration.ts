@@ -61,12 +61,12 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 			ignoredRoles: cfg.ignoredRoles ?? defaults.ignoredRoles,
 			ignoredUsers: cfg.ignoredUsers ?? defaults.ignoredUsers,
 		} as {
-      enabled: boolean;
-      rules: { inviteLinks: { enabled: boolean }; caps: { enabled: boolean; threshold: number }; spam: { enabled: boolean; threshold: number } };
-      ignoredChannels: string[];
-      ignoredRoles: string[];
-      ignoredUsers: string[];
-    };
+			enabled: boolean;
+			rules: { inviteLinks: { enabled: boolean }; caps: { enabled: boolean; threshold: number }; spam: { enabled: boolean; threshold: number } };
+			ignoredChannels: string[];
+			ignoredRoles: string[];
+			ignoredUsers: string[];
+		};
 
 		if (!policy.enabled) return;
 
@@ -261,11 +261,11 @@ export async function __test_invokeInvite(message: Message, options?: { throwAt?
 	// simulate the early delete/send steps that live in the outer try
 	try {
 		if (options?.throwAt === 'delete') throw new Error('test-delete-throw');
-		await (message.delete as any)?.().catch(() => null);
+		await (message.delete)?.().catch(() => null);
 
 		if (options?.throwAt === 'channelSend') throw new Error('test-channel-send-throw');
 		const ch = message.channel as unknown as { send?: unknown };
-		if (typeof ch?.send === 'function') await (ch as any).send({ content: 'test' }).catch(() => null);
+		if (typeof ch?.send === 'function') await (ch).send({ content: 'test' }).catch(() => null);
 
 		// inner try block from the event
 		try {
@@ -307,11 +307,11 @@ export async function __test_invokeCaps(message: Message, options?: { throwAt?: 
 	const guildId = guild?.id ?? 'test-guild';
 	try {
 		if (options?.throwAt === 'delete') throw new Error('test-delete-throw-caps');
-		await (message.delete as any)?.().catch(() => null);
+		await (message.delete)?.().catch(() => null);
 
 		const ch = message.channel as unknown as { send?: unknown };
 		if (options?.throwAt === 'channelSend') throw new Error('test-channel-send-throw-caps');
-		if (typeof ch?.send === 'function') await (ch as any).send({ content: 'caps' }).catch(() => null);
+		if (typeof ch?.send === 'function') await (ch).send({ content: 'caps' }).catch(() => null);
 
 		try {
 			const existingRaw = await WarningDB.findOne({ GuildID: guildId, UserID: message.author.id }).lean().catch(() => null);
@@ -342,11 +342,11 @@ export async function __test_invokeSpam(messages: Message[], options?: { throwAt
 	const guildId = guild?.id ?? 'test-guild';
 	try {
 		if (options?.throwAt === 'delete') throw new Error('test-delete-throw-spam');
-		await (message.delete as any)?.().catch(() => null);
+		await (message.delete)?.().catch(() => null);
 
 		const ch = message.channel as unknown as { send?: unknown };
 		if (options?.throwAt === 'channelSend') throw new Error('test-channel-send-throw-spam');
-		if (typeof ch?.send === 'function') await (ch as any).send({ content: 'spam' }).catch(() => null);
+		if (typeof ch?.send === 'function') await (ch).send({ content: 'spam' }).catch(() => null);
 
 		try {
 			const existingRaw = await WarningDB.findOne({ GuildID: guildId, UserID: message.author.id }).lean().catch(() => null);
