@@ -91,7 +91,10 @@ export async function handleIntegrationWebhook(req: Request, res: Response) {
 		const secret = process.env.INTEGRATIONS_SECRET ?? '';
 		const incomingSecret = (req.headers[SECRET_HEADER] as string) ?? '';
 		if (!secret || incomingSecret !== secret) {
-			console.debug('Integration secret mismatch', { expected: secret, incoming: incomingSecret });
+			console.debug('Integration secret mismatch', {
+				hasExpectedSecret: !!secret,
+				incomingLength: typeof incomingSecret === 'string' ? incomingSecret.length : 0
+			});
 			res.status(401).json({ error: 'Unauthorized' });
 			return;
 		}
