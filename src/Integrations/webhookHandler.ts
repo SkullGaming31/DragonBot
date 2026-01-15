@@ -110,9 +110,9 @@ export async function handleIntegrationWebhook(req: Request, res: Response) {
 		};
 
 		// Deduplicate
-		const eventKey = normalized.id;
+		const eventKey = String(normalized.id ?? '');
 		try {
-			const existing = await IntegrationEventModel.findOne({ eventId: eventKey }).lean().exec();
+			const existing = await IntegrationEventModel.findOne({ eventId: { $eq: eventKey } }).lean().exec();
 			if (existing) { res.status(202).json({ status: 'duplicate' }); return; }
 			await IntegrationEventModel.create({ eventId: eventKey, provider: normalized.provider });
 		} catch (e) {
