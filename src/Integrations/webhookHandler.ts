@@ -16,8 +16,13 @@ export async function handleIntegrationWebhook(req: Request, res: Response) {
 		if (isTwitch) {
 			// Twitch EventSub verification challenge
 			const msgType = (req.headers['twitch-eventsub-message-type'] as string) ?? '';
-			if (msgType === 'webhook_callback_verification' && req.body && (req.body.challenge as string)) {
-				res.status(200).send(req.body.challenge);
+			if (msgType === 'webhook_callback_verification') {
+				const challenge = req.body && (req.body as { challenge?: unknown }).challenge;
+				if (typeof challenge !== 'string' || challenge.length === 0 || challenge.length > 1024) {
+					res.status(400).json({ error: 'invalid challenge' });
+					return;
+				}
+				res.status(200).type('text/plain').send(challenge);
 				return;
 			}
 
