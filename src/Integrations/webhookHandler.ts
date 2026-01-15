@@ -18,7 +18,13 @@ export async function handleIntegrationWebhook(req: Request, res: Response) {
 			const msgType = (req.headers['twitch-eventsub-message-type'] as string) ?? '';
 			if (msgType === 'webhook_callback_verification') {
 				const challenge = req.body && (req.body as { challenge?: unknown }).challenge;
-				if (typeof challenge !== 'string' || challenge.length === 0 || challenge.length > 1024) {
+				// Validate Twitch challenge: must be a reasonably sized ASCII string without control characters
+				if (
+					typeof challenge !== 'string' ||
+					challenge.length === 0 ||
+					challenge.length > 1024 ||
+					!/^[\x20-\x7E]+$/.test(challenge)
+				) {
 					res.status(400).json({ error: 'invalid challenge' });
 					return;
 				}
