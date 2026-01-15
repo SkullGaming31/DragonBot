@@ -38,7 +38,7 @@ export const connectDatabase = async (): Promise<void> => {
 	mongoose.set('debug', false);
 
 	// MongoDB connection URIs
-	const uri = isDev ? process.env.MONGO_DEV_URI : process.env.MONGO_DATABASE_URI;
+	const uri = isDev ? process.env.MONGO_DEV_URI : process.env.MONGODB_URI;
 
 	if (!uri) {
 		throw new MongoDBConnectionError('MongoDB URI is not defined');

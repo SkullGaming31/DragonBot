@@ -1,5 +1,6 @@
-import { Router, Request, Response } from 'express';
+import express, { Router, Request, Response } from 'express';
 import { appInstance } from '../index';
+import { handleIntegrationWebhook } from '../Integrations/webhookHandler';
 
 export const apiV1Routes = Router();
 
@@ -39,6 +40,11 @@ apiV1Routes.get('/commands', (req: Request, res: Response) => {
 		res.status(500).json({ error: 'Unable to fetch commands' });
 		console.error(err);
 	}
+});
+
+// Generic integrations webhook receiver
+apiV1Routes.post('/integrations/webhook', express.json(), (req: Request, res: Response) => {
+	return handleIntegrationWebhook(req, res);
 });
 
 export default apiV1Routes;
