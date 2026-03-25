@@ -338,12 +338,26 @@ export default new Command({
 					if (!userData) throw new Error('User not found');
 
 					// Helper functions
+					// const getStoreLoot = (store: StoreType): string[] => {
+					// 	const items = Object.keys(store.items);
+					// 	return items
+					// 		.sort(() => Math.random() - 0.5)
+					// 		.slice(0, randomInt(1, 3))
+					// 		.filter(() => Math.random() > 0.3);
+					// };
 					const getStoreLoot = (store: StoreType): string[] => {
 						const items = Object.keys(store.items);
-						return items
+						const picked = items
 							.sort(() => Math.random() - 0.5)
-							.slice(0, randomInt(1, 3))
-							.filter(() => Math.random() > 0.3);
+							.slice(0, randomInt(1, 3));
+						const filtered = picked.filter(() => Math.random() > 0.3);
+						if (filtered.length === 0 && picked.length > 0) {
+							const best = picked.reduce((a, b) =>
+								(store.items[a] ?? 0) >= (store.items[b] ?? 0) ? a : b
+							);
+							return [best];
+						}
+						return filtered;
 					};
 
 					const getSpecialStoreEvent = (): string => {
@@ -420,27 +434,35 @@ export default new Command({
 											content: `🚨 **CAUGHT!** Paid ${fine} gold from your balance!`,
 											components: []
 										});
-									} else {
-										// Jail handling with permission check
+									}
+
+									// Attempt to timeout the member if possible, otherwise fall back to balance penalty.
+									try {
 										const member = await guild?.members.fetch(user.id);
-										if (member && guild?.members.me?.permissions.has('ModerateMembers')) {
-											await member.timeout(300000, 'Failed robbery fine');
+										const canModerate = !!member && guild?.members.me?.permissions.has('ModerateMembers') && (member as any).moderatable;
+										if (canModerate) {
+											await member!.timeout(300000, 'Failed robbery fine');
 											return i.editReply({
 												content: '⛓️ **JAILED!** 5 minute timeout for insufficient funds!',
 												components: []
 											});
 										}
-										// Fallback penalty
-										await updateUserBalance(user.id, -userBalance);
-										return i.editReply({
-											content: `🚨 **CAUGHT!** Lost all ${userBalance} gold!`,
-											components: []
-										});
+									} catch (timeoutErr) {
+										console.error('Timeout failed:', timeoutErr);
+										// Fall back to balance penalty below
 									}
-								} catch (jailError) {
-									console.error('Jail failed:', jailError);
+
+									// Fallback penalty if we can't timeout the member
+									await updateUserBalance(user.id, -userBalance);
 									return i.editReply({
-										content: '🚨 **CAUGHT!** Error processing penalty!',
+										content: `🚨 **CAUGHT!** Lost all ${userBalance} gold!`,
+										components: []
+									});
+								} catch (penaltyErr) {
+									console.error('Penalty processing failed:', penaltyErr);
+									try { await updateUserBalance(user.id, -userBalance); } catch (e) { console.error('Fallback penalty failed:', e); }
+									return i.editReply({
+										content: `🚨 **CAUGHT!** Lost all ${userBalance} gold!`,
 										components: []
 									});
 								}
