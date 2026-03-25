@@ -47,3 +47,34 @@ Below are suggested features and improvements you can add to DragonBot. Each ite
 
 14. Integrations (Twitch, YouTube, Webhooks)
     - Add integrations for Twitch stream announcements, YouTube uploads, and generic webhooks with templated messages and rate-limits.
+
+
+    POSSIBLE FEATURES:
+    
+🎮 Gaming & Community Features:
+
+Game night scheduler - Plan events, send reminders, track RSVPs
+LFG (Looking for Group) system - Post what game you're playing, auto-match with others
+Voice channel auto-roles - Give temp roles when users join specific voice channels
+Highlight reels - Let users submit clips/screenshots to a showcase channel
+
+🛡️ Moderation & Safety:
+
+Auto-mod filters - Spam detection, link filtering (you mentioned this!), caps/emoji limits
+Warning system with points - Track infractions, auto-escalate punishments
+Raid protection - Auto-lockdown on mass joins, verification gates
+Message logging - Track edits/deletes for mod transparency
+
+🎉 Engagement & Fun:
+
+Level/XP system - Reward active members with roles/perks
+Custom currency & shop - Earn coins, buy cosmetic roles or privileges
+Mini-games - Trivia, word games, or simple reaction-based games
+Birthday announcements - Auto-congratulate members on their special day
+
+🔧 Utility:
+
+Polls & voting - Quick community decisions with visual results
+Reminders - Personal or server-wide reminders
+Welcome messages - Customizable welcomes with server rules/info
+Role menus - Self-serve role selection (color roles, hobby roles, etc.)

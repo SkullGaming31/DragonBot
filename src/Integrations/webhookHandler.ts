@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import crypto from 'crypto';
 import IntegrationConfigModel from '../Database/Schemas/integrationConfig';
 import IntegrationEventModel from '../Database/Schemas/integrationEvent';
 import { NormalizedEvent } from './adapter';
@@ -7,15 +8,24 @@ import TwitchAdapter from './twitchAdapter';
 
 const SECRET_HEADER = 'x-integration-secret';
 
+function getHeaderValue(headers: Record<string, unknown>, name: string): string | undefined {
+	const key = Object.keys(headers).find(k => k.toLowerCase() === name.toLowerCase());
+	if (!key) return undefined;
+	const raw = headers[key] as unknown;
+	if (Array.isArray(raw)) return String(raw[0]);
+	if (typeof raw === 'string') return raw;
+	return undefined;
+}
+
 export async function handleIntegrationWebhook(req: Request, res: Response) {
 	try {
 		// Detect source; prefer explicit header but allow inferring from Twitch EventSub headers
-		const headerSource = (req.headers['x-integration-source'] as string) ?? '';
-		const isTwitch = headerSource === 'twitch' || !!req.headers['twitch-eventsub-message-type'];
+		const headerSource = getHeaderValue(req.headers as Record<string, unknown>, 'x-integration-source') ?? '';
+		const isTwitch = headerSource === 'twitch' || !!getHeaderValue(req.headers as Record<string, unknown>, 'twitch-eventsub-message-type');
 
 		if (isTwitch) {
 			// Twitch EventSub verification challenge
-			const msgType = (req.headers['twitch-eventsub-message-type'] as string) ?? '';
+			const msgType = getHeaderValue(req.headers as Record<string, unknown>, 'twitch-eventsub-message-type') ?? '';
 			if (msgType === 'webhook_callback_verification') {
 				const challenge = req.body && (req.body as { challenge?: unknown }).challenge;
 				// Validate Twitch challenge: must be a reasonably sized ASCII string without control characters
@@ -95,12 +105,22 @@ export async function handleIntegrationWebhook(req: Request, res: Response) {
 
 		// Non-Twitch path: validate shared secret
 		const secret = process.env.INTEGRATIONS_SECRET ?? '';
-		const incomingSecret = (req.headers[SECRET_HEADER] as string) ?? '';
-		if (!secret || incomingSecret !== secret) {
-			console.debug('Integration secret mismatch', {
-				hasExpectedSecret: !!secret,
-				incomingLength: typeof incomingSecret === 'string' ? incomingSecret.length : 0
-			});
+		const incomingSecret = getHeaderValue(req.headers as Record<string, unknown>, SECRET_HEADER) ?? '';
+		if (!secret) {
+			if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') console.debug('Integration secret missing on server');
+			res.status(401).json({ error: 'Unauthorized' });
+			return;
+		}
+		if (!incomingSecret) {
+			if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') console.debug('Integration secret header missing');
+			res.status(401).json({ error: 'Unauthorized' });
+			return;
+		}
+		// timing-safe compare
+		const expectedBuf = Buffer.from(secret, 'utf8');
+		const incomingBuf = Buffer.from(incomingSecret, 'utf8');
+		if (expectedBuf.length !== incomingBuf.length || !crypto.timingSafeEqual(expectedBuf, incomingBuf)) {
+			if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') console.debug('Integration secret mismatch', { hasExpectedSecret: !!secret, incomingSecretPresent: !!incomingSecret });
 			res.status(401).json({ error: 'Unauthorized' });
 			return;
 		}
