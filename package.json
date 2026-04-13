@@ -38,7 +38,7 @@
 		"connect-mongo": "^5.1.0",
 		"cors": "^2.8.5",
 		"discord-api-types": "^0.38.37",
-		"discord.js": "^14.25.1",
+		"discord.js": "^14.26.2",
 		"dotenv": "^16.5.0",
 		"express": "^5.1.0",
 		"express-rate-limit": "^7.5.0",
