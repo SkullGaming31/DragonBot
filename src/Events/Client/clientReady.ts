@@ -2,6 +2,7 @@ import { ActivityType, Client, Guild } from 'discord.js';
 import { Event } from '../../Structures/Event';
 import { startReactionCleanup } from '../../Utilities/reactionCleanup';
 import { startMetricsReporter } from '../../Utilities/metricsReporter';
+import { startBirthdayScheduler } from '../../Utilities/birthdayScheduler';
 
 export default new Event<'clientReady'>('clientReady', async (client: Client) => {
 	const { user, guilds } = client;
@@ -39,5 +40,13 @@ export default new Event<'clientReady'>('clientReady', async (client: Client) =>
 		(client as unknown as { __metricsStop?: (() => void) }).__metricsStop = stopMetrics;
 	} catch (err) {
 		console.error('Failed to start metrics reporter', err);
+	}
+
+	// start birthday scheduler
+	try {
+		const stopBirthday = startBirthdayScheduler(client);
+		(client as unknown as { __birthdayStop?: (() => void) }).__birthdayStop = stopBirthday;
+	} catch (err) {
+		console.error('Failed to start birthday scheduler', err);
 	}
 });
