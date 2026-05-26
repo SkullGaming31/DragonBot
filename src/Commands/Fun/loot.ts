@@ -1,6 +1,7 @@
 
 import { randomInt } from 'crypto';
 import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonInteraction, ButtonStyle, Collection, ComponentType, TextChannel, userMention } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
 
@@ -177,9 +178,12 @@ export default new Command({
 					// Set cooldown on failure
 					userData.houseCooldown = new Date(Date.now() + HOUSE_COOLDOWN);
 					await userData.save();
-					return interaction.editReply({
-						content: '🚨 You got caught by the homeowners! Police arrived immediately!',
-					});
+					const caughtEmbed = new EmbedBuilder()
+						.setTitle('🚨 Caught!')
+						.setColor('Red')
+						.setDescription('You got caught by the homeowners! Police arrived immediately!')
+						.addFields({ name: 'Cooldown', value: `You must wait ${Math.ceil(HOUSE_COOLDOWN / 60000)} minute(s).` });
+					return interaction.editReply({ embeds: [caughtEmbed] });
 				}
 
 				// Determine number of items stolen
@@ -206,9 +210,11 @@ export default new Command({
 					// Set cooldown even on failed search
 					userData.houseCooldown = new Date(Date.now() + HOUSE_COOLDOWN);
 					await userData.save();
-					return interaction.editReply({
-						content: '🔍 You searched the house but couldn\'t find anything valuable!'
-					});
+					const noneEmbed = new EmbedBuilder()
+						.setTitle('🔍 Nothing Found')
+						.setColor('Grey')
+						.setDescription('You searched the house but couldn\'t find anything valuable!');
+					return interaction.editReply({ embeds: [noneEmbed] });
 				}
 
 				// Steal items
@@ -238,15 +244,16 @@ export default new Command({
 					return `${emoji} ${item.charAt(0).toUpperCase() + item.slice(1)}`;
 				});
 
-				await interaction.editReply({
-					content: [
-						'🏠 **House Robbery Report**',
-						`✅ Successfully stole ${stolenCount} items:`,
-						`${formattedItems.join('\n')}`,
-						`💰 Total Value: ${totalStolenValue.toLocaleString()} gold`,
-						`⚠️ Police Alert Level: ${userData.policeAlertLevel} (+15% detection chance)`
-					].join('\n')
-				});
+				const successEmbed = new EmbedBuilder()
+					.setTitle('🏠 House Robbery Report')
+					.setColor('Green')
+					.addFields(
+						{ name: 'Result', value: `✅ Successfully stole ${stolenCount} item(s)`, inline: true },
+						{ name: 'Total Value', value: `${totalStolenValue.toLocaleString()} gold`, inline: true },
+						{ name: 'Police Alert Level', value: `${userData.policeAlertLevel} (+15% detection chance)`, inline: true },
+						{ name: 'Items', value: formattedItems.join('\n') }
+					);
+				await interaction.editReply({ embeds: [successEmbed] });
 				break;
 
 			case 'person':
@@ -320,10 +327,13 @@ export default new Command({
 							await updateUserBalance(member.id, -stolenAmount);
 							await updateUserBalance(interaction.user.id, stolenAmount);
 
-							await interaction.editReply({
-								content: `Successfully robbed ${stolenAmount} gold from ${userMention(member.id)}!`,
-								components: []
-							});
+							const personEmbed = new EmbedBuilder()
+								.setTitle('💰 Successful Robbery')
+								.setColor('Green')
+								.setDescription(`${userMention(member.id)} was robbed of **${stolenAmount}** gold!`)
+								.addFields({ name: 'Victim', value: `${member.user.username}`, inline: true }, { name: 'Amount', value: `${stolenAmount}`, inline: true });
+
+							await interaction.editReply({ embeds: [personEmbed], components: [] });
 						}
 					});
 
@@ -416,33 +426,37 @@ export default new Command({
 
 									if (userBalance >= fine) {
 										await updateUserBalance(user.id, -fine);
-										return i.editReply({
-											content: `🚨 **CAUGHT!** Paid ${fine} gold from your balance!`,
-											components: []
-										});
+										const caughtEmbed = new EmbedBuilder()
+											.setTitle('🚨 CAUGHT!')
+											.setColor('Red')
+											.setDescription(`Paid ${fine} gold from your balance!`);
+										return i.editReply({ embeds: [caughtEmbed], components: [] });
 									} else {
 										// Jail handling with permission check
 										const member = await guild?.members.fetch(user.id);
 										if (member && guild?.members.me?.permissions.has('ModerateMembers')) {
 											await member.timeout(300000, 'Failed robbery fine');
-											return i.editReply({
-												content: '⛓️ **JAILED!** 5 minute timeout for insufficient funds!',
-												components: []
-											});
+											const jailedEmbed = new EmbedBuilder()
+												.setTitle('⛓️ JAILED')
+												.setColor('Red')
+												.setDescription('5 minute timeout for insufficient funds!');
+											return i.editReply({ embeds: [jailedEmbed], components: [] });
 										}
 										// Fallback penalty
 										await updateUserBalance(user.id, -userBalance);
-										return i.editReply({
-											content: `🚨 **CAUGHT!** Lost all ${userBalance} gold!`,
-											components: []
-										});
+										const lostAllEmbed = new EmbedBuilder()
+											.setTitle('🚨 CAUGHT!')
+											.setColor('Red')
+											.setDescription(`Lost all ${userBalance} gold!`);
+										return i.editReply({ embeds: [lostAllEmbed], components: [] });
 									}
 								} catch (jailError) {
 									console.error('Jail failed:', jailError);
-									return i.editReply({
-										content: '🚨 **CAUGHT!** Error processing penalty!',
-										components: []
-									});
+									const errorEmbed = new EmbedBuilder()
+										.setTitle('🚨 CAUGHT!')
+										.setColor('Red')
+										.setDescription('Error processing penalty!');
+									return i.editReply({ embeds: [errorEmbed], components: [] });
 								}
 							}
 
@@ -466,26 +480,28 @@ export default new Command({
 									`• ${item.replace(/([A-Z])/g, ' $1').toUpperCase()}`
 								).join('\n');
 
-								await i.editReply({
-									content: [
-										'🏃♂️ **SUCCESSFUL HEIST!**',
-										`Stolen Items:\n${itemDisplay}`,
-										`💰 Total Value: ${totalValue} gold`,
-										randomChoice([
-											'You escaped through the loading dock!',
-											'A customer accidentally blocked security!',
-											'Your getaway driver was waiting out back!'
-										])
-									].join('\n'),
-									components: []
-								});
+								const storeSuccess = new EmbedBuilder()
+									.setTitle('🏃 Success!')
+									.setColor('Green')
+									.addFields(
+										{ name: 'Stolen Items', value: `${itemDisplay}` },
+										{ name: 'Total Value', value: `${totalValue} gold`, inline: true }
+									)
+									.setDescription(randomChoice([
+										'You escaped through the loading dock!',
+										'A customer accidentally blocked security!',
+										'Your getaway driver was waiting out back!'
+									]));
+
+								await i.editReply({ embeds: [storeSuccess], components: [] });
 
 							} catch (heistError) {
 								console.error('Heist error:', heistError);
-								await i.editReply({
-									content: '❌ Failed to complete heist!',
-									components: []
-								});
+								const failEmbed = new EmbedBuilder()
+									.setTitle('❌ Failed')
+									.setColor('Red')
+									.setDescription('Failed to complete heist!');
+								await i.editReply({ embeds: [failEmbed], components: [] });
 							}
 
 						} catch (error) {

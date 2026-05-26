@@ -6,6 +6,7 @@ import { ExtendedInteraction } from '../../Typings/Command';
 import { safeInteractionReply, setCooldown } from '../../Utilities/functions';
 import { appInstance } from '../../index';
 import { UserModel } from '../../Database/Schemas/userModel';
+import { recordCommandTimestamp } from '../../Utilities/metricsReporter';
 
 export default new Event<'interactionCreate'>('interactionCreate', async (interaction) => {
 	const { guild, user } = interaction;
@@ -28,6 +29,9 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 				client,
 				interaction: interaction as ExtendedInteraction
 			});
+
+			// record for metrics (include command category when available)
+			try { recordCommandTimestamp(commandName, (command as any)?.Category); } catch (e) { /* ignore */ }
 
 			// Set cooldown after successful command execution
 			if (command.Cooldown) {

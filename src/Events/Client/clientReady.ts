@@ -1,6 +1,7 @@
 import { ActivityType, Client, Guild } from 'discord.js';
 import { Event } from '../../Structures/Event';
 import { startReactionCleanup } from '../../Utilities/reactionCleanup';
+import { startMetricsReporter } from '../../Utilities/metricsReporter';
 
 export default new Event<'clientReady'>('clientReady', async (client: Client) => {
 	const { user, guilds } = client;
@@ -30,5 +31,13 @@ export default new Event<'clientReady'>('clientReady', async (client: Client) =>
 		(client as unknown as { __reactionCleanupStop?: (() => void) }).__reactionCleanupStop = stop;
 	} catch (err) {
 		console.error('Failed to start reaction cleanup', err);
+	}
+
+	// start metrics reporter
+	try {
+		const stopMetrics = startMetricsReporter(client);
+		(client as unknown as { __metricsStop?: (() => void) }).__metricsStop = stopMetrics;
+	} catch (err) {
+		console.error('Failed to start metrics reporter', err);
 	}
 });
