@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { MongoMemoryServer, MongoMemoryReplSet } from 'mongodb-memory-server';
 
-let mongod: MongoMemoryServer | null = null;
+let mongod: MongoMemoryServer | MongoMemoryReplSet | null = null;
 
 export async function startInMemoryMongo() {
   // If a CI or external MongoDB URL is provided, connect to it instead of
@@ -65,8 +65,11 @@ export async function startInMemoryMongo() {
     throw new Error(`Failed to connect to external MongoDB at ${external}: ${String(lastErr)}`);
   }
 
-  mongod = await MongoMemoryServer.create({ instance: { storageEngine: 'wiredTiger' } });
-  const uri = mongod.getUri();
+  // For local development, use a replica-set-backed in-memory server so tests
+  // that exercise transactions (MongoDB sessions) behave the same as CI.
+  const replset = await MongoMemoryReplSet.create({ replSet: { count: 1 } });
+  mongod = replset;
+  const uri = replset.getUri();
   await mongoose.connect(uri);
   return uri;
 }
