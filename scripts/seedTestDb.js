@@ -38,7 +38,28 @@ async function ensureReplicaSet(db) {
 async function seed() {
   const mongoUrl = process.env.MONGO_URL || 'mongodb://mongo:27017/testdb';
   console.log(`Seeding test DB at ${mongoUrl}`);
-  await mongoose.connect(mongoUrl, { serverSelectionTimeoutMS: 10000 });
+
+  // Retry connect loop — CI mongo service may take some time to accept connections
+  const maxAttempts = 30;
+  const delayMs = 2000;
+  let connected = false;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      console.log(`Attempting mongoose.connect (attempt ${attempt}/${maxAttempts})`);
+      await mongoose.connect(mongoUrl, { serverSelectionTimeoutMS: 5000 });
+      connected = true;
+      break;
+    } catch (err) {
+      console.log(`Connection attempt ${attempt} failed: ${err.message || err}`);
+      if (attempt < maxAttempts) {
+        await new Promise((r) => setTimeout(r, delayMs));
+      }
+    }
+  }
+
+  if (!connected) {
+    throw new Error('Unable to connect to MongoDB after multiple attempts');
+  }
 
   // Ensure replica set is initialized so transaction tests can run in CI
   try {
