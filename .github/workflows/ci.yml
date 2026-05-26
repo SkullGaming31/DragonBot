@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, master, feature/** ]
+    branches: [main, master, feature/**]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
 
 permissions:
   contents: read
@@ -50,6 +50,13 @@ jobs:
     services:
       mongo:
         image: mongo:6.0
+        # Start mongod with replica set enabled so tests that require transactions work in CI
+        options: >-
+          --health-cmd "mongosh --eval \"db.adminCommand({ ping: 1 })\"" \
+          --health-interval 5s \
+          --health-timeout 2s \
+          --health-retries 5
+        command: ["--replSet", "rs0", "--bind_ip_all"]
         ports:
           - 27017:27017
     needs: lint
@@ -90,8 +97,12 @@ jobs:
           CI: true
           MONGO_URL: mongodb://mongo:27017/testdb
         run: |
-          # Wait for mongo then seed the test database
+          # Wait for mongo then initiate replica set and seed the test database
           for i in {1..20}; do mongosh --host mongo --eval "db.adminCommand({ ping: 1 })" && break || sleep 1; done
+          # Initiate replica set for transactions (idempotent if already initiated)
+          mongosh --host mongo --eval "try { rs.initiate(); } catch(e) { print('rs.initiate error: ' + e); }"
+          # Wait briefly for the replset primary to be elected
+          sleep 2
           node scripts/seedTestDb.js
 
       - name: Run tests (vitest)
