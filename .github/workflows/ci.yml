@@ -47,6 +47,11 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: node:18-bullseye
+    services:
+      mongo:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
     needs: lint
     timeout-minutes: 20
     strategy:
@@ -83,6 +88,7 @@ jobs:
       - name: Run tests (vitest)
         env:
           CI: true
+          MONGO_URL: mongodb://localhost:27017
         run: |
           # Use fewer workers to be gentle on CI runners and reduce memory pressure
           npx vitest --run --reporter=dot --maxWorkers=2 --coverage
