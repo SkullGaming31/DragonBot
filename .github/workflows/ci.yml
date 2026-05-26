@@ -88,6 +88,15 @@ jobs:
       - name: lint (if available)
         run: npm run lint --if-present
 
+      - name: Initialize Mongo replica set
+        env:
+          MONGO_URL: mongodb://mongo:27017/admin
+        run: |
+          # Initiate replset (safe to re-run)
+          mongosh "$MONGO_URL" --eval 'try { rs.status() } catch(e) { rs.initiate({_id:"rs0", members:[{_id:0, host:"mongo:27017"}]}) }'
+          # Wait for PRIMARY
+          mongosh "$MONGO_URL" --eval 'for (let i=0; i<60; i++) { try { const s=rs.status(); if (s.myState===1) { print("PRIMARY"); quit(0); } } catch(e) {} sleep(1000); } print("Timed out waiting for PRIMARY"); quit(1)'
+
       - name: Seed DB
         env:
           CI: true
