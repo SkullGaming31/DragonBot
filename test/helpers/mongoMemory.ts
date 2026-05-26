@@ -15,6 +15,15 @@ export async function startInMemoryMongo() {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         await mongoose.connect(external, { serverSelectionTimeoutMS: 5000 });
+        // If we're using an external Mongo (CI service or local dev), ensure
+        // the test database is clean. Only drop when it's clearly a safe
+        // target: CI environment or localhost/127.0.0.1 to avoid harming
+        // accidental production connections.
+        const isLocal = /localhost|127\.0\.0\.1/.test(external);
+        if (process.env.CI === 'true' || isLocal) {
+          // eslint-disable-next-line no-await-in-loop
+          await mongoose.connection.db.dropDatabase();
+        }
         return external;
       } catch (err) {
         lastErr = err;
