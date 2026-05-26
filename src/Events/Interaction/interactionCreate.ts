@@ -2,6 +2,7 @@ import { CommandInteractionOptionResolver, EmbedBuilder, MessageFlags, RoleResol
 import SuggestionModel, { ISuggestion } from '../../Database/Schemas/SuggestDB';
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { Event } from '../../Structures/Event';
+import { CommandType } from '../../Typings/Command';
 import { ExtendedInteraction } from '../../Typings/Command';
 import { safeInteractionReply, setCooldown } from '../../Utilities/functions';
 import { appInstance } from '../../index';
@@ -31,7 +32,10 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 			});
 
 			// record for metrics (include command category when available)
-			try { recordCommandTimestamp(commandName, (command as any)?.Category); } catch (e) { /* ignore */ }
+			try {
+				const cmd = command as CommandType | undefined;
+				recordCommandTimestamp(commandName, cmd?.Category);
+			} catch (e) { /* ignore */ }
 
 			// Set cooldown after successful command execution
 			if (command.Cooldown) {
