@@ -1,6 +1,5 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, Colors, EmbedBuilder } from 'discord.js';
-import { MongooseError } from 'mongoose';
-import DB from '../../Database/Schemas/ticketDB';
+import DB, { Ticket } from '../../Database/Schemas/ticketDB';
 import { Command } from '../../Structures/Command';
 
 export default new Command({
@@ -41,35 +40,35 @@ export default new Command({
 		const embed = new EmbedBuilder();
 
 		switch (Action) {
-			case 'add':
-				DB.findOne({ GuildID: guildId, ChannelID: channel?.id }, async (err: MongooseError | null, docs: { MembersID: string[]; save: () => void; } | null) => {
-					if (err) throw err;
-					if (!docs) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], ephemeral: true });
-					if (docs.MembersID.includes(Member?.id)) return interaction.reply({
-						embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this member is already added to this ticket')], ephemeral: true
+			case 'add': {
+				const docs = await DB.findOne({ GuildID: guildId, ChannelID: channel?.id }).exec() as Ticket | null;
+				if (!docs) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], ephemeral: true });
+				if (docs.MembersID?.includes(Member?.id as string)) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this member is already added to this ticket')], ephemeral: true });
+				docs.MembersID = docs.MembersID ?? [];
+				docs.MembersID.push(Member?.id as string);
+				if (channel?.type === ChannelType.GuildText) {
+					await channel.permissionOverwrites.edit(Member?.id as string, {
+						SendMessages: true,
+						ViewChannel: true,
+						ReadMessageHistory: true,
+						AttachFiles: true
 					});
-					docs.MembersID.push(Member?.id);
-					if (channel?.type === ChannelType.GuildText)
-						channel?.permissionOverwrites.edit(Member?.id, {
-							SendMessages: true,
-							ViewChannel: true,
-							ReadMessageHistory: true,
-							AttachFiles: true
-						});
-					interaction.reply({ content: `${Member}`, embeds: [embed.setColor(Colors.Green).setDescription(`✅ | ${Member} has been added to the ticket`)] });
-					docs.save();
-				});
+				}
+				await interaction.reply({ content: `${Member}`, embeds: [embed.setColor(Colors.Green).setDescription(`✅ | ${Member} has been added to the ticket`)] });
+				await docs.save();
+			}
 				break;
-			case 'remove':
-				DB.findOne({ GuildID: guildId, ChannelID: channel?.id }, async (err: MongooseError | null, docs: { MembersID: string[]; save: () => void; } | null) => {
-					if (err) throw err;
-					if (!docs) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], ephemeral: true });
-					if (!docs.MembersID.includes(Member?.id)) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this member is not in this ticket')], ephemeral: true });
-					docs.MembersID = docs.MembersID.filter(id => id !== Member?.id);
-					if (channel?.type === ChannelType.GuildText) channel?.permissionOverwrites.edit(Member?.id, { ViewChannel: false });
-					interaction.reply({ embeds: [embed.setColor(Colors.Green).setDescription(`✅ | ${Member} has been removed from the ticket`)] });
-					docs.save();
-				});
+				break;
+			case 'remove': {
+				const docs = await DB.findOne({ GuildID: guildId, ChannelID: channel?.id }).exec() as Ticket | null;
+				if (!docs) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], ephemeral: true });
+				if (!docs.MembersID?.includes(Member?.id as string)) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this member is not in this ticket')], ephemeral: true });
+				docs.MembersID = docs.MembersID.filter(id => id !== (Member?.id as string));
+				if (channel?.type === ChannelType.GuildText) await channel.permissionOverwrites.edit(Member?.id as string, { ViewChannel: false });
+				await interaction.reply({ embeds: [embed.setColor(Colors.Green).setDescription(`✅ | ${Member} has been removed from the ticket`)] });
+				await docs.save();
+			}
+				break;
 				break;
 		}
 	}

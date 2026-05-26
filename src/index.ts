@@ -83,6 +83,13 @@ class App {
 					} catch (e) {
 						// ignore
 					}
+					try {
+						const maybeMetrics = this.client as unknown as { __metricsStop?: (() => void) };
+						const stopMetrics = maybeMetrics.__metricsStop;
+						if (typeof stopMetrics === 'function') stopMetrics();
+					} catch (e) {
+						// ignore
+					}
 
 					await this.client.destroy();
 					server.close(() => {

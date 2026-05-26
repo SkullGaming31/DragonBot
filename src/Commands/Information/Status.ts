@@ -1,4 +1,4 @@
-import { ApplicationCommandType, ChannelType, EmbedBuilder, MessageFlags, version } from 'discord.js';
+import { ApplicationCommandType, ChannelType, EmbedBuilder, MessageFlags, version, User, Team } from 'discord.js';
 import { connection } from 'mongoose';
 import os from 'os';
 import { Command } from '../../Structures/Command';
@@ -28,6 +28,20 @@ export default new Command({
 		if (client.readyTimestamp === null) return;
 		if (interaction.client.application.owner === null) return;
 
+		const appOwner = interaction.client.application?.owner as User | Team | null;
+		let ownerName = 'None';
+		const isUser = (o: User | Team): o is User => 'username' in o;
+		if (appOwner) {
+			if (isUser(appOwner)) {
+				ownerName = appOwner.username;
+			} else {
+				const team = appOwner as Team;
+				const ownerId = team.ownerId as string | null;
+				const ownerMember = ownerId ? team.members?.get(ownerId) : undefined;
+				ownerName = ownerMember?.user?.username || team.name || 'None';
+			}
+		}
+
 		const embed = new EmbedBuilder()
 			.setColor('Blue')
 			.setTitle(`🍞 ${user?.username} Status`)
@@ -37,7 +51,7 @@ export default new Command({
 				{ name: '👩🏻‍🔧 Client', value: `${user?.username}` },
 				{ name: '📆 Created', value: `<t:${parseInt(`${user?.createdTimestamp / 1000}`)}:R>`, inline: true },
 				{ name: '☑ Verified', value: user?.flags?.has('VerifiedBot') ? 'Yes' : 'No', inline: true },
-				{ name: '👩🏻‍💻 Bot Owner', value: `${interaction.client.user.username || 'None'}`, inline: true },
+				{ name: '👩🏻‍💻 Bot Owner', value: `${ownerName}`, inline: true },
 				{ name: '📚 Database', value: status[connection.readyState], inline: true },
 				{ name: '🖥 System', value: os.type().replace('Windows_NT', 'Windows').replace('Darwin', 'macOS'), inline: true },
 				{ name: '🧠 CPU Model', value: `${os.cpus()[0].model}`, inline: true },
