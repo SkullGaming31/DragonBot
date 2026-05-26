@@ -93,12 +93,7 @@ jobs:
           CI: true
           MONGO_URL: mongodb://mongo:27017/testdb
         run: |
-          # Wait for mongo then initiate replica set and seed the test database
-          for i in {1..20}; do mongosh --host mongo --eval "db.adminCommand({ ping: 1 })" && break || sleep 1; done
-          # Initiate replica set for transactions (idempotent if already initiated)
-          mongosh --host mongo --eval "try { rs.initiate(); } catch(e) { print('rs.initiate error: ' + e); }"
-          # Wait briefly for the replset primary to be elected
-          sleep 2
+          # Run the seeding script — it will initiate the replset and wait for primary if needed
           node scripts/seedTestDb.js
 
       - name: Run tests (vitest)
