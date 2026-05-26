@@ -48,7 +48,7 @@ export async function runBirthdayCheck(client: Client) {
 			try {
 				const settings = await BirthdaySettingsModel.findOne({ GuildID: b.guildID }).lean();
 				const channelId = settings?.ChannelID ?? undefined;
-				await sendBirthdayGreeting(client, b.guildID, b.userID, channelId, (b as any).year ?? null);
+				await sendBirthdayGreeting(client, b.guildID, b.userID, channelId, (b).year ?? null);
 				sent++;
 			} catch {
 				// continue
