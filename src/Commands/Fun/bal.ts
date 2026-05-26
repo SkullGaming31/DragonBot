@@ -84,7 +84,7 @@ export default new Command({
 				.setColor('Green')
 				.addFields([
 					{
-						name: 'Balance',
+						name: 'Wallet',
 						value: `${userDoc.balance || '0'} gold`, // Use "0" or a better default if balance is undefined
 						inline: true
 					},

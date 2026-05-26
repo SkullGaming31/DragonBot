@@ -6,7 +6,8 @@
 	"keywords": [
 		"discord",
 		"chatbot",
-		"moderation"
+		"moderation",
+		"economy"
 	],
 	"license": "MIT",
 	"main": "./dist/src/index.js",
@@ -24,7 +25,7 @@
 	},
 	"scripts": {
 		"start": "node ./dist/src/index.js",
-		"dev": "ts-node ./src/index.ts",
+		"start:dev": "ts-node ./src/index.ts",
 		"lint": "eslint --fix src",
 		"build": "tsc",
 		"watch": "tsc -w",
@@ -34,7 +35,7 @@
 		"check:coverage": "node ./scripts/check-coverage.js"
 	},
 	"dependencies": {
-		"axios": "^1.15.0",
+		"axios": "^1.15.2",
 		"connect-mongo": "^5.1.0",
 		"cors": "^2.8.5",
 		"discord-api-types": "^0.38.37",
