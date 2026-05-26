@@ -70,8 +70,8 @@ async function seed() {
 		'127.0.0.1:27017',
 	];
 
-	// If user provided full MONGO_URL, use it; otherwise try hosts list
-	const providedUrl = process.env.MONGO_URL;
+	// If user provided full MONGO_URL via env, `providedUrl` (declared above) will be used;
+	// otherwise the script will probe the candidate hosts.
 	let connected = false;
 	let lastError = null;
 	for (const host of candidateHosts) {
