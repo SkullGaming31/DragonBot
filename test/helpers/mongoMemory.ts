@@ -9,7 +9,7 @@ export async function startInMemoryMongo() {
   const external = process.env.MONGO_URL ?? process.env.MONGODB_URI ?? process.env.CI_MONGO_URL;
   if (external) {
     // Try to connect with retries — the CI mongo service may take a few seconds to be ready.
-    const maxAttempts = 12; // ~60s total with 5s delay
+    const maxAttempts = 24; // ~2 minutes total with 5s delay
     const delayMs = 5000;
     let lastErr: unknown = null;
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -18,7 +18,7 @@ export async function startInMemoryMongo() {
           // eslint-disable-next-line no-console
           console.log(`startInMemoryMongo: attempting connect to external Mongo (${external}), attempt ${attempt}/${maxAttempts}`);
         }
-        await mongoose.connect(external, { serverSelectionTimeoutMS: 5000 });
+        await mongoose.connect(external, { serverSelectionTimeoutMS: 15000 });
         // If we're using an external Mongo (CI service or local dev), ensure
         // the test database is clean. Only drop when it's clearly a safe
         // target: CI environment or localhost/127.0.0.1 to avoid harming
@@ -48,6 +48,10 @@ export async function startInMemoryMongo() {
       }
     }
     // If we exit the loop, throw the last error so test harness fails with a helpful message
+    if (process.env.CI === 'true') {
+      // eslint-disable-next-line no-console
+      console.error(`startInMemoryMongo: failed to connect to external Mongo after ${maxAttempts} attempts`);
+    }
     throw new Error(`Failed to connect to external MongoDB at ${external}: ${String(lastErr)}`);
   }
 
