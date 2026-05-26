@@ -14,6 +14,10 @@ export async function startInMemoryMongo() {
     let lastErr: unknown = null;
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
+        if (process.env.CI === 'true') {
+          // eslint-disable-next-line no-console
+          console.log(`startInMemoryMongo: attempting connect to external Mongo (${external}), attempt ${attempt}/${maxAttempts}`);
+        }
         await mongoose.connect(external, { serverSelectionTimeoutMS: 5000 });
         // If we're using an external Mongo (CI service or local dev), ensure
         // the test database is clean. Only drop when it's clearly a safe
@@ -23,6 +27,10 @@ export async function startInMemoryMongo() {
         if (process.env.CI === 'true' || isLocal) {
           const db = mongoose.connection.db;
           if (db) {
+            if (process.env.CI === 'true') {
+              // eslint-disable-next-line no-console
+              console.log('startInMemoryMongo: dropping external test database');
+            }
             // eslint-disable-next-line no-await-in-loop
             await db.dropDatabase();
           }
@@ -30,6 +38,10 @@ export async function startInMemoryMongo() {
         return external;
       } catch (err) {
         lastErr = err;
+        if (process.env.CI === 'true') {
+          // eslint-disable-next-line no-console
+          console.warn(`startInMemoryMongo: connect attempt ${attempt} failed: ${String(err)}`);
+        }
         // wait before retrying
         // eslint-disable-next-line no-await-in-loop
         await new Promise((res) => setTimeout(res, delayMs));
