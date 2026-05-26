@@ -3,7 +3,6 @@ import { defineConfig } from 'vitest/config';
 // Coverage thresholds — adjust numbers as your target
 export default defineConfig({
 	test: {
-		// Increase hook timeout to allow slow startup of in-memory MongoDB
 		hookTimeout: 120000,
 		setupFiles: ['./test/setup.ts'],
 		coverage: {
