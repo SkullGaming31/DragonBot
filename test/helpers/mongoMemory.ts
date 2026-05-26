@@ -21,8 +21,11 @@ export async function startInMemoryMongo() {
         // accidental production connections.
         const isLocal = /localhost|127\.0\.0\.1/.test(external);
         if (process.env.CI === 'true' || isLocal) {
-          // eslint-disable-next-line no-await-in-loop
-          await mongoose.connection.db.dropDatabase();
+          const db = mongoose.connection.db;
+          if (db) {
+            // eslint-disable-next-line no-await-in-loop
+            await db.dropDatabase();
+          }
         }
         return external;
       } catch (err) {
