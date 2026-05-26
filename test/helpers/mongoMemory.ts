@@ -15,11 +15,17 @@ export async function startInMemoryMongo() {
     let lastErr: unknown = null;
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
+        // In CI the Mongo service is often available at the network alias 'mongo'
+        // even when the workflow exposes MONGO_URL as mongodb://localhost:27017.
+        // Prefer connecting to the service alias in CI to avoid ECONNREFUSED.
+        const connectTarget = (process.env.CI === 'true' && /localhost|127\.0\.0\.1/.test(external))
+          ? external.replace('localhost', 'mongo').replace('127.0.0.1', 'mongo')
+          : external;
         if (process.env.CI === 'true') {
           // eslint-disable-next-line no-console
-          console.log(`startInMemoryMongo: attempting connect to external Mongo (${external}), attempt ${attempt}/${maxAttempts}`);
+          console.log(`startInMemoryMongo: attempting connect to external Mongo (${connectTarget}), attempt ${attempt}/${maxAttempts}`);
         }
-        await mongoose.connect(external, { serverSelectionTimeoutMS: 5000 });
+        await mongoose.connect(connectTarget, { serverSelectionTimeoutMS: 5000 });
         // If we're using an external Mongo (CI service or local dev), ensure
         // the test database is clean. Only drop when it's clearly a safe
         // target: CI environment or localhost/127.0.0.1 to avoid harming
@@ -36,7 +42,7 @@ export async function startInMemoryMongo() {
             await db.dropDatabase();
           }
         }
-        return external;
+        return connectTarget;
       } catch (err) {
         lastErr = err;
         if (process.env.CI === 'true') {
