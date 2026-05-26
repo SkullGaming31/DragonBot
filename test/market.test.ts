@@ -1,21 +1,17 @@
 import mongoose from 'mongoose';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MongoMemoryReplSet } from 'mongodb-memory-server';
+import { startInMemoryMongo, stopInMemoryMongo } from './helpers/mongoMemory';
 import { ListingModel } from '../src/Database/Schemas/marketListing';
 import { UserModel } from '../src/Database/Schemas/userModel';
 import marketCmd from '../src/Commands/Fun/market';
 
-let replset: MongoMemoryReplSet;
-
 beforeAll(async () => {
-  replset = await MongoMemoryReplSet.create({ replSet: { count: 1 } });
-  const uri = replset.getUri();
-  await mongoose.connect(uri);
+  await startInMemoryMongo();
 });
 
 afterAll(async () => {
-  await mongoose.disconnect();
-  if (replset) await replset.stop();
+  await stopInMemoryMongo();
 });
 
 beforeEach(async () => {
