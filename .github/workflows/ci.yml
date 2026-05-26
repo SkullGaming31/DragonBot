@@ -56,7 +56,7 @@ jobs:
           --health-interval 5s \
           --health-timeout 2s \
           --health-retries 5
-        command: ["--replSet", "rs0", "--bind_ip_all"]
+        command: "--replSet rs0 --bind_ip_all"
         ports:
           - 27017:27017
     needs: lint
