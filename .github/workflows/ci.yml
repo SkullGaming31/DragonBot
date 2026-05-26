@@ -85,10 +85,19 @@ jobs:
       - name: lint (if available)
         run: npm run lint --if-present
 
+      - name: Seed DB
+        env:
+          CI: true
+          MONGO_URL: mongodb://mongo:27017/testdb
+        run: |
+          # Wait for mongo then seed the test database
+          for i in {1..20}; do mongosh --host mongo --eval "db.adminCommand({ ping: 1 })" && break || sleep 1; done
+          node scripts/seedTestDb.js
+
       - name: Run tests (vitest)
         env:
           CI: true
-          MONGO_URL: mongodb://localhost:27017
+          MONGO_URL: mongodb://mongo:27017/testdb
         run: |
           # Use fewer workers to be gentle on CI runners and reduce memory pressure
           npx vitest --run --reporter=dot --maxWorkers=2 --coverage

@@ -1,7 +1,6 @@
 {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "vscode.typescript-language-features",
-
     "editor.indentSize": "tabSize",
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features"
@@ -18,5 +17,8 @@
         "cSpell.fixSpellingWithRenameProvider": false
     },
     "editor.tabSize": 2,
-    "files.eol": "\n"
+    "files.eol": "\n",
+    "[github-actions-workflow]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
 }
