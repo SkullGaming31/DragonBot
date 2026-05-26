@@ -6,7 +6,10 @@ let mongod: MongoMemoryServer | null = null;
 export async function startInMemoryMongo() {
   // If a CI or external MongoDB URL is provided, connect to it instead of
   // attempting to download a binary (prevents CI download failures).
-  const external = process.env.MONGO_URL ?? process.env.MONGODB_URI ?? process.env.CI_MONGO_URL;
+  // Prefer the in-memory server by default for local dev. Use external Mongo only when
+  // running in CI (`CI=true`) or when explicitly opted in with `USE_LOCAL_MONGO=1`.
+  const envExternal = process.env.MONGO_URL ?? process.env.MONGODB_URI ?? process.env.CI_MONGO_URL;
+  const external = (process.env.CI === 'true' || process.env.USE_LOCAL_MONGO === '1') ? envExternal : undefined;
   if (external) {
     // Try to connect with retries — the CI mongo service may take a few seconds to be ready.
     // Keep total worst-case retry duration comfortably below Vitest hookTimeout (120s).
