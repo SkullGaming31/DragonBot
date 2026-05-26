@@ -88,6 +88,17 @@ jobs:
       - name: lint (if available)
         run: npm run lint --if-present
 
+      - name: Install mongosh
+        run: |
+          apt-get update
+          apt-get install -y curl ca-certificates gnupg
+          curl -fsSL https://pgp.mongodb.com/server-6.0.asc | gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg
+          echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/debian bullseye/mongodb-org/6.0 main" \
+            > /etc/apt/sources.list.d/mongodb-org-6.0.list
+          apt-get update
+          apt-get install -y mongodb-mongosh
+          mongosh --version
+
       - name: Initialize Mongo replica set
         env:
           MONGO_URL: mongodb://mongo:27017/admin
