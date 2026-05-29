@@ -130,33 +130,37 @@ export default new Command({
 	options: [
 		{
 			name: 'lore',
-			description: 'Add points to a user',
+			description: 'Show a summary of Warframe lore',
 			type: ApplicationCommandOptionType.Subcommand,
 		},
 		{
 			name: 'about',
-			description: 'Remove points from a user',
+			description: 'Show an overview of Warframe',
 			type: ApplicationCommandOptionType.Subcommand,
 		},
 		{
 			name: 'mr',
-			description: 'Purge all points from all users',
+			description: 'Show example Mastery Rank information',
 			type: ApplicationCommandOptionType.Subcommand
 		},
 		{
 			name: 'lookup',
-			description: 'Lookup a user\'s points',
+			description: 'Lookup a Warframe or item by name',
 			type: ApplicationCommandOptionType.Subcommand,
 			options: [
 				{
-					name: 'query',
-					description: 'The user to lookup',
+					name: 'type',
+					description: 'Choose warframe or item',
 					type: ApplicationCommandOptionType.String,
-					required: true
+					required: true,
+					choices: [
+						{ name: 'warframe', value: 'warframe' },
+						{ name: 'item', value: 'item' }
+					]
 				},
 				{
 					name: 'name',
-					description: 'The name of the item or warframe to lookup for you',
+					description: 'The name of the item or warframe to lookup',
 					type: ApplicationCommandOptionType.String,
 					required: true
 				}
@@ -166,12 +170,17 @@ export default new Command({
 	run: async ({ interaction }) => {
 		const { options, user } = interaction;
 		const subcommand = options.getSubcommand();
-		const Query = (options.getString('query') ?? '').toLowerCase();
-		const Name = options.getString('name') ?? '';
+		const lookupType = options.getString('type');
+		const lookupName = options.getString('name');
 
 		await interaction.deferReply();
-		const warframeName = Name;
-		const itemName = Name;
+		const warframeName = (lookupName || '').trim();
+		const itemName = (lookupName || '').trim();
+
+		const truncate = (s: string | undefined, n = 1024) => {
+			if (!s) return '';
+			return s.length > n ? s.slice(0, n - 3) + '...' : s;
+		};
 
 		try {
 			switch (subcommand) {
@@ -217,17 +226,18 @@ export default new Command({
 					break;
 
 				case 'lookup':
-					switch (Query) {
-						case 'warframe': {
+					switch ((lookupType || '').toLowerCase()) {
+						case 'warframe':
 							const warframeUrl = `https://api.warframestat.us/warframes/search/${encodeURIComponent(warframeName)}`;
 							const response = await axios.get(warframeUrl);
-							const data = response.data;
+							const raw = response.data;
+							const data = Array.isArray(raw) ? raw : (raw ? [raw] : []);
 
-							if (!data || (Array.isArray(data) && data.length === 0)) {
+							if (!data || data.length === 0) {
 								return interaction.editReply({ content: `No Warframe found with the name "${warframeName}"` });
 							}
 
-							const warframeData: WarframeData = Array.isArray(data) ? data[0] : data;
+							const warframeData: WarframeData = data[0];
 
 							// Create component fields with appropriate display for Prime vs non-Prime
 							const componentFields = await Promise.all(warframeData.components.map(async (component) => {
@@ -389,7 +399,7 @@ export default new Command({
 								warframeEmbed.addFields(
 									warframeData.abilities.map(ability => ({
 										name: ability.name,
-										value: ability.description,
+										value: truncate(ability.description, 1024) || 'No description',
 										inline: false
 									}))
 								);
@@ -398,53 +408,69 @@ export default new Command({
 							// Send the embed
 							await interaction.editReply({ embeds: [warframeEmbed] });
 							break;
-						case 'item': {
+						case 'item':
 							try {
 								const itemUrl = `https://api.warframestat.us/items/search/${encodeURIComponent(itemName)}`;
 								const itemResponse = await axios.get(itemUrl);
-								const raw = itemResponse.data;
+								const rawItem = itemResponse.data;
+								const itemData: ItemResponse[] = Array.isArray(rawItem) ? rawItem : (rawItem ? [rawItem] : []);
 
-								let firstItem: ItemResponse | undefined;
-								if (!raw) {
+								if (!itemData || itemData.length === 0) {
 									return interaction.editReply({ content: `No item found with the name "${itemName}"` });
 								}
-								if (Array.isArray(raw)) {
-									if (raw.length === 0) return interaction.editReply({ content: `No item found with the name "${itemName}"` });
-									firstItem = raw[0];
-								} else if (typeof raw === 'object') {
-									firstItem = raw as ItemResponse;
-								}
 
-								if (!firstItem) return interaction.editReply({ content: `No item found with the name "${itemName}"` });
+								const firstItem = itemData[0];
 
 								const fields: { name: string; value: string }[] = [];
-								if (firstItem && 'components' in firstItem && Array.isArray((firstItem as any).components)) {
-									const componentsArray = (firstItem as { components: Components[] }).components;
+
+								const maybeWithComponents = firstItem as unknown as { components?: Components[] };
+								if (maybeWithComponents.components && Array.isArray(maybeWithComponents.components) && maybeWithComponents.components.length > 0) {
+									const componentsArray = maybeWithComponents.components;
+
 									componentsArray.forEach((component: Components, index: number) => {
-										fields.push({ name: `Recipe Item ${index + 1}`, value: `Name: ${component.name}\nDescription: \`${component.description}\`\nItem Count: ${component.itemCount}\n` });
+										fields.push({
+											name: `Recipe Item ${index + 1}`,
+											value: `Name: ${component.name}\nDescription: ${truncate(component.description, 1024)}\nItem Count: ${component.itemCount}\n`
+										});
 									});
 								} else {
-									fields.push({ name: 'Components', value: 'This item does not have components.' });
+									fields.push({
+										name: 'Components',
+										value: 'This item does not have components.'
+									});
 								}
 
 								const itemEmbed = new EmbedBuilder()
 									.setTitle(firstItem.name)
-									.setDescription(firstItem.description)
-									.addFields([{ name: 'Category', value: firstItem.category }, { name: 'Type', value: firstItem.type }, { name: 'Tradable', value: firstItem.tradable ? 'Yes' : 'No' }])
+									.setDescription(truncate(firstItem.description, 2048) || 'No description')
+									.addFields([
+										{
+											name: 'Category',
+											value: firstItem.category || 'Unknown'
+										},
+										{
+											name: 'Type',
+											value: firstItem.type || 'Unknown'
+										},
+										{
+											name: 'Tradable',
+											value: firstItem.tradable ? 'Yes' : 'No'
+										}
+									])
 									.addFields(fields)
-									.setThumbnail(`https://cdn.warframestat.us/img/${firstItem.imageName}`)
+									.setColor('Green')
+									.setThumbnail(firstItem.imageName ? `https://cdn.warframestat.us/img/${firstItem.imageName}` : (firstItem.wikiaThumbnail || 'https://via.placeholder.com/150'))
 									.setTimestamp();
 
 								await interaction.editReply({ embeds: [itemEmbed] });
 							} catch (error) {
 								console.error(error);
-								return interaction.editReply({ content: 'Failed to fetch item data.' });
+								await interaction.editReply({ content: 'An error occurred while fetching item data.' });
 							}
 							break;
-						}
 
 						default:
-							return interaction.reply({ content: 'Invalid subcommand.', ephemeral: true });
+							return interaction.editReply({ content: 'Invalid lookup type. Use "warframe" or "item".' });
 					}
 			}
 		} catch (error) {
