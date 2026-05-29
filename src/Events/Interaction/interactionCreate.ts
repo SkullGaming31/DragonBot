@@ -44,10 +44,11 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 		} catch (err) {
 			console.error(`Error executing command ${commandName}:`, err);
 			try {
-				if (!interaction.replied) {
-					await interaction.reply({ content: 'An internal error occurred while executing this command.', flags: MessageFlags.Ephemeral });
-				} else if (interaction.deferred) {
+				// If the interaction was deferred, edit the deferred reply first. Otherwise send a reply.
+				if (interaction.deferred) {
 					await interaction.editReply({ content: 'An internal error occurred while executing this command.' });
+				} else if (!interaction.replied) {
+					await interaction.reply({ content: 'An internal error occurred while executing this command.', flags: MessageFlags.Ephemeral });
 				}
 			} catch (replyErr) {
 				console.error('Failed to send error reply to interaction:', replyErr);

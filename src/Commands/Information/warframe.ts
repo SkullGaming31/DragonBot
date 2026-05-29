@@ -149,7 +149,7 @@ export default new Command({
 				{ name: 'warframe', value: 'warframe' },
 				{ name: 'item', value: 'item' },
 			],
-			required: true,
+			required: false,
 		},
 		{
 			name: 'name',
@@ -164,6 +164,16 @@ export default new Command({
 		const Query = options.getString('query');
 		const Name = options.getString('name');
 		await interaction.deferReply();
+
+		// Validate lookup usage: for `lookup` choice require `query` and `name`.
+		if (Choices === 'lookup') {
+			if (!Query) {
+				return interaction.editReply({ content: 'Please specify the `query` option: `warframe` or `item`.' });
+			}
+			if ((Query === 'warframe' || Query === 'item') && !Name) {
+				return interaction.editReply({ content: 'Please provide a `name` to search for.' });
+			}
+		}
 
 		let warframeName = '';
 		let itemName = '';
@@ -184,7 +194,7 @@ export default new Command({
 				await interaction.editReply({ content: 'Warframe is a free-to-play action role-playing third-person shooter multiplayer online game developed and published by Digital Extremes.' });
 				break;
 			case 'mr':
-				const ps4WFRank = 18;
+				const ps4WFRank = 22;
 				const embed = new EmbedBuilder()
 					.setTitle('Mastery Rank')
 					.setDescription('my warframe is now set for cross save, xbl ps4 pc are all my ps4 account now')
@@ -224,33 +234,86 @@ export default new Command({
 						const warframeData: WarframeData = data[0];
 
 						// Create component fields with appropriate display for Prime vs non-Prime
-						const componentFields = warframeData.components.map((component) => {
+						const componentFields = await Promise.all(warframeData.components.map(async (component) => {
+							let drops: Drops[] = component.drops || [];
+							let fallbackItemUrl: string | undefined = undefined;
+
+							// If drops are empty, attempt a fallback lookup against the items API
+							if (!drops || drops.length === 0) {
+								try {
+									const itemUrl = `https://api.warframestat.us/items/search/${encodeURIComponent(component.name)}`;
+									const itemResp = await axios.get(itemUrl);
+									const itemData: ItemResponse[] = itemResp.data;
+									if (itemData && itemData.length > 0) {
+										const fallback = itemData[0];
+										if (fallback.drops && fallback.drops.length > 0) {
+											drops = fallback.drops;
+											fallbackItemUrl = (fallback.wikiaUrl || fallback.wikiaThumbnail) as string | undefined;
+										} else {
+
+											fallbackItemUrl = (fallback.wikiaUrl || fallback.wikiaThumbnail) as string | undefined;
+										}
+									} else {
+										// no results from items endpoint
+									}
+								} catch (e) {
+									console.error('[warframe] Failed to fetch item fallback for', component.name, e);
+								}
+							}
+
+							const hasDrops = Array.isArray(drops) && drops.length > 0;
+
 							let dropsText = '';
 
 							if (warframeData.isPrime) {
-								// Prime component display
-								dropsText = component.drops.map(drop => {
-									return `Relic: ${drop.location}\nRarity: ${drop.rarity}\nChance: ${drop.chance.toFixed(2)}%`;
-								}).join('\n\n');
+								if (!hasDrops) {
+									// No drops available even after fallback; provide a helpful suggestion
+									dropsText = fallbackItemUrl
+										? `No drop data available from API. Try item lookup: ${fallbackItemUrl}`
+										: `No drop data available from API. Try: /warframe lookup item ${component.name}`;
+								} else {
+									// Prime component display
+									dropsText = drops.map(drop => {
+										return `Relic: ${drop.location}\nRarity: ${drop.rarity}\nChance: ${drop.chance.toFixed(2)}%`;
+									}).join('\n\n');
+								}
 
-								return {
-									name: `${component.name} ${component.ducats ? `(${component.ducats} ducats)` : ''}`,
-									value: `Tradable: ${component.tradable ? 'Yes' : 'No'}\nDrops:\n${dropsText}`,
-									inline: false
-								};
+								const fieldName = `${component.name} ${component.ducats ? `(${component.ducats} ducats)` : ''}`;
+								let fieldValue = `Tradable: ${component.tradable ? 'Yes' : 'No'}\nDrops:\n${dropsText}`;
+								if (fieldValue.length > 1024) {
+									const ref = fallbackItemUrl ? `See: ${fallbackItemUrl}` : `Try: /warframe lookup item ${component.name}`;
+									const allowed = 1024 - (ref.length + 5);
+									fieldValue = fieldValue.slice(0, Math.max(0, allowed)) + '...\n' + ref;
+								}
+
+								return { name: fieldName, value: fieldValue, inline: false };
 							} else {
-								// Non-Prime component display
-								dropsText = component.drops.map(drop => {
-									return `${drop.location} (${drop.rarity}, ${drop.chance.toFixed(2)}%)`;
-								}).join('\n');
+								// Debug: log raw drops payload for non-Prime components (after fallback)
+								// (debug logs removed)
 
-								return {
-									name: component.name,
-									value: `Tradable: ${component.tradable ? 'Yes' : 'No'}\nDrops:\n${dropsText}`,
-									inline: false
-								};
+								if (!hasDrops) {
+									// No drops available even after fallback; provide a helpful suggestion
+									dropsText = fallbackItemUrl
+										? `No drop data available from API. Try item lookup: ${fallbackItemUrl}`
+										: `No drop data available from API. Try: /warframe lookup item ${component.name}`;
+								} else {
+									// Non-Prime component display
+									dropsText = drops.map(drop => {
+										return `${drop.location} (${drop.rarity}, ${drop.chance.toFixed(2)}%)`;
+									}).join('\n');
+								}
+
+								const fieldName = component.name;
+								let fieldValue = `Tradable: ${component.tradable ? 'Yes' : 'No'}\nDrops:\n${dropsText}`;
+								if (fieldValue.length > 1024) {
+									const ref = fallbackItemUrl ? `See: ${fallbackItemUrl}` : `Try: /warframe lookup item ${component.name}`;
+									const allowed = 1024 - (ref.length + 5);
+									fieldValue = fieldValue.slice(0, Math.max(0, allowed)) + '...\n' + ref;
+								}
+
+								return { name: fieldName, value: fieldValue, inline: false };
 							}
-						});
+						}));
 
 						// Create the embed
 						const warframeEmbed = new EmbedBuilder()
@@ -304,7 +367,8 @@ export default new Command({
 								},
 								...componentFields
 							])
-							.setThumbnail(warframeData.imageName || 'https://via.placeholder.com/150')
+							// imageName from API is a filename; construct CDN URL. Fall back to wikiaThumbnail or placeholder.
+							.setThumbnail(warframeData.imageName ? `https://cdn.warframestat.us/img/${warframeData.imageName}` : (warframeData.wikiaThumbnail || 'https://via.placeholder.com/150'))
 							.setURL(warframeData.wikiaUrl)
 							.setTimestamp();
 
