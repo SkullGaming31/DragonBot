@@ -130,33 +130,37 @@ export default new Command({
 	options: [
 		{
 			name: 'lore',
-			description: 'Add points to a user',
+			description: 'Show a summary of Warframe lore',
 			type: ApplicationCommandOptionType.Subcommand,
 		},
 		{
 			name: 'about',
-			description: 'Remove points from a user',
+			description: 'Show an overview of Warframe',
 			type: ApplicationCommandOptionType.Subcommand,
 		},
 		{
 			name: 'mr',
-			description: 'Purge all points from all users',
+			description: 'Show example Mastery Rank information',
 			type: ApplicationCommandOptionType.Subcommand
 		},
 		{
 			name: 'lookup',
-			description: 'Lookup a user\'s points',
+			description: 'Lookup a Warframe or item by name',
 			type: ApplicationCommandOptionType.Subcommand,
 			options: [
 				{
-					name: 'query',
-					description: 'The user to lookup',
+					name: 'type',
+					description: 'Choose warframe or item',
 					type: ApplicationCommandOptionType.String,
-					required: true
+					required: true,
+					choices: [
+						{ name: 'warframe', value: 'warframe' },
+						{ name: 'item', value: 'item' }
+					]
 				},
 				{
 					name: 'name',
-					description: 'The name of the item or warframe to lookup for you',
+					description: 'The name of the item or warframe to lookup',
 					type: ApplicationCommandOptionType.String,
 					required: true
 				}
@@ -166,12 +170,17 @@ export default new Command({
 	run: async ({ interaction }) => {
 		const { options, user } = interaction;
 		const subcommand = options.getSubcommand();
-		const Query = options.getString('query');
-		const Name = options.getString('name');
+		const lookupType = options.getString('type');
+		const lookupName = options.getString('name');
 
 		await interaction.deferReply();
-		const warframeName = '';
-		const itemName = '';
+		const warframeName = (lookupName || '').trim();
+		const itemName = (lookupName || '').trim();
+
+		const truncate = (s: string | undefined, n = 1024) => {
+			if (!s) return '';
+			return s.length > n ? s.slice(0, n - 3) + '...' : s;
+		};
 
 		try {
 			switch (subcommand) {
@@ -217,11 +226,12 @@ export default new Command({
 					break;
 
 				case 'lookup':
-					switch (Query) {
+					switch ((lookupType || '').toLowerCase()) {
 						case 'warframe':
-							const warframeUrl = `https://api.warframestat.us/warframes/search/${warframeName}`;
+							const warframeUrl = `https://api.warframestat.us/warframes/search/${encodeURIComponent(warframeName)}`;
 							const response = await axios.get(warframeUrl);
-							const data = await response.data;
+							const raw = response.data;
+							const data = Array.isArray(raw) ? raw : (raw ? [raw] : []);
 
 							if (!data || data.length === 0) {
 								return interaction.editReply({ content: `No Warframe found with the name "${warframeName}"` });
@@ -389,7 +399,7 @@ export default new Command({
 								warframeEmbed.addFields(
 									warframeData.abilities.map(ability => ({
 										name: ability.name,
-										value: ability.description,
+										value: truncate(ability.description, 1024) || 'No description',
 										inline: false
 									}))
 								);
@@ -400,32 +410,27 @@ export default new Command({
 							break;
 						case 'item':
 							try {
-								const itemUrl = `https://api.warframestat.us/items/search/${itemName}`;
-								// console.log('Item Url: ', itemUrl);
+								const itemUrl = `https://api.warframestat.us/items/search/${encodeURIComponent(itemName)}`;
 								const itemResponse = await axios.get(itemUrl);
-								const itemData: ItemResponse[] = await itemResponse.data;
-
-								// console.log('item response data: ', itemData);
+								const rawItem = itemResponse.data;
+								const itemData: ItemResponse[] = Array.isArray(rawItem) ? rawItem : (rawItem ? [rawItem] : []);
 
 								if (!itemData || itemData.length === 0) {
 									return interaction.editReply({ content: `No item found with the name "${itemName}"` });
 								}
 
-								// Assuming you want to display information about the first item found
 								const firstItem = itemData[0];
 
 								const fields: { name: string; value: string }[] = [];
 
-								if ('components' in firstItem) {
-									// Access the components array and assert its type
-									const componentsArray = (firstItem as { components: Components[] }).components;
+								const maybeWithComponents = firstItem as unknown as { components?: Components[] };
+								if (maybeWithComponents.components && Array.isArray(maybeWithComponents.components) && maybeWithComponents.components.length > 0) {
+									const componentsArray = maybeWithComponents.components;
 
-									// Iterate over each component
 									componentsArray.forEach((component: Components, index: number) => {
-										// Construct fields for each component
 										fields.push({
 											name: `Recipe Item ${index + 1}`,
-											value: `Name: ${component.name}\nDescription: \`${component.description}\`\nItem Count: ${component.itemCount}\n`
+											value: `Name: ${component.name}\nDescription: ${truncate(component.description, 1024)}\nItem Count: ${component.itemCount}\n`
 										});
 									});
 								} else {
@@ -437,33 +442,35 @@ export default new Command({
 
 								const itemEmbed = new EmbedBuilder()
 									.setTitle(firstItem.name)
-									.setDescription(firstItem.description)
+									.setDescription(truncate(firstItem.description, 2048) || 'No description')
 									.addFields([
 										{
 											name: 'Category',
-											value: firstItem.category
+											value: firstItem.category || 'Unknown'
 										},
 										{
 											name: 'Type',
-											value: firstItem.type
+											value: firstItem.type || 'Unknown'
 										},
 										{
 											name: 'Tradable',
 											value: firstItem.tradable ? 'Yes' : 'No'
 										}
 									])
-									.addFields(fields) // Add the fields array to the embed
-									.setThumbnail(`https://cdn.warframestat.us/img/${firstItem.imageName}`)
+									.addFields(fields)
+									.setColor('Green')
+									.setThumbnail(firstItem.imageName ? `https://cdn.warframestat.us/img/${firstItem.imageName}` : (firstItem.wikiaThumbnail || 'https://via.placeholder.com/150'))
 									.setTimestamp();
 
 								await interaction.editReply({ embeds: [itemEmbed] });
 							} catch (error) {
 								console.error(error);
+								await interaction.editReply({ content: 'An error occurred while fetching item data.' });
 							}
 							break;
 
 						default:
-							return interaction.reply({ content: 'Invalid subcommand.', ephemeral: true });
+							return interaction.editReply({ content: 'Invalid lookup type. Use "warframe" or "item".' });
 					}
 			}
 		} catch (error) {
