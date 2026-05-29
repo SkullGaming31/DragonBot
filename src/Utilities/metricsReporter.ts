@@ -94,21 +94,28 @@ export function startMetricsReporter(client: Client) {
 					if (status === 404) {
 						continue;
 					}
-					error('metrics: failed to push metrics', { url: fullUrl, status, message: axiosErr?.message ?? String(err) });
+					// Only log push failures in debug environment to avoid noise in production
+					if ((process.env.Enviroment ?? '').toLowerCase() === 'debug') {
+						error('metrics: failed to push metrics', { url: fullUrl, status, message: axiosErr?.message ?? String(err) });
+					}
 					break;
 				}
 			}
 
 			if (!succeeded) {
 				const e = lastError as unknown as AxiosError | null;
-				error('metrics: all endpoints failed or not found', { message: e?.message ?? 'no response', status: e?.response?.status });
+				if ((process.env.Enviroment ?? '').toLowerCase() === 'debug') {
+					error('metrics: all endpoints failed or not found', { message: e?.message ?? 'no response', status: e?.response?.status });
+				}
 				backoff = Math.min(backoff * 2, MAX_BACKOFF_MS);
 			} else {
 				backoff = DEFAULT_INTERVAL_MS;
 			}
 		} catch (err) {
 			const e = err as Error;
-			error('metrics: failed to push metrics (unexpected)', { message: e.message });
+			if ((process.env.Enviroment ?? '').toLowerCase() === 'debug') {
+				error('metrics: failed to push metrics (unexpected)', { message: e.message });
+			}
 			backoff = Math.min(backoff * 2, MAX_BACKOFF_MS);
 		}
 		// schedule next

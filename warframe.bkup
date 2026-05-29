@@ -166,12 +166,12 @@ export default new Command({
 	run: async ({ interaction }) => {
 		const { options, user } = interaction;
 		const subcommand = options.getSubcommand();
-		const Query = (options.getString('query') ?? '').toLowerCase();
-		const Name = options.getString('name') ?? '';
+		const Query = options.getString('query');
+		const Name = options.getString('name');
 
 		await interaction.deferReply();
-		const warframeName = Name;
-		const itemName = Name;
+		const warframeName = '';
+		const itemName = '';
 
 		try {
 			switch (subcommand) {
@@ -218,16 +218,16 @@ export default new Command({
 
 				case 'lookup':
 					switch (Query) {
-						case 'warframe': {
-							const warframeUrl = `https://api.warframestat.us/warframes/search/${encodeURIComponent(warframeName)}`;
+						case 'warframe':
+							const warframeUrl = `https://api.warframestat.us/warframes/search/${warframeName}`;
 							const response = await axios.get(warframeUrl);
-							const data = response.data;
+							const data = await response.data;
 
-							if (!data || (Array.isArray(data) && data.length === 0)) {
+							if (!data || data.length === 0) {
 								return interaction.editReply({ content: `No Warframe found with the name "${warframeName}"` });
 							}
 
-							const warframeData: WarframeData = Array.isArray(data) ? data[0] : data;
+							const warframeData: WarframeData = data[0];
 
 							// Create component fields with appropriate display for Prime vs non-Prime
 							const componentFields = await Promise.all(warframeData.components.map(async (component) => {
@@ -398,50 +398,69 @@ export default new Command({
 							// Send the embed
 							await interaction.editReply({ embeds: [warframeEmbed] });
 							break;
-						case 'item': {
+						case 'item':
 							try {
-								const itemUrl = `https://api.warframestat.us/items/search/${encodeURIComponent(itemName)}`;
+								const itemUrl = `https://api.warframestat.us/items/search/${itemName}`;
+								// console.log('Item Url: ', itemUrl);
 								const itemResponse = await axios.get(itemUrl);
-								const raw = itemResponse.data;
+								const itemData: ItemResponse[] = await itemResponse.data;
 
-								let firstItem: ItemResponse | undefined;
-								if (!raw) {
+								// console.log('item response data: ', itemData);
+
+								if (!itemData || itemData.length === 0) {
 									return interaction.editReply({ content: `No item found with the name "${itemName}"` });
 								}
-								if (Array.isArray(raw)) {
-									if (raw.length === 0) return interaction.editReply({ content: `No item found with the name "${itemName}"` });
-									firstItem = raw[0];
-								} else if (typeof raw === 'object') {
-									firstItem = raw as ItemResponse;
-								}
 
-								if (!firstItem) return interaction.editReply({ content: `No item found with the name "${itemName}"` });
+								// Assuming you want to display information about the first item found
+								const firstItem = itemData[0];
 
 								const fields: { name: string; value: string }[] = [];
-								if (firstItem && 'components' in firstItem && Array.isArray((firstItem as any).components)) {
+
+								if ('components' in firstItem) {
+									// Access the components array and assert its type
 									const componentsArray = (firstItem as { components: Components[] }).components;
+
+									// Iterate over each component
 									componentsArray.forEach((component: Components, index: number) => {
-										fields.push({ name: `Recipe Item ${index + 1}`, value: `Name: ${component.name}\nDescription: \`${component.description}\`\nItem Count: ${component.itemCount}\n` });
+										// Construct fields for each component
+										fields.push({
+											name: `Recipe Item ${index + 1}`,
+											value: `Name: ${component.name}\nDescription: \`${component.description}\`\nItem Count: ${component.itemCount}\n`
+										});
 									});
 								} else {
-									fields.push({ name: 'Components', value: 'This item does not have components.' });
+									fields.push({
+										name: 'Components',
+										value: 'This item does not have components.'
+									});
 								}
 
 								const itemEmbed = new EmbedBuilder()
 									.setTitle(firstItem.name)
 									.setDescription(firstItem.description)
-									.addFields([{ name: 'Category', value: firstItem.category }, { name: 'Type', value: firstItem.type }, { name: 'Tradable', value: firstItem.tradable ? 'Yes' : 'No' }])
-									.addFields(fields)
+									.addFields([
+										{
+											name: 'Category',
+											value: firstItem.category
+										},
+										{
+											name: 'Type',
+											value: firstItem.type
+										},
+										{
+											name: 'Tradable',
+											value: firstItem.tradable ? 'Yes' : 'No'
+										}
+									])
+									.addFields(fields) // Add the fields array to the embed
 									.setThumbnail(`https://cdn.warframestat.us/img/${firstItem.imageName}`)
 									.setTimestamp();
 
 								await interaction.editReply({ embeds: [itemEmbed] });
 							} catch (error) {
 								console.error(error);
-								return interaction.editReply({ content: 'Failed to fetch item data.' });
 							}
 							break;
-						}
 
 						default:
 							return interaction.reply({ content: 'Invalid subcommand.', ephemeral: true });
