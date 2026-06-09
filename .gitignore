@@ -5,5 +5,7 @@
 ./src/devLogs/
 NOTES.txt
 /scripts/supervisor-run.js
+/scripts/export_issues.js
 coverage/
 .vscode
+/issues

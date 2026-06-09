@@ -4,7 +4,8 @@
 FROM node:18-bullseye AS builder
 
 WORKDIR /app
-ENV NODE_ENV=production
+# Ensure devDependencies (like TypeScript) are installed during the build
+ENV NODE_ENV=dev
 
 # Copy package files first to leverage caching
 COPY package.json package-lock.json* ./
@@ -21,7 +22,7 @@ FROM node:18-bullseye-slim
 WORKDIR /app
 
 # Minimal env defaults
-ENV NODE_ENV=production
+ENV NODE_ENV=prod
 ENV PORT=3000
 
 # Create a non-root user to run the process
@@ -35,6 +36,11 @@ RUN npm ci --omit=dev --no-audit --no-fund --no-progress || npm install --produc
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/assets ./assets
 
+# Copy helper script to wait for MongoDB and make it executable
+COPY docker/wait-for-mongo.sh /usr/local/bin/wait-for-mongo.sh
+RUN chmod +x /usr/local/bin/wait-for-mongo.sh || true
+RUN chown app:app /usr/local/bin/wait-for-mongo.sh || true
+
 # Ensure correct permissions for the non-root user
 RUN chown -R app:app /app
 USER app
@@ -45,5 +51,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD node -e "const http=require('http');const opts={host:'127.0.0.1',port:process.env.PORT||3000,path:'/api/v1/health',timeout:2000};const req=http.get(opts,res=>{if(res.statusCode!==200)process.exit(1);process.exit(0);});req.on('error',()=>process.exit(1));" || exit 1
 
-# Start the compiled app
-CMD ["node", "dist/index.js"]
+# Start the compiled app (wait for Mongo first)
+CMD ["bash", "-c", "/usr/local/bin/wait-for-mongo.sh mongo 27017 && node dist/src/index.js"]
