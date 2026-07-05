@@ -1,4 +1,5 @@
 import { EmbedBuilder, Guild, GuildMember, ChannelType, TextChannel } from 'discord.js';
+import axios from 'axios';
 import SettingsModel from '../Database/Schemas/settingsDB';
 import { info as logInfo, warn as logWarn, error as logError } from '../Utilities/logger';
 
@@ -91,6 +92,21 @@ export async function escalateByWarnings(
 					logWarn('escalateByWarnings: timeout failed', { guild: guild.id, user: member.id, error: (err as Error)?.message ?? err });
 				});
 				logInfo('escalateByWarnings: applied timeout', { guild: guild.id, user: member.id });
+				// Notify external dashboard if configured (best-effort)
+				(async () => {
+					try {
+						const url = process.env.AUTOMOD_DASHBOARD_URL;
+						const secret = process.env.INTERNAL_SECRET;
+						if (url) {
+							const payload = { userId: member.id, action: 'timeout', reason, metadata: { userDisplayName: (member.user?.username ?? member.displayName ?? member.user?.tag) } };
+							console.log('[automod] posting timeout incident', { guild: guild.id, user: member.id });
+							await axios.post(`${url.replace(/\/$/, '')}/api/v1/automod/${guild.id}/incidents`, payload, { headers: secret ? { 'x-internal-secret': secret } : {} });
+							console.log('[automod] posted timeout incident', { guild: guild.id, user: member.id });
+						}
+					} catch (err) {
+						// do not throw — best effort only
+					}
+				})();
 				return 'timeout';
 			}
 			return null;
@@ -106,6 +122,20 @@ export async function escalateByWarnings(
 					logWarn('escalateByWarnings: kick failed', { guild: guild.id, user: member.id, error: (err as Error)?.message ?? err });
 				});
 				logInfo('escalateByWarnings: kicked member', { guild: guild.id, user: member.id });
+				(async () => {
+					try {
+						const url = process.env.AUTOMOD_DASHBOARD_URL;
+						const secret = process.env.INTERNAL_SECRET;
+						if (url) {
+							const payload = { userId: member.id, action: 'kick', reason, metadata: { userDisplayName: (member.user?.username ?? member.displayName ?? member.user?.tag) } };
+							console.log('[automod] posting kick incident', { guild: guild.id, user: member.id });
+							await axios.post(`${url.replace(/\/$/, '')}/api/v1/automod/${guild.id}/incidents`, payload, { headers: secret ? { 'x-internal-secret': secret } : {} });
+							console.log('[automod] posted kick incident', { guild: guild.id, user: member.id });
+						}
+					} catch (err) {
+						// ignore
+					}
+				})();
 				return 'kick';
 			}
 			return null;
@@ -122,6 +152,20 @@ export async function escalateByWarnings(
 					logWarn('escalateByWarnings: ban failed', { guild: guild.id, user: member.id, error: (err as Error)?.message ?? err });
 				});
 				logInfo('escalateByWarnings: banned member', { guild: guild.id, user: member.id });
+				(async () => {
+					try {
+						const url = process.env.AUTOMOD_DASHBOARD_URL;
+						const secret = process.env.INTERNAL_SECRET;
+						if (url) {
+							const payload = { userId: member.id, action: 'ban', reason, metadata: { userDisplayName: (member.user?.username ?? member.displayName ?? member.user?.tag) } };
+							console.log('[automod] posting ban incident', { guild: guild.id, user: member.id });
+							await axios.post(`${url.replace(/\/$/, '')}/api/v1/automod/${guild.id}/incidents`, payload, { headers: secret ? { 'x-internal-secret': secret } : {} });
+							console.log('[automod] posted ban incident', { guild: guild.id, user: member.id });
+						}
+					} catch (err) {
+						// ignore
+					}
+				})();
 				return 'ban';
 			}
 			return null;
