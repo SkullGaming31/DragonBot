@@ -4,13 +4,14 @@ import AutoModModel, { IAutoMod } from '../../Database/Schemas/autoMod';
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import WarningDB from '../../Database/Schemas/WarnDB';
 import { EmbedBuilder, ChannelType, GuildMember, Guild } from 'discord.js';
+import axios from 'axios';
 import { postPunishment, escalateByWarnings } from '../../Utilities/moderation';
 import { Event } from '../../Structures/Event';
 import { info as logInfo, error as logError } from '../../Utilities/logger';
 
 // Simple in-memory message history for spam detection: { guildId: { userId: [timestamps] } }
 const messageHistory: Record<string, Record<string, number[]>> = {};
-const SPAM_WINDOW_MS = 10_000; // 10 seconds
+const SPAM_WINDOW_MS = 30_000; // 30 seconds
 
 function isInvite(text: string) {
 	// matches discord.gg/ or discord.com/invite/ or invite codes
@@ -92,7 +93,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 			} else {
 				try {
 					// delete original message first
-					await message.delete().catch(() => null);
+					await message.delete().catch((err) => console.error(err));
 
 					// Build embed used for DM and logs
 					const discordLinkDetection = new EmbedBuilder()
@@ -152,6 +153,18 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 					}
 
 					logInfo('autoModeration: deleted invite link', { guildId, userId: message.author.id });
+					// Best-effort: notify external dashboard of the incident so it's visible in UI
+					void (async () => {
+						try {
+							const url = process.env.AUTOMOD_DASHBOARD_URL;
+							const secret = process.env.INTERNAL_SECRET;
+							if (url) {
+								await axios.post(`${url.replace(/\/$/, '')}/api/v1/automod/${guildId}/incidents`, { userId: message.author.id, userDisplayName: (message.author.globalName || message.author.username || message.author.tag), action: 'deleted_invite', reason: 'Posted invite link' }, { headers: secret ? { 'x-internal-secret': secret } : {} });
+							}
+						} catch (err) {
+							// non-fatal — ignore
+						}
+					})();
 					return;
 				} catch (err) {
 					logError('autoModeration: error handling invite link', { error: (err as Error)?.message ?? err });

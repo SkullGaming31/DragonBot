@@ -63,7 +63,9 @@ export function startMetricsReporter(client: Client) {
 			ws_ping: Math.round(client.ws.ping),
 			commands_per_min: commandsPerMinute(),
 			top_commands: topCommands(),
-			uptime_ms: client.uptime ?? 0
+			uptime_ms: client.uptime ?? 0,
+			// include guild IDs so the dashboard can mark which guilds the bot is present in
+			guilds: Array.from(client.guilds.cache.keys()),
 		};
 
 		try {
