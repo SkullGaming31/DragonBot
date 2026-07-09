@@ -11,6 +11,9 @@ All notable changes to this repository will be documented in this file.
 
 - Reaction roles manager: persistent mappings stored in DB, admin commands (create/list/delete), and event handlers refactored to apply/remove roles based on stored mappings. Added `src/Database/Schemas/reactionRole.ts`, updated `src/Commands/Moderator/reactionRoles.ts`, `src/Events/customMessage/reactionRolesAdd.ts`, and `src/Events/customMessage/reactionRolesRemove.ts`.
 - Tests: Added unit tests for reaction role event handlers (`test/events/reactionRolesAdd.test.ts`, `test/events/reactionRolesRemove.test.ts`) and fixed test mocks to support `.lean()` chaining.
+ - 2026-07-09 — Code scanning & test fix
+ 	- Added `.github/workflows/codeql-analysis.yml` to enable CodeQL analysis for JavaScript/TypeScript and GitHub Actions workflows.
+ 	- Fixed a hanging unit test by mocking `WarningDB.findOne` in `test/events/guildMemberAdd.test.ts` (prevents real DB calls during the test run).
   
 ## 2025-10-23 — Reaction roles manager: implementation & hardening
 

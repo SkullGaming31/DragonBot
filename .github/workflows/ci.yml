@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [20.x]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -46,7 +46,7 @@ jobs:
     # Run inside a Docker container that includes OpenSSL 1.1 (Debian Bullseye image)
     runs-on: ubuntu-latest
     container:
-      image: node:18-bullseye
+      image: node:20-bullseye
     services:
       mongo:
         image: mongo:6.0
@@ -59,7 +59,7 @@ jobs:
     timeout-minutes: 20
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [20.x]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

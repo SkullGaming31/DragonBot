@@ -1,8 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import GuildMemberAdd from '../../src/Events/Logs/guildMemberAdd';
 import settings from '../../src/Database/Schemas/settingsDB';
+import WarningDB from '../../src/Database/Schemas/WarnDB';
 
 settings.findOne = vi.fn().mockResolvedValue(null);
+WarningDB.findOne = vi.fn().mockResolvedValue(null as any);
 
 describe('guildMemberAdd event', () => {
   it('does not throw when no welcome channel configured', async () => {
