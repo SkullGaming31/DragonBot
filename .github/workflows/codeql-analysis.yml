@@ -33,6 +33,9 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
+        # Allow the action to continue if GitHub rejects the SARIF upload
+        # (e.g., when the repository has the default setup enabled).
+        continue-on-error: true
         with:
           # Upload results to the repository's code scanning alerts
           category: "security"

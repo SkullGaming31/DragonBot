@@ -1,6 +1,8 @@
 import { ChannelType, EmbedBuilder, TextBasedChannel, channelMention } from 'discord.js';
+import axios from 'axios';
 
 import settings from '../../Database/Schemas/settingsDB';
+import WarningDB from '../../Database/Schemas/WarnDB';
 import { Event } from '../../Structures/Event';
 import { error as logError, info as logInfo } from '../../Utilities/logger';
 
@@ -8,6 +10,34 @@ export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member) => {
 	const guild = member.guild;
 	const user = member.user ?? undefined;
 	if (!guild) return;
+
+	// If the user has prior warnings, optionally enforce a rejoin ban to prevent
+	// evading punishments by leaving and rejoining. Threshold is configurable
+	// via AUTOMOD_REJOIN_BAN_THRESHOLD (defaults to 2 warnings).
+	try {
+		const rejoinThreshold = Number(process.env.AUTOMOD_REJOIN_BAN_THRESHOLD ?? 2);
+		const warnDoc = await WarningDB.findOne({ GuildID: guild.id, UserID: member.id }).lean().catch(() => null) as any | null;
+		const warnCount = Array.isArray(warnDoc?.Warnings) ? warnDoc.Warnings.length : 0;
+		if (warnCount >= rejoinThreshold) {
+			// Attempt to ban the rejoining member to prevent immediate rejoin.
+			if ((member as any).bannable) {
+				try {
+					await (member as any).ban({ reason: 'Rejoin after multiple warnings' });
+					// Post to dashboard (best-effort)
+					const url = process.env.AUTOMOD_DASHBOARD_URL;
+					const secret = process.env.INTERNAL_SECRET;
+					if (url) {
+						await axios.post(`${url.replace(/\/$/, '')}/api/v1/automod/${guild.id}/incidents`, { userId: member.id, userDisplayName: user?.globalName ?? user?.username ?? user?.tag, action: 'ban', reason: 'Rejoin after multiple warnings' }, { headers: secret ? { 'x-internal-secret': secret } : {} }).catch(() => null);
+					}
+					return; // don't send welcome message
+				} catch (err) {
+					// ignore ban errors and continue to welcome flow
+				}
+			}
+		}
+	} catch (err) {
+		// non-fatal
+	}
 
 	let data;
 	try {

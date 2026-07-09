@@ -14,6 +14,8 @@ All notable changes to this repository will be documented in this file.
  - 2026-07-09 — Code scanning & test fix
  	- Added `.github/workflows/codeql-analysis.yml` to enable CodeQL analysis for JavaScript/TypeScript and GitHub Actions workflows.
  	- Fixed a hanging unit test by mocking `WarningDB.findOne` in `test/events/guildMemberAdd.test.ts` (prevents real DB calls during the test run).
+
+	- Updated `.github/workflows/codeql-analysis.yml` to make the `analyze` step non-fatal when GitHub rejects SARIF uploads (prevents CI failures when repository default setup conflicts with advanced CodeQL configurations).
   
 ## 2025-10-23 — Reaction roles manager: implementation & hardening
 

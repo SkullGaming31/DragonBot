@@ -1,4 +1,5 @@
-import { ChannelType, EmbedBuilder, TextBasedChannel } from 'discord.js';
+import { AuditLogEvent, ChannelType, EmbedBuilder, TextBasedChannel } from 'discord.js';
+import axios from 'axios';
 
 import ChanLogger from '../../Database/Schemas/LogsChannelDB';
 import settings from '../../Database/Schemas/settingsDB';
@@ -9,6 +10,42 @@ export default new Event<'guildMemberRemove'>('guildMemberRemove', async (member
 	const guild = member.guild;
 	const user = member.user ?? undefined;
 	if (!guild) return;
+
+	// Detect kicks via audit log (Discord has no dedicated kick event).
+	// guildBanAdd handles bans separately, so we skip those here.
+	void (async () => {
+		try {
+			const url = process.env.AUTOMOD_DASHBOARD_URL;
+			const secret = process.env.INTERNAL_SECRET;
+			if (!url || !user) return;
+
+			// Fetch recent kick audit log entries — requires VIEW_AUDIT_LOG permission.
+			const logs = await guild.fetchAuditLogs({ type: AuditLogEvent.MemberKick, limit: 5 }).catch(() => null);
+			if (!logs) return;
+
+			const FIVE_SECONDS = 5_000;
+			const entry = logs.entries.find(
+				e => e.target?.id === user.id && (Date.now() - e.createdTimestamp) < FIVE_SECONDS
+			);
+			if (!entry) return; // not a kick — voluntary leave or ban (handled by guildBanAdd)
+
+			const executor = entry.executor;
+			await axios.post(
+				`${url.replace(/\/$/, '')}/api/v1/automod/${guild.id}/incidents`,
+				{
+					userId: user.id,
+					userDisplayName: user.globalName ?? user.username ?? user.tag,
+					actorId: executor?.id,
+					action: 'kick',
+					reason: entry.reason ?? 'No reason provided',
+				},
+				{ headers: secret ? { 'x-internal-secret': secret } : {} }
+			);
+			logInfo('guildMemberRemove: posted kick incident to dashboard', { guild: guild.id, user: user.id, executor: executor?.id });
+		} catch (err) {
+			logError('guildMemberRemove: failed to post kick incident', { error: (err as Error)?.message ?? err });
+		}
+	})();
 
 	let data;
 	try {
