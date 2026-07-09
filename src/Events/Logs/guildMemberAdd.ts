@@ -1,4 +1,4 @@
-import { ChannelType, EmbedBuilder, TextBasedChannel, channelMention } from 'discord.js';
+import { ChannelType, EmbedBuilder, TextBasedChannel, channelMention, GuildMember } from 'discord.js';
 import axios from 'axios';
 
 import settings from '../../Database/Schemas/settingsDB';
@@ -6,7 +6,7 @@ import WarningDB from '../../Database/Schemas/WarnDB';
 import { Event } from '../../Structures/Event';
 import { error as logError, info as logInfo } from '../../Utilities/logger';
 
-export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member) => {
+export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member: GuildMember) => {
 	const guild = member.guild;
 	const user = member.user ?? undefined;
 	if (!guild) return;
@@ -16,13 +16,13 @@ export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member) => {
 	// via AUTOMOD_REJOIN_BAN_THRESHOLD (defaults to 2 warnings).
 	try {
 		const rejoinThreshold = Number(process.env.AUTOMOD_REJOIN_BAN_THRESHOLD ?? 2);
-		const warnDoc = await WarningDB.findOne({ GuildID: guild.id, UserID: member.id }).lean().catch(() => null) as any | null;
+		const warnDoc = await WarningDB.findOne({ GuildID: guild.id, UserID: member.id }).lean().catch(() => null) as unknown as { Warnings?: unknown[] } | null;
 		const warnCount = Array.isArray(warnDoc?.Warnings) ? warnDoc.Warnings.length : 0;
 		if (warnCount >= rejoinThreshold) {
 			// Attempt to ban the rejoining member to prevent immediate rejoin.
-			if ((member as any).bannable) {
+			if (member.bannable) {
 				try {
-					await (member as any).ban({ reason: 'Rejoin after multiple warnings' });
+					await member.ban({ reason: 'Rejoin after multiple warnings' });
 					// Post to dashboard (best-effort)
 					const url = process.env.AUTOMOD_DASHBOARD_URL;
 					const secret = process.env.INTERNAL_SECRET;
