@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-escape -- quickfix: regex literal contains escaped slashes for readability */
 import { ChannelType, EmbedBuilder, Message, PermissionsBitField } from 'discord.js';
-import settings from '../../Database/Schemas/settingsDB';
-import AutoModModel from '../../Database/Schemas/autoMod';
+import settings, { ISettings } from '../../Database/Schemas/settingsDB';
+import AutoModModel, { IAutoMod } from '../../Database/Schemas/autoMod';
 import { postPunishment, tryKick } from '../../Utilities/moderation';
 import { Event } from '../../Structures/Event';
 import { info as logInfo, warn as logWarn, error as logError } from '../../Utilities/logger';
@@ -38,9 +38,9 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 	if (author.bot || !guild) return;
 
 	// Fetch guild settings from database (guarded)
-	let settingsData: any = null;
+	let settingsData: ISettings | null = null;
 	try {
-		settingsData = await settings.findOne({ GuildID: guild.id }).lean().exec();
+		settingsData = (await settings.findOne({ GuildID: guild.id }).lean().exec()) as unknown as ISettings | null;
 	} catch (err) {
 		logError('twitchDetection: failed to read settings', { guild: guild.id, error: (err as Error)?.message ?? err });
 		return;
@@ -147,9 +147,9 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 	};
 
 	// Consult AutoMod config for link spam thresholds and ignored lists (optional)
-	let autoModConfig: any = null;
+	let autoModConfig: IAutoMod | null = null;
 	try {
-		autoModConfig = await AutoModModel.findOne({ guildId: guild.id }).lean().catch(() => null);
+		autoModConfig = (await AutoModModel.findOne({ guildId: guild.id }).lean().catch(() => null)) as unknown as IAutoMod | null;
 	} catch (err) {
 		logWarn('twitchDetection: failed to read automod config', { guild: guild.id, error: (err as Error)?.message ?? err });
 	}

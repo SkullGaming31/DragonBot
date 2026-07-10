@@ -17,17 +17,6 @@ export class ExtendedClient extends Client {
 	commands: Collection<string, CommandType> = new Collection();
 	buttons: Collection<string, ButtonType> = new Collection();
 
-	/**
-	 * Constructs a new ExtendedClient instance.
-	 *
-	 * @remarks
-	 * The client is constructed with the following options:
-	 * - Gateway intents: Guilds, GuildMembers, GuildMessages, MessageContent, GuildWebhooks, GuildMessageReactions, GuildPresences
-	 * - Partials: Channel, GuildMember, GuildScheduledEvent, Message, Reaction, ThreadMember, User
-	 * - Allowed mentions: everyone, roles, users
-	 * - Cache: limited to 200 messages
-	 * - Presence: watching "Im DragonBot", afk false, status online
-	 */
 	constructor() {
 		super({
 			intents: [
@@ -38,7 +27,7 @@ export class ExtendedClient extends Client {
 				GatewayIntentBits.GuildWebhooks,
 				GatewayIntentBits.GuildMessageReactions,
 				GatewayIntentBits.GuildPresences,
-				GatewayIntentBits.GuildMessagePolls
+				GatewayIntentBits.GuildMessagePolls,
 			],
 			partials: [
 				Partials.Channel,
@@ -48,28 +37,19 @@ export class ExtendedClient extends Client {
 				Partials.Reaction,
 				Partials.ThreadMember,
 				Partials.User,
-				Partials.SoundboardSound
+				Partials.SoundboardSound,
 			],
 			allowedMentions: { parse: ['everyone', 'roles', 'users'] },
 			makeCache: Options.cacheWithLimits({
 				...Options.DefaultMakeCacheSettings,
-				MessageManager: { maxSize: 200 }
+				MessageManager: { maxSize: 200 },
 			}),
 			presence: { activities: [{ name: 'Im DragonBot', type: ActivityType.Watching, url: 'https://github.com/skullgaming31/dragonbot' }], afk: false, status: 'online' },
 		});
 	}
 
-	/**
-	 * Logs the bot into Discord and registers all commands, events, and modules.
-	 * @async
-	 */
 	async start() {
-		const agent = new Agent({
-			connect: {
-				timeout: 300000
-			}
-		});
-
+		const agent = new Agent({ connect: { timeout: 300000 } });
 		this.rest.setAgent(agent);
 		await this.registerModules();
 		switch (process.env.Enviroment) {
@@ -84,30 +64,18 @@ export class ExtendedClient extends Client {
 	}
 
 	async importFile(filePath: string) {
-		try {
-			// When running via ts-node, `require` handles .ts modules; prefer require for .ts files
-			if (filePath.endsWith('.ts')) {
-				// Use require so ts-node's register hooks load the TypeScript file correctly
-				// eslint-disable-next-line @typescript-eslint/no-var-requires
-				const mod = require(filePath);
-				return mod?.default ?? mod;
-			}
+		// Prefer require for TypeScript files when using ts-node
+		if (filePath.endsWith('.ts')) {
 
-			// Convert local filesystem paths to file:// URLs to satisfy the ESM loader on Windows for .js imports
-			const importTarget = filePath.includes(':') ? pathToFileURL(filePath).href : filePath;
-			return (await import(importTarget))?.default;
-		} catch (err) {
-			throw err;
+			const mod = require(filePath);
+			return mod?.default ?? mod;
 		}
+
+		// For JS files, use dynamic import and convert to file:// URL on Windows
+		const importTarget = filePath.includes(':') ? pathToFileURL(filePath).href : filePath;
+		return (await import(importTarget))?.default;
 	}
 
-	/**
-	 * Registers commands for a guild or globally
-	 * @param {RegisterCommandOptions} options - The options for registering the commands
-	 * @param {ApplicationCommandDataResolvable[]} options.commands - The commands to register
-	 * @param {string} [options.guildId] - The ID of the guild to register the commands for. If not provided, the commands will be registered globally.
-	 * @returns {Promise<void>}
-	 */
 	async registerCommands({ commands, guildId }: RegisterCommandOptions): Promise<void> {
 		if (guildId) {
 			const guild = this.guilds.cache.get(guildId);
@@ -120,7 +88,6 @@ export class ExtendedClient extends Client {
 				console.log(`Commands registered for guild ${guildId}: ${commandsList.size}`);
 				logInfo('registerCommands: registered guild commands', { guildId, count: commandsList.size });
 			} catch (err) {
-				// Log the error and continue - do not crash the process on Discord API errors
 				console.error('Failed to register guild commands', err);
 				logError('registerCommands: failed to register guild commands', { error: (err as Error)?.message ?? err, guildId });
 			}
@@ -136,18 +103,10 @@ export class ExtendedClient extends Client {
 		}
 	}
 
-	/**
-	 * Registers all commands and events in the bot
-	 * @description This method is called when the bot is ready. It registers all commands and events in the bot.
-	 * @example
-	 *
-	 */
 	async registerModules() {
-		// Commands
 		const slashCommands: ApplicationCommandDataResolvable[] = [];
 		const commandFiles = await PG(`${__dirname}/../Commands/*/*{.ts,.js}`, {});
 
-		// Load commands sequentially to avoid race conditions and detect duplicates
 		for (const filePath of commandFiles) {
 			const command: CommandType = await this.importFile(filePath);
 			if (!command || !command.name) continue;
@@ -156,12 +115,10 @@ export class ExtendedClient extends Client {
 				continue;
 			}
 			this.commands.set(command.name, command);
-			// `command` should be compatible with ApplicationCommandDataResolvable
 			slashCommands.push(command as unknown as ApplicationCommandDataResolvable);
 		}
 
 		this.on('clientReady', () => {
-			// Deduplicate commands by name before sending to Discord's API
 			const dedupedCommands = Array.from(new Map(slashCommands.map((c: ApplicationCommandDataResolvable & { name?: string }) => [c.name ?? '', c])).values());
 			switch (process.env.Enviroment) {
 				case 'dev':
@@ -177,10 +134,7 @@ export class ExtendedClient extends Client {
 			}
 		});
 
-		// Events
 		const eventFiles = await PG(`${__dirname}/../Events/*/*{.ts,.js}`);
-
-		// Buttons
 		const buttonFiles = await PG(`${__dirname}/../Buttons/*{.ts,.js}`);
 
 		for (const filePath of buttonFiles) {
@@ -193,13 +147,10 @@ export class ExtendedClient extends Client {
 			this.buttons.set(btn.customId, btn);
 		}
 
-		eventFiles.forEach(async (filePath: string) => {
+		for (const filePath of eventFiles) {
 			const event: Event<keyof ClientEvents> = await this.importFile(filePath);
-			if (event.event === 'clientReady') {
-				this.once(event.event, event.run);
-			} else {
-				this.on(event.event, event.run);
-			}
-		});
+			if (event.event === 'clientReady') this.once(event.event, event.run);
+			else this.on(event.event, event.run);
+		}
 	}
 }
