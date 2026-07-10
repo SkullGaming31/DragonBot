@@ -117,14 +117,15 @@ export default new Command({
 		}
 
 		// Weighted reward system
-		const rewardTiers = [
+		type RewardTier = { weight: number; min: number; max: number };
+		const rewardTiers: RewardTier[] = [
 			{ weight: 5, min: 50, max: 100 },    // 50% chance: 50-100 coins
 			{ weight: 3, min: 101, max: 200 },   // 30% chance: 101-200 coins
 			{ weight: 2, min: 201, max: 400 }    // 20% chance: 201-400 coins
 		];
 
 		// Create weighted pool
-		const pool = [];
+		const pool: RewardTier[] = [];
 		for (const tier of rewardTiers) {
 			for (let i = 0; i < tier.weight; i++) {
 				pool.push(tier);

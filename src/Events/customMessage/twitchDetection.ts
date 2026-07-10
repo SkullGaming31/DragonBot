@@ -38,7 +38,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 	if (author.bot || !guild) return;
 
 	// Fetch guild settings from database (guarded)
-	let settingsData = null;
+	let settingsData: any = null;
 	try {
 		settingsData = await settings.findOne({ GuildID: guild.id }).lean().exec();
 	} catch (err) {
@@ -147,7 +147,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 	};
 
 	// Consult AutoMod config for link spam thresholds and ignored lists (optional)
-	let autoModConfig = null;
+	let autoModConfig: any = null;
 	try {
 		autoModConfig = await AutoModModel.findOne({ guildId: guild.id }).lean().catch(() => null);
 	} catch (err) {

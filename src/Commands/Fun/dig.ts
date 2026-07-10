@@ -30,7 +30,9 @@ const CACHE_TIERS = {
 		},
 		// image: 'luxury-case.png'
 	}
-};
+} as const;
+
+type CacheTier = (typeof CACHE_TIERS)[keyof typeof CACHE_TIERS];
 
 export default new Command({
 	name: 'dig',
@@ -104,7 +106,7 @@ export default new Command({
 
 			// Determine found cache
 			const roll = Math.random();
-			let foundTier;
+			let foundTier: CacheTier;
 
 			if (roll < CACHE_TIERS.LUXURY.chance * tierModifier) {
 				foundTier = CACHE_TIERS.LUXURY;
@@ -115,8 +117,9 @@ export default new Command({
 			}
 
 			// Generate loot
-			const loot = {
-				gold: randomInt(...foundTier.rewards.gold)
+			const goldRange = foundTier.rewards.gold as [number, number];
+			const loot: { gold: number } = {
+				gold: randomInt(...goldRange)
 			};
 
 			// Update inventory

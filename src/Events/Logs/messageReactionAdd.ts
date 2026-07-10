@@ -1,6 +1,6 @@
 
- 
-import { MessageReaction, User, TextChannel, EmbedBuilder, PartialMessageReaction, PartialUser } from 'discord.js';
+
+import { MessageReaction, User, TextChannel, EmbedBuilder, PartialMessageReaction, PartialUser, Message } from 'discord.js';
 import StarboardModel from '../../Database/Schemas/starboardDB';
 import { Event } from '../../Structures/Event';
 import { error as logError, info as logInfo } from '../../Utilities/logger';
@@ -89,7 +89,7 @@ export default new Event<'messageReactionAdd'>('messageReactionAdd', async (reac
 		if (post) {
 			// update existing starboard message
 			try {
-				let starMsg = null;
+				let starMsg: Message | null = null;
 				try {
 					starMsg = await channel.messages.fetch(post.starboardMessageId).catch(() => null);
 				} catch (err) {

@@ -3,6 +3,7 @@ import { config } from 'dotenv';
 import glob from 'glob';
 import { Agent } from 'undici';
 import { promisify } from 'util';
+import { pathToFileURL } from 'url';
 const PG = promisify(glob);
 
 import { CommandType } from '../Typings/Command';
@@ -82,7 +83,23 @@ export class ExtendedClient extends Client {
 		}
 	}
 
-	async importFile(filePath: string) { return (await import(filePath))?.default; }
+	async importFile(filePath: string) {
+		try {
+			// When running via ts-node, `require` handles .ts modules; prefer require for .ts files
+			if (filePath.endsWith('.ts')) {
+				// Use require so ts-node's register hooks load the TypeScript file correctly
+				// eslint-disable-next-line @typescript-eslint/no-var-requires
+				const mod = require(filePath);
+				return mod?.default ?? mod;
+			}
+
+			// Convert local filesystem paths to file:// URLs to satisfy the ESM loader on Windows for .js imports
+			const importTarget = filePath.includes(':') ? pathToFileURL(filePath).href : filePath;
+			return (await import(importTarget))?.default;
+		} catch (err) {
+			throw err;
+		}
+	}
 
 	/**
 	 * Registers commands for a guild or globally

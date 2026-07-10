@@ -127,8 +127,9 @@ class App {
 				}
 			});
 		} catch (error) {
-			console.error(error);
-			throw new Error('Error connecting to Database');
+			// Surface the original error to aid debugging instead of hiding it behind a generic message
+			console.error('Startup error:', error);
+			throw error;
 		}
 	}
 }

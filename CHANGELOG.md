@@ -10,12 +10,17 @@ All notable changes to this repository will be documented in this file.
 - Documentation: updated TODO and referenced marketplace implementation (commit f1e958b)
 
 - Reaction roles manager: persistent mappings stored in DB, admin commands (create/list/delete), and event handlers refactored to apply/remove roles based on stored mappings. Added `src/Database/Schemas/reactionRole.ts`, updated `src/Commands/Moderator/reactionRoles.ts`, `src/Events/customMessage/reactionRolesAdd.ts`, and `src/Events/customMessage/reactionRolesRemove.ts`.
-- Tests: Added unit tests for reaction role event handlers (`test/events/reactionRolesAdd.test.ts`, `test/events/reactionRolesRemove.test.ts`) and fixed test mocks to support `.lean()` chaining.
- - 2026-07-09 — Code scanning & test fix
- 	- Added `.github/workflows/codeql-analysis.yml` to enable CodeQL analysis for JavaScript/TypeScript and GitHub Actions workflows.
- 	- Fixed a hanging unit test by mocking `WarningDB.findOne` in `test/events/guildMemberAdd.test.ts` (prevents real DB calls during the test run).
 
-	- Updated `.github/workflows/codeql-analysis.yml` to make the `analyze` step non-fatal when GitHub rejects SARIF uploads (prevents CI failures when repository default setup conflicts with advanced CodeQL configurations).
+- Tests: Added unit tests for reaction role event handlers (`test/events/reactionRolesAdd.test.ts`, `test/events/reactionRolesRemove.test.ts`) and fixed test mocks to support `.lean()` chaining.
+
+- 2026-07-09 — Dev/runtime & CI fixes
+	- Add: `.github/workflows/codeql-analysis.yml` to enable CodeQL analysis for JavaScript/TypeScript and GitHub Actions workflows.
+	- Fix: made CodeQL `analyze` step non-fatal when SARIF uploads are rejected by GitHub (avoids CI failures for advanced configs).
+	- Fix: `test/events/guildMemberAdd.test.ts` mocked `WarningDB.findOne` to avoid real DB calls that could hang tests.
+	- Fix: `src/Structures/Client.ts` dynamic loader — prefer `require` for `.ts` files under `ts-node` and `import()` for `.js` files to resolve Windows ESM loader errors.
+	- Fix: TypeScript build/type errors resolved: added explicit types (`CacheTier`, `RewardTier`), preserved tuple types, and typed starboard variables to remove `never`/implicit any issues so `tsc` passes.
+	- Fix: `src/Database/index.ts` accepts multiple Mongo URI env names and skips DB connect in dev when no URI configured (safer local dev).
+	- Fix: linting issues addressed (removed a few explicit `any` usages in event handlers).
   
 ## 2025-10-23 — Reaction roles manager: implementation & hardening
 

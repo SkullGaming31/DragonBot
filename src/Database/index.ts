@@ -37,10 +37,17 @@ export const connectDatabase = async (): Promise<void> => {
 	const isDev = process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug';
 	mongoose.set('debug', false);
 
-	// MongoDB connection URIs
-	const uri = isDev ? process.env.MONGO_DEV_URI : process.env.MONGODB_URI;
+	// MongoDB connection URIs — support several common env var names for compatibility
+	const uri = isDev
+		? process.env.MONGO_DEV_URI ?? process.env.MONGO_DATABASE_URI ?? process.env.MONGODB_URI
+		: process.env.MONGODB_URI ?? process.env.MONGO_DATABASE_URI ?? process.env.MONGO_DEV_URI;
 
 	if (!uri) {
+		// In development/debug mode, allow running without a database connection for convenience.
+		if (isDev) {
+			console.warn('MongoDB URI not configured — skipping database connection in dev mode');
+			return;
+		}
 		throw new MongoDBConnectionError('MongoDB URI is not defined');
 	}
 
