@@ -1,6 +1,7 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, EmbedBuilder, MessageFlags, channelMention, roleMention } from 'discord.js';
 import settings from '../../Database/Schemas/settingsDB';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 
 export default new Command({
 	name: 'settings',
@@ -116,7 +117,7 @@ export default new Command({
 				}
 				data = await settings.findOne({ GuildID: guild.id });
 			} catch (err) {
-				console.error('Error fetching data:', err);
+				logError('Error fetching settings data', { error: (err as Error)?.message ?? err });
 				return interaction.reply({ content: 'An error occurred.', flags: MessageFlags.Ephemeral });
 			}
 
@@ -220,7 +221,7 @@ export default new Command({
 				.setTimestamp();
 			await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 		} catch (error) {
-			console.error(error);
+			logError('Settings command failed', { error: (error as Error)?.message ?? error });
 		}
 	}
 });

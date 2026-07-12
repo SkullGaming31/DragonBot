@@ -3,6 +3,7 @@ import { randomInt } from 'node:crypto';
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { IUser, UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 
 // Cache types mirroring Vigor's progression
 const CACHE_TIERS = {
@@ -190,10 +191,10 @@ export default new Command({
 			});
 
 		} catch (error) {
-			console.error('Dig Command Error:', error);
+			logError('Dig Command Error:', { error: (error as Error)?.message ?? error });
 			await interaction.reply({
 				content: '⚠️ Equipment failure - scavenge aborted',
-				ephemeral: true
+				flags: MessageFlags.Ephemeral
 			});
 		}
 	}

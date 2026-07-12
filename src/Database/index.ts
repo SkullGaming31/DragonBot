@@ -1,5 +1,6 @@
 import { config } from 'dotenv';
 import mongoose, { Connection } from 'mongoose';
+import { error as logError, warn as logWarn, info as logInfo } from '../Utilities/logger';
 
 config();
 
@@ -68,9 +69,37 @@ export const connectDatabase = async (): Promise<void> => {
 
 		console.log(connectionStates[connection.readyState] || 'Unknown state');
 
-		// Handle connection errors
+		// Handle connection errors without throwing from the event handler.
+		// Throwing inside an event handler can crash the process; instead log
+		// and attempt a reconnect strategy.
+		let reconnecting = false;
+		const tryReconnect = async () => {
+			if (reconnecting) return;
+			reconnecting = true;
+			const maxAttempts = 5;
+			let attempt = 0;
+			while (attempt < maxAttempts) {
+				attempt += 1;
+				const waitMs = 2000 * attempt; // linear backoff
+				try {
+					logInfo('Attempting MongoDB reconnect', { attempt });
+					await mongoose.connect(uri, { connectTimeoutMS: 10000 });
+					logInfo('MongoDB reconnect successful', { attempt });
+					reconnecting = false;
+					return;
+				} catch (e) {
+					logWarn('MongoDB reconnect attempt failed', { attempt, error: String(e) });
+					await new Promise((r) => setTimeout(r, waitMs));
+				}
+			}
+			logError('MongoDB reconnect failed after max attempts', { maxAttempts });
+			reconnecting = false;
+		};
+
 		connection.on('error', (err) => {
-			throw new MongoDBConnectionError(`MongoDB connection error: ${err}`);
+			// Log the error and try to reconnect rather than throwing.
+			logError('MongoDB connection error', { error: String(err) });
+			void tryReconnect();
 		});
 	} catch (error) {
 		// Handle connection errors

@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, channelMention, TextChannel } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, channelMention, MessageFlags, TextChannel } from 'discord.js';
 import StarboardModel from '../../Database/Schemas/starboardDB';
 import { Command } from '../../Structures/Command';
 
@@ -46,7 +46,7 @@ export default new Command({
 	run: async ({ interaction }) => {
 		const sub = interaction.options.getSubcommand(true);
 		const guildId = interaction.guildId;
-		if (!guildId) return interaction.reply({ content: 'This command can only be used in a guild.', ephemeral: true });
+		if (!guildId) return interaction.reply({ content: 'This command can only be used in a guild.', flags: MessageFlags.Ephemeral });
 
 		let config = await StarboardModel.findOne({ guildId }).exec();
 		if (!config) {
@@ -57,21 +57,21 @@ export default new Command({
 			const ch = interaction.options.getChannel('channel', true) as TextChannel;
 			config.channelId = ch.id;
 			await config.save();
-			return interaction.reply({ content: `Starboard channel set to ${channelMention(ch.id)}`, ephemeral: false });
+			return interaction.reply({ content: `Starboard channel set to ${channelMention(ch.id)}` });
 		}
 
 		if (sub === 'set-threshold') {
 			const count = interaction.options.getInteger('count', true);
 			config.threshold = Math.max(1, count);
 			await config.save();
-			return interaction.reply({ content: `Starboard threshold set to ${config.threshold}`, ephemeral: false });
+			return interaction.reply({ content: `Starboard threshold set to ${config.threshold}` });
 		}
 
 		if (sub === 'set-emoji') {
 			const emoji = interaction.options.getString('emoji', true);
 			config.emoji = emoji;
 			await config.save();
-			return interaction.reply({ content: `Starboard emoji set to ${emoji}`, ephemeral: false });
+			return interaction.reply({ content: `Starboard emoji set to ${emoji}` });
 		}
 
 		if (sub === 'ignore-channel') {
@@ -81,14 +81,14 @@ export default new Command({
 			if (idx >= 0) {
 				config.ignoredChannels.splice(idx, 1);
 				await config.save();
-				return interaction.reply({ content: `Channel ${channelMention(chId)} is no longer ignored.`, ephemeral: false });
+				return interaction.reply({ content: `Channel ${channelMention(chId)} is no longer ignored.` });
 			} else {
 				config.ignoredChannels.push(chId);
 				await config.save();
-				return interaction.reply({ content: `Channel ${channelMention(chId)} is now ignored.`, ephemeral: false });
+				return interaction.reply({ content: `Channel ${channelMention(chId)} is now ignored.` });
 			}
 		}
 
-		return interaction.reply({ content: 'Unknown subcommand', ephemeral: true });
+		return interaction.reply({ content: 'Unknown subcommand', flags: MessageFlags.Ephemeral });
 	}
 });

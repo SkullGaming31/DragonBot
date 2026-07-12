@@ -2,6 +2,7 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, MessageFlags } from 'discord.js';
 import { IUser, UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 
 export default new Command({
 	name: 'gamble',
@@ -51,6 +52,17 @@ export default new Command({
 
 			if (!userModel || userModel.balance === undefined) { return interaction.reply({ content: 'You don\'t have any coins to gamble!' }); }
 
+			const twitchSubRoleId = guild.roles.cache.find((r) => r.name === 'Twitch Subscriber')?.id;
+			let hasTwitchSubscriberRole = false;
+			if (twitchSubRoleId && member) {
+				if (Array.isArray(member.roles)) {
+					hasTwitchSubscriberRole = member.roles.includes(twitchSubRoleId);
+				} else {
+					hasTwitchSubscriberRole = member.roles.cache.has(twitchSubRoleId);
+				}
+			}
+			const winProbability = hasTwitchSubscriberRole ? 0.25 : 0.2;
+
 			switch (Options) {
 				case 'all'://DONE !gamble [all] gamble everything in there balance
 					try {
@@ -58,20 +70,23 @@ export default new Command({
 						if (!currentBalance || currentBalance.balance === undefined) return;
 						if (currentBalance.balance === 0) return interaction.reply({ content: 'You do not have any gold to gamble away', flags: MessageFlags.Ephemeral });
 
-						const winProbability = member?.roles.cache.has('Twitch Subscriber') ?? false ? 0.25 : 0.2;
-						const isWin = Math.random() <= winProbability;
-
-						// Use integer math only. Winning pays double the gambled amount (net profit = balance)
 						const gambled = Math.floor(currentBalance.balance);
+						const isWin = Math.random() <= winProbability;
 						const winAmount = isWin ? gambled : -gambled; // $inc will add/subtract the gambled amount
 
-						await UserModel.findOneAndUpdate({ guildID: guild.id, id: user.id }, { $inc: { balance: winAmount } });
+						// Atomic update: only apply if user still has at least `gambled` balance
+						const updated = await UserModel.findOneAndUpdate(
+							{ guildID: guild.id, id: user.id, balance: { $gte: gambled } },
+							{ $inc: { balance: winAmount } }
+						);
+						if (!updated) {
+							return interaction.reply({ content: 'You do not have enough gold to gamble. Try again.', flags: MessageFlags.Ephemeral });
+						}
 
 						const finalResponse = isWin ? `Congratulations! You risked it all and won ${gambled} gold!` : `Sorry, you lost ${gambled} gold.`;
-
 						await interaction.reply({ content: finalResponse });
 					} catch (_error) {
-						console.error(_error);
+						logError('Gamble (all) error', { error: (_error as Error)?.message ?? _error });
 					}
 					break;
 				case 'percentage': //DONE !gamble [percentage] ex !gamble 20% of your balance
@@ -89,19 +104,24 @@ export default new Command({
 						const amountToGamble = Math.floor((currentBalance.balance * percentage) / 100);
 						if (amountToGamble <= 0) return interaction.reply({ content: 'The percentage you provided is too small to gamble any coins.' });
 
-						const winProbability = member?.roles.cache.has('Twitch Subscriber') ?? false ? 0.25 : 0.2;
 						const isWin = Math.random() <= winProbability;
-
 						const delta = isWin ? amountToGamble : -amountToGamble;
 
-						await UserModel.findOneAndUpdate({ guildID: guild.id, id: user.id }, { $inc: { balance: delta } });
+						// Atomic update: only apply if user still has at least `amountToGamble`
+						const updated = await UserModel.findOneAndUpdate(
+							{ guildID: guild.id, id: user.id, balance: { $gte: amountToGamble } },
+							{ $inc: { balance: delta } }
+						);
+						if (!updated) {
+							return interaction.reply({ content: 'You do not have enough gold to gamble that percentage. Try again.', flags: MessageFlags.Ephemeral });
+						}
 
 						const abs = Math.abs(delta);
 						const finalResponse = isWin ? `Congratulations! You risked ${percentage}% of your balance and won ${abs} gold!` : `Sorry, you lost ${abs} gold (${percentage}% of your balance).`;
 
 						await interaction.reply({ content: finalResponse });
 					} catch (_error) {
-						console.error(_error);
+						logError('Gamble (percentage) error', { error: (_error as Error)?.message ?? _error });
 					}
 					break;
 				case 'fixed number'://DONE !gamble [Amount] ex !gamble 500coins from your balance
@@ -109,28 +129,30 @@ export default new Command({
 					if (typeof fixedRaw !== 'number') return interaction.reply({ content: 'Please provide a valid amount to gamble.' });
 					const fixedAmount = Math.floor(fixedRaw);
 					if (fixedAmount <= 0) return interaction.reply({ content: 'Please enter a positive amount to gamble.' });
-					if (userModel.balance < fixedAmount) return interaction.reply({ content: 'You can not cover that bet with your current Balance, please use ``/bal`` and try again', flags: MessageFlags.Ephemeral });
 
-					// Check if user has the "Twitch Subscriber" role
-					const hasTwitchSubscriberRole = member?.roles.cache.has('Twitch Subscriber') ?? false;
-
-					const winProb = hasTwitchSubscriberRole ? 0.25 : 0.2;
-					const isWinFixed = Math.random() <= winProb;
+					const isWinFixed = Math.random() <= winProbability;
 					const deltaFixed = isWinFixed ? fixedAmount : -fixedAmount;
 
 					try {
-						await UserModel.findOneAndUpdate({ guildID: guild.id, id: user.id }, { $inc: { balance: deltaFixed } });
+						// Atomic update: only apply if user still has at least `fixedAmount`
+						const updated = await UserModel.findOneAndUpdate(
+							{ guildID: guild.id, id: user.id, balance: { $gte: fixedAmount } },
+							{ $inc: { balance: deltaFixed } }
+						);
+						if (!updated) {
+							return interaction.reply({ content: 'You can not cover that bet with your current Balance, please use ``/bal`` and try again', flags: MessageFlags.Ephemeral });
+						}
 						const response = isWinFixed ? `Congratulations! You won ${fixedAmount} gold.` : `Sorry, you lost ${fixedAmount} gold.`;
 						await interaction.reply({ content: response });
 					} catch (_error) {
-						console.error(_error);
+						logError('Gamble (fixed) error', { error: (_error as Error)?.message ?? _error });
 					}
 					break;
 				default:
 					break;
 			}
 		} catch (error) {
-			console.error('Error in gamble command:', error);
+			logError('Error in gamble command:', { error: (error as Error)?.message ?? error });
 			await interaction.reply({ content: 'An error occurred while processing your gamble.' });
 		}
 	},

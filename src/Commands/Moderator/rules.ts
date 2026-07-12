@@ -89,7 +89,10 @@ export default new Command({
 					inline: field.inline,
 				})));
 			} catch (error) {
-				console.error('Error parsing fields:', error);
+				// Use structured logging for parse errors
+				 
+				const { error: logError } = require('../../Utilities/logger');
+				logError('Error parsing fields in rules command', { error: (error as Error)?.message ?? error });
 			}
 		}
 

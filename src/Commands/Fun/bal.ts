@@ -2,6 +2,7 @@ import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder, Mes
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 
 export default new Command({
 	name: 'bal',
@@ -49,7 +50,7 @@ export default new Command({
 
 			// Check if the user is in the guild to access their roles
 			if (targetUser && !guild) {
-				console.log('Guild is missing'); // Debug log
+				logError('Guild is missing when attempting to view target user balance');
 				return interaction.reply({ content: 'This command can only be used in a guild.', flags: MessageFlags.Ephemeral });
 			}
 
@@ -115,7 +116,7 @@ export default new Command({
 
 			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
-			console.error('Error fetching user balance:', error);
+			logError('Error fetching user balance:', { error: (error as Error)?.message ?? error });
 			await interaction.reply({ content: 'Oops! Something went wrong while checking the balance. Please try again later.', flags: MessageFlags.Ephemeral });
 		}
 	},

@@ -2,6 +2,7 @@ import { ApplicationCommandOptionType, ApplicationCommandType, ButtonStyle, Acti
 import { Command } from '../../Structures/Command';
 import { safeInteractionReply } from '../../Utilities/functions';
 import { appInstance } from '../../index';
+import { error as logError } from '../../Utilities/logger';
 import { ButtonStyle as DJSButtonStyle } from 'discord.js';
 
 export default new Command({
@@ -69,10 +70,10 @@ export default new Command({
 		try {
 			// prefer TextChannel typing for sending; fallback to optional chaining
 			await (interaction.channel as import('discord.js').TextChannel | undefined)?.send({ content: `Test button: ${customId}`, components: [row] });
-			await safeInteractionReply(interaction, { content: `Sent test button with customId \`${customId}\``, ephemeral: true });
+			await safeInteractionReply(interaction, { content: `Sent test button with customId \`${customId}\``, flags: MessageFlags.Ephemeral });
 		} catch (err) {
-			console.error('Failed to send test button:', err);
-			await safeInteractionReply(interaction, { content: 'Failed to send test button. Check bot permissions and channel.', ephemeral: true });
+			logError('Failed to send test button:', { error: (err as Error)?.message ?? err });
+			await safeInteractionReply(interaction, { content: 'Failed to send test button. Check bot permissions and channel.', flags: MessageFlags.Ephemeral });
 		}
 	}
 });

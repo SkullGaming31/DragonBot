@@ -1,5 +1,36 @@
 // src/index.ts
 
+import fs from 'fs/promises';
+import path from 'path';
+import fsSync from 'fs';
+
+// Mirror console output into devLogs/logs.log without calling `logger` to avoid recursion.
+// Placed before other imports so any console output from module initialization
+// (for example in `Structures/Client`) is captured.
+const _origLog = console.log.bind(console);
+const _origWarn = console.warn.bind(console);
+const _origError = console.error.bind(console);
+const writeConsoleLog = async (level: 'INFO' | 'WARN' | 'ERROR', args: unknown[]) => {
+	try {
+		const line = `${new Date().toISOString()} [${level}] ${args.map(a => (typeof a === 'string' ? a : JSON.stringify(a))).join(' ')}\n`;
+		const logsDir = path.resolve(process.cwd(), 'devLogs');
+		await fs.mkdir(logsDir, { recursive: true });
+		await fs.appendFile(path.join(logsDir, 'logs.log'), line);
+	} catch { /* ignore file errors */ }
+};
+console.log = (...args: unknown[]) => {
+	_origLog(...args);
+	void writeConsoleLog('INFO', args);
+};
+console.warn = (...args: unknown[]) => {
+	_origWarn(...args);
+	void writeConsoleLog('WARN', args);
+};
+console.error = (...args: unknown[]) => {
+	_origError(...args);
+	void writeConsoleLog('ERROR', args);
+};
+
 import { config } from 'dotenv';
 import { connectDatabase } from './Database';
 import { ExtendedClient } from './Structures/Client';
@@ -11,7 +42,9 @@ import rateLimit from 'express-rate-limit';
 
 import Health from './routes/health';
 import apiV1Routes from './routes/apiv1';
-import { info } from './Utilities/logger';
+import { createIntegrationRouter } from './Integrations/webhookHandler';
+import { info, warn as logWarn, error as logError } from './Utilities/logger';
+import errorHandler from './Structures/errorHandler';
 
 class App {
 	public client: ExtendedClient;
@@ -53,7 +86,8 @@ class App {
 			const requireApiKey = (req: Request, res: Response, next: NextFunction): void => {
 				// In development, allow requests without API key for convenience
 				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') { next(); return; }
-				const provided = req.header('x-api-key') || req.query.api_key;
+				// Only accept API key via `x-api-key` header to avoid leaking secrets in URLs
+				const provided = req.header('x-api-key');
 				if (!apiKey) { res.status(500).json({ error: 'API key not configured on server' }); return; }
 				if (!provided || provided !== apiKey) { res.status(401).json({ error: 'Unauthorized' }); return; }
 				next();
@@ -62,6 +96,13 @@ class App {
 			// Mount API routes (protected)
 			this.app.use('/api/v1/health', Health); // keep health minimal and separate
 			this.app.use('/api/v1', requireApiKey, apiV1Routes);
+
+			// Mount integrations router (decoupled) after client is available
+			try {
+				this.app.use('/integrations', createIntegrationRouter(this.client));
+			} catch (e) {
+				console.error('Failed to mount integrations router', e);
+			}
 			this.app.get('/', (((req: Request, res: Response) => res.send('Hello, world!')) as unknown) as express.RequestHandler);
 
 			// Respect an env-provided port, useful for containers and CI
@@ -101,31 +142,8 @@ class App {
 					process.exit(1);
 				}
 			};
-			process.on('SIGINT', () => shutdown('SIGINT'));
-			process.on('SIGTERM', () => shutdown('SIGTERM'));
-
-			// Global runtime error handlers to ensure we log crashes before exiting
-			process.on('unhandledRejection', async (reason, promise) => {
-				try {
-					info('unhandledRejection: Caught unhandled promise rejection');
-					console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-					await shutdown('unhandledRejection');
-				} catch (err) {
-					console.error('Error during unhandledRejection shutdown', err);
-					process.exit(1);
-				}
-			});
-
-			process.on('uncaughtException', async (err) => {
-				try {
-					info('uncaughtException: Caught exception');
-					console.error('Uncaught Exception:', err);
-					await shutdown('uncaughtException');
-				} catch (err2) {
-					console.error('Error during uncaughtException shutdown', err2);
-					process.exit(1);
-				}
-			});
+			// Register centralized error handlers (errorHandler will call our shutdown)
+			await errorHandler(shutdown);
 		} catch (error) {
 			// Surface the original error to aid debugging instead of hiding it behind a generic message
 			console.error('Startup error:', error);
@@ -138,6 +156,38 @@ export const appInstance = new App();
 
 // Only start the app automatically when this file is the main module.
 // This prevents the app from auto-starting when imported for testing or debugging.
-if (typeof require !== 'undefined' && require.main === module) {
+const sentinelPath = path.resolve(process.cwd(), '.no_autorun');
+const lockPath = path.resolve(process.cwd(), '.bot.pid');
+if (process.env.DISABLE_AUTOSTART === 'true' || fsSync.existsSync(sentinelPath)) {
+	console.log('Auto-start disabled (DISABLE_AUTORUN or .no_autorun present)');
+} else if (typeof require !== 'undefined' && require.main === module) {
+	// Single-instance lock: if another process holds the PID file and is alive, exit.
+	try {
+		if (fsSync.existsSync(lockPath)) {
+			const raw = fsSync.readFileSync(lockPath, 'utf8').trim();
+			const otherPid = Number(raw) || NaN;
+			if (!Number.isNaN(otherPid)) {
+				try {
+					process.kill(otherPid, 0);
+					console.log(`Another instance is already running (PID ${otherPid}), exiting.`);
+					process.exit(0);
+				} catch (e) {
+					// Process not running; remove stale lock
+					try { fsSync.unlinkSync(lockPath); } catch { /** */ }
+				}
+			} else {
+				try { fsSync.unlinkSync(lockPath); } catch { /** */ }
+			}
+		}
+		// Write our pid to lock file
+		fsSync.writeFileSync(lockPath, String(process.pid), { encoding: 'utf8' });
+		const cleanup = () => { try { if (fsSync.existsSync(lockPath)) fsSync.unlinkSync(lockPath); } catch { /** */ } };
+		process.on('exit', cleanup);
+		process.on('SIGINT', () => { cleanup(); process.exit(0); });
+		process.on('SIGTERM', () => { cleanup(); process.exit(0); });
+	} catch (e) {
+		console.warn('Failed to acquire single-instance lock, continuing startup', e);
+	}
+
 	appInstance.start();
 }

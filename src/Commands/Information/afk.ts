@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, MessageFlags, PresenceStatusData } from 'discord.js';
 import { Command } from '../../Structures/Command';
+import { error as logError, warn as logWarn } from '../../Utilities/logger';
 import { IUser, UserModel } from '../../Database/Schemas/userModel';
 
 // FIX: Setting user Presence does not work.
@@ -74,13 +75,13 @@ export default new Command({
 					if (userMember.presence) {
 						userMember.presence.status = presenceStatus; // Assign only if presence exists
 					} else {
-						console.log('something happened');
+						logWarn('AFK: user presence missing when setting status', { user: user.id, guild: guild?.id });
 					}
 				}
 			}
 			await interaction.reply({ content: 'AFK message set! I will reply with your message if you are tagged.', flags: MessageFlags.Ephemeral });
 		} catch (error) {
-			console.error(error);
+			logError('AFK command failed', { error: (error as Error)?.message ?? error });
 		}
 	},
 });

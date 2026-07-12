@@ -3,6 +3,7 @@ import { ApplicationCommandOptionType, ApplicationCommandType, Collection, Embed
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
+import { error as logError, warn as logWarn } from '../../Utilities/logger';
 
 interface Participant {
 	userId: string; // User ID for future reference
@@ -137,20 +138,21 @@ export default new Command({
 			if (economyChannelID) {
 				const econChannel = interaction.guild?.channels.cache.get(economyChannelID);
 				if (econChannel === undefined) {
-					console.warn(`Economy channel ${economyChannelID} not found.`);
+					logWarn(`Economy channel ${economyChannelID} not found.`);
 				} else if (interaction.channel?.id !== econChannel?.id) {
 					return interaction.editReply({ content: `All economy commands should be used in ${channelMention(econChannel?.id)}. Please try again there.` });
 				}
 			}
 
-			// Check if the user balance is sufficient for the bet amount
-			const userBalance = await UserModel.findOne({ guildID: guild?.id, id: user.id }).then(user => user?.balance);
-			if (!userBalance || userBalance < Amount) {
+			// Atomically reserve the bet amount from the user's balance.
+			const userDoc = await UserModel.findOneAndUpdate(
+				{ guildID: guild?.id, id: user.id, balance: { $gte: Amount } },
+				{ $inc: { balance: -Amount } },
+				{ new: true }
+			);
+			if (!userDoc) {
 				return interaction.editReply({ content: 'You don\'t have enough coins to start this heist!' });
 			}
-
-			const updatedBalance = userBalance - Amount;
-			await UserModel.findOneAndUpdate({ guildID: guild?.id, id: user.id }, { balance: updatedBalance });
 
 			let heistInProgress = false;
 			const participants: Collection<string, Participant> = new Collection();
@@ -241,14 +243,14 @@ export default new Command({
 					const messageIdsToDelete = Array.from(joinMessagesMap.values());
 					if (textChannel) {
 						try {
-							await textChannel.bulkDelete(messageIdsToDelete, true).catch((err) => { console.error(err); });
+							await textChannel.bulkDelete(messageIdsToDelete, true).catch((err) => { logError('Bulk delete error in heist', { error: (err as Error)?.message ?? err }); });
 						} catch (error) {
-							console.error('Failed to bulk delete messages:', error);
+							logError('Failed to bulk delete messages in heist:', { error: (error as Error)?.message ?? error });
 							for (const messageId of messageIdsToDelete) {
 								try {
 									await interaction.channel?.messages.fetch(messageId).then(message => message.delete());
 								} catch (error) {
-									console.error('Failed to delete message:', error);
+									logError('Failed to delete message during heist cleanup:', { error: (error as Error)?.message ?? error, messageId });
 								}
 							}
 						}
@@ -298,7 +300,7 @@ export default new Command({
 				}
 			});
 		} catch (error) {
-			console.error(error);
+			logError('Heist command error', { error: (error as Error)?.message ?? error });
 		}
 	},
 });

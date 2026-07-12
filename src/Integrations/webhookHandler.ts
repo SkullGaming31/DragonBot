@@ -1,13 +1,25 @@
-import { Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import IntegrationConfigModel from '../Database/Schemas/integrationConfig';
 import IntegrationEventModel from '../Database/Schemas/integrationEvent';
 import { NormalizedEvent } from './adapter';
-import { appInstance } from '../index';
+import type { ExtendedClient } from '../Structures/Client';
 import TwitchAdapter from './twitchAdapter';
 
 const SECRET_HEADER = 'x-integration-secret';
 
-export async function handleIntegrationWebhook(req: Request, res: Response) {
+export async function handleIntegrationWebhook(req: Request, res: Response, client?: ExtendedClient) {
+	// If client not provided (tests may call handler directly), attempt to load appInstance dynamically.
+	let effectiveClient: ExtendedClient | undefined = client;
+	if (!effectiveClient) {
+		try {
+			// dynamic import so module import-time doesn't pull in index.ts circularly
+			// tests can mock this module before importing the handler
+			const mod = await import('../index');
+			effectiveClient = (mod as unknown as { appInstance?: { client?: ExtendedClient } }).appInstance?.client;
+		} catch (e) {
+			effectiveClient = undefined;
+		}
+	}
 	try {
 		// Detect source; prefer explicit header but allow inferring from Twitch EventSub headers
 		const headerSource = (req.headers['x-integration-source'] as string) ?? '';
@@ -54,12 +66,11 @@ export async function handleIntegrationWebhook(req: Request, res: Response) {
 			}
 
 			const configs = await IntegrationConfigModel.find({ provider: 'twitch', enabled: true }).lean().exec();
-			const client = appInstance.client;
 
 			for (const cfg of configs) {
 				try {
 					if (!cfg.channelId) continue;
-					const channel = await client.channels.fetch(cfg.channelId).catch(() => null);
+					const channel = await effectiveClient?.channels.fetch(cfg.channelId).catch(() => null);
 					if (!channel || !('send' in channel)) continue;
 
 					let message: string;
@@ -126,12 +137,11 @@ export async function handleIntegrationWebhook(req: Request, res: Response) {
 		}
 
 		const configs = await IntegrationConfigModel.find({ provider: source, enabled: true }).lean().exec();
-		const client = appInstance.client;
 
 		for (const cfg of configs) {
 			try {
 				if (!cfg.channelId) continue;
-				const channel = await client.channels.fetch(cfg.channelId).catch(() => null);
+				const channel = await effectiveClient?.channels.fetch(cfg.channelId).catch(() => null);
 				if (!channel || !('send' in channel)) continue;
 
 				let message: string;
@@ -157,4 +167,12 @@ export async function handleIntegrationWebhook(req: Request, res: Response) {
 		console.error('integration webhook error', err);
 		res.status(500).json({ error: 'internal error' });
 	}
+}
+
+// Router factory: create a router that handles integration webhooks using the provided Discord client.
+export function createIntegrationRouter(client: ExtendedClient) {
+	const router = express.Router();
+	// Expect JSON body to be parsed by the parent express app
+	router.post('/', (req: Request, res: Response) => handleIntegrationWebhook(req, res, client));
+	return router;
 }

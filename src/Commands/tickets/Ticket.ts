@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, Colors, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, Colors, EmbedBuilder, MessageFlags } from 'discord.js';
 import DB, { Ticket } from '../../Database/Schemas/ticketDB';
 import { Command } from '../../Structures/Command';
 
@@ -42,8 +42,8 @@ export default new Command({
 		switch (Action) {
 			case 'add': {
 				const docs = await DB.findOne({ GuildID: guildId, ChannelID: channel?.id }).exec() as Ticket | null;
-				if (!docs) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], ephemeral: true });
-				if (docs.MembersID?.includes(Member?.id as string)) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this member is already added to this ticket')], ephemeral: true });
+				if (!docs) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], flags: MessageFlags.Ephemeral });
+				if (docs.MembersID?.includes(Member?.id as string)) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this member is already added to this ticket')], flags: MessageFlags.Ephemeral });
 				docs.MembersID = docs.MembersID ?? [];
 				docs.MembersID.push(Member?.id as string);
 				if (channel?.type === ChannelType.GuildText) {
@@ -58,17 +58,15 @@ export default new Command({
 				await docs.save();
 			}
 				break;
-				break;
 			case 'remove': {
 				const docs = await DB.findOne({ GuildID: guildId, ChannelID: channel?.id }).exec() as Ticket | null;
-				if (!docs) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], ephemeral: true });
-				if (!docs.MembersID?.includes(Member?.id as string)) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this member is not in this ticket')], ephemeral: true });
+				if (!docs) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this channel is not tied with a ticket')], flags: MessageFlags.Ephemeral });
+				if (!docs.MembersID?.includes(Member?.id as string)) return interaction.reply({ embeds: [embed.setColor(Colors.Red).setDescription('⛔ | this member is not in this ticket')], flags: MessageFlags.Ephemeral });
 				docs.MembersID = docs.MembersID.filter(id => id !== (Member?.id as string));
 				if (channel?.type === ChannelType.GuildText) await channel.permissionOverwrites.edit(Member?.id as string, { ViewChannel: false });
 				await interaction.reply({ embeds: [embed.setColor(Colors.Green).setDescription(`✅ | ${Member} has been removed from the ticket`)] });
 				await docs.save();
 			}
-				break;
 				break;
 		}
 	}

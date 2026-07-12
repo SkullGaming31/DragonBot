@@ -1,6 +1,7 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, EmbedBuilder, MessageFlags, channelMention } from 'discord.js';
 import DB from '../../Database/Schemas/LogsChannelDB'; // DB
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 
 export default new Command({
 	name: 'logger',
@@ -39,7 +40,7 @@ export default new Command({
 			try {
 				data = await DB.findOne({ GuildID: guild.id });
 			} catch (err) {
-				console.error('Error fetching data:', err);
+				logError('Error fetching logs channel data', { error: (err as Error)?.message ?? err });
 				return interaction.reply({ content: 'An error occurred.', flags: MessageFlags.Ephemeral });
 			}
 
@@ -64,7 +65,7 @@ export default new Command({
 			await data.save();
 			await interaction.reply({ content: 'Added and/or Updated the database', embeds: [embed], flags: MessageFlags.Ephemeral });
 		} catch (error) {
-			console.error(error);
+			logError('Logger command failed', { error: (error as Error)?.message ?? error });
 			await interaction.reply({ content: 'An error occurred.', flags: MessageFlags.Ephemeral });
 			return;
 		}

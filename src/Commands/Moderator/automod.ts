@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder, MessageFlags } from 'discord.js';
 import { Command } from '../../Structures/Command';
 import AutoModModel from '../../Database/Schemas/autoMod';
 
@@ -16,7 +16,7 @@ export default new Command({
 	run: async ({ interaction }) => {
 		const sub = interaction.options.getSubcommand(true);
 		const guildId = interaction.guildId;
-		if (!guildId) return interaction.reply({ content: 'This command must be used in a guild.', ephemeral: true });
+		if (!guildId) return interaction.reply({ content: 'This command must be used in a guild.', flags: MessageFlags.Ephemeral });
 
 		let config = await AutoModModel.findOne({ guildId }).exec();
 		if (!config) {
@@ -32,7 +32,7 @@ export default new Command({
 					{ name: 'Spam', value: String(config.rules?.spam?.enabled ?? true), inline: true },
 					{ name: 'Spam threshold', value: String(config.rules?.spam?.threshold ?? 5), inline: true },
 				]);
-			return interaction.reply({ embeds: [embed], ephemeral: true });
+			return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 		}
 
 		if (sub === 'toggle') {
@@ -40,7 +40,7 @@ export default new Command({
 			const enabled = enabledStr === 'true' || enabledStr === '1' || enabledStr === 'on';
 			config.enabled = enabled;
 			await config.save();
-			return interaction.reply({ content: `AutoMod is now ${enabled ? 'enabled' : 'disabled'}.`, ephemeral: true });
+			return interaction.reply({ content: `AutoMod is now ${enabled ? 'enabled' : 'disabled'}.`, flags: MessageFlags.Ephemeral });
 		}
 
 		if (sub === 'set-spam-threshold') {
@@ -48,9 +48,9 @@ export default new Command({
 			config.rules = config.rules ?? { inviteLinks: { enabled: true }, caps: { enabled: true, threshold: 70 }, spam: { enabled: true, threshold: 5 } };
 			config.rules.spam.threshold = Math.max(1, count);
 			await config.save();
-			return interaction.reply({ content: `Spam threshold set to ${config.rules.spam.threshold}.`, ephemeral: true });
+			return interaction.reply({ content: `Spam threshold set to ${config.rules.spam.threshold}.`, flags: MessageFlags.Ephemeral });
 		}
 
-		return interaction.reply({ content: 'Unknown subcommand', ephemeral: true });
+		return interaction.reply({ content: 'Unknown subcommand', flags: MessageFlags.Ephemeral });
 	},
 });

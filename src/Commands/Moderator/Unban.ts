@@ -1,5 +1,6 @@
 import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, Colors, ComponentType, EmbedBuilder, MessageFlags } from 'discord.js';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 
 export default new Command({
 	name: 'unban',
@@ -55,7 +56,7 @@ export default new Command({
 					try {
 						await guild.members.unban(id);
 					} catch (error) {
-						console.error('Error while unbanning:', error);
+						logError('Error while unbanning:', { error: (error as Error)?.message ?? error });
 					}
 
 					interaction.editReply({ embeds: [unbanEmbed.setDescription('**✔ | the user has been unbanned**')], components: [] });

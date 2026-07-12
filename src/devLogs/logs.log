@@ -1,0 +1,389 @@
+2026-07-12T17:48:07.537Z [INFO] registerCommands: registered guild commands {"guildId":"959693430227894292","count":44}
+2026-07-12T17:48:17.325Z [ERROR] runReactionCleanup: failed to query mappings {"err":"Operation `reactionroles.find()` buffering timed out after 10000ms"}
+2026-07-12T18:17:49.782Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"abc"}
+2026-07-12T18:17:49.823Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"fromContent"}
+2026-07-12T18:17:55.381Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"user1"}
+2026-07-12T18:17:55.380Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:17:55.383Z [INFO] autoModeration: deleted caps message {"guildId":"guild1","userId":"user2","capPct":100}
+2026-07-12T18:17:55.385Z [INFO] autoModeration: deleted spam messages {"guildId":"guild1","userId":"spammer","count":3}
+2026-07-12T18:17:55.383Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:17:55.386Z [INFO] escalateByWarnings: kicked member {"guild":"guild1","user":"victim"}
+2026-07-12T18:17:55.386Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"victim"}
+2026-07-12T18:17:55.385Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:17:55.386Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:17:57.107Z [WARN] audit: configured logs channel is not a text channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:17:57.131Z [INFO] audit: sent embed to logs channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:17:59.640Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2026-07-12T18:17:59.643Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2026-07-12T18:18:03.726Z [INFO] accept button: logged role toggle {"guild":"g1","member":"m1","role":"role1","action":"added"}
+2026-07-12T18:18:17.212Z [INFO] messageDelete: removed stale reaction-role mappings {"guildId":"g1","messageId":"m1","deleted":3}
+2026-07-12T18:18:17.207Z [INFO] roleDelete: removed stale reaction-role mappings {"guildId":"g1","roleId":"r1","deleted":2}
+2026-07-12T18:18:19.829Z [ERROR] autoModeration: failed to read config {"error":"__vite_ssr_import_1__.default.findOne(...).lean is not a function"}
+2026-07-12T18:18:19.831Z [ERROR] autoModeration: handler error {"error":"message.member.roles.cache.map is not a function"}
+2026-07-12T18:18:31.330Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T18:18:33.865Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:18:35.236Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:18:37.274Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T18:18:40.783Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:18:42.031Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:18:51.878Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:23:24.023Z [ERROR] autoModeration: failed to read config {"error":"__vite_ssr_import_1__.default.findOne(...).lean is not a function"}
+2026-07-12T18:23:24.025Z [ERROR] autoModeration: handler error {"error":"message.member.roles.cache.map is not a function"}
+2026-07-12T18:23:32.975Z [WARN] audit: configured logs channel is not a text channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:23:32.998Z [INFO] audit: sent embed to logs channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:23:36.065Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"abc"}
+2026-07-12T18:23:36.106Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"fromContent"}
+2026-07-12T18:23:40.150Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:23:40.151Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"user1"}
+2026-07-12T18:23:40.154Z [INFO] autoModeration: deleted caps message {"guildId":"guild1","userId":"user2","capPct":100}
+2026-07-12T18:23:40.154Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:23:40.155Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:23:40.155Z [INFO] autoModeration: deleted spam messages {"guildId":"guild1","userId":"spammer","count":3}
+2026-07-12T18:23:40.158Z [INFO] escalateByWarnings: kicked member {"guild":"guild1","user":"victim"}
+2026-07-12T18:23:40.158Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:23:40.159Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"victim"}
+2026-07-12T18:23:40.768Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2026-07-12T18:23:40.771Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2026-07-12T18:23:42.957Z [INFO] accept button: logged role toggle {"guild":"g1","member":"m1","role":"role1","action":"added"}
+2026-07-12T18:23:43.717Z [INFO] roleDelete: removed stale reaction-role mappings {"guildId":"g1","roleId":"r1","deleted":2}
+2026-07-12T18:23:43.721Z [INFO] messageDelete: removed stale reaction-role mappings {"guildId":"g1","messageId":"m1","deleted":3}
+2026-07-12T18:23:53.241Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:23:56.286Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:23:56.717Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T18:23:59.861Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T18:24:00.164Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:24:02.685Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:24:03.870Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:27:57.816Z [ERROR] autoModeration: failed to read config {"error":"__vite_ssr_import_1__.default.findOne(...).lean is not a function"}
+2026-07-12T18:27:57.818Z [ERROR] autoModeration: handler error {"error":"message.member.roles.cache.map is not a function"}
+2026-07-12T18:28:03.954Z [WARN] audit: configured logs channel is not a text channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:28:03.979Z [INFO] audit: sent embed to logs channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:28:07.203Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"abc"}
+2026-07-12T18:28:07.241Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"fromContent"}
+2026-07-12T18:28:10.323Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:28:10.326Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:28:10.326Z [INFO] autoModeration: deleted caps message {"guildId":"guild1","userId":"user2","capPct":100}
+2026-07-12T18:28:10.327Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:28:10.327Z [INFO] autoModeration: deleted spam messages {"guildId":"guild1","userId":"spammer","count":3}
+2026-07-12T18:28:10.329Z [INFO] escalateByWarnings: kicked member {"guild":"guild1","user":"victim"}
+2026-07-12T18:28:10.324Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"user1"}
+2026-07-12T18:28:10.329Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:28:10.329Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"victim"}
+2026-07-12T18:28:13.001Z [INFO] accept button: logged role toggle {"guild":"g1","member":"m1","role":"role1","action":"added"}
+2026-07-12T18:28:13.978Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2026-07-12T18:28:13.981Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2026-07-12T18:28:17.429Z [INFO] roleDelete: removed stale reaction-role mappings {"guildId":"g1","roleId":"r1","deleted":2}
+2026-07-12T18:28:17.434Z [INFO] messageDelete: removed stale reaction-role mappings {"guildId":"g1","messageId":"m1","deleted":3}
+2026-07-12T18:28:20.787Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:28:24.203Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T18:28:27.218Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:28:27.584Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T18:28:31.198Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:28:31.559Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:28:34.450Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:30:27.906Z [ERROR] autoModeration: failed to read config {"error":"__vite_ssr_import_1__.default.findOne(...).lean is not a function"}
+2026-07-12T18:30:27.908Z [ERROR] autoModeration: handler error {"error":"message.member.roles.cache.map is not a function"}
+2026-07-12T18:30:31.425Z [WARN] audit: configured logs channel is not a text channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:30:31.456Z [INFO] audit: sent embed to logs channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:30:35.130Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"abc"}
+2026-07-12T18:30:35.172Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"fromContent"}
+2026-07-12T18:30:38.755Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:30:38.756Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"user1"}
+2026-07-12T18:30:38.758Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:30:38.759Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:30:38.758Z [INFO] autoModeration: deleted caps message {"guildId":"guild1","userId":"user2","capPct":100}
+2026-07-12T18:30:38.761Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:30:38.761Z [INFO] escalateByWarnings: kicked member {"guild":"guild1","user":"victim"}
+2026-07-12T18:30:38.761Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"victim"}
+2026-07-12T18:30:38.759Z [INFO] autoModeration: deleted spam messages {"guildId":"guild1","userId":"spammer","count":3}
+2026-07-12T18:30:40.486Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2026-07-12T18:30:40.489Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2026-07-12T18:30:40.825Z [INFO] accept button: logged role toggle {"guild":"g1","member":"m1","role":"role1","action":"added"}
+2026-07-12T18:30:44.188Z [INFO] roleDelete: removed stale reaction-role mappings {"guildId":"g1","roleId":"r1","deleted":2}
+2026-07-12T18:30:44.193Z [INFO] messageDelete: removed stale reaction-role mappings {"guildId":"g1","messageId":"m1","deleted":3}
+2026-07-12T18:30:47.154Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:30:51.315Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T18:30:54.172Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T18:30:54.612Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:30:57.912Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:30:59.161Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:31:00.936Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:38:00.210Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"abc"}
+2026-07-12T18:38:00.243Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"fromContent"}
+2026-07-12T18:38:06.127Z [WARN] audit: configured logs channel is not a text channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:38:06.150Z [INFO] audit: sent embed to logs channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:38:09.374Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2026-07-12T18:38:09.376Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2026-07-12T18:38:13.053Z [INFO] accept button: logged role toggle {"guild":"g1","member":"m1","role":"role1","action":"added"}
+2026-07-12T18:38:25.455Z [INFO] messageDelete: removed stale reaction-role mappings {"guildId":"g1","messageId":"m1","deleted":3}
+2026-07-12T18:38:25.451Z [INFO] roleDelete: removed stale reaction-role mappings {"guildId":"g1","roleId":"r1","deleted":2}
+2026-07-12T18:38:27.472Z [ERROR] autoModeration: failed to read config {"error":"__vite_ssr_import_1__.default.findOne(...).lean is not a function"}
+2026-07-12T18:38:27.474Z [ERROR] autoModeration: handler error {"error":"message.member.roles.cache.map is not a function"}
+2026-07-12T18:38:38.639Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T18:38:40.781Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:38:41.954Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:38:43.842Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T18:38:47.128Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:38:48.220Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:38:57.283Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:41:31.095Z [ERROR] autoModeration: failed to read config {"error":"__vite_ssr_import_1__.default.findOne(...).lean is not a function"}
+2026-07-12T18:41:31.097Z [ERROR] autoModeration: handler error {"error":"message.member.roles.cache.map is not a function"}
+2026-07-12T18:41:36.144Z [WARN] audit: configured logs channel is not a text channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:41:36.168Z [INFO] audit: sent embed to logs channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:41:39.410Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"abc"}
+2026-07-12T18:41:39.444Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"fromContent"}
+2026-07-12T18:41:42.001Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:41:42.003Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"user1"}
+2026-07-12T18:41:42.005Z [INFO] autoModeration: deleted caps message {"guildId":"guild1","userId":"user2","capPct":100}
+2026-07-12T18:41:42.006Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:41:42.005Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:41:42.006Z [INFO] autoModeration: deleted spam messages {"guildId":"guild1","userId":"spammer","count":3}
+2026-07-12T18:41:42.008Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:41:42.007Z [INFO] escalateByWarnings: kicked member {"guild":"guild1","user":"victim"}
+2026-07-12T18:41:42.008Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"victim"}
+2026-07-12T18:41:42.573Z [INFO] accept button: logged role toggle {"guild":"g1","member":"m1","role":"role1","action":"added"}
+2026-07-12T18:41:43.843Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2026-07-12T18:41:43.841Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2026-07-12T18:41:46.955Z [INFO] roleDelete: removed stale reaction-role mappings {"guildId":"g1","roleId":"r1","deleted":2}
+2026-07-12T18:41:46.960Z [INFO] messageDelete: removed stale reaction-role mappings {"guildId":"g1","messageId":"m1","deleted":3}
+2026-07-12T18:41:49.678Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T18:41:57.797Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T18:41:57.877Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:41:58.483Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:42:00.984Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:42:01.105Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:42:04.165Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:44:13.028Z [ERROR] autoModeration: failed to read config {"error":"__vite_ssr_import_1__.default.findOne(...).lean is not a function"}
+2026-07-12T18:44:13.030Z [ERROR] autoModeration: handler error {"error":"message.member.roles.cache.map is not a function"}
+2026-07-12T18:44:16.208Z [WARN] audit: configured logs channel is not a text channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:44:16.230Z [INFO] audit: sent embed to logs channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:44:19.496Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"abc"}
+2026-07-12T18:44:19.535Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"fromContent"}
+2026-07-12T18:44:21.045Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:44:21.046Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"user1"}
+2026-07-12T18:44:21.049Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:44:21.049Z [INFO] autoModeration: deleted caps message {"guildId":"guild1","userId":"user2","capPct":100}
+2026-07-12T18:44:21.051Z [INFO] escalateByWarnings: kicked member {"guild":"guild1","user":"victim"}
+2026-07-12T18:44:21.050Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:44:21.050Z [INFO] autoModeration: deleted spam messages {"guildId":"guild1","userId":"spammer","count":3}
+2026-07-12T18:44:21.051Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:44:21.051Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"victim"}
+2026-07-12T18:44:22.576Z [INFO] accept button: logged role toggle {"guild":"g1","member":"m1","role":"role1","action":"added"}
+2026-07-12T18:44:22.775Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2026-07-12T18:44:22.778Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2026-07-12T18:44:24.224Z [INFO] roleDelete: removed stale reaction-role mappings {"guildId":"g1","roleId":"r1","deleted":2}
+2026-07-12T18:44:24.229Z [INFO] messageDelete: removed stale reaction-role mappings {"guildId":"g1","messageId":"m1","deleted":3}
+2026-07-12T18:44:31.356Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:44:36.093Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T18:44:37.771Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T18:44:39.209Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:44:39.638Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:44:41.069Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:44:42.658Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:48:58.380Z [ERROR] autoModeration: failed to read config {"error":"__vite_ssr_import_1__.default.findOne(...).lean is not a function"}
+2026-07-12T18:48:58.382Z [ERROR] autoModeration: handler error {"error":"message.member.roles.cache.map is not a function"}
+2026-07-12T18:49:05.311Z [WARN] audit: configured logs channel is not a text channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:49:05.335Z [INFO] audit: sent embed to logs channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:49:07.736Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"abc"}
+2026-07-12T18:49:07.775Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"fromContent"}
+2026-07-12T18:49:10.591Z [INFO] autoModeration: deleted caps message {"guildId":"guild1","userId":"user2","capPct":100}
+2026-07-12T18:49:10.587Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:49:10.590Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:49:10.588Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"user1"}
+2026-07-12T18:49:10.592Z [INFO] autoModeration: deleted spam messages {"guildId":"guild1","userId":"spammer","count":3}
+2026-07-12T18:49:10.592Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:49:10.593Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:49:10.593Z [INFO] escalateByWarnings: kicked member {"guild":"guild1","user":"victim"}
+2026-07-12T18:49:10.594Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"victim"}
+2026-07-12T18:49:10.864Z [INFO] roleDelete: removed stale reaction-role mappings {"guildId":"g1","roleId":"r1","deleted":2}
+2026-07-12T18:49:10.869Z [INFO] messageDelete: removed stale reaction-role mappings {"guildId":"g1","messageId":"m1","deleted":3}
+2026-07-12T18:49:12.211Z [INFO] accept button: logged role toggle {"guild":"g1","member":"m1","role":"role1","action":"added"}
+2026-07-12T18:49:14.693Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2026-07-12T18:49:14.691Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2026-07-12T18:49:20.160Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T18:49:26.367Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:49:26.711Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T18:49:29.457Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:49:30.063Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:49:32.067Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:49:32.528Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T18:59:38.300Z [ERROR] autoModeration: handler error {"error":"message.member.roles.cache.map is not a function"}
+2026-07-12T18:59:38.297Z [ERROR] autoModeration: failed to read config {"error":"__vite_ssr_import_1__.default.findOne(...).lean is not a function"}
+2026-07-12T18:59:49.205Z [WARN] audit: configured logs channel is not a text channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:59:49.229Z [INFO] audit: sent embed to logs channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T18:59:53.892Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"abc"}
+2026-07-12T18:59:53.916Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"fromContent"}
+2026-07-12T18:59:56.457Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:59:56.458Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"user1"}
+2026-07-12T18:59:56.460Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:59:56.460Z [INFO] autoModeration: deleted caps message {"guildId":"guild1","userId":"user2","capPct":100}
+2026-07-12T18:59:56.462Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:59:56.462Z [INFO] autoModeration: deleted spam messages {"guildId":"guild1","userId":"spammer","count":3}
+2026-07-12T18:59:56.463Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T18:59:56.463Z [INFO] escalateByWarnings: kicked member {"guild":"guild1","user":"victim"}
+2026-07-12T18:59:56.463Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"victim"}
+2026-07-12T18:59:57.630Z [INFO] accept button: logged role toggle {"guild":"g1","member":"m1","role":"role1","action":"added"}
+2026-07-12T18:59:58.375Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2026-07-12T18:59:58.378Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2026-07-12T18:59:59.905Z [INFO] messageDelete: removed stale reaction-role mappings {"guildId":"g1","messageId":"m1","deleted":3}
+2026-07-12T18:59:59.901Z [INFO] roleDelete: removed stale reaction-role mappings {"guildId":"g1","roleId":"r1","deleted":2}
+2026-07-12T19:00:06.626Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T19:00:10.933Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T19:00:12.190Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:00:13.281Z [ERROR] Error fetching user balance: {"error":"__vite_ssr_import_2__.UserModel.find(...).sort is not a function"}
+2026-07-12T19:00:14.577Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:00:16.588Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:00:17.227Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:00:17.725Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:04:22.471Z [ERROR] autoModeration: failed to read config {"error":"__vite_ssr_import_1__.default.findOne(...).lean is not a function"}
+2026-07-12T19:04:22.473Z [ERROR] autoModeration: handler error {"error":"message.member.roles.cache.map is not a function"}
+2026-07-12T19:04:31.342Z [WARN] audit: configured logs channel is not a text channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T19:04:31.365Z [INFO] audit: sent embed to logs channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T19:04:35.702Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"abc"}
+2026-07-12T19:04:35.739Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"fromContent"}
+2026-07-12T19:04:39.108Z [INFO] accept button: logged role toggle {"guild":"g1","member":"m1","role":"role1","action":"added"}
+2026-07-12T19:04:39.399Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"user1"}
+2026-07-12T19:04:39.401Z [INFO] autoModeration: deleted caps message {"guildId":"guild1","userId":"user2","capPct":100}
+2026-07-12T19:04:39.401Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:04:39.403Z [INFO] escalateByWarnings: kicked member {"guild":"guild1","user":"victim"}
+2026-07-12T19:04:39.398Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:04:39.402Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:04:39.402Z [INFO] autoModeration: deleted spam messages {"guildId":"guild1","userId":"spammer","count":3}
+2026-07-12T19:04:39.403Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:04:39.404Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"victim"}
+2026-07-12T19:04:42.254Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2026-07-12T19:04:42.256Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2026-07-12T19:04:42.539Z [INFO] roleDelete: removed stale reaction-role mappings {"guildId":"g1","roleId":"r1","deleted":2}
+2026-07-12T19:04:42.545Z [INFO] messageDelete: removed stale reaction-role mappings {"guildId":"g1","messageId":"m1","deleted":3}
+2026-07-12T19:04:45.871Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T19:04:48.620Z [ERROR] Error fetching user balance: {"error":"__vite_ssr_import_2__.UserModel.find(...).sort is not a function"}
+2026-07-12T19:04:50.559Z [ERROR] Failed to send message for create_message in reactionRoles {"error":"Missing Permissions"}
+2026-07-12T19:04:51.836Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:04:55.316Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T19:04:55.950Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:04:56.597Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:04:58.419Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:04:59.405Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:08:33.076Z [ERROR] autoModeration: handler error {"error":"message.member.roles.cache.map is not a function"}
+2026-07-12T19:08:33.069Z [ERROR] autoModeration: failed to read config {"error":"__vite_ssr_import_1__.default.findOne(...).lean is not a function"}
+2026-07-12T19:08:39.847Z [WARN] audit: configured logs channel is not a text channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T19:08:39.873Z [INFO] audit: sent embed to logs channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T19:08:43.174Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"abc"}
+2026-07-12T19:08:43.209Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"fromContent"}
+2026-07-12T19:08:43.225Z [ERROR] Failed to send message for create_message in reactionRoles {"error":"channel.send is not a function"}
+2026-07-12T19:08:43.226Z [ERROR] Failed to send message for create_message in reactionRoles {"error":"fail"}
+2026-07-12T19:08:46.618Z [INFO] accept button: logged role toggle {"guild":"g1","member":"m1","role":"role1","action":"added"}
+2026-07-12T19:08:46.668Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"user1"}
+2026-07-12T19:08:46.667Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:08:46.670Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:08:46.670Z [INFO] autoModeration: deleted caps message {"guildId":"guild1","userId":"user2","capPct":100}
+2026-07-12T19:08:46.671Z [INFO] autoModeration: deleted spam messages {"guildId":"guild1","userId":"spammer","count":3}
+2026-07-12T19:08:46.671Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:08:46.673Z [INFO] escalateByWarnings: kicked member {"guild":"guild1","user":"victim"}
+2026-07-12T19:08:46.673Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:08:46.673Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"victim"}
+2026-07-12T19:08:46.767Z [INFO] roleDelete: removed stale reaction-role mappings {"guildId":"g1","roleId":"r1","deleted":2}
+2026-07-12T19:08:46.771Z [INFO] messageDelete: removed stale reaction-role mappings {"guildId":"g1","messageId":"m1","deleted":3}
+2026-07-12T19:08:51.491Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2026-07-12T19:08:51.493Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2026-07-12T19:08:51.951Z [WARN] Ignored interaction API error {"code":10062,"message":"ignored"}
+2026-07-12T19:08:52.983Z [ERROR] Failed to send message for create_message in reactionRoles {"error":"Missing Permissions"}
+2026-07-12T19:08:54.565Z [ERROR] Error fetching user balance: {"error":"__vite_ssr_import_2__.UserModel.find(...).sort is not a function"}
+2026-07-12T19:08:57.717Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T19:08:59.784Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T19:09:01.372Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:09:04.081Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:09:04.698Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:09:04.877Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:09:07.801Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:11:28.148Z [ERROR] autoModeration: handler error {"error":"message.member.roles.cache.map is not a function"}
+2026-07-12T19:11:28.146Z [ERROR] autoModeration: failed to read config {"error":"__vite_ssr_import_1__.default.findOne(...).lean is not a function"}
+2026-07-12T19:11:40.106Z [WARN] audit: configured logs channel is not a text channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T19:11:40.127Z [INFO] audit: sent embed to logs channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T19:11:43.170Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"abc"}
+2026-07-12T19:11:43.197Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"fromContent"}
+2026-07-12T19:11:43.213Z [ERROR] Failed to send message for create_message in reactionRoles {"error":"channel.send is not a function"}
+2026-07-12T19:11:43.214Z [ERROR] Failed to send message for create_message in reactionRoles {"error":"fail"}
+2026-07-12T19:11:46.344Z [WARN] Ignored interaction API error {"code":10062,"message":"ignored"}
+2026-07-12T19:11:46.835Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:11:46.838Z [INFO] autoModeration: deleted caps message {"guildId":"guild1","userId":"user2","capPct":100}
+2026-07-12T19:11:46.838Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:11:46.836Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"user1"}
+2026-07-12T19:11:46.839Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:11:46.841Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:11:46.841Z [INFO] escalateByWarnings: kicked member {"guild":"guild1","user":"victim"}
+2026-07-12T19:11:46.839Z [INFO] autoModeration: deleted spam messages {"guildId":"guild1","userId":"spammer","count":3}
+2026-07-12T19:11:46.841Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"victim"}
+2026-07-12T19:11:49.747Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2026-07-12T19:11:49.749Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2026-07-12T19:11:50.202Z [INFO] accept button: logged role toggle {"guild":"g1","member":"m1","role":"role1","action":"added"}
+2026-07-12T19:11:51.384Z [INFO] roleDelete: removed stale reaction-role mappings {"guildId":"g1","roleId":"r1","deleted":2}
+2026-07-12T19:11:51.389Z [INFO] messageDelete: removed stale reaction-role mappings {"guildId":"g1","messageId":"m1","deleted":3}
+2026-07-12T19:11:53.394Z [ERROR] Failed to send message for create_message in reactionRoles {"error":"Missing Permissions"}
+2026-07-12T19:11:56.070Z [ERROR] Error fetching user balance: {"error":"__vite_ssr_import_2__.UserModel.find(...).sort is not a function"}
+2026-07-12T19:12:00.127Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:12:01.796Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T19:12:03.646Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T19:12:05.323Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:12:06.102Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:12:06.981Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:12:08.606Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:14:07.767Z [ERROR] autoModeration: failed to read config {"error":"__vite_ssr_import_1__.default.findOne(...).lean is not a function"}
+2026-07-12T19:14:07.769Z [ERROR] autoModeration: handler error {"error":"message.member.roles.cache.map is not a function"}
+2026-07-12T19:14:20.556Z [ERROR] autoModeration: failed to read config {"error":"__vite_ssr_import_1__.default.findOne(...).lean is not a function"}
+2026-07-12T19:14:20.558Z [ERROR] autoModeration: handler error {"error":"message.member.roles.cache.map is not a function"}
+2026-07-12T19:14:28.059Z [WARN] audit: configured logs channel is not a text channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T19:14:28.082Z [INFO] audit: sent embed to logs channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T19:14:31.148Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"abc"}
+2026-07-12T19:14:31.186Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"fromContent"}
+2026-07-12T19:14:31.203Z [ERROR] Failed to send message for create_message in reactionRoles {"error":"fail"}
+2026-07-12T19:14:31.202Z [ERROR] Failed to send message for create_message in reactionRoles {"error":"channel.send is not a function"}
+2026-07-12T19:14:34.102Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"user1"}
+2026-07-12T19:14:34.104Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:14:34.101Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:14:34.104Z [INFO] autoModeration: deleted caps message {"guildId":"guild1","userId":"user2","capPct":100}
+2026-07-12T19:14:34.105Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:14:34.105Z [INFO] autoModeration: deleted spam messages {"guildId":"guild1","userId":"spammer","count":3}
+2026-07-12T19:14:34.106Z [INFO] escalateByWarnings: kicked member {"guild":"guild1","user":"victim"}
+2026-07-12T19:14:34.106Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:14:34.107Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"victim"}
+2026-07-12T19:14:34.248Z [INFO] accept button: logged role toggle {"guild":"g1","member":"m1","role":"role1","action":"added"}
+2026-07-12T19:14:35.287Z [WARN] Ignored interaction API error {"code":10062,"message":"ignored"}
+2026-07-12T19:14:37.373Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2026-07-12T19:14:37.370Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2026-07-12T19:14:40.379Z [ERROR] Failed to send message for create_message in reactionRoles {"error":"Missing Permissions"}
+2026-07-12T19:14:40.467Z [INFO] roleDelete: removed stale reaction-role mappings {"guildId":"g1","roleId":"r1","deleted":2}
+2026-07-12T19:14:40.471Z [INFO] messageDelete: removed stale reaction-role mappings {"guildId":"g1","messageId":"m1","deleted":3}
+2026-07-12T19:14:40.583Z [ERROR] Error fetching user balance: {"error":"__vite_ssr_import_2__.UserModel.find(...).sort is not a function"}
+2026-07-12T19:14:43.540Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T19:14:46.629Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-12T19:14:48.801Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:14:49.989Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:14:54.749Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:14:55.026Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:14:56.176Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-12T19:15:25.661Z [ERROR] autoModeration: failed to read config {"error":"__vite_ssr_import_1__.default.findOne(...).lean is not a function"}
+2026-07-12T19:15:25.663Z [ERROR] autoModeration: handler error {"error":"message.member.roles.cache.map is not a function"}
+2026-07-12T19:15:31.871Z [WARN] audit: configured logs channel is not a text channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T19:15:31.893Z [INFO] audit: sent embed to logs channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-12T19:15:35.523Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"abc"}
+2026-07-12T19:15:35.565Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"fromContent"}
+2026-07-12T19:15:35.581Z [ERROR] Failed to send message for create_message in reactionRoles {"error":"fail"}
+2026-07-12T19:15:35.580Z [ERROR] Failed to send message for create_message in reactionRoles {"error":"channel.send is not a function"}
+2026-07-12T19:15:38.832Z [WARN] Ignored interaction API error {"code":10062,"message":"ignored"}
+2026-07-12T19:15:38.994Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:15:38.995Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"user1"}
+2026-07-12T19:15:38.997Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:15:38.999Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:15:38.999Z [INFO] autoModeration: deleted spam messages {"guildId":"guild1","userId":"spammer","count":3}
+2026-07-12T19:15:39.000Z [INFO] escalateByWarnings: kicked member {"guild":"guild1","user":"victim"}
+2026-07-12T19:15:39.000Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-12T19:15:38.998Z [INFO] autoModeration: deleted caps message {"guildId":"guild1","userId":"user2","capPct":100}
+2026-07-12T19:15:39.000Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"victim"}
+2026-07-12T19:15:40.646Z [INFO] accept button: logged role toggle {"guild":"g1","member":"m1","role":"role1","action":"added"}
+2026-07-12T19:15:41.903Z [INFO] messageDelete: removed stale reaction-role mappings {"guildId":"g1","messageId":"m1","deleted":3}
+2026-07-12T19:15:41.899Z [INFO] roleDelete: removed stale reaction-role mappings {"guildId":"g1","roleId":"r1","deleted":2}
+2026-07-12T19:15:42.068Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2026-07-12T19:15:42.071Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2026-07-12T19:15:45.269Z [ERROR] Failed to send message for create_message in reactionRoles {"error":"Missing Permissions"}
+2026-07-12T19:15:45.849Z [ERROR] Error fetching user balance: {"error":"__vite_ssr_import_2__.UserModel.find(...).sort is not a function"}

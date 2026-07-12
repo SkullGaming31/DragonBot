@@ -1,6 +1,6 @@
 
- 
-import { BaseInteraction, ChannelType, Colors, EmbedBuilder, Collection, Message } from 'discord.js';
+
+import { BaseInteraction, ChannelType, Colors, EmbedBuilder, Collection, Message, MessageFlags } from 'discord.js';
 import { Event } from '../../Structures/Event';
 // import settings from '../../Structures/Schemas/settingsDB';
 import DB from '../../Database/Schemas/ticketDB';
@@ -14,7 +14,7 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 	if (!['close', 'lock', 'unlock', 'claim'].includes(customId)) return;
 
 	const TicketSetup = await ticket.findOne({ GuildID: guild.id });
-	if (!TicketSetup) return safeInteractionReply(interaction, { content: 'the data for this system is outdated', ephemeral: true });
+	if (!TicketSetup) return safeInteractionReply(interaction, { content: 'the data for this system is outdated', flags: MessageFlags.Ephemeral });
 
 	// TODO: grab Admin/mod RoleID from database
 	// const settingsData = await settings.findOne({ Guild: guild.id });
@@ -29,14 +29,14 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 	// const moderatorRoleId = '708768425388015728';// mainServer
 
 	const isAdminOrModerator = member.permissions.has(adminRoleId) || member.permissions.has(moderatorRoleId);
-	if (!isAdminOrModerator) { return safeInteractionReply(interaction, { content: `you must have the <@&${adminRoleId}> or <@&${moderatorRoleId}> role to interact with these buttons`, ephemeral: true }); }
+	if (!isAdminOrModerator) { return safeInteractionReply(interaction, { content: `you must have the <@&${adminRoleId}> or <@&${moderatorRoleId}> role to interact with these buttons`, flags: MessageFlags.Ephemeral }); }
 
 	const embed = new EmbedBuilder().setColor(Colors.Blue);
 
 	try {
 		// Use async/await with .exec() to avoid deprecated callback usage
 		const docs = await DB.findOne({ ChannelID: channel?.id }).exec();
-		if (!docs) return safeInteractionReply(interaction, { content: 'no data was found related to this ticket, please delete it manually', ephemeral: true });
+		if (!docs) return safeInteractionReply(interaction, { content: 'no data was found related to this ticket, please delete it manually', flags: MessageFlags.Ephemeral });
 
 		switch (customId) {
 			case 'lock':
@@ -57,7 +57,7 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 				break;
 			case 'unlock':
 				if (docs.Locked == false)
-					return safeInteractionReply(interaction, { content: 'this ticket is already unlocked', ephemeral: true });
+					return safeInteractionReply(interaction, { content: 'this ticket is already unlocked', flags: MessageFlags.Ephemeral });
 				await DB.updateOne({ ChannelID: channel?.id }, { Locked: false });
 				embed.setDescription('🔓 | this channel has been unlocked');
 				if (channel?.type === ChannelType.GuildText)
@@ -72,7 +72,7 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 				break;
 			case 'close':
 				if (docs.Closed)
-					return safeInteractionReply(interaction, { content: 'Ticket is already closed, please wait for it to be automatically deleted', ephemeral: true });
+					return safeInteractionReply(interaction, { content: 'Ticket is already closed, please wait for it to be automatically deleted', flags: MessageFlags.Ephemeral });
 				await DB.updateOne({ ChannelID: channel?.id }, { Closed: true });
 				await safeInteractionReply(interaction, { content: 'The channel will deleted in 10 seconds.' });
 
@@ -143,7 +143,7 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 				await DB.deleteOne({ ChannelID: channel?.id });
 				break;
 			case 'claim':
-				if (docs.Claimed == true) return safeInteractionReply(interaction, { content: `this ticket has already been claimed by <@${docs.ClaimedBy}>`, ephemeral: true });
+				if (docs.Claimed == true) return safeInteractionReply(interaction, { content: `this ticket has already been claimed by <@${docs.ClaimedBy}>`, flags: MessageFlags.Ephemeral });
 				await DB.updateOne({ ChannelID: channel?.id }, { Claimed: true, ClaimedBy: member.id });
 
 				embed.setDescription(`🛄 | this ticket is now claimed by ${member}`);

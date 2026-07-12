@@ -6,6 +6,7 @@ import { CommandType } from '../../Typings/Command';
 import { ExtendedInteraction } from '../../Typings/Command';
 import { safeInteractionReply, setCooldown } from '../../Utilities/functions';
 import { appInstance } from '../../index';
+import { error as logError, warn as logWarn, info as logInfo } from '../../Utilities/logger';
 import { UserModel } from '../../Database/Schemas/userModel';
 import { recordCommandTimestamp } from '../../Utilities/metricsReporter';
 
@@ -42,7 +43,7 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 				setCooldown(commandName, user.id, command.Cooldown);
 			}
 		} catch (err) {
-			console.error(`Error executing command ${commandName}:`, err);
+			logError(`Error executing command ${commandName}:`, { error: (err as Error)?.message ?? err });
 			try {
 				// If the interaction was deferred, edit the deferred reply first. Otherwise send a reply.
 				if (interaction.deferred) {
@@ -51,7 +52,7 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 					await interaction.reply({ content: 'An internal error occurred while executing this command.', flags: MessageFlags.Ephemeral });
 				}
 			} catch (replyErr) {
-				console.error('Failed to send error reply to interaction:', replyErr);
+				logError('Failed to send error reply to interaction:', { error: (replyErr as Error)?.message ?? replyErr });
 			}
 		}
 	}
@@ -68,11 +69,11 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 			const e = error as unknown as { code?: number; message?: string };
 			const errCode = e?.code;
 			if (errCode === 10062 || errCode === 40060) {
-				console.warn('Ignored Discord interaction error', errCode, e?.message ?? error);
+				logWarn('Ignored Discord interaction error', { code: errCode, message: e?.message ?? String(error) });
 				return;
 			}
-			console.error('Error handling interaction:', error);
-			await safeInteractionReply(interaction, { content: 'An error occurred while processing your request. Please try again later.', ephemeral: true });
+			logError('Error handling interaction:', { error: (error as Error)?.message ?? error });
+			await safeInteractionReply(interaction, { content: 'An error occurred while processing your request. Please try again later.', flags: MessageFlags.Ephemeral });
 		}
 	}
 });

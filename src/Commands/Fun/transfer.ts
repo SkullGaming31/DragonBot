@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, MessageFlags } from 'discord.js';
 import { UserModel, IUser } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
 
@@ -16,7 +16,7 @@ export default new Command({
 		const targetId = options.getString('user', true);
 		const amountRaw = options.getString('amount', true);
 
-		if (targetId === user.id) return interaction.reply({ content: 'You cannot transfer to yourself.', ephemeral: true });
+		if (targetId === user.id) return interaction.reply({ content: 'You cannot transfer to yourself.', flags: MessageFlags.Ephemeral });
 
 		// resolve amount
 		let amount = 0;
@@ -28,7 +28,7 @@ export default new Command({
 			amount = Math.floor(Number(amountRaw));
 		}
 
-		if (!amount || amount <= 0) return interaction.reply({ content: 'Please provide a valid amount greater than 0.', ephemeral: true });
+		if (!amount || amount <= 0) return interaction.reply({ content: 'Please provide a valid amount greater than 0.', flags: MessageFlags.Ephemeral });
 
 		// Atomic transfer: decrement sender if sufficient, increment recipient
 		const session = await UserModel.db.startSession?.();
@@ -45,7 +45,7 @@ export default new Command({
 				if (!sender) {
 					await session.abortTransaction();
 					session.endSession();
-					return interaction.reply({ content: 'Insufficient funds.', ephemeral: true });
+					return interaction.reply({ content: 'Insufficient funds.', flags: MessageFlags.Ephemeral });
 				}
 
 				await UserModel.findOneAndUpdate(
@@ -60,7 +60,7 @@ export default new Command({
 			} catch {
 				await session.abortTransaction();
 				session.endSession();
-				return interaction.reply({ content: 'Transfer failed, please try again later.', ephemeral: true });
+				return interaction.reply({ content: 'Transfer failed, please try again later.', flags: MessageFlags.Ephemeral });
 			}
 		}
 
@@ -71,7 +71,7 @@ export default new Command({
 			{ new: true }
 		).exec();
 
-		if (!senderRes) return interaction.reply({ content: 'Insufficient funds.', ephemeral: true });
+		if (!senderRes) return interaction.reply({ content: 'Insufficient funds.', flags: MessageFlags.Ephemeral });
 
 		await UserModel.findOneAndUpdate({ guildID: guild?.id, id: targetId }, { $inc: { balance: amount } }, { new: true, upsert: true }).exec();
 

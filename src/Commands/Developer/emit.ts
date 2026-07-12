@@ -1,7 +1,8 @@
- 
+
 
 import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, Guild, MessageFlags, PermissionsBitField, Role, RoleFlagsBitField, SnowflakeUtil } from 'discord.js';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 
 export default new Command({
 	name: 'emit',
@@ -168,7 +169,7 @@ export default new Command({
 						flags: MessageFlags.Ephemeral
 					});
 				} catch (error) {
-					console.error('RoleCreate Test Error:', error);
+					logError('RoleCreate Test Error:', { error: (error as Error)?.message ?? error });
 					await interaction.reply({
 						content: '❌ Failed to emit roleCreate event',
 						flags: MessageFlags.Ephemeral
@@ -190,7 +191,7 @@ export default new Command({
 						flags: MessageFlags.Ephemeral
 					});
 				} catch (error) {
-					console.error('roleDelete Test Error:', error);
+					logError('roleDelete Test Error:', { error: (error as Error)?.message ?? error });
 					await interaction.reply({
 						content: '❌ Failed to emit roleDelete event',
 						flags: MessageFlags.Ephemeral
@@ -207,7 +208,7 @@ export default new Command({
 					client.emit('roleUpdate', oldRole, newRole);
 					await interaction.reply({ content: `✅ Emitted roleUpdate event for ${oldRole.name} -> ${newRole.name}`, flags: MessageFlags.Ephemeral });
 				} catch (error) {
-					console.error('roleUpdate Test Error:', error);
+					logError('roleUpdate Test Error:', { error: (error as Error)?.message ?? error });
 					await interaction.reply({ content: '❌ Failed to emit roleUpdate event', flags: MessageFlags.Ephemeral });
 				}
 				break;

@@ -13,6 +13,13 @@ export default defineConfig([
 	{ files: ['**/*.json'], plugins: { json }, language: 'json/json', extends: ['json/recommended'] },
 	{ files: ['**/*.jsonc'], plugins: { json }, language: 'json/jsonc', extends: ['json/recommended'] },
 	{ files: ['**/*.md'], plugins: { markdown }, language: 'markdown/gfm', extends: ['markdown/recommended'] },
+	// Disable explicit-any rule in tests to allow pragmatic use of `any` in test helpers/mocks
+	{
+		files: ['test/**/*.ts', 'test/**/*.tsx', 'test/**/*.js', 'test/**/*.jsx', 'test/**/*.mts', 'test/**/*.mjs', 'test/**/*.cjs'],
+		rules: {
+			'@typescript-eslint/no-explicit-any': 'off'
+		}
+	},
 	{
 		rules: {
 			'indent': ['error', 'tab', { 'SwitchCase': 1 }],

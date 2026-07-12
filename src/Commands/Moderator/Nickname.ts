@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, Colors, EmbedBuilder, MessageFlags } from 'discord.js';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 
 export default new Command({
 	name: 'nickname',
@@ -51,7 +52,7 @@ export default new Command({
 			await Target?.setNickname(setNickname, Reason);
 			await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 		} catch (error) {
-			console.error(error);
+			logError('Nickname command failed', { error: (error as Error)?.message ?? error });
 			return;
 		}
 	}

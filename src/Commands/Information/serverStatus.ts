@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder } from 'discord.js';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 import axios from 'axios';
 
 export default new Command({
@@ -165,7 +166,7 @@ export default new Command({
 				await interaction.editReply('Invalid subcommand. Use `/server status`, `/server start`, `/server stop`, or `/server restart`.');
 			}
 		} catch (error) {
-			console.error('Error handling server command:', error);
+			logError('Error handling server command', { error: (error as Error)?.message ?? error });
 			await interaction.editReply({ content: 'An error occurred while trying to process the server command.' });
 		}
 	},

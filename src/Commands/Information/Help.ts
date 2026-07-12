@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, EmbedBuilder, MessageFlags, TextChannel } from 'discord.js';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 
 export default new Command({
 	name: 'help',
@@ -85,7 +86,7 @@ export default new Command({
 				await ch.send({ embeds: [contactEmbed] });
 				delivered = true;
 			} catch (err) {
-				console.error('Failed to send help embed to contact channel', err);
+				logError('Failed to send help embed to contact channel', { guild: guild?.id, error: (err as Error)?.message ?? err });
 			}
 		}
 

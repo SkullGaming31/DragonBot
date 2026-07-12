@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder, Message } from 'discord.js';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 
 export default new Command({
 	name: 'clear',
@@ -50,16 +51,16 @@ export default new Command({
 					response.setDescription(`🧹 ${interaction.user.username} Cleared ${messages.size} messages from ${Target}`)
 						.setColor('Red');
 					await interaction.reply({ embeds: [response] });
-				}).catch((err) => { console.error(`Error Deleting Messages from Channel and ${Target}`, err); });
+				}).catch((err) => { logError('Error Deleting Messages from Channel and target', { error: (err as Error)?.message ?? err, target: Target?.id }); });
 			} else {
 				await channel?.bulkDelete(Amount, true).then(async (messages) => {
 					response.setDescription(`🧹 ${interaction.user.username} Cleared ${messages.size} messages from the channel`)
 						.setColor('Red');
 					await interaction.reply({ embeds: [response] });
-				}).catch((err) => { console.error('Error Deleting Messages from channel', err); });
+				}).catch((err) => { logError('Error Deleting Messages from channel', { error: (err as Error)?.message ?? err }); });
 			}
 		} catch (error) {
-			console.error(error);
+			logError('Error in clear command', { error: (error as Error)?.message ?? error });
 		}
 	}
 });

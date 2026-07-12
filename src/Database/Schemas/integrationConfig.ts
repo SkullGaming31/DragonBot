@@ -1,4 +1,4 @@
-import { Document, Schema, model } from 'mongoose';
+import { Document, Schema, model, models, Model } from 'mongoose';
 
 export interface IIntegrationConfig extends Document {
   GuildID: string;
@@ -18,6 +18,6 @@ const integrationConfigSchema = new Schema<IIntegrationConfig>({
 	rateLimitWindowSec: { type: Number, default: 60 }
 });
 
-const IntegrationConfigModel = model<IIntegrationConfig>('IntegrationConfig', integrationConfigSchema);
+const IntegrationConfigModel: Model<IIntegrationConfig> = (models.IntegrationConfig as Model<IIntegrationConfig>) || model<IIntegrationConfig>('IntegrationConfig', integrationConfigSchema);
 
 export default IntegrationConfigModel;

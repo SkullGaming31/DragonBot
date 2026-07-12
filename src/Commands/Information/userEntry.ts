@@ -1,6 +1,7 @@
 import { ApplicationCommandType, MessageFlags } from 'discord.js';
 import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
+import { error as logError, info as logInfo } from '../../Utilities/logger';
 
 export default new Command({
 	name: 'begin',
@@ -16,7 +17,7 @@ export default new Command({
 
 			// Check if the user already exists in the database for this guild
 			const existingUser = await UserModel.findOne({ guildID: guild?.id, id: user.id });
-			console.log(`${guild?.id} : ${user.username}`);
+			logInfo('userEntry: checking/creating user', { guild: guild?.id, user: user.id });
 			if (existingUser) {
 				return interaction.reply({ content: 'You already have an entry in the database!', flags: MessageFlags.Ephemeral });
 			}
@@ -27,7 +28,7 @@ export default new Command({
 
 			return interaction.reply({ content: 'Welcome! You have been added to the database and can now start earning gold!', flags: MessageFlags.Ephemeral });
 		} catch (error) {
-			console.error('Error creating user entry:', error);
+			logError('Error creating user entry', { error: (error as Error)?.message ?? error });
 			return interaction.reply({ content: 'Oops! Something went wrong while creating your entry. Please try again later.', flags: MessageFlags.Ephemeral });
 		}
 	},

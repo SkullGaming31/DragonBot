@@ -5,6 +5,7 @@ import {
 	MessageFlags
 } from 'discord.js';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 import { ListingModel, IListing } from '../../Database/Schemas/marketListing';
 import { UserModel } from '../../Database/Schemas/userModel';
 import { FilterQuery } from 'mongoose';
@@ -128,7 +129,8 @@ export default new Command({
 						session.endSession();
 						return interaction.reply({ content: `You bought ${quantity}x ${listing.itemName} for ${total}g.` });
 					} catch (err) {
-						await session.abortTransaction(); session.endSession(); console.error('Market buy transaction failed:', err);
+						await session.abortTransaction(); session.endSession();
+						logError('Market buy transaction failed:', { error: (err as Error)?.message ?? err });
 						return interaction.reply({ content: 'Purchase failed, please try again later.', flags: MessageFlags.Ephemeral });
 					}
 				}
@@ -149,7 +151,7 @@ export default new Command({
 			return interaction.reply({ content: 'Unknown subcommand.', flags: MessageFlags.Ephemeral });
 
 		} catch (err) {
-			console.error('Market command error:', err);
+			logError('Market command error:', { error: (err as Error)?.message ?? err });
 			return interaction.reply({ content: 'An error occurred while processing the marketplace command.', flags: MessageFlags.Ephemeral });
 		}
 	}

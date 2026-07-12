@@ -19,20 +19,33 @@ export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member: Guil
 		const warnDoc = await WarningDB.findOne({ GuildID: guild.id, UserID: member.id }).lean().catch(() => null) as unknown as { Warnings?: unknown[] } | null;
 		const warnCount = Array.isArray(warnDoc?.Warnings) ? warnDoc.Warnings.length : 0;
 		if (warnCount >= rejoinThreshold) {
-			// Attempt to ban the rejoining member to prevent immediate rejoin.
-			if (member.bannable) {
-				try {
-					await member.ban({ reason: 'Rejoin after multiple warnings' });
-					// Post to dashboard (best-effort)
-					const url = process.env.AUTOMOD_DASHBOARD_URL;
-					const secret = process.env.INTERNAL_SECRET;
-					if (url) {
-						await axios.post(`${url.replace(/\/$/, '')}/api/v1/automod/${guild.id}/incidents`, { userId: member.id, userDisplayName: user?.globalName ?? user?.username ?? user?.tag, action: 'ban', reason: 'Rejoin after multiple warnings' }, { headers: secret ? { 'x-internal-secret': secret } : {} }).catch(() => null);
+			// Don't apply rejoin ban to guild owner or test IDs
+			try {
+				const rawTestIds = process.env.AUTOMOD_TEST_USER_IDS ?? process.env.AUTOMOD_TEST_USER_ID ?? '';
+				const TEST_USER_IDS = String(rawTestIds).split(',').map(s => s.trim()).filter(Boolean);
+				if (member.id === guild.ownerId) {
+					logInfo('guildMemberAdd: skipping rejoin ban for guild owner', { guild: guild.id, user: member.id });
+				} else if (TEST_USER_IDS.includes(member.id)) {
+					logInfo('guildMemberAdd: skipping rejoin ban for test user', { guild: guild.id, user: member.id });
+				} else {
+					// Attempt to ban the rejoining member to prevent immediate rejoin.
+					if (member.bannable) {
+						try {
+							await member.ban({ reason: 'Rejoin after multiple warnings' });
+							// Post to dashboard (best-effort)
+							const url = process.env.AUTOMOD_DASHBOARD_URL;
+							const secret = process.env.INTERNAL_SECRET;
+							if (url) {
+								await axios.post(`${url.replace(/\/$/, '')}/api/v1/automod/${guild.id}/incidents`, { userId: member.id, userDisplayName: user?.globalName ?? user?.username ?? user?.tag, action: 'ban', reason: 'Rejoin after multiple warnings' }, { headers: secret ? { 'x-internal-secret': secret } : {} }).catch(() => null);
+							}
+							return; // don't send welcome message
+						} catch (err) {
+							// ignore ban errors and continue to welcome flow
+						}
 					}
-					return; // don't send welcome message
-				} catch (err) {
-					// ignore ban errors and continue to welcome flow
 				}
+			} catch (err) {
+				// non-fatal
 			}
 		}
 	} catch (err) {

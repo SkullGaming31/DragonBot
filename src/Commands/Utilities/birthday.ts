@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, channelMention, ChannelType } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, channelMention, ChannelType, MessageFlags } from 'discord.js';
 import { Command } from '../../Structures/Command';
 import BirthdayModel from '../../Database/Schemas/birthdayDB';
 import BirthdaySettingsModel from '../../Database/Schemas/birthdaySettingsDB';
@@ -75,46 +75,46 @@ export default new Command({
 		if (sub === 'test') {
 			const target = interaction.options.getUser('user')?.id || userId;
 			// only allow testing others if user has ManageGuild
-			if (target !== userId && !interaction.memberPermissions?.has('ManageGuild')) return safeInteractionReply(interaction, { content: 'You need Manage Guild to test other users.', ephemeral: true });
+			if (target !== userId && !interaction.memberPermissions?.has('ManageGuild')) return safeInteractionReply(interaction, { content: 'You need Manage Guild to test other users.', flags: MessageFlags.Ephemeral });
 			const rec = await BirthdayModel.findOne({ guildID: guildId, userID: target }).lean();
-			if (!rec) return safeInteractionReply(interaction, { content: 'No birthday set for that user.', ephemeral: true });
+			if (!rec) return safeInteractionReply(interaction, { content: 'No birthday set for that user.', flags: MessageFlags.Ephemeral });
 			const settings = await BirthdaySettingsModel.findOne({ GuildID: guildId }).lean();
 			const channelId = settings?.ChannelID ?? undefined;
 			// trigger greeting
 			try {
 				await (require('../../Utilities/birthdayScheduler')).sendBirthdayGreeting(interaction.client, guildId, target, channelId, rec.year ?? null);
-				return safeInteractionReply(interaction, { content: 'Birthday test message triggered.', ephemeral: true });
+				return safeInteractionReply(interaction, { content: 'Birthday test message triggered.', flags: MessageFlags.Ephemeral });
 			} catch (err) {
 				const msg = (err as unknown as Error)?.message ?? String(err);
-				return safeInteractionReply(interaction, { content: `Failed to send test message: ${msg}`, ephemeral: true });
+				return safeInteractionReply(interaction, { content: `Failed to send test message: ${msg}`, flags: MessageFlags.Ephemeral });
 			}
 		}
 
 		if (sub === 'set') {
 			const dateStr = interaction.options.getString('date', true);
 			const parsed = parseDate(dateStr.trim());
-			if (!parsed) return safeInteractionReply(interaction, { content: 'Invalid date format. Use YYYY-MM-DD or MM-DD', ephemeral: true });
+			if (!parsed) return safeInteractionReply(interaction, { content: 'Invalid date format. Use YYYY-MM-DD or MM-DD', flags: MessageFlags.Ephemeral });
 			await BirthdayModel.findOneAndUpdate({ guildID: guildId, userID: userId }, { guildID: guildId, userID: userId, month: parsed.month, day: parsed.day, year: parsed.year ?? null }, { upsert: true });
-			return safeInteractionReply(interaction, { content: `Saved your birthday as ${parsed.month}-${parsed.day}${parsed.year ? `-${parsed.year}` : ''}`, ephemeral: true });
+			return safeInteractionReply(interaction, { content: `Saved your birthday as ${parsed.month}-${parsed.day}${parsed.year ? `-${parsed.year}` : ''}`, flags: MessageFlags.Ephemeral });
 		}
 
 		if (sub === 'remove') {
 			await BirthdayModel.deleteOne({ guildID: guildId, userID: userId }).catch(() => null);
-			return safeInteractionReply(interaction, { content: 'Removed your birthday.', ephemeral: true });
+			return safeInteractionReply(interaction, { content: 'Removed your birthday.', flags: MessageFlags.Ephemeral });
 		}
 
 		if (sub === 'channel') {
-			if (!interaction.memberPermissions?.has('ManageGuild')) return safeInteractionReply(interaction, { content: 'You need Manage Guild permission to set the channel.', ephemeral: true });
+			if (!interaction.memberPermissions?.has('ManageGuild')) return safeInteractionReply(interaction, { content: 'You need Manage Guild permission to set the channel.', flags: MessageFlags.Ephemeral });
 			const ch = interaction.options.getChannel('channel', true);
-			if (ch.type !== ChannelType.GuildText && ch.type !== ChannelType.GuildPublicThread) return safeInteractionReply(interaction, { content: 'Please choose a text channel.', ephemeral: true });
+			if (ch.type !== ChannelType.GuildText && ch.type !== ChannelType.GuildPublicThread) return safeInteractionReply(interaction, { content: 'Please choose a text channel.', flags: MessageFlags.Ephemeral });
 			await BirthdaySettingsModel.findOneAndUpdate({ GuildID: guildId }, { GuildID: guildId, ChannelID: ch.id }, { upsert: true });
-			return safeInteractionReply(interaction, { content: `Birthday messages will be posted in ${channelMention(ch.id)}`, ephemeral: false });
+			return safeInteractionReply(interaction, { content: `Birthday messages will be posted in ${channelMention(ch.id)}`, flags: MessageFlags.Ephemeral });
 		}
 
 		if (sub === 'info') {
 			const target = interaction.options.getUser('user')?.id || userId;
 			const rec = await BirthdayModel.findOne({ guildID: guildId, userID: target }).lean();
-			if (!rec) return safeInteractionReply(interaction, { content: `${target === userId ? 'You have' : 'That user has'} not set a birthday.`, ephemeral: true });
+			if (!rec) return safeInteractionReply(interaction, { content: `${target === userId ? 'You have' : 'That user has'} not set a birthday.`, flags: MessageFlags.Ephemeral });
 			let resp = `${target === userId ? 'Your' : `<@${target}>'s`} birthday: ${rec.month}-${rec.day}${rec.year ? `-${rec.year}` : ''}`;
 			if (rec.year) {
 				const now = new Date();
@@ -125,9 +125,9 @@ export default new Command({
 				if (monthToday < rec.month || (monthToday === rec.month && dayToday < rec.day)) age -= 1;
 				if (age >= 0) resp += ` (age: ${age})`;
 			}
-			return safeInteractionReply(interaction, { content: resp, ephemeral: true });
+			return safeInteractionReply(interaction, { content: resp, flags: MessageFlags.Ephemeral });
 		}
 
-		return safeInteractionReply(interaction, { content: 'Unknown subcommand', ephemeral: true });
+		return safeInteractionReply(interaction, { content: 'Unknown subcommand', flags: MessageFlags.Ephemeral });
 	}
 });

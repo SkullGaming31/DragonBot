@@ -2,6 +2,7 @@ import { ApplicationCommandOptionType, ApplicationCommandType, Collection, Embed
 import { UserModel } from '../../Database/Schemas/userModel';
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 
 export default new Command({
 	name: 'leaderboard',
@@ -74,7 +75,7 @@ export default new Command({
 			// Send the leaderboard in the correct channel
 			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
-			console.error('Error fetching leaderboard:', error);
+			logError('Error fetching leaderboard:', { error: (error as Error)?.message ?? error });
 			await interaction.reply({ content: 'Failed to retrieve the leaderboard. Please try again later.', flags: MessageFlags.Ephemeral });
 		}
 	},

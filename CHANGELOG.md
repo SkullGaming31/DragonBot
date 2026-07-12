@@ -122,3 +122,19 @@ Planned MVP:
 Implementation notes:
 - Use `guild.commands` registration for slash commands in dev environment.
 - Keep updates idempotent and use upsert to store mapping.
+
+## 2026-07-12 — Reliability, security, and logging hardening
+
+- Fix: Make economy updates atomic across commands (`gamble`, `heist`, `loot`, `market`, and other fun/economy flows). Use `findOneAndUpdate` with `balance: { $gte: ... }` and `$inc` to prevent race conditions and overdraws.
+- Fix: Loot/store/person handlers now use safe fallback penalties when moderation actions fail (for example: attempting to timeout the guild owner). Timeout attempts are skipped for the guild owner and missing-permission errors fall back to balance deductions and structured warnings.
+- Change: Decoupled webhook handling from app bootstrap — `src/Integrations/webhookHandler.ts` exports `handleIntegrationWebhook` and router factories; `src/routes/apiv1.ts` now dynamically loads the `appInstance`/client to avoid circular imports.
+- Change: API key middleware tightened — only accept `x-api-key` header (no query-string API key acceptance) and improved rate-limiting and security headers in `src/index.ts`.
+- Add: Single-instance lockfile and `.no_autorun` sentinel to prevent accidental autorun in developer environments; `DISABLE_AUTORUN` env var respected.
+- Change: Centralized logging — introduced/expanded use of `src/Utilities/logger.ts` across commands, events, and utilities; replaced many `console.log`/`console.error` usages (large sweep: `src/Commands/Fun/*`, `src/Commands/Moderator/*`, `src/Commands/Information/*`, and utilities).
+- Fix: Centralize process-level error handling and startup wiring (non-fatal MongoDB connection errors are logged and retried; startup errors surface with clear logs).
+- Fix: Moderation helpers hardened — `src/Utilities/moderation.ts` now skips moderation against the guild owner, respects `AUTOMOD_TEST_USER_IDS`, and logs permission failures rather than throwing.
+- Fix: `guildMemberAdd` rejoin-ban logic updated to skip owner/test IDs and log decisions.
+- Change: Tighten default `allowedMentions` in `src/Structures/Client.ts` to `{ parse: [], repliedUser: false }` to avoid accidental mass pings; sends that require mentions must opt-in explicitly.
+- Fix: `src/routes/apiv1.ts` updated to avoid importing `appInstance` at module load (dynamic import used for stats/commands endpoints); integration webhook route delegates to `handleIntegrationWebhook` to avoid circular loading.
+- Fix: Linting/type issues addressed (replaced a few explicit `any` usages, added `ExtendedClient` typing in routes, and fixed `@typescript-eslint/no-explicit-any` violations).
+- Tests: Rebuilt and re-ran tests after changes; adjusted tests where needed (integration/test harness adjustments for dynamic imports and mocked clients).

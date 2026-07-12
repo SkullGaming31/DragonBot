@@ -1,6 +1,6 @@
-import express, { Router, Request, Response } from 'express';
-import { appInstance } from '../index';
-import { handleIntegrationWebhook } from '../Integrations/webhookHandler';
+import express, { Router, Request, Response, NextFunction } from 'express';
+import { createIntegrationRouter, handleIntegrationWebhook } from '../Integrations/webhookHandler';
+import type { ExtendedClient } from '../Structures/Client';
 
 export const apiV1Routes = Router();
 
@@ -9,9 +9,10 @@ apiV1Routes.get('/', (req: Request, res: Response) => {
 });
 
 // Minimal stats endpoint used by the dashboard
-apiV1Routes.get('/stats', (req: Request, res: Response) => {
+apiV1Routes.get('/stats', async (req: Request, res: Response) => {
 	try {
-		const client = appInstance?.client;
+		const mod = await import('../index');
+		const client = (mod as unknown as { appInstance?: { client?: ExtendedClient } }).appInstance?.client;
 		const uptimeSeconds = process.uptime();
 		const hours = Math.floor(uptimeSeconds / 3600);
 		const minutes = Math.floor((uptimeSeconds % 3600) / 60);
@@ -28,10 +29,12 @@ apiV1Routes.get('/stats', (req: Request, res: Response) => {
 });
 
 // Minimal commands endpoint for dashboard command listing
-apiV1Routes.get('/commands', (req: Request, res: Response) => {
+apiV1Routes.get('/commands', async (req: Request, res: Response) => {
 	try {
 		type CommandDescriptor = { name?: string; description?: string };
-		const commands = Array.from(appInstance.client.commands.values()).map((c: unknown) => {
+		const mod = await import('../index');
+		const client = (mod as unknown as { appInstance?: { client?: ExtendedClient } }).appInstance?.client;
+		const commands = Array.from((client?.commands?.values?.() ?? []) as unknown[]).map((c: unknown) => {
 			const cmd = c as CommandDescriptor;
 			return { name: cmd.name ?? 'unknown', description: cmd.description ?? '' };
 		});
@@ -42,9 +45,14 @@ apiV1Routes.get('/commands', (req: Request, res: Response) => {
 	}
 });
 
-// Generic integrations webhook receiver
-apiV1Routes.post('/integrations/webhook', express.json(), (req: Request, res: Response) => {
-	return handleIntegrationWebhook(req, res);
+// Generic integrations webhook receiver — delegate to handler dynamically to avoid circular imports
+apiV1Routes.post('/integrations/webhook', express.json(), async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		// call handler directly; it will attempt to dynamically load the client if needed
+		await handleIntegrationWebhook(req, res);
+	} catch (err) {
+		next(err);
+	}
 });
 
 export default apiV1Routes;

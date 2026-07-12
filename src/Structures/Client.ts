@@ -39,7 +39,9 @@ export class ExtendedClient extends Client {
 				Partials.User,
 				Partials.SoundboardSound,
 			],
-			allowedMentions: { parse: ['everyone', 'roles', 'users'] },
+			// Restrict allowed mentions by default to avoid accidental mass pings.
+			// Individual sends may opt-in to mentions explicitly when needed.
+			allowedMentions: { parse: [], repliedUser: false },
 			makeCache: Options.cacheWithLimits({
 				...Options.DefaultMakeCacheSettings,
 				MessageManager: { maxSize: 200 },
@@ -52,7 +54,15 @@ export class ExtendedClient extends Client {
 		const agent = new Agent({ connect: { timeout: 300000 } });
 		this.rest.setAgent(agent);
 		await this.registerModules();
-		switch (process.env.Enviroment) {
+		// Guard: if Enviroment is explicitly set to an unknown value, surface an error
+		const env = process.env.Enviroment;
+		const allowed = new Set(['dev', 'debug', 'prod']);
+		if (typeof env === 'string' && env.length > 0 && !allowed.has(env)) {
+			const msg = `Invalid Enviroment value: "${env}". Allowed: dev|debug|prod`;
+			logError(msg);
+			throw new Error(msg);
+		}
+		switch (env) {
 			case 'dev':
 			case 'debug':
 				await this.login(process.env.DEV_DISCORD_BOT_TOKEN);
@@ -71,9 +81,9 @@ export class ExtendedClient extends Client {
 			return mod?.default ?? mod;
 		}
 
-		// For JS files, use dynamic import and convert to file:// URL on Windows
-		const importTarget = filePath.includes(':') ? pathToFileURL(filePath).href : filePath;
-		return (await import(importTarget))?.default;
+		// For JS files, require by absolute path to avoid file:// URL issues in compiled CommonJS
+		const mod = require(filePath);
+		return mod?.default ?? mod;
 	}
 
 	async registerCommands({ commands, guildId }: RegisterCommandOptions): Promise<void> {

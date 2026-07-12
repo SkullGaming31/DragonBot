@@ -2,6 +2,7 @@ import { ApplicationCommandOptionType, ApplicationCommandType, Colors, EmbedBuil
 import ms, { StringValue } from 'ms';
 import Database from '../../Database/Schemas/Infractions';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 
 export default new Command({
 	name: 'timeout',
@@ -142,7 +143,7 @@ export default new Command({
 					return interaction.reply({ embeds: [timedoutEmbed] });
 
 				} catch (error) {
-					console.error('Timeout Error:', error);
+					logError('Timeout Error:', { error: (error as Error)?.message ?? error });
 					return interaction.reply({
 						content: 'Failed to timeout user due to an error',
 						flags: MessageFlags.Ephemeral

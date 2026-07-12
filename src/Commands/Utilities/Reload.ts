@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, MessageFlags } from 'discord.js';
 import type { ApplicationCommandDataResolvable } from 'discord.js';
 import path from 'path';
 import fs from 'fs';
@@ -37,7 +37,7 @@ export default new Command({
 		const command = client.commands.get(commandName);
 
 		if (!command) {
-			await interaction.reply({ content: `There is no command with name \`${commandName}\`!`, ephemeral: true });
+			await interaction.reply({ content: `There is no command with name \`${commandName}\`!`, flags: MessageFlags.Ephemeral });
 			return;
 		}
 
@@ -49,7 +49,7 @@ export default new Command({
 			if (fs.existsSync(tsPath)) commandFilePath = tsPath;
 			else if (fs.existsSync(jsPath)) commandFilePath = jsPath;
 			else {
-				await interaction.reply({ content: `Command file not found for \`${command.name}\`.`, ephemeral: true });
+				await interaction.reply({ content: `Command file not found for \`${command.name}\`.`, flags: MessageFlags.Ephemeral });
 				return;
 			}
 
@@ -93,7 +93,7 @@ export default new Command({
 			const maybeModule = newCommandModule as unknown;
 			const candidate: CommandLike = ((maybeModule as { default?: unknown }).default ?? maybeModule) as CommandLike;
 			if (!candidate || !candidate.name) {
-				await interaction.reply({ content: 'Reloaded module did not export a valid command.', ephemeral: true });
+				await interaction.reply({ content: 'Reloaded module did not export a valid command.', flags: MessageFlags.Ephemeral });
 				return;
 			}
 
@@ -109,7 +109,7 @@ export default new Command({
 					type: candidate.type ?? 1,
 					options: candidate.options ?? []
 				};
-				await interaction.reply({ content: `Dry run - command JSON:\n\n\`\`\`json\n${JSON.stringify(json, null, 2)}\n\`\`\``, ephemeral: true });
+				await interaction.reply({ content: `Dry run - command JSON:\n\n\`\`\`json\n${JSON.stringify(json, null, 2)}\n\`\`\``, flags: MessageFlags.Ephemeral });
 				return;
 			}
 
@@ -132,11 +132,11 @@ export default new Command({
 				guildId: targetGuildId
 			});
 
-			await interaction.reply({ content: `Command \`${candidate.name}\` was reloaded and the command set was re-registered.`, ephemeral: true });
+			await interaction.reply({ content: `Command \`${candidate.name}\` was reloaded and the command set was re-registered.`, flags: MessageFlags.Ephemeral });
 		} catch (error) {
 			console.error('Error reloading command:', error);
 			if (error instanceof Error) {
-				await interaction.reply({ content: `There was an error while reloading a command \`${command.name}\`. See logs.`, ephemeral: true });
+				await interaction.reply({ content: `There was an error while reloading a command \`${command.name}\`. See logs.`, flags: MessageFlags.Ephemeral });
 			}
 		}
 		// await interaction.reply({ content: `Command is currently under development`, flags: MessageFlags.Ephemeral });

@@ -1,9 +1,10 @@
 
 import { randomInt } from 'crypto';
-import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonInteraction, ButtonStyle, Collection, ComponentType, TextChannel, userMention } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonInteraction, ButtonStyle, Collection, ComponentType, MessageFlags, TextChannel, userMention } from 'discord.js';
 import { EmbedBuilder } from 'discord.js';
 import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
+import { error as logError, warn as logWarn } from '../../Utilities/logger';
 
 const houseItems: {
 	tv: number;
@@ -139,16 +140,29 @@ export default new Command({
 		// const robberyAmount = 0;
 
 		const updateUserBalance = async (userId: string, amount: number) => {
+			// Atomic balance updates. For credits (amount >= 0) we simply $inc.
+			// For debits (amount < 0) we attempt an atomic $inc only when the
+			// user has sufficient balance (balance: { $gte: debitedAmount }).
 			try {
-				const user = await UserModel.findOne({ guildID: guild?.id, id: userId });
-
-				if (!user) {
-					return interaction.editReply({ content: 'User not found in the database.' });
+				if (amount >= 0) {
+					await UserModel.findOneAndUpdate(
+						{ guildID: guild?.id, id: userId },
+						{ $inc: { balance: amount } },
+						{ upsert: true, new: true }
+					);
+					return true;
 				}
-				user.balance = Math.max(user.balance + amount, 0); // Prevent negative balance
-				await user.save();
+
+				const debit = Math.abs(amount);
+				const res = await UserModel.findOneAndUpdate(
+					{ guildID: guild?.id, id: userId, balance: { $gte: debit } },
+					{ $inc: { balance: -debit } },
+					{ new: true }
+				);
+				return !!res;
 			} catch (error) {
-				console.error('Error updating user balance:', error);
+				logError('Error updating user balance:', { error: (error as Error)?.message ?? error });
+				return false;
 			}
 		};
 		switch (robberyTarget) {
@@ -323,9 +337,38 @@ export default new Command({
 
 					collector.on('end', async (collected: Collection<string, ButtonInteraction>) => {
 						if (collected.size === 0) {
-							// Update both balances
-							await updateUserBalance(member.id, -stolenAmount);
-							await updateUserBalance(interaction.user.id, stolenAmount);
+							// Atomically decrement victim; if victim no longer has full amount,
+							// attempt to take what's left, otherwise abort.
+							const victimRes = await UserModel.findOneAndUpdate(
+								{ guildID: guild?.id, id: member.id, balance: { $gte: stolenAmount } },
+								{ $inc: { balance: -stolenAmount } },
+								{ new: true }
+							);
+
+							if (!victimRes) {
+								const victimDoc = await UserModel.findOne({ guildID: guild?.id, id: member.id });
+								const available = victimDoc?.balance || 0;
+								if (available <= 0) {
+									return interaction.editReply({ content: `${member.user.username} is broke! Nothing to steal.` });
+								}
+								// Try to take the remaining balance atomically
+								const took = await UserModel.findOneAndUpdate(
+									{ guildID: guild?.id, id: member.id, balance: { $gte: available } },
+									{ $inc: { balance: -available } },
+									{ new: true }
+								);
+								if (!took) {
+									return interaction.editReply({ content: 'Failed to complete robbery due to race condition. Try again.' });
+								}
+								stolenAmount = available;
+							}
+
+							// Credit the robber
+							await UserModel.findOneAndUpdate(
+								{ guildID: guild?.id, id: interaction.user.id },
+								{ $inc: { balance: stolenAmount } },
+								{ upsert: true, new: true }
+							);
 
 							const personEmbed = new EmbedBuilder()
 								.setTitle('💰 Successful Robbery')
@@ -338,7 +381,7 @@ export default new Command({
 					});
 
 				} catch (error) {
-					console.error(error);
+					logError('Error in person robbery handler', { error: (error as Error)?.message ?? error });
 					return interaction.editReply({ content: 'An error occurred while attempting to rob a user.' });
 				}
 				break;
@@ -425,25 +468,54 @@ export default new Command({
 									await userData.save();
 
 									if (userBalance >= fine) {
-										await updateUserBalance(user.id, -fine);
-										const caughtEmbed = new EmbedBuilder()
-											.setTitle('🚨 CAUGHT!')
-											.setColor('Red')
-											.setDescription(`Paid ${fine} gold from your balance!`);
-										return i.editReply({ embeds: [caughtEmbed], components: [] });
-									} else {
-										// Jail handling with permission check
-										const member = await guild?.members.fetch(user.id);
-										if (member && guild?.members.me?.permissions.has('ModerateMembers')) {
-											await member.timeout(300000, 'Failed robbery fine');
-											const jailedEmbed = new EmbedBuilder()
-												.setTitle('⛓️ JAILED')
+										// Attempt atomic debit; if it fails due to race, fallback below
+										const decRes = await UserModel.findOneAndUpdate(
+											{ guildID: guild?.id, id: user.id, balance: { $gte: fine } },
+											{ $inc: { balance: -fine } },
+											{ new: true }
+										);
+										if (decRes) {
+											const caughtEmbed = new EmbedBuilder()
+												.setTitle('🚨 CAUGHT!')
 												.setColor('Red')
-												.setDescription('5 minute timeout for insufficient funds!');
-											return i.editReply({ embeds: [jailedEmbed], components: [] });
+												.setDescription(`Paid ${fine} gold from your balance!`);
+											return i.editReply({ embeds: [caughtEmbed], components: [] });
 										}
-										// Fallback penalty
-										await updateUserBalance(user.id, -userBalance);
+										// If atomic debit failed, refresh balance and fall through to insufficient funds handling
+										const refreshed = await UserModel.findOne({ guildID: guild?.id, id: user.id });
+										const refreshedBal = refreshed?.balance || 0;
+										if (refreshedBal <= 0) {
+											// Jail or fallback handled below
+										} else {
+											// Take whatever is left
+											await UserModel.findOneAndUpdate({ guildID: guild?.id, id: user.id, balance: { $gte: refreshedBal } }, { $inc: { balance: -refreshedBal } }, { new: true });
+											const lostAllEmbed = new EmbedBuilder()
+												.setTitle('🚨 CAUGHT!')
+												.setColor('Red')
+												.setDescription(`Lost all ${refreshedBal} gold!`);
+											return i.editReply({ embeds: [lostAllEmbed], components: [] });
+										}
+									} else {
+										// Jail handling with permission check. Prefer timeout when possible
+										const member = await guild?.members.fetch(user.id).catch(() => null);
+										try {
+											const canTimeout = !!(member && member.moderatable && guild?.members.me?.permissions.has('ModerateMembers'));
+											// Never attempt to timeout the guild owner
+											const isOwner = member?.id === guild?.ownerId;
+											if (canTimeout && !isOwner) {
+												await member!.timeout(300000, 'Failed robbery fine');
+												const jailedEmbed = new EmbedBuilder()
+													.setTitle('⛓️ JAILED')
+													.setColor('Red')
+													.setDescription('5 minute timeout for insufficient funds!');
+												return i.editReply({ embeds: [jailedEmbed], components: [] });
+											}
+										} catch (timeoutErr) {
+											// Timeout failed (likely missing permissions or attempting to moderate owner)
+											logWarn('Failed to apply timeout during loot penalty, falling back to balance penalty', { error: (timeoutErr as Error)?.message ?? timeoutErr, guild: guild?.id, user: user.id });
+										}
+										// Fallback penalty: remove remaining balance (best-effort)
+										await UserModel.findOneAndUpdate({ guildID: guild?.id, id: user.id }, { $inc: { balance: -userBalance } }, { new: true });
 										const lostAllEmbed = new EmbedBuilder()
 											.setTitle('🚨 CAUGHT!')
 											.setColor('Red')
@@ -451,7 +523,7 @@ export default new Command({
 										return i.editReply({ embeds: [lostAllEmbed], components: [] });
 									}
 								} catch (jailError) {
-									console.error('Jail failed:', jailError);
+									logError('Jail failed:', { error: (jailError as Error)?.message ?? jailError });
 									const errorEmbed = new EmbedBuilder()
 										.setTitle('🚨 CAUGHT!')
 										.setColor('Red')
@@ -496,7 +568,7 @@ export default new Command({
 								await i.editReply({ embeds: [storeSuccess], components: [] });
 
 							} catch (heistError) {
-								console.error('Heist error:', heistError);
+								logError('Heist error in loot.store collector', { error: (heistError as Error)?.message ?? heistError });
 								const failEmbed = new EmbedBuilder()
 									.setTitle('❌ Failed')
 									.setColor('Red')
@@ -505,11 +577,11 @@ export default new Command({
 							}
 
 						} catch (error) {
-							console.error('Button processing error:', error);
+							logError('Button processing error in loot', { error: (error as Error)?.message ?? error });
 							if (!i.replied && !i.deferred) {
 								await i.followUp({
 									content: '❌ Critical error during robbery!',
-									ephemeral: true
+									flags: MessageFlags.Ephemeral
 								});
 							}
 						}
@@ -519,11 +591,11 @@ export default new Command({
 						try {
 							await interaction.editReply({ components: [] });
 						} catch (error) {
-							console.error('Cleanup error:', error);
+							logError('Cleanup error in loot collector end', { error: (error as Error)?.message ?? error });
 						}
 					});
 				} catch (error) {
-					console.error(error);
+					logError('Error in loot store handler', { error: (error as Error)?.message ?? error });
 					await interaction.editReply({
 						content: randomChoice([
 							'🔦 The store lights suddenly went out!',

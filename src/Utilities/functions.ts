@@ -1,5 +1,6 @@
 
-import { CommandInteraction, Interaction } from 'discord.js';
+import { CommandInteraction, Interaction, MessageFlags } from 'discord.js';
+import { warn as logWarn } from './logger';
 
 // Map to store cooldowns for commands
 export const cooldowns = new Map<string, Map<string, number>>(); // Key: command name, Sub-key: user ID, Value: cooldown end timestamp (ms)
@@ -43,7 +44,7 @@ export async function safeInteractionReply(
 	interaction: CommandInteraction | Interaction | ReplyableInteraction,
 	options: unknown
 ) {
-	const replyOpts = typeof options === 'string' ? { content: options, ephemeral: true } : options;
+	const replyOpts = typeof options === 'string' ? { content: options, flags: MessageFlags.Ephemeral } : options;
 
 	try {
 		// prefer interaction.reply when available and not already replied/deferred
@@ -82,7 +83,7 @@ export async function safeInteractionReply(
 		const code = e?.code;
 		// Ignore unknown interaction / already acknowledged
 		if (code === 10062 || code === 40060) {
-			console.warn('Ignored interaction API error', code, e?.message);
+			logWarn('Ignored interaction API error', { code, message: e?.message });
 			return;
 		}
 

@@ -2,6 +2,7 @@ import { randomInt } from 'crypto';
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { UserModel } from '../../Database/Schemas/userModel';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 import { ApplicationCommandType, ApplicationCommandOptionType, EmbedBuilder, channelMention, MessageFlags } from 'discord.js';
 import RouletteModel from '../../Database/Schemas/rouletteDB';
 
@@ -56,7 +57,7 @@ export default new Command({
 				username: user.username, // Ensure the username is set
 				balance: 0 // Initialize balance
 			});
-			await userDoc.save().catch(err => console.error('Error saving user document:', err));
+			await userDoc.save().catch(err => logError('Error saving user document:', { error: (err as Error)?.message ?? err }));
 		} else {
 			// Log the found user document
 			// console.log('User document found:', userDoc);
@@ -72,14 +73,14 @@ export default new Command({
 		if (betAmount < minBet || betAmount > maxBet || typeof betAmount !== 'number') {
 			return interaction.reply({
 				content: `Bet must be between ${minBet} and ${maxBet} gold!`,
-				ephemeral: true
+				flags: MessageFlags.Ephemeral
 			});
 		}
 
 		if (userDoc.balance < betAmount) {
 			return interaction.reply({
 				content: `❌ Insufficient funds! You need ${betAmount - userDoc.balance} more gold.`,
-				ephemeral: true
+				flags: MessageFlags.Ephemeral
 			});
 		}
 

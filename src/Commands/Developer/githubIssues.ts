@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
-import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder, MessageFlags } from 'discord.js';
 import { Command } from '../../Structures/Command';
+import { error as logError, info as logInfo } from '../../Utilities/logger';
 
 interface Github {
 	url: string;
@@ -111,7 +112,7 @@ export default new Command({
 		const token = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
 
 		if (!token) {
-			console.error('GitHub token not found');
+			logError('GitHub token not found');
 			return;
 		}
 
@@ -131,26 +132,26 @@ export default new Command({
 			const response: AxiosResponse<Github> = await axios.post(apiUrl, data, { headers });
 
 			if (response.status === 201) {
-				console.log('Github Response: ', response.data);
+				logInfo('Github Response', { data: response.data });
 				const successfulEmbed = new EmbedBuilder()
 					.setTitle(`${response.data.title}`)
 					.setColor('Green')
 					.setAuthor({ name: `${response.data.user.login}`, iconURL: `${response.data.user.avatar_url}` })
 					.setURL(`https://github.com/${owner}/${repo}/issues/${response.data.number}`)
 					.setTimestamp();
-				await interaction.reply({ embeds: [successfulEmbed], ephemeral: true });
+				await interaction.reply({ embeds: [successfulEmbed], flags: MessageFlags.Ephemeral });
 			} else {
-				await interaction.reply({ content: 'Failed to create a GitHub issue.', ephemeral: true });
+				await interaction.reply({ content: 'Failed to create a GitHub issue.', flags: MessageFlags.Ephemeral });
 			}
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
-			console.error('Error creating GitHub issue:', error);
+			logError('Error creating GitHub issue:', { error: error?.message ?? error });
 			const errorEmbed = new EmbedBuilder()
 				.setTitle('ERROR')
 				.setDescription(`${error.response?.data?.message}`)
 				.setColor('Red')
 				.setTimestamp();
-			await interaction.reply({ content: 'An error occurred while creating the GitHub issue.', embeds: [errorEmbed], ephemeral: true });
+			await interaction.reply({ content: 'An error occurred while creating the GitHub issue.', embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
 		}
 	}
 });

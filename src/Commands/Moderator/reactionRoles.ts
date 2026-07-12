@@ -1,5 +1,6 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder, TextChannel, ChannelType } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder, TextChannel, ChannelType, MessageFlags } from 'discord.js';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 import ReactionRoleModel from '../../Database/Schemas/reactionRole';
 import { tryReact } from '../../Utilities/retry';
 import { createAndLogMapping } from '../../Utilities/reactionMapping';
@@ -62,7 +63,7 @@ export default new Command({
 	run: async ({ interaction }) => {
 		const sub = interaction.options.getSubcommand();
 		const guildId = interaction.guild?.id;
-		if (!guildId) return interaction.reply({ content: 'Guild not found.', ephemeral: true });
+		if (!guildId) return interaction.reply({ content: 'Guild not found.', flags: MessageFlags.Ephemeral });
 
 		if (sub === 'create') {
 			const channel = interaction.options.getChannel('channel', true) as TextChannel;
@@ -79,11 +80,11 @@ export default new Command({
 				const perms = me ? channel.permissionsFor(me) : null;
 				// Only fail early when we have a permissions object and it explicitly lacks required perms.
 				if (perms && typeof (perms as unknown as { has?: unknown }).has === 'function' && !(perms as unknown as { has: (p: unknown) => boolean }).has(['ViewChannel', 'ReadMessageHistory', 'AddReactions'])) {
-					return interaction.reply({ content: 'I do not have sufficient permissions in the target channel (need View Channel, Read Message History, Add Reactions).', ephemeral: true });
+					return interaction.reply({ content: 'I do not have sufficient permissions in the target channel (need View Channel, Read Message History, Add Reactions).', flags: MessageFlags.Ephemeral });
 				}
 				// role hierarchy: bot must be higher than target role
 				if (interaction.guild && me && role && (me.roles?.highest?.position ?? 0) <= (role?.position ?? 0)) {
-					return interaction.reply({ content: 'I cannot assign that role because my role is not above the target role in the server role hierarchy.', ephemeral: true });
+					return interaction.reply({ content: 'I cannot assign that role because my role is not above the target role in the server role hierarchy.', flags: MessageFlags.Ephemeral });
 				}
 			} catch (err) {
 				// if permission checks throw, continue and let operations fail with clear error messages later
@@ -93,12 +94,12 @@ export default new Command({
 
 			// Permission/visibility checks (only enforce when host channel object exposes these properties)
 			if (typeof (channel as unknown as { viewable?: unknown }).viewable === 'boolean' && !(channel as unknown as { viewable?: boolean }).viewable) {
-				return interaction.reply({ content: 'I cannot view that channel. Check my channel permissions.', ephemeral: true });
+				return interaction.reply({ content: 'I cannot view that channel. Check my channel permissions.', flags: MessageFlags.Ephemeral });
 			}
 			if (typeof (channel as unknown as { permissionsFor?: unknown }).permissionsFor === 'function') {
 				const perms = (channel as unknown as { permissionsFor: (u: unknown) => unknown }).permissionsFor(interaction.client.user!);
 				if (perms && typeof (perms as unknown as { has?: unknown }).has === 'function' && !(perms as unknown as { has: (p: unknown) => boolean }).has('AddReactions')) {
-					return interaction.reply({ content: 'I need the Add Reactions permission in the target channel to pre-populate the emoji.', ephemeral: true });
+					return interaction.reply({ content: 'I need the Add Reactions permission in the target channel to pre-populate the emoji.', flags: MessageFlags.Ephemeral });
 				}
 			}
 
@@ -114,10 +115,10 @@ export default new Command({
 				actorId: interaction.user?.id,
 			});
 
-			if (res.existing) return interaction.reply({ content: 'This mapping already exists.', ephemeral: true });
+			if (res.existing) return interaction.reply({ content: 'This mapping already exists.', flags: MessageFlags.Ephemeral });
 			let replyMsg = `Created mapping with id ${res.doc._id}`;
 			if (res.reactResult === 'missing_permissions') replyMsg += ' — I could not add the reaction because I lack permissions or access to the emoji.';
-			return interaction.reply({ content: replyMsg, ephemeral: true });
+			return interaction.reply({ content: replyMsg, flags: MessageFlags.Ephemeral });
 		}
 
 		if (sub === 'create_message') {
@@ -133,10 +134,10 @@ export default new Command({
 				const perms = me ? channel.permissionsFor(me) : null;
 				// Only fail early when we have a permissions object and it explicitly lacks required perms.
 				if (perms && typeof (perms as unknown as { has?: unknown }).has === 'function' && !(perms as unknown as { has: (p: unknown) => boolean }).has(['ViewChannel', 'SendMessages', 'AddReactions'])) {
-					return interaction.reply({ content: 'I do not have sufficient permissions in the target channel (need View Channel, Send Messages, Add Reactions).', ephemeral: true });
+					return interaction.reply({ content: 'I do not have sufficient permissions in the target channel (need View Channel, Send Messages, Add Reactions).', flags: MessageFlags.Ephemeral });
 				}
 				if (interaction.guild && me && role && (me.roles?.highest?.position ?? 0) <= (role?.position ?? 0)) {
-					return interaction.reply({ content: 'I cannot assign that role because my role is not above the target role in the server role hierarchy.', ephemeral: true });
+					return interaction.reply({ content: 'I cannot assign that role because my role is not above the target role in the server role hierarchy.', flags: MessageFlags.Ephemeral });
 				}
 			} catch (err) {
 				// ignore and continue to attempt send which will fail with a clear error
@@ -147,12 +148,12 @@ export default new Command({
 			let sentMessage: unknown = undefined;
 			// Pre-flight permission checks before sending (only enforce when channel exposes checks)
 			if (typeof (channel as unknown as { viewable?: unknown }).viewable === 'boolean' && !(channel as unknown as { viewable?: boolean }).viewable) {
-				return interaction.reply({ content: 'I cannot view that channel. Check my channel permissions.', ephemeral: true });
+				return interaction.reply({ content: 'I cannot view that channel. Check my channel permissions.', flags: MessageFlags.Ephemeral });
 			}
 			if (typeof (channel as unknown as { permissionsFor?: unknown }).permissionsFor === 'function') {
 				const perms = (channel as unknown as { permissionsFor: (u: unknown) => unknown }).permissionsFor(interaction.client.user!);
 				if (perms && typeof (perms as unknown as { has?: unknown }).has === 'function' && !(perms as unknown as { has: (p: unknown) => boolean }).has('SendMessages')) {
-					return interaction.reply({ content: 'I need Send Messages permission in the target channel to create the message.', ephemeral: true });
+					return interaction.reply({ content: 'I need Send Messages permission in the target channel to create the message.', flags: MessageFlags.Ephemeral });
 				}
 			}
 
@@ -170,8 +171,8 @@ export default new Command({
 					throw new Error('Failed to determine sent message id');
 				}
 			} catch (err) {
-				console.error('Failed to send message for create_message:', err);
-				return interaction.reply({ content: 'Failed to send the message in the target channel. Ensure I have permission to send messages there.', ephemeral: true });
+				logError('Failed to send message for create_message in reactionRoles', { error: (err as Error)?.message ?? err });
+				return interaction.reply({ content: 'Failed to send the message in the target channel. Ensure I have permission to send messages there.', flags: MessageFlags.Ephemeral });
 			}
 
 			const res = await createAndLogMapping({
@@ -186,28 +187,28 @@ export default new Command({
 				actorId: interaction.user?.id,
 			});
 
-			if (res.existing) return interaction.reply({ content: 'This mapping already exists.', ephemeral: true });
+			if (res.existing) return interaction.reply({ content: 'This mapping already exists.', flags: MessageFlags.Ephemeral });
 			let replyMsg = `Created mapping with id ${res.doc._id}`;
 			if (res.reactResult === 'missing_permissions') replyMsg += ' — I could not add the reaction because I lack permissions or access to the emoji.';
-			return interaction.reply({ content: replyMsg, ephemeral: true });
+			return interaction.reply({ content: replyMsg, flags: MessageFlags.Ephemeral });
 		}
 
 		if (sub === 'list') {
 			const docs = await ReactionRoleModel.find({ guildId }).lean();
-			if (!docs || docs.length === 0) return interaction.reply({ content: 'No reaction role mappings found for this guild.', ephemeral: true });
+			if (!docs || docs.length === 0) return interaction.reply({ content: 'No reaction role mappings found for this guild.', flags: MessageFlags.Ephemeral });
 
 			const embed = new EmbedBuilder().setTitle('Reaction Role Mappings');
 			for (const d of docs) {
 				embed.addFields([{ name: String(d._id), value: `channel: <#${d.channelId}> message: ${d.messageId} emoji: ${d.emoji} role: <@&${d.roleId}> ${d.label ? `\n${d.label}` : ''}` }]);
 			}
 
-			return interaction.reply({ embeds: [embed], ephemeral: true });
+			return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 		}
 
 		if (sub === 'cleanup') {
 			// Ensure the invoker has ManageGuild or is allowed by UserPerms
 			if (!interaction.memberPermissions?.has?.('ManageGuild')) {
-				return interaction.reply({ content: 'You do not have permission to run cleanup.', ephemeral: true });
+				return interaction.reply({ content: 'You do not have permission to run cleanup.', flags: MessageFlags.Ephemeral });
 			}
 
 			const mode = interaction.options.getString('mode', false) ?? 'run';
@@ -217,11 +218,11 @@ export default new Command({
 				try {
 					const ReactionCleanupModel = (await import('../../Database/Schemas/reactionCleanupDB')).default;
 					const doc = await ReactionCleanupModel.findOne({ Guild: guildId }).lean().catch(() => null);
-					if (!doc) return interaction.reply({ content: 'No cleanup run recorded for this guild.', ephemeral: true });
-					return interaction.reply({ content: `Last cleanup: ${doc.lastRunAt?.toISOString() ?? 'unknown'} — checked ${doc.lastChecked ?? 0}, removed ${doc.lastRemoved ?? 0}.`, ephemeral: true });
+					if (!doc) return interaction.reply({ content: 'No cleanup run recorded for this guild.', flags: MessageFlags.Ephemeral });
+					return interaction.reply({ content: `Last cleanup: ${doc.lastRunAt?.toISOString() ?? 'unknown'} — checked ${doc.lastChecked ?? 0}, removed ${doc.lastRemoved ?? 0}.`, flags: MessageFlags.Ephemeral });
 				} catch (err) {
-					console.error('Failed to read cleanup status', err);
-					return interaction.reply({ content: 'Failed to read cleanup status.', ephemeral: true });
+					logError('Failed to read cleanup status in reactionRoles cleanup status', { error: (err as Error)?.message ?? err });
+					return interaction.reply({ content: 'Failed to read cleanup status.', flags: MessageFlags.Ephemeral });
 				}
 			}
 
@@ -229,17 +230,17 @@ export default new Command({
 			try {
 				const { runReactionCleanup } = await import('../../Utilities/reactionCleanup');
 				const result = await runReactionCleanup(interaction.client);
-				return interaction.reply({ content: `Cleanup complete. Checked ${result?.checked ?? 0} mappings, removed ${result?.removed ?? 0}.`, ephemeral: true });
+				return interaction.reply({ content: `Cleanup complete. Checked ${result?.checked ?? 0} mappings, removed ${result?.removed ?? 0}.`, flags: MessageFlags.Ephemeral });
 			} catch (err) {
-				console.error('Cleanup failed', err);
-				return interaction.reply({ content: 'Cleanup failed. Check logs for details.', ephemeral: true });
+				logError('Cleanup failed in reactionRoles', { error: (err as Error)?.message ?? err });
+				return interaction.reply({ content: 'Cleanup failed. Check logs for details.', flags: MessageFlags.Ephemeral });
 			}
 		}
 
 		if (sub === 'delete') {
 			const id = interaction.options.getString('id', true);
 			const removed = await ReactionRoleModel.findOneAndDelete({ guildId, _id: id });
-			if (!removed) return interaction.reply({ content: 'Mapping not found.', ephemeral: true });
+			if (!removed) return interaction.reply({ content: 'Mapping not found.', flags: MessageFlags.Ephemeral });
 
 			// optional: log deletion to configured logs channel (best-effort; don't block reply)
 			(async () => {
@@ -258,11 +259,11 @@ export default new Command({
 
 					await sendGuildLog(interaction.guild!, embed, removed.channelId).catch(() => null);
 				} catch (err) {
-					console.error('Failed to log reaction mapping deletion:', err);
+					logError('Failed to log reaction mapping deletion in reactionRoles.delete', { error: (err as Error)?.message ?? err });
 				}
 			})();
 
-			return interaction.reply({ content: `Deleted mapping ${id}`, ephemeral: true });
+			return interaction.reply({ content: `Deleted mapping ${id}`, flags: MessageFlags.Ephemeral });
 		}
 	},
 });

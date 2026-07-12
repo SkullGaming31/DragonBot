@@ -10,7 +10,7 @@
 		"economy"
 	],
 	"license": "MIT",
-	"main": "./dist/src/index.js",
+	"main": "./dist/index.js",
 	"maintainers": [
 		"SkullGaming31"
 	],
@@ -24,7 +24,7 @@
 		"url": "https://github.com/skullgaming31/dragonbot/issues"
 	},
 	"scripts": {
-		"start": "node ./dist/src/index.js",
+		"start": "node ./dist/index.js",
 		"start:dev": "ts-node ./src/index.ts",
 		"lint": "eslint --fix src",
 		"build": "tsc",

@@ -1,5 +1,6 @@
 import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, Colors, ComponentType, DiscordAPIError, EmbedBuilder, MessageFlags } from 'discord.js';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 
 export default new Command({
 	name: 'ban',
@@ -81,8 +82,10 @@ export default new Command({
 								])
 						]
 					}).catch((err: DiscordAPIError) => {
-						if (err.code !== 50007) return console.error('Users Dm\'s are turned off', err);
-						interaction.editReply({ content: 'a Message to the user was not sent, they have there DM\'s turned off' });
+						if (err.code !== 50007) {
+							logError('Users DMs are turned off when attempting to send ban message', { error: (err as Error)?.message ?? err });
+							return interaction.editReply({ content: 'a Message to the user was not sent, they have there DM\'s turned off' });
+						}
 					});
 					break;
 				case 'ban-no':

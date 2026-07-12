@@ -1,6 +1,7 @@
 import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, Colors, ComponentType, DiscordAPIError, EmbedBuilder, MessageFlags } from 'discord.js';
 import ms from 'ms';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 
 export default new Command({
 	name: 'kick',
@@ -79,7 +80,9 @@ export default new Command({
 								])
 						]
 					}).catch((err: DiscordAPIError) => {
-						if (err.code !== 50007) return console.error('Users Dm\'s are turned off', err);
+						if (err.code !== 50007) {
+							logError('Users DMs are turned off when attempting to send kick message', { error: (err as Error)?.message ?? err });
+						}
 					});
 					break;
 				case 'kick-no':

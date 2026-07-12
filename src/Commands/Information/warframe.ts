@@ -1,5 +1,6 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder, MessageFlags } from 'discord.js';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 import axios from 'axios';
 
 interface WarframeData {
@@ -263,7 +264,7 @@ export default new Command({
 											// no results from items endpoint
 										}
 									} catch (e) {
-										console.error('[warframe] Failed to fetch item fallback for', component.name, e);
+										logError('[warframe] Failed to fetch item fallback for', { component: component.name, error: (e as Error)?.message ?? e });
 									}
 								}
 
@@ -464,7 +465,7 @@ export default new Command({
 
 								await interaction.editReply({ embeds: [itemEmbed] });
 							} catch (error) {
-								console.error(error);
+								logError('warframe item lookup error', { error: (error as Error)?.message ?? error });
 								await interaction.editReply({ content: 'An error occurred while fetching item data.' });
 							}
 							break;
@@ -474,8 +475,8 @@ export default new Command({
 					}
 			}
 		} catch (error) {
-			console.error('Error handling points:', error);
-			await interaction.reply({ content: 'An error occurred while processing the points. Please try again later.', ephemeral: true });
+			logError('warframe command failed', { error: (error as Error)?.message ?? error });
+			await interaction.reply({ content: 'An error occurred while processing the points. Please try again later.', flags: MessageFlags.Ephemeral });
 		}
 	},
 });

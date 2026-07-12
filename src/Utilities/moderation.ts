@@ -70,6 +70,16 @@ export async function escalateByWarnings(
 	try {
 		if (!member) return null;
 
+		// Never attempt moderation actions against the guild owner
+		try {
+			if (typeof guild?.ownerId === 'string' && member.id === guild.ownerId) {
+				logWarn('escalateByWarnings: attempted moderation on guild owner, skipping', { guild: guild.id, user: member.id });
+				return null;
+			}
+		} catch (e) {
+			// ignore owner lookup failures
+		}
+
 		// Testing guard: do not actually apply moderation to specific test user ids.
 		// Configure a single id or multiple comma-separated ids via env var:
 		// AUTOMOD_TEST_USER_IDS=353674019943219204 or AUTOMOD_TEST_USER_IDS=1,2,3
@@ -85,7 +95,7 @@ export async function escalateByWarnings(
 			if (member.moderatable) {
 				if (TEST_USER_IDS.includes(member.id)) {
 					// Do not apply timeout in tests for listed test user ids; log instead
-					console.log(`[automod] TEST_MODE: would timeout user ${member.id} for ${reason}`);
+					logInfo('automod TEST_MODE: would timeout user', { guild: guild.id, user: member.id, reason });
 					return 'timeout';
 				}
 				await member.timeout(5 * 60 * 1000, reason).catch((err) => {
@@ -99,9 +109,9 @@ export async function escalateByWarnings(
 						const secret = process.env.INTERNAL_SECRET;
 						if (url) {
 							const payload = { userId: member.id, action: 'timeout', reason, metadata: { userDisplayName: (member.user?.username ?? member.displayName ?? member.user?.tag) } };
-							console.log('[automod] posting timeout incident', { guild: guild.id, user: member.id });
+							logInfo('automod posting timeout incident', { guild: guild.id, user: member.id });
 							await axios.post(`${url.replace(/\/$/, '')}/api/v1/automod/${guild.id}/incidents`, payload, { headers: secret ? { 'x-internal-secret': secret } : {} });
-							console.log('[automod] posted timeout incident', { guild: guild.id, user: member.id });
+							logInfo('automod posted timeout incident', { guild: guild.id, user: member.id });
 						}
 					} catch (err) {
 						// do not throw — best effort only
@@ -115,7 +125,7 @@ export async function escalateByWarnings(
 		if (total === 2) {
 			if (member.kickable) {
 				if (TEST_USER_IDS.includes(member.id)) {
-					console.log(`[automod] TEST_MODE: would kick user ${member.id} for ${reason}`);
+					logInfo('automod TEST_MODE: would kick user', { guild: guild.id, user: member.id, reason });
 					return 'kick';
 				}
 				await member.kick(reason).catch((err) => {
@@ -128,9 +138,9 @@ export async function escalateByWarnings(
 						const secret = process.env.INTERNAL_SECRET;
 						if (url) {
 							const payload = { userId: member.id, action: 'kick', reason, metadata: { userDisplayName: (member.user?.username ?? member.displayName ?? member.user?.tag) } };
-							console.log('[automod] posting kick incident', { guild: guild.id, user: member.id });
+							logInfo('automod posting kick incident', { guild: guild.id, user: member.id });
 							await axios.post(`${url.replace(/\/$/, '')}/api/v1/automod/${guild.id}/incidents`, payload, { headers: secret ? { 'x-internal-secret': secret } : {} });
-							console.log('[automod] posted kick incident', { guild: guild.id, user: member.id });
+							logInfo('automod posted kick incident', { guild: guild.id, user: member.id });
 						}
 					} catch (err) {
 						// ignore
@@ -145,7 +155,7 @@ export async function escalateByWarnings(
 		if (total >= 3) {
 			if (member.bannable) {
 				if (TEST_USER_IDS.includes(member.id)) {
-					console.log(`[automod] TEST_MODE: would ban user ${member.id} for ${reason}`);
+					logInfo('automod TEST_MODE: would ban user', { guild: guild.id, user: member.id, reason });
 					return 'ban';
 				}
 				await member.ban({ reason, deleteMessageSeconds: 5 }).catch((err) => {
@@ -158,9 +168,9 @@ export async function escalateByWarnings(
 						const secret = process.env.INTERNAL_SECRET;
 						if (url) {
 							const payload = { userId: member.id, action: 'ban', reason, metadata: { userDisplayName: (member.user?.username ?? member.displayName ?? member.user?.tag) } };
-							console.log('[automod] posting ban incident', { guild: guild.id, user: member.id });
+							logInfo('automod posting ban incident', { guild: guild.id, user: member.id });
 							await axios.post(`${url.replace(/\/$/, '')}/api/v1/automod/${guild.id}/incidents`, payload, { headers: secret ? { 'x-internal-secret': secret } : {} });
-							console.log('[automod] posted ban incident', { guild: guild.id, user: member.id });
+							logInfo('automod posted ban incident', { guild: guild.id, user: member.id });
 						}
 					} catch (err) {
 						// ignore
@@ -184,12 +194,17 @@ export async function escalateByWarnings(
 export async function tryKick(member: GuildMember | null, reason = 'Moderation action'): Promise<boolean> {
 	try {
 		if (!member) return false;
+		if (member.id === member.guild.ownerId) {
+			logWarn('tryKick: attempted to kick guild owner, skipping', { guild: member.guild.id, user: member.id });
+			return false;
+		}
 		if (!member.kickable) {
 			logWarn('tryKick: member not kickable', { guild: member.guild.id, user: member.id });
 			return false;
 		}
 		await member.kick(reason).catch((err) => {
-			logWarn('tryKick: kick failed', { guild: member.guild.id, user: member.id, error: (err as Error)?.message ?? err });
+			const msg = (err as Error)?.message ?? err;
+			logWarn('tryKick: kick failed', { guild: member.guild.id, user: member.id, error: msg });
 		});
 		logInfo('tryKick: kicked member', { guild: member.guild.id, user: member.id });
 		return true;
@@ -205,12 +220,17 @@ export async function tryKick(member: GuildMember | null, reason = 'Moderation a
 export async function tryBan(member: GuildMember | null, reason = 'Moderation action'): Promise<boolean> {
 	try {
 		if (!member) return false;
+		if (member.id === member.guild.ownerId) {
+			logWarn('tryBan: attempted to ban guild owner, skipping', { guild: member.guild.id, user: member.id });
+			return false;
+		}
 		if (!member.bannable) {
 			logWarn('tryBan: member not bannable', { guild: member.guild.id, user: member.id });
 			return false;
 		}
 		await member.ban({ reason, deleteMessageSeconds: 5 }).catch((err) => {
-			logWarn('tryBan: ban failed', { guild: member.guild.id, user: member.id, error: (err as Error)?.message ?? err });
+			const msg = (err as Error)?.message ?? err;
+			logWarn('tryBan: ban failed', { guild: member.guild.id, user: member.id, error: msg });
 		});
 		logInfo('tryBan: banned member', { guild: member.guild.id, user: member.id });
 		return true;
@@ -226,12 +246,17 @@ export async function tryBan(member: GuildMember | null, reason = 'Moderation ac
 export async function tryTimeout(member: GuildMember | null, durationMs: number, reason = 'Moderation action'): Promise<boolean> {
 	try {
 		if (!member) return false;
+		if (member.id === member.guild.ownerId) {
+			logWarn('tryTimeout: attempted to timeout guild owner, skipping', { guild: member.guild.id, user: member.id });
+			return false;
+		}
 		if (!member.moderatable) {
 			logWarn('tryTimeout: member not moderatable', { guild: member.guild.id, user: member.id });
 			return false;
 		}
 		await member.timeout(durationMs, reason).catch((err) => {
-			logWarn('tryTimeout: timeout failed', { guild: member.guild.id, user: member.id, error: (err as Error)?.message ?? err });
+			const msg = (err as Error)?.message ?? err;
+			logWarn('tryTimeout: timeout failed', { guild: member.guild.id, user: member.id, error: msg });
 		});
 		logInfo('tryTimeout: timed out member', { guild: member.guild.id, user: member.id });
 		return true;
