@@ -138,3 +138,6 @@ Implementation notes:
 - Fix: `src/routes/apiv1.ts` updated to avoid importing `appInstance` at module load (dynamic import used for stats/commands endpoints); integration webhook route delegates to `handleIntegrationWebhook` to avoid circular loading.
 - Fix: Linting/type issues addressed (replaced a few explicit `any` usages, added `ExtendedClient` typing in routes, and fixed `@typescript-eslint/no-explicit-any` violations).
 - Tests: Rebuilt and re-ran tests after changes; adjusted tests where needed (integration/test harness adjustments for dynamic imports and mocked clients).
+ - Fix: Replace remaining `console.*` usages with centralized logger calls in multiple command files (notable updates: `src/Commands/tickets/ticketSetup.ts`, `src/Commands/Utilities/Reload.ts`, `src/Commands/Moderator/Settings.ts`).
+ - Chore: Commit workspace hygiene and notes updates; updated `CODE-REVIEW-NOTES.md` to reflect fixes and priorities.
+ - Test: Ran full test suite locally after changes — all tests passed (62 test files, 138 tests).
