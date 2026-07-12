@@ -5,6 +5,7 @@ import fs from 'fs';
 import { pathToFileURL } from 'url';
 import { Command } from '../../Structures/Command';
 import { ExtendedClient } from '../../Structures/Client';
+import { info as logInfo, error as logError } from '../../Utilities/logger';
 
 export default new Command({
 	// ISSUE: Command is not outputting new command data ex. first ping outputs 3! alter the command in the code and change it to output 1! but still outputs 3!
@@ -56,7 +57,7 @@ export default new Command({
 			// Try clearing common require cache entries if present (works for CJS runtimes)
 			try { delete require.cache[require.resolve(commandFilePath)]; } catch { /* ignore if not present */ }
 
-			console.log('[Reload] resolved commandFilePath:', commandFilePath);
+			logInfo('reload: resolved commandFilePath', { commandFilePath });
 
 			// Load the module. For TypeScript runtime (ts-node) require() works best for .ts files.
 			type CommandLike = {
@@ -78,14 +79,14 @@ export default new Command({
 
 					newCommandModule = require(commandFilePath);
 				} catch (err) {
-					console.error('Require failed for .ts file, falling back to dynamic import', err);
+					logError('reload: require failed for .ts file, falling back to dynamic import', { error: (err as Error)?.message ?? String(err) });
 					const imported = await import(pathToFileURL(commandFilePath).href + `?update=${Date.now()}`);
 					newCommandModule = imported;
 				}
 			} else {
 				// For .js files use a proper file URL (works on Windows)
 				const fileUrl = pathToFileURL(commandFilePath).href + `?update=${Date.now()}`;
-				console.log('[Reload] importing via file URL:', fileUrl);
+				logInfo('reload: importing via file URL', { fileUrl });
 				const imported = await import(fileUrl);
 				newCommandModule = imported;
 			}
@@ -134,7 +135,7 @@ export default new Command({
 
 			await interaction.reply({ content: `Command \`${candidate.name}\` was reloaded and the command set was re-registered.`, flags: MessageFlags.Ephemeral });
 		} catch (error) {
-			console.error('Error reloading command:', error);
+			logError('reload: error reloading command', { error: (error as Error)?.message ?? String(error) });
 			if (error instanceof Error) {
 				await interaction.reply({ content: `There was an error while reloading a command \`${command.name}\`. See logs.`, flags: MessageFlags.Ephemeral });
 			}

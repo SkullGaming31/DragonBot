@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, EmbedBuilder, MessageFlags, channelMention, roleMention } from 'discord.js';
 import settings from '../../Database/Schemas/settingsDB';
 import { Command } from '../../Structures/Command';
-import { error as logError } from '../../Utilities/logger';
+import { info as logInfo, debug as logDebug, error as logError } from '../../Utilities/logger';
 
 export default new Command({
 	name: 'settings',
@@ -90,8 +90,8 @@ export default new Command({
 		try {
 			if (!interaction.inCachedGuild()) return;
 			const { guild, options } = interaction;
-			if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
-				console.log('Retrieved options:', options);
+			if (process.env.Enviroment === 'debug') {
+				logDebug('settings: retrieved options');
 			}
 			const SuggestionChan = options.getChannel('sugestchan') || null;
 			const PunishmentChan = options.getChannel('punishmentchan') || null;
@@ -103,8 +103,8 @@ export default new Command({
 			const EconChannel = options.getChannel('econchan') || null;
 
 			const Administrator = options.getRole('admin') ?? null;
-			if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
-				console.log('Administrator role ID:', Administrator);
+			if (process.env.Enviroment === 'debug') {
+				logDebug('settings: administrator role', { administratorId: Administrator?.id });
 			}
 			const Moderator = options.getRole('moderator') ?? null;
 			const MemberRole = options.getRole('memberrole') ?? null;
@@ -112,8 +112,8 @@ export default new Command({
 			// Find or create a document using async/await
 			let data;
 			try {
-				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
-					console.log('Fetching settings data');
+				if (process.env.Enviroment === 'debug') {
+					logDebug('settings: fetching settings data', { guildId: guild.id });
 				}
 				data = await settings.findOne({ GuildID: guild.id });
 			} catch (err) {
@@ -136,8 +136,8 @@ export default new Command({
 					EconChan: EconChannel?.id ?? null,
 					ModerationChannel: ModerationChannel?.id ?? null
 				});
-				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
-					console.log('Created new document in database');
+				if (process.env.Enviroment === 'debug') {
+					logInfo('settings: created new document', { guildId: guild.id });
 				}
 				await data.save();
 			} else {
@@ -159,8 +159,8 @@ export default new Command({
 						new: true,
 						upsert: true
 					});
-				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
-					console.log('updating document in database');
+				if (process.env.Enviroment === 'debug') {
+					logInfo('settings: updated document', { guildId: guild.id });
 				}
 			}
 			const embed = new EmbedBuilder()

@@ -1,6 +1,7 @@
 import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandType, ButtonBuilder, ButtonStyle, ChannelType, EmbedBuilder, MessageFlags } from 'discord.js';
 import ticket from '../../Database/Schemas/ticketSetupDB';
 import { Command } from '../../Structures/Command';
+import { error as logError } from '../../Utilities/logger';
 
 export default new Command({
 	name: 'ticketsetup',
@@ -175,7 +176,7 @@ export default new Command({
 			2. Make sure to use this format for your buttons => Name,Emoji.
 			3. Make sure your button names do not exceed 200 characters.
 			4. Make sure your button emojis are actually emojis, not ids.`);
-			console.error(error);
+			logError('ticketSetup: setup error', { error: (error as Error)?.message ?? String(error) });
 			await interaction.reply({ embeds: [errEmbed], flags: MessageFlags.Ephemeral });
 		}
 	}
