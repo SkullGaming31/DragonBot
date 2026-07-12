@@ -124,7 +124,7 @@ export default new Command({
 						logError('Gamble (percentage) error', { error: (_error as Error)?.message ?? _error });
 					}
 					break;
-				case 'fixed number'://DONE !gamble [Amount] ex !gamble 500coins from your balance
+				case 'fixed number': { // DONE !gamble [Amount] ex !gamble 500coins from your balance
 					const fixedRaw = Amount;
 					if (typeof fixedRaw !== 'number') return interaction.reply({ content: 'Please provide a valid amount to gamble.' });
 					const fixedAmount = Math.floor(fixedRaw);
@@ -147,7 +147,9 @@ export default new Command({
 					} catch (_error) {
 						logError('Gamble (fixed) error', { error: (_error as Error)?.message ?? _error });
 					}
+
 					break;
+				}
 				default:
 					break;
 			}

@@ -60,16 +60,16 @@ Important improvements for security, observability, and correctness — not alwa
 
 Polish, maintainability, and minor hardening — do when higher-priority work is done.
 
-- [ ] **Re-enable** `@typescript-eslint/no-unused-vars` **as** `warn`  
+- [X] **Re-enable** `@typescript-eslint/no-unused-vars` **as** `warn`  
   Both `no-unused-vars` and `@typescript-eslint/no-unused-vars` are `'off'` in `eslint.config.mjs`. Suggested: `['warn', { argsIgnorePattern: '^_' }]`.
 
-- [ ] **Add braces to multi-statement switch cases in** `gamble.ts`  
-  The `'fixed number'` case declares `const` directly in the switch without a block. Works because `no-case-declarations` is off, but braces would be clearer and safer.
+- [x] **Add braces to multi-statement switch cases in** `gamble.ts`  
+  The `'fixed number'` case declared `const` directly in the switch without a block; wrapped the case in braces to avoid declaration-in-case issues.
 
-- [ ] **Call** `mongoose.disconnect()` **on graceful shutdown**  
+- [X] **Call** `mongoose.disconnect()` **on graceful shutdown**  
   `src/index.ts` shuts down the Discord client and HTTP server but does not close the Mongo connection.
 
-- [ ] **Move** `supertest` **to** `devDependencies`  
+- [X] **Move** `supertest` **to** `devDependencies`  
   Listed as a production dependency in `package.json` but only used in tests.
 
 - [ ] **Fix or replace** `checkVariables()`  

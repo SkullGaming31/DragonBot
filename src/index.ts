@@ -45,6 +45,7 @@ import apiV1Routes from './routes/apiv1';
 import { createIntegrationRouter } from './Integrations/webhookHandler';
 import { info, warn as logWarn, error as logError } from './Utilities/logger';
 import errorHandler from './Structures/errorHandler';
+import mongoose from 'mongoose';
 
 class App {
 	public client: ExtendedClient;
@@ -121,14 +122,14 @@ class App {
 						const maybe = this.client as unknown as { __reactionCleanupStop?: (() => void) };
 						const stop = maybe.__reactionCleanupStop;
 						if (typeof stop === 'function') stop();
-					} catch (e) {
+					} catch {
 						// ignore
 					}
 					try {
 						const maybeMetrics = this.client as unknown as { __metricsStop?: (() => void) };
 						const stopMetrics = maybeMetrics.__metricsStop;
 						if (typeof stopMetrics === 'function') stopMetrics();
-					} catch (e) {
+					} catch {
 						// ignore
 					}
 
@@ -137,6 +138,7 @@ class App {
 						info('HTTP server closed');
 						process.exit(0);
 					});
+					await mongoose.disconnect();
 				} catch (err) {
 					console.error('Error during shutdown', err);
 					process.exit(1);
@@ -171,7 +173,7 @@ if (process.env.DISABLE_AUTOSTART === 'true' || fsSync.existsSync(sentinelPath))
 					process.kill(otherPid, 0);
 					console.log(`Another instance is already running (PID ${otherPid}), exiting.`);
 					process.exit(0);
-				} catch (e) {
+				} catch {
 					// Process not running; remove stale lock
 					try { fsSync.unlinkSync(lockPath); } catch { /** */ }
 				}
