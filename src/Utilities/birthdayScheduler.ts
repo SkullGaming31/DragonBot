@@ -28,7 +28,7 @@ export async function sendBirthdayGreeting(client: Client, guildId: string, user
 			if (age >= 0) message = `🎉 Happy Birthday ${display}! You are ${age} today 🎂`;
 		}
 		await sendChannel.send(message);
-	} catch (err) {
+	} catch {
 		// swallow errors to avoid crashing scheduler
 		// console.error('sendBirthdayGreeting error', err);
 	}
@@ -55,7 +55,7 @@ export async function runBirthdayCheck(client: Client) {
 			}
 		}
 		return { sent };
-	} catch (err) {
+	} catch {
 		return { sent: 0 };
 	}
 }

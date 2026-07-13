@@ -2,6 +2,7 @@
 
 import { BaseInteraction, ChannelType, Colors, EmbedBuilder, Collection, Message, MessageFlags } from 'discord.js';
 import { Event } from '../../Structures/Event';
+import { error as logError } from '../../Utilities/logger';
 // import settings from '../../Structures/Schemas/settingsDB';
 import DB from '../../Database/Schemas/ticketDB';
 import ticket from '../../Database/Schemas/ticketSetupDB';
@@ -129,15 +130,15 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 								const sendFn = (target as unknown as { send?: (..._args: unknown[]) => Promise<unknown> }).send;
 								if (sendFn) await sendFn.call(target, { files: [{ attachment: Buffer.from(html, 'utf8'), name: filename }] });
 							} catch (uploadErr) {
-								console.error('Failed to upload transcript file:', uploadErr);
+								logError('Failed to upload transcript file', { error: (uploadErr as Error)?.message ?? uploadErr });
 							}
 						}
 					}
 				} catch (e) {
-					console.error('Failed to save transcript:', e);
+					logError('Failed to save transcript', { error: (e as Error)?.message ?? e });
 				}
 				setTimeout(async () => {
-					await channel?.delete().catch((err: Error) => { console.error(err); });
+					await channel?.delete().catch((err: Error) => { logError('ticketResponse: failed to delete channel', { error: (err as Error)?.message ?? err }); });
 				}, 10 * 1000);
 
 				await DB.deleteOne({ ChannelID: channel?.id });
@@ -151,7 +152,7 @@ export default new Event('interactionCreate', async (interaction: BaseInteractio
 				break;
 		}
 	} catch (err) {
-		console.error(err);
+		logError('ticketResponse: unexpected error', { error: (err as Error)?.message ?? err });
 		return;
 	}
 });

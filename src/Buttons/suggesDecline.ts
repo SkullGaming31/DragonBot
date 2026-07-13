@@ -1,6 +1,7 @@
 import { ButtonType } from '../Typings/Button';
 import { EmbedBuilder, MessageFlags, ButtonStyle, APIEmbedField } from 'discord.js';
 import SuggestionModel, { ISuggestion } from '../Database/Schemas/SuggestDB';
+import { error as logError } from '../Utilities/logger';
 
 const handler: ButtonType = {
 	customId: 'sugges-decline',
@@ -27,7 +28,7 @@ const handler: ButtonType = {
 		try {
 			await message.edit({ embeds: [EmbedBuilder.from(embed).setFields(fields).setColor('Red').setTimestamp()], components: [] });
 		} catch (err) {
-			console.error('Failed to edit suggestion message on decline:', err);
+			logError('Failed to edit suggestion message on decline', { error: (err as Error)?.message ?? err });
 		}
 
 		await SuggestionModel.deleteOne({ guildId: guild?.id, messageId: message.id }).catch(() => null);

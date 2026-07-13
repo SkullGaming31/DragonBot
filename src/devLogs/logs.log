@@ -451,3 +451,37 @@
 2026-07-12T20:35:39.443Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
 2026-07-12T20:35:39.560Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
 2026-07-12T20:35:43.331Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-13T13:03:00.641Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"abc"}
+2026-07-13T13:03:00.679Z [INFO] reactionMapping: sent audit log {"guildId":"g1","mappingId":"fromContent"}
+2026-07-13T13:03:00.696Z [ERROR] Failed to send message for create_message in reactionRoles {"error":"fail"}
+2026-07-13T13:03:00.696Z [ERROR] Failed to send message for create_message in reactionRoles {"error":"channel.send is not a function"}
+2026-07-13T13:03:06.336Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-13T13:03:06.337Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"user1"}
+2026-07-13T13:03:06.339Z [INFO] autoModeration: deleted caps message {"guildId":"guild1","userId":"user2","capPct":100}
+2026-07-13T13:03:06.338Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-13T13:03:06.340Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-13T13:03:06.340Z [INFO] autoModeration: deleted spam messages {"guildId":"guild1","userId":"spammer","count":3}
+2026-07-13T13:03:06.341Z [WARN] postPunishment: no punishment channel available for guild {"guild":"guild1"}
+2026-07-13T13:03:06.341Z [INFO] escalateByWarnings: kicked member {"guild":"guild1","user":"victim"}
+2026-07-13T13:03:06.342Z [INFO] autoModeration: deleted invite link {"guildId":"guild1","userId":"victim"}
+2026-07-13T13:03:07.272Z [WARN] audit: configured logs channel is not a text channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-13T13:03:07.297Z [INFO] audit: sent embed to logs channel {"guildId":"guild1","logsChannelID":"chan1"}
+2026-07-13T13:03:07.871Z [ERROR] Failed to add reaction role {"error":"Missing Permissions","guildId":"g1","roleId":"r_missing"}
+2026-07-13T13:03:10.399Z [INFO] messageReactionAdd: created starboard message {"guildId":"G1","messageId":"M1","count":3}
+2026-07-13T13:03:10.402Z [INFO] messageReactionRemove: removed starboard mapping {"guildId":"G1","messageId":"M1"}
+2026-07-13T13:03:13.712Z [INFO] accept button: logged role toggle {"guild":"g1","member":"m1","role":"role1","action":"added"}
+2026-07-13T13:03:16.145Z [DEBUG] Integration secret mismatch {"hasExpectedSecret":true,"incomingLength":0}
+2026-07-13T13:03:16.868Z [WARN] Ignored interaction API error {"code":10062,"message":"ignored"}
+2026-07-13T13:03:24.723Z [ERROR] Error fetching user balance: {"error":"__vite_ssr_import_2__.UserModel.find(...).sort is not a function"}
+2026-07-13T13:03:27.167Z [INFO] messageDelete: removed stale reaction-role mappings {"guildId":"g1","messageId":"m1","deleted":3}
+2026-07-13T13:03:27.162Z [INFO] roleDelete: removed stale reaction-role mappings {"guildId":"g1","roleId":"r1","deleted":2}
+2026-07-13T13:03:27.909Z [ERROR] Failed to send message for create_message in reactionRoles {"error":"Missing Permissions"}
+2026-07-13T13:03:29.374Z [ERROR] autoModeration: failed to read config {"error":"__vite_ssr_import_1__.default.findOne(...).lean is not a function"}
+2026-07-13T13:03:29.376Z [ERROR] autoModeration: handler error {"error":"message.member.roles.cache.map is not a function"}
+2026-07-13T13:03:41.047Z [ERROR] messageReactionAdd: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-13T13:03:41.449Z [ERROR] guildAuditLogEntryCreate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-13T13:03:44.398Z [ERROR] guildBanAdd: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-13T13:03:44.514Z [ERROR] messageReactionRemove: failed to read StarboardModel {"error":"__vite_ssr_import_1__.default.findOne(...).exec is not a function"}
+2026-07-13T13:03:47.667Z [ERROR] roleUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}
+2026-07-13T13:03:50.693Z [ERROR] guildBanRemove: failed to read LogsChannelDB {"error":"Cannot read properties of undefined (reading 'id')"}
+2026-07-13T13:03:58.781Z [ERROR] emojiUpdate: failed to read ChanLogger {"err":"Cannot read properties of undefined (reading 'id')"}

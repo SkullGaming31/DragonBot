@@ -1,8 +1,9 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder, TextChannel, ChannelType, MessageFlags } from 'discord.js';
+/* eslint-disable no-unused-vars */
+import { ApplicationCommandOptionType, ApplicationCommandType, EmbedBuilder, TextChannel, MessageFlags } from 'discord.js';
 import { Command } from '../../Structures/Command';
 import { error as logError } from '../../Utilities/logger';
 import ReactionRoleModel from '../../Database/Schemas/reactionRole';
-import { tryReact } from '../../Utilities/retry';
+// import { tryReact } from '../../Utilities/retry';
 import { createAndLogMapping } from '../../Utilities/reactionMapping';
 
 export default new Command({
@@ -86,7 +87,7 @@ export default new Command({
 				if (interaction.guild && me && role && (me.roles?.highest?.position ?? 0) <= (role?.position ?? 0)) {
 					return interaction.reply({ content: 'I cannot assign that role because my role is not above the target role in the server role hierarchy.', flags: MessageFlags.Ephemeral });
 				}
-			} catch (err) {
+			} catch {
 				// if permission checks throw, continue and let operations fail with clear error messages later
 			}
 

@@ -46,7 +46,7 @@ export const connectDatabase = async (): Promise<void> => {
 	if (!uri) {
 		// In development/debug mode, allow running without a database connection for convenience.
 		if (isDev) {
-			console.warn('MongoDB URI not configured — skipping database connection in dev mode');
+			logWarn('MongoDB URI not configured — skipping database connection in dev mode');
 			return;
 		}
 		throw new MongoDBConnectionError('MongoDB URI is not defined');
@@ -67,7 +67,7 @@ export const connectDatabase = async (): Promise<void> => {
 			99: 'Mongo Database is not initialized',
 		};
 
-		console.log(connectionStates[connection.readyState] || 'Unknown state');
+		logInfo(connectionStates[connection.readyState] || 'Unknown state');
 
 		// Handle connection errors without throwing from the event handler.
 		// Throwing inside an event handler can crash the process; instead log

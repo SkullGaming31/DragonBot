@@ -1,6 +1,7 @@
 import { Message, userMention } from 'discord.js';
 import { Event } from '../../Structures/Event';
 import { UserModel } from '../../Database/Schemas/userModel';
+import { error as logError } from '../../Utilities/logger';
 
 export default new Event<'messageCreate'>('messageCreate', async (message: Message) => {
 	if (!message.inGuild()) return;
@@ -23,6 +24,6 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 	try {
 		await message.reply({ content: `${userMention(author.id)}, **${mentionedUser.username}** is currently AFK: \`${userData.AFKmessage}\`` });
 	} catch (error) {
-		console.error('Error replying to message:', error); // Log any errors that occur during message reply
+		logError('Error replying to message', { error: (error as Error)?.message ?? error });
 	}
 });

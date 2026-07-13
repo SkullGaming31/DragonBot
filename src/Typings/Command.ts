@@ -11,6 +11,7 @@ interface RunOptions {
 	args: CommandInteractionOptionResolver;
 }
 
+// eslint-disable-next-line no-unused-vars
 type RunFunction = (options: RunOptions) => unknown;
 
 export type CommandType = {

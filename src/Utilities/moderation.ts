@@ -1,4 +1,4 @@
-import { EmbedBuilder, Guild, GuildMember, ChannelType, TextChannel } from 'discord.js';
+import { EmbedBuilder, Guild, GuildMember, TextChannel } from 'discord.js';
 import axios from 'axios';
 import SettingsModel from '../Database/Schemas/settingsDB';
 import { info as logInfo, warn as logWarn, error as logError } from '../Utilities/logger';
@@ -51,11 +51,15 @@ export async function postPunishment(guild: Guild, embed: EmbedBuilder, fallback
  */
 /**
  * Escalate a moderation action based on warning count.
- * By default callers pass the current stored warning count (before adding the new warning).
- * Historically the code treated the provided warningCount as the current total (no implicit +1).
- * To remain compatible with existing callers and tests the default is `isBeforeUpdate = false`.
  *
- * Mapping (applies to the new total):
+ * Important note about the `warningCount` parameter and `isBeforeUpdate` flag:
+ * - By default (`isBeforeUpdate = false`) the function treats the provided `warningCount`
+ *   as the total number of warnings (no implicit +1).
+ * - If callers want the function to interpret the provided `warningCount` as the
+ *   stored count before adding a new warning (so the function will evaluate the
+ *   "new" total), they should pass `isBeforeUpdate = true`.
+ *
+ * Mapping (applies to the interpreted total):
  * 1 -> timeout 5 minutes
  * 2 -> kick
  * 3+ -> ban
@@ -76,7 +80,7 @@ export async function escalateByWarnings(
 				logWarn('escalateByWarnings: attempted moderation on guild owner, skipping', { guild: guild.id, user: member.id });
 				return null;
 			}
-		} catch (e) {
+		} catch {
 			// ignore owner lookup failures
 		}
 
@@ -113,7 +117,7 @@ export async function escalateByWarnings(
 							await axios.post(`${url.replace(/\/$/, '')}/api/v1/automod/${guild.id}/incidents`, payload, { headers: secret ? { 'x-internal-secret': secret } : {} });
 							logInfo('automod posted timeout incident', { guild: guild.id, user: member.id });
 						}
-					} catch (err) {
+					} catch {
 						// do not throw — best effort only
 					}
 				})();
@@ -142,7 +146,7 @@ export async function escalateByWarnings(
 							await axios.post(`${url.replace(/\/$/, '')}/api/v1/automod/${guild.id}/incidents`, payload, { headers: secret ? { 'x-internal-secret': secret } : {} });
 							logInfo('automod posted kick incident', { guild: guild.id, user: member.id });
 						}
-					} catch (err) {
+					} catch {
 						// ignore
 					}
 				})();
@@ -172,7 +176,7 @@ export async function escalateByWarnings(
 							await axios.post(`${url.replace(/\/$/, '')}/api/v1/automod/${guild.id}/incidents`, payload, { headers: secret ? { 'x-internal-secret': secret } : {} });
 							logInfo('automod posted ban incident', { guild: guild.id, user: member.id });
 						}
-					} catch (err) {
+					} catch {
 						// ignore
 					}
 				})();

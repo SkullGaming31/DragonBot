@@ -4,7 +4,7 @@ import { ButtonStyle, MessageFlags, RoleResolvable, TextChannel } from 'discord.
 import SettingsModel from '../Database/Schemas/settingsDB';
 import ChanLogger from '../Database/Schemas/LogsChannelDB';
 import { EmbedBuilder, ChannelType } from 'discord.js';
-import { info as logInfo } from '../Utilities/logger';
+import { info as logInfo, error as logError } from '../Utilities/logger';
 
 const acceptButton: ButtonType = {
 	customId: 'accept',
@@ -74,10 +74,10 @@ const acceptButton: ButtonType = {
 					}
 				}
 			} catch (err) {
-				console.error('Failed to log role toggle from accept button:', err);
+				logError('Failed to log role toggle from accept button', { error: (err as Error)?.message ?? err });
 			}
 		} catch (error) {
-			console.error('Error toggling role:', error);
+			logError('Error toggling role', { error: (error as Error)?.message ?? error });
 			await interaction.reply({ content: 'An error occurred while toggling the role.', flags: MessageFlags.Ephemeral });
 		}
 	}

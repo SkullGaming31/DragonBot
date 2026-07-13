@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-useless-escape -- quickfix: regex literal contains escaped slashes for readability */
 import { ChannelType, EmbedBuilder, Message, PermissionsBitField } from 'discord.js';
 import settings, { ISettings } from '../../Database/Schemas/settingsDB';
@@ -74,7 +75,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 			const u = new URL(candidate);
 			const hostname = u.hostname.toLowerCase();
 			return Object.keys(linkWhitelist).some((k) => hostname === k || hostname.endsWith(`.${k}`));
-		} catch (err) {
+		} catch {
 			return false;
 		}
 	};

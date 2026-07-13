@@ -1,4 +1,4 @@
- 
+
 import { PresenceStatusData } from 'discord.js';
 import { Document, Schema, model } from 'mongoose';
 
@@ -83,8 +83,7 @@ userSchema.post('findOneAndUpdate', async (doc: Document & Partial<IUser> | null
 				// Attempt to access a model-like constructor from the document in a typed way
 				const maybeCtor = (doc as unknown as { constructor?: unknown }).constructor;
 
-				// Narrow constructor shape without introducing named unused params
-				// Narrow constructor shape without naming unused parameters
+				// eslint-disable-next-line no-unused-vars
 				const ctor = maybeCtor as unknown as { findByIdAndUpdate?: (...args: unknown[]) => Promise<unknown> } | undefined;
 				const id = (doc as unknown as { _id?: unknown })._id;
 				if (ctor?.findByIdAndUpdate && id !== undefined) {

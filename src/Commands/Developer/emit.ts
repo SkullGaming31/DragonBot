@@ -77,6 +77,7 @@ export default new Command({
 						roles: oldMember.roles,
 					} as MemberLike & { guild?: Guild };
 					// Use a narrow emit signature to avoid using `any` while still calling the event
+					// eslint-disable-next-line no-unused-vars
 					(client as unknown as { emit: (...args: unknown[]) => boolean }).emit('guildMemberUpdate', oldMember, newMember);
 					await interaction.reply({ content: 'Emitted guildMemberUpdate with a simulated old/new member', flags: MessageFlags.Ephemeral });
 				}
@@ -243,9 +244,11 @@ export default new Command({
 						equals: function (this: Role, other: Role) {
 							return this.id === other.id;
 						},
+						// eslint-disable-next-line no-unused-vars
 						delete: function (this: Role) {
 							return Promise.resolve(this);
 						},
+						// eslint-disable-next-line no-unused-vars
 						edit: function (this: Role) {
 							return Promise.resolve(this);
 						},

@@ -39,16 +39,16 @@ export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member: Guil
 								await axios.post(`${url.replace(/\/$/, '')}/api/v1/automod/${guild.id}/incidents`, { userId: member.id, userDisplayName: user?.globalName ?? user?.username ?? user?.tag, action: 'ban', reason: 'Rejoin after multiple warnings' }, { headers: secret ? { 'x-internal-secret': secret } : {} }).catch(() => null);
 							}
 							return; // don't send welcome message
-						} catch (err) {
+						} catch {
 							// ignore ban errors and continue to welcome flow
 						}
 					}
 				}
-			} catch (err) {
+			} catch {
 				// non-fatal
 			}
 		}
-	} catch (err) {
+	} catch {
 		// non-fatal
 	}
 

@@ -1,5 +1,6 @@
 import express, { Router, Request, Response, NextFunction } from 'express';
-import { createIntegrationRouter, handleIntegrationWebhook } from '../Integrations/webhookHandler';
+import { handleIntegrationWebhook } from '../Integrations/webhookHandler';
+import { error as logError } from '../Utilities/logger';
 import type { ExtendedClient } from '../Structures/Client';
 
 export const apiV1Routes = Router();
@@ -24,7 +25,7 @@ apiV1Routes.get('/stats', async (req: Request, res: Response) => {
 		});
 	} catch (err) {
 		res.status(500).json({ error: 'Unable to fetch stats' });
-		console.error(err);
+		logError('apiV1 /stats failed', { error: (err as Error)?.message ?? err });
 	}
 });
 
@@ -41,7 +42,7 @@ apiV1Routes.get('/commands', async (req: Request, res: Response) => {
 		res.json(commands);
 	} catch (err) {
 		res.status(500).json({ error: 'Unable to fetch commands' });
-		console.error(err);
+		logError('apiV1 /commands failed', { error: (err as Error)?.message ?? err });
 	}
 });
 

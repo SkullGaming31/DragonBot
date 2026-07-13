@@ -2,6 +2,7 @@
 import { MessageReaction, PartialMessageReaction, PartialUser, User } from 'discord.js';
 import { Event } from '../../Structures/Event';
 import ReactionRoleModel from '../../Database/Schemas/reactionRole';
+import { error as logError } from '../../Utilities/logger';
 
 function normalizeEmojiIdentifier(emoji: { id: string | null; name: string | null }) {
 	// custom emoji: name:id, unicode: name only
@@ -34,8 +35,7 @@ export default new Event<'messageReactionAdd'>('messageReactionAdd', async (reac
 			await member.roles.add(map.roleId, 'reaction-role add');
 		} catch (err) {
 			// ignore role add errors for now, but log
-			 
-			console.error('Failed to add reaction role', { err: (err as Error)?.message ?? err, guildId: guild.id, roleId: map.roleId });
+			logError('Failed to add reaction role', { error: (err as Error)?.message ?? err, guildId: guild.id, roleId: map.roleId });
 		}
 	}
 });

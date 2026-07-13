@@ -57,11 +57,6 @@ export default new Command({
 		// find a likely ticket channel in the guild (by name containing 'ticket')
 		const ticketChannel = guild?.channels.cache.find(c => /ticket/i.test(c.name || '')) as TextChannel | undefined;
 
-		const constructionEmbed = new EmbedBuilder()
-			.setTitle(`${botName} helpdesk`)
-			.setAuthor({ name: `${user.globalName}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` })
-			.setDescription('This command is still a work in progress');
-
 		const contactEmbed = new EmbedBuilder()
 			.setTitle(`${botName} helpdesk`)
 			.setAuthor({ name: `${user.globalName}`, iconURL: `${user.displayAvatarURL({ size: 512 })}` })

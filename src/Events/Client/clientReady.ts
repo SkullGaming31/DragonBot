@@ -3,10 +3,11 @@ import { Event } from '../../Structures/Event';
 import { startReactionCleanup } from '../../Utilities/reactionCleanup';
 import { startMetricsReporter } from '../../Utilities/metricsReporter';
 import { startBirthdayScheduler } from '../../Utilities/birthdayScheduler';
+import { info as logInfo, error as logError } from '../../Utilities/logger';
 
 export default new Event<'clientReady'>('clientReady', async (client: Client) => {
 	const { user, guilds } = client;
-	console.log(`${user?.tag} is online`);
+	logInfo(`${user?.tag} is online`);
 	const Enviroment = process.env.Enviroment;
 	switch (Enviroment) {
 		case 'dev':
@@ -14,13 +15,13 @@ export default new Event<'clientReady'>('clientReady', async (client: Client) =>
 			break;
 		case 'prod':
 			client.user?.setActivity({ name: ` ${guilds.cache.size} Discord Severs`, type: ActivityType.Watching });
-			guilds.cache.forEach((g: Guild) => console.log(g.name));
+			guilds.cache.forEach((g: Guild) => logInfo(`Guild: ${g.name}`));
 			break;
 		case 'debug':
 			client.user?.setActivity({ name: 'Debugging Code', type: ActivityType.Custom });
 			break;
 		default:
-			console.log('Development Enviroment: ', Enviroment);
+			logInfo('Development Enviroment', { env: Enviroment });
 			break;
 	}
 
@@ -31,7 +32,7 @@ export default new Event<'clientReady'>('clientReady', async (client: Client) =>
 		const stop = startReactionCleanup(client);
 		(client as unknown as { __reactionCleanupStop?: (() => void) }).__reactionCleanupStop = stop;
 	} catch (err) {
-		console.error('Failed to start reaction cleanup', err);
+		logError('Failed to start reaction cleanup', { error: (err as Error)?.message ?? err });
 	}
 
 	// start metrics reporter
@@ -39,7 +40,7 @@ export default new Event<'clientReady'>('clientReady', async (client: Client) =>
 		const stopMetrics = startMetricsReporter(client);
 		(client as unknown as { __metricsStop?: (() => void) }).__metricsStop = stopMetrics;
 	} catch (err) {
-		console.error('Failed to start metrics reporter', err);
+		logError('Failed to start metrics reporter', { error: (err as Error)?.message ?? err });
 	}
 
 	// start birthday scheduler
@@ -47,6 +48,6 @@ export default new Event<'clientReady'>('clientReady', async (client: Client) =>
 		const stopBirthday = startBirthdayScheduler(client);
 		(client as unknown as { __birthdayStop?: (() => void) }).__birthdayStop = stopBirthday;
 	} catch (err) {
-		console.error('Failed to start birthday scheduler', err);
+		logError('Failed to start birthday scheduler', { error: (err as Error)?.message ?? err });
 	}
 });

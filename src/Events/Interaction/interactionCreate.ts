@@ -1,18 +1,17 @@
-import { CommandInteractionOptionResolver, EmbedBuilder, MessageFlags, RoleResolvable } from 'discord.js';
-import SuggestionModel, { ISuggestion } from '../../Database/Schemas/SuggestDB';
-import SettingsModel from '../../Database/Schemas/settingsDB';
+import { CommandInteractionOptionResolver, MessageFlags } from 'discord.js';
+// import SuggestionModel, { ISuggestion } from '../../Database/Schemas/SuggestDB';
+// import SettingsModel from '../../Database/Schemas/settingsDB';
 import { Event } from '../../Structures/Event';
 import { CommandType } from '../../Typings/Command';
 import { ExtendedInteraction } from '../../Typings/Command';
 import { safeInteractionReply, setCooldown } from '../../Utilities/functions';
 import { appInstance } from '../../index';
-import { error as logError, warn as logWarn, info as logInfo } from '../../Utilities/logger';
-import { UserModel } from '../../Database/Schemas/userModel';
+import { error as logError, warn as logWarn } from '../../Utilities/logger';
 import { recordCommandTimestamp } from '../../Utilities/metricsReporter';
 
 export default new Event<'interactionCreate'>('interactionCreate', async (interaction) => {
-	const { guild, user } = interaction;
-	const settings = await SettingsModel.findOne({ GuildID: guild?.id });
+	const { user } = interaction;
+	// const settings = await SettingsModel.findOne({ GuildID: guild?.id });
 
 	// Handle chat input commands
 	if (interaction.isChatInputCommand && interaction.isChatInputCommand()) {
@@ -24,7 +23,7 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 			return interaction.reply({ content: 'You have used a non-existent command, please try another command', flags: MessageFlags.Ephemeral });
 		}
 
-		// console.log('[Interaction] executing command:', command.name, 'command object id:', command);
+		// await logInfo(`[Interaction] executing command: ${command.name} command object id: {command}$`);
 		try {
 			await command.run({
 				args: interaction.options as CommandInteractionOptionResolver,
@@ -36,7 +35,7 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 			try {
 				const cmd = command as CommandType | undefined;
 				recordCommandTimestamp(commandName, cmd?.Category);
-			} catch (e) { /* ignore */ }
+			} catch { /* ignore */ }
 
 			// Set cooldown after successful command execution
 			if (command.Cooldown) {

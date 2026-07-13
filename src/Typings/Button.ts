@@ -11,6 +11,7 @@ export type ButtonType = {
   // Optional defaults for command-created buttons
   defaultLabel?: string;
   defaultStyle?: ButtonStyle;
+  // eslint-disable-next-line no-unused-vars
   run: (options: ButtonRunOptions) => unknown | Promise<unknown>;
 };
 

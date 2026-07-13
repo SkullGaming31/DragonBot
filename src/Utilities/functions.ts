@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 
 import { CommandInteraction, Interaction, MessageFlags } from 'discord.js';
 import { warn as logWarn } from './logger';

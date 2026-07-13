@@ -1,6 +1,7 @@
 import { ChannelType, Guild, TextChannel } from 'discord.js';
 import SettingsModel from '../../Database/Schemas/settingsDB';
 import { Event } from '../../Structures/Event';
+import { error as logError } from '../../Utilities/logger';
 
 export default new Event('guildCreate', async (guild: Guild) => {
 	try {
@@ -26,6 +27,6 @@ export default new Event('guildCreate', async (guild: Guild) => {
 			}
 		}
 	} catch (error) {
-		console.error(error);
+		logError('roleRequirement: unexpected error', { error: (error as Error)?.message ?? error });
 	}
 });

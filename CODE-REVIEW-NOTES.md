@@ -72,15 +72,15 @@ Polish, maintainability, and minor hardening — do when higher-priority work is
 - [X] **Move** `supertest` **to** `devDependencies`  
   Listed as a production dependency in `package.json` but only used in tests.
 
-- [ ] **Fix or replace** `checkVariables()`  
+- [X] **Fix or replace** `checkVariables()`  
   `src/Structures/checkVariables.ts` iterates `Object.entries(env)` and checks `value === undefined`, but undefined values never appear in entries — it won't catch missing required vars.
 
-- [ ] **Correct misleading comment in** `autoModeration.ts`  
+- [X] **Correct misleading comment in** `autoModeration.ts`  
   Line ~122 says escalation treats count as "before-update by default," but `escalateByWarnings` defaults `isBeforeUpdate` to `false`. Behavior works today; comment is wrong and risky for future edits.
 
-- [ ] **Remove** `__test_`* **exports from production** `autoModeration.ts`  
+- [X] **Remove** `__test_`* **exports from production** `autoModeration.ts`  
   Test-only helpers (`__test_invokeInvite`, etc.) are exported from the runtime event module.
-- [ ] fix **Warning: Supplying "ephemeral" for interaction response options is deprecated. Utilize flags instead.
+- [X] fix **Warning: Supplying "ephemeral" for interaction response options is deprecated. Utilize flags instead.
   (Use `node --trace-warnings ...` to show where the warning was created)**
 
 ---

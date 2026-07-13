@@ -1,9 +1,8 @@
 import { Message } from 'discord.js';
 import { randomBytes } from 'crypto';
 import AutoModModel, { IAutoMod } from '../../Database/Schemas/autoMod';
-import SettingsModel from '../../Database/Schemas/settingsDB';
 import WarningDB from '../../Database/Schemas/WarnDB';
-import { EmbedBuilder, ChannelType, GuildMember, Guild } from 'discord.js';
+import { EmbedBuilder, GuildMember, Guild } from 'discord.js';
 import axios from 'axios';
 import { postPunishment, escalateByWarnings } from '../../Utilities/moderation';
 import { Event } from '../../Structures/Event';
@@ -93,7 +92,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 			} else {
 				try {
 					// delete original message first
-					await message.delete().catch((err) => console.error(err));
+					await message.delete().catch((err) => logError('autoModeration: message delete failed', { error: (err as Error)?.message ?? err }));
 
 					// Build embed used for DM and logs
 					const discordLinkDetection = new EmbedBuilder()
@@ -107,6 +106,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 					// Notify the channel with a simple mention (keep brief) — we'll add an embed DM below
 					const ch = message.channel as unknown as { send?: unknown };
 					if (typeof ch.send === 'function') {
+						// eslint-disable-next-line no-unused-vars
 						await (ch as { send: (o: unknown) => Promise<unknown> }).send({ content: `<@${message.author.id}>, posting invite links is not allowed here.` }).catch(() => null);
 					}
 
@@ -119,7 +119,10 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 						// resolve member
 						const member = (message.member ?? (await guild.members.fetch(message.author.id).catch(() => null))) as GuildMember | null;
 
-						// apply escalation based on stored count (helper treats it as before-update by default)
+						// apply escalation based on stored count
+						// Note: `escalateByWarnings` by default treats the provided `warningCount` as the
+						// total (no implicit +1). To have it treat the value as "before update",
+						// callers must pass `isBeforeUpdate = true`.
 						await escalateByWarnings(member ?? null, guild, warningCount, 'Posted invite link');
 
 						// persist new warning
@@ -161,7 +164,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 							if (url) {
 								await axios.post(`${url.replace(/\/$/, '')}/api/v1/automod/${guildId}/incidents`, { userId: message.author.id, userDisplayName: (message.author.globalName || message.author.username || message.author.tag), action: 'deleted_invite', reason: 'Posted invite link' }, { headers: secret ? { 'x-internal-secret': secret } : {} });
 							}
-						} catch (err) {
+						} catch {
 							// non-fatal — ignore
 						}
 					})();
@@ -181,6 +184,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 					await message.delete().catch(() => null);
 					const ch = message.channel as unknown as { send?: unknown };
 					if (typeof ch.send === 'function') {
+						// eslint-disable-next-line no-unused-vars
 						await (ch as { send: (o: unknown) => Promise<unknown> }).send({ content: `<@${message.author.id}>, please avoid excessive capitalization.` }).catch(() => null);
 					}
 					try {
@@ -222,6 +226,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 					await message.delete().catch(() => null);
 					const ch = message.channel as unknown as { send?: unknown };
 					if (typeof ch.send === 'function') {
+						// eslint-disable-next-line no-unused-vars
 						await (ch as { send: (o: unknown) => Promise<unknown> }).send({ content: `<@${message.author.id}>, please stop spamming.` }).catch(() => null);
 					}
 					try {
@@ -298,7 +303,7 @@ export async function __test_invokeInvite(message: Message, options?: { throwAt?
 
 			if (options?.throwAt === 'authorSend') throw new Error('test-author-send-throw');
 			await message.author.send?.({ embeds: [] }).catch(() => null);
-		} catch (err) {
+		} catch {
 			// inner catch mirrors original: non-fatal
 		}
 

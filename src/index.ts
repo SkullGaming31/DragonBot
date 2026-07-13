@@ -102,7 +102,7 @@ class App {
 			try {
 				this.app.use('/integrations', createIntegrationRouter(this.client));
 			} catch (e) {
-				console.error('Failed to mount integrations router', e);
+				logError('Failed to mount integrations router', { error: (e as Error)?.message ?? e });
 			}
 			this.app.get('/', (((req: Request, res: Response) => res.send('Hello, world!')) as unknown) as express.RequestHandler);
 
@@ -110,7 +110,7 @@ class App {
 			this.port = Number(process.env.PORT) || this.port;
 
 			const server = this.app.listen(this.port, () => {
-				console.log(`Server is listening http://localhost:${this.port}`);
+				info(`[Server:] listening http://localhost:${this.port}`);
 			});
 
 			// Graceful shutdown helpers so the process can close cleanly in tests or CI
@@ -140,7 +140,7 @@ class App {
 					});
 					await mongoose.disconnect();
 				} catch (err) {
-					console.error('Error during shutdown', err);
+					logError('Error during shutdown', { error: (err as Error)?.message ?? err });
 					process.exit(1);
 				}
 			};
@@ -148,7 +148,7 @@ class App {
 			await errorHandler(shutdown);
 		} catch (error) {
 			// Surface the original error to aid debugging instead of hiding it behind a generic message
-			console.error('Startup error:', error);
+			logError('Startup error', { error: (error as Error)?.message ?? error });
 			throw error;
 		}
 	}
@@ -161,7 +161,7 @@ export const appInstance = new App();
 const sentinelPath = path.resolve(process.cwd(), '.no_autorun');
 const lockPath = path.resolve(process.cwd(), '.bot.pid');
 if (process.env.DISABLE_AUTOSTART === 'true' || fsSync.existsSync(sentinelPath)) {
-	console.log('Auto-start disabled (DISABLE_AUTORUN or .no_autorun present)');
+	info('Auto-start disabled (DISABLE_AUTORUN or .no_autorun present)');
 } else if (typeof require !== 'undefined' && require.main === module) {
 	// Single-instance lock: if another process holds the PID file and is alive, exit.
 	try {
@@ -171,7 +171,7 @@ if (process.env.DISABLE_AUTOSTART === 'true' || fsSync.existsSync(sentinelPath))
 			if (!Number.isNaN(otherPid)) {
 				try {
 					process.kill(otherPid, 0);
-					console.log(`Another instance is already running (PID ${otherPid}), exiting.`);
+					info(`Another instance is already running (PID ${otherPid}), exiting.`);
 					process.exit(0);
 				} catch {
 					// Process not running; remove stale lock
@@ -188,7 +188,7 @@ if (process.env.DISABLE_AUTOSTART === 'true' || fsSync.existsSync(sentinelPath))
 		process.on('SIGINT', () => { cleanup(); process.exit(0); });
 		process.on('SIGTERM', () => { cleanup(); process.exit(0); });
 	} catch (e) {
-		console.warn('Failed to acquire single-instance lock, continuing startup', e);
+		logWarn('Failed to acquire single-instance lock, continuing startup', { error: (e as Error)?.message ?? e });
 	}
 
 	appInstance.start();

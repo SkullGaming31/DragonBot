@@ -10,6 +10,7 @@ interface ErrorContext {
  * Register process-level handlers. If an optional `shutdown` callback is provided
  * it will be invoked for fatal signals so callers can perform graceful teardown.
  */
+// eslint-disable-next-line no-unused-vars
 async function errorHandler(shutdown?: (signal: string) => Promise<void>): Promise<void> {
 	// Allow tests or local development to disable exiting on fatal errors
 	const shouldExitOnFatal = process.env.ERROR_HANDLER_EXIT_ON_FATAL !== 'false';
@@ -22,7 +23,7 @@ async function errorHandler(shutdown?: (signal: string) => Promise<void>): Promi
 				try {
 					await shutdown('unhandledRejection');
 				} catch (e) {
-					console.error('Error while shutting down after unhandledRejection', e);
+					logError('Error while shutting down after unhandledRejection', { error: (e as Error)?.message ?? e });
 					process.exit(1);
 				}
 			} else {
@@ -43,7 +44,7 @@ async function errorHandler(shutdown?: (signal: string) => Promise<void>): Promi
 				try {
 					await shutdown('uncaughtException');
 				} catch (e) {
-					console.error('Error while shutting down after uncaughtException', e);
+					logError('Error while shutting down after uncaughtException', { error: (e as Error)?.message ?? e });
 					process.exit(1);
 				}
 			} else {
@@ -66,7 +67,7 @@ async function errorHandler(shutdown?: (signal: string) => Promise<void>): Promi
 				try {
 					await shutdown('SIGINT');
 				} catch (e) {
-					console.error('Error while handling SIGINT', e);
+					logError('Error while handling SIGINT', { error: (e as Error)?.message ?? e });
 					process.exit(1);
 				}
 			} else {
@@ -85,7 +86,7 @@ async function errorHandler(shutdown?: (signal: string) => Promise<void>): Promi
 				try {
 					await shutdown('SIGTERM');
 				} catch (e) {
-					console.error('Error while handling SIGTERM', e);
+					logError('Error while handling SIGTERM', { error: (e as Error)?.message ?? e });
 					process.exit(1);
 				}
 			} else {

@@ -2,6 +2,7 @@
 import { MessageReaction, PartialMessageReaction, PartialUser, User } from 'discord.js';
 import { Event } from '../../Structures/Event';
 import ReactionRoleModel from '../../Database/Schemas/reactionRole';
+import { error as logError } from '../../Utilities/logger';
 
 function normalizeEmojiIdentifier(emoji: { id: string | null; name: string | null }) {
 	if (emoji.id) return `${emoji.name}:${emoji.id}`;
@@ -31,8 +32,7 @@ export default new Event<'messageReactionRemove'>('messageReactionRemove', async
 		try {
 			await member.roles.remove(map.roleId, 'reaction-role remove');
 		} catch (err) {
-			 
-			console.error('Failed to remove reaction role', { err: (err as Error)?.message ?? err, guildId: guild.id, roleId: map.roleId });
+			logError('Failed to remove reaction role', { error: (err as Error)?.message ?? err, guildId: guild.id, roleId: map.roleId });
 		}
 	}
 });

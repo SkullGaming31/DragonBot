@@ -4,6 +4,7 @@ import IntegrationEventModel from '../Database/Schemas/integrationEvent';
 import { NormalizedEvent } from './adapter';
 import type { ExtendedClient } from '../Structures/Client';
 import TwitchAdapter from './twitchAdapter';
+import { error as logError, debug as logDebug } from '../Utilities/logger';
 
 const SECRET_HEADER = 'x-integration-secret';
 
@@ -16,7 +17,7 @@ export async function handleIntegrationWebhook(req: Request, res: Response, clie
 			// tests can mock this module before importing the handler
 			const mod = await import('../index');
 			effectiveClient = (mod as unknown as { appInstance?: { client?: ExtendedClient } }).appInstance?.client;
-		} catch (e) {
+		} catch {
 			effectiveClient = undefined;
 		}
 	}
@@ -62,7 +63,7 @@ export async function handleIntegrationWebhook(req: Request, res: Response, clie
 				if (existing) { res.status(202).json({ status: 'duplicate' }); return; }
 				await IntegrationEventModel.create({ eventId: eventKey, provider: normalized.provider });
 			} catch (e) {
-				console.error('integration event dedupe check failed', e);
+				logError('integration event dedupe check failed', { error: (e as Error)?.message ?? e });
 			}
 
 			const configs = await IntegrationConfigModel.find({ provider: 'twitch', enabled: true }).lean().exec();
@@ -93,10 +94,11 @@ export async function handleIntegrationWebhook(req: Request, res: Response, clie
 						message = `New ${normalized.provider} event: ${normalized.title ?? 'untitled'}\n${normalized.url ?? ''}`;
 					}
 
+					// eslint-disable-next-line no-unused-vars
 					const sendFn = (channel as unknown as { send?: (m: string) => Promise<unknown> }).send;
 					if (typeof sendFn === 'function') await sendFn(message).catch(() => null);
 				} catch (e) {
-					console.error('Failed to post integration message for config', cfg, e);
+					logError('Failed to post integration message for config', { config: cfg, error: (e as Error)?.message ?? e });
 				}
 			}
 
@@ -108,7 +110,7 @@ export async function handleIntegrationWebhook(req: Request, res: Response, clie
 		const secret = process.env.INTEGRATIONS_SECRET ?? '';
 		const incomingSecret = (req.headers[SECRET_HEADER] as string) ?? '';
 		if (!secret || incomingSecret !== secret) {
-			console.debug('Integration secret mismatch', {
+			logDebug('Integration secret mismatch', {
 				hasExpectedSecret: !!secret,
 				incomingLength: typeof incomingSecret === 'string' ? incomingSecret.length : 0
 			});
@@ -133,7 +135,7 @@ export async function handleIntegrationWebhook(req: Request, res: Response, clie
 			if (existing) { res.status(202).json({ status: 'duplicate' }); return; }
 			await IntegrationEventModel.create({ eventId: eventKey, provider: normalized.provider });
 		} catch (e) {
-			console.error('integration event dedupe check failed', e);
+			logError('integration event dedupe check failed', { error: (e as Error)?.message ?? e });
 		}
 
 		const configs = await IntegrationConfigModel.find({ provider: source, enabled: true }).lean().exec();
@@ -155,16 +157,17 @@ export async function handleIntegrationWebhook(req: Request, res: Response, clie
 					message = `New ${normalized.provider} event: ${normalized.title ?? 'untitled'}\n${normalized.url ?? ''}`;
 				}
 
+				// eslint-disable-next-line no-unused-vars
 				const sendFn = (channel as unknown as { send?: (m: string) => Promise<unknown> }).send;
 				if (typeof sendFn === 'function') await sendFn(message).catch(() => null);
 			} catch (e) {
-				console.error('Failed to post integration message for config', cfg, e);
+				logError('Failed to post integration message for config', { config: cfg, error: (e as Error)?.message ?? e });
 			}
 		}
 
 		res.json({ status: 'accepted' });
 	} catch (err) {
-		console.error('integration webhook error', err);
+		logError('integration webhook error', { error: (err as Error)?.message ?? err });
 		res.status(500).json({ error: 'internal error' });
 	}
 }

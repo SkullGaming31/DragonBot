@@ -2,6 +2,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, EmbedBuilder
 import DB from '../../Database/Schemas/ticketDB';
 import TicketSetup from '../../Database/Schemas/ticketSetupDB';
 import { Event } from '../../Structures/Event';
+import { error as logError } from '../../Utilities/logger';
 
 export default new Event('interactionCreate', async (interaction) => {
 	if (!interaction.isButton() || !interaction.inCachedGuild()) return;
@@ -78,13 +79,13 @@ export default new Event('interactionCreate', async (interaction) => {
 				await channel.send({ embeds: [embed], components: [Buttons], });
 				await channel.send({ content: `${member} here is your ticket` }).then((m) => {
 					setTimeout(() => {
-						m.delete().catch((err: Error) => { console.error(err); });
+						m.delete().catch((err: Error) => { logError('initialTicket: failed to delete temp message', { error: (err as Error)?.message ?? err }); });
 					}, 5000); // 1000ms = 1 second
-				}).catch((err: Error) => { console.error(err); });
+				}).catch((err: Error) => { logError('initialTicket: failed to send temp message', { error: (err as Error)?.message ?? err }); });
 				await interaction.reply({ content: `${member} your ticket has been created: ${channel}`, flags: MessageFlags.Ephemeral, });
 			});
 	} catch (error) {
-		console.error(error);
+		logError('initialTicket: unexpected error', { error: (error as Error)?.message ?? error });
 		return;
 	}
 });

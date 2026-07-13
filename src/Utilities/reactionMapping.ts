@@ -4,15 +4,15 @@ import { tryReact } from './retry';
 import { info } from './logger';
 
 export interface CreateMappingOpts {
-  guild: Guild;
-  guildId: string;
-  channel: TextChannel;
-  messageId: string;
-  messageLike?: unknown;
-  emoji: string;
-  roleId: string;
-  label?: string;
-  actorId?: string;
+	guild: Guild;
+	guildId: string;
+	channel: TextChannel;
+	messageId: string;
+	messageLike?: unknown;
+	emoji: string;
+	roleId: string;
+	label?: string;
+	actorId?: string;
 }
 
 /**
@@ -40,7 +40,7 @@ export async function createAndLogMapping(opts: CreateMappingOpts) {
 				// ignore
 			}
 		}
-	} catch (err) {
+	} catch {
 		// ignore reaction errors
 	}
 
@@ -61,7 +61,7 @@ export async function createAndLogMapping(opts: CreateMappingOpts) {
 
 			await sendGuildLog(guild, embed, channel.id).catch(() => null);
 			info('reactionMapping: sent audit log', { guildId: guild.id, mappingId: String(doc._id) });
-		} catch (err) {
+		} catch {
 			// swallow - best-effort logging
 		}
 	})();

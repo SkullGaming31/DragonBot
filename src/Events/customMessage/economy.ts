@@ -4,6 +4,7 @@ import { UserModel } from '../../Database/Schemas/userModel';
 import TicketModel from '../../Database/Schemas/ticketDB';
 import TicketSetupModel from '../../Database/Schemas/ticketSetupDB';
 import { Event } from '../../Structures/Event';
+import { info as logInfo, warn as logWarn, error as logError } from '../../Utilities/logger';
 
 const BASE_CURRENCY_CHANCE = 0.1;
 const DEV_BASE_CURRENCY_CHANCE = 0.9;
@@ -96,12 +97,7 @@ export default new Event('messageCreate', async (message: Message) => {
 			// Dev debug logging
 			if (isDev) {
 				notificationMessage += ' (DEV TEST)';
-				console.log('[DEV] Economy debug:', {
-					userId: author.id,
-					awarded: currencyAmount,
-					isJackpot,
-					newBalance: updatedUser.balance
-				});
+				logInfo('[DEV] Economy debug', { userId: author.id, awarded: currencyAmount, isJackpot, newBalance: updatedUser?.balance });
 			}
 
 			// Notify user about earned currency
@@ -119,16 +115,17 @@ export default new Event('messageCreate', async (message: Message) => {
 
 			await new Promise((resolve) => setTimeout(resolve, 1000)); // Delay 1 second
 			if (channelForNotification && typeof (channelForNotification as unknown as { send?: unknown }).send === 'function') {
+				// eslint-disable-next-line no-unused-vars
 				const sendFn = (channelForNotification as unknown as { send: (payload: unknown) => Promise<unknown> }).send;
 				try {
 					const payload = { content: notificationMessage };
 					await sendFn(payload);
 				} catch (sendErr) {
-					console.warn('Failed to send economy notification:', sendErr);
+					logWarn('Failed to send economy notification', { error: (sendErr as Error)?.message ?? sendErr });
 				}
 			}
 		} catch (error) {
-			console.error('Error updating user currency:', error);
+			logError('Error updating user currency', { error: (error as Error)?.message ?? error });
 		}
 	}
 });
