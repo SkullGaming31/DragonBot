@@ -454,7 +454,7 @@ describe('autoModeration extra branches', () => {
 
   it('__test_invokeInvite triggers outer catch when delete throws', async () => {
     const logger = await mockLogger();
-    const { __test_invokeInvite } = await import('../src/Events/customMessage/autoModeration');
+    const { __test_invokeInvite } = await import('../src/Events/customMessage/autoModeration.test-helpers');
     const WarnDB = await import('../src/Database/Schemas/WarnDB');
     (WarnDB.default.findOne as any) = vi.fn(() => ({ lean: async () => null }));
     (WarnDB.default.updateOne as any) = vi.fn(async () => null);
@@ -468,7 +468,7 @@ describe('autoModeration extra branches', () => {
 
   it('__test_invokeCaps triggers outer catch when delete throws', async () => {
     const logger = await mockLogger();
-    const { __test_invokeCaps } = await import('../src/Events/customMessage/autoModeration');
+    const { __test_invokeCaps } = await import('../src/Events/customMessage/autoModeration.test-helpers');
     const WarnDB = await import('../src/Database/Schemas/WarnDB');
     (WarnDB.default.findOne as any) = vi.fn(() => ({ lean: async () => null }));
     (WarnDB.default.updateOne as any) = vi.fn(async () => null);
@@ -483,7 +483,7 @@ describe('autoModeration extra branches', () => {
 
   it('__test_invokeSpam triggers outer catch when delete throws', async () => {
     const logger = await mockLogger();
-    const { __test_invokeSpam } = await import('../src/Events/customMessage/autoModeration');
+    const { __test_invokeSpam } = await import('../src/Events/customMessage/autoModeration.test-helpers');
     const WarnDB = await import('../src/Database/Schemas/WarnDB');
     (WarnDB.default.findOne as any) = vi.fn(() => ({ lean: async () => null }));
     (WarnDB.default.updateOne as any) = vi.fn(async () => null);
@@ -499,7 +499,7 @@ describe('autoModeration extra branches', () => {
 
   // Cover remaining boolean branches in the test helpers
   it('__test_invokeInvite covers channel.send true/false and inner branches', async () => {
-    const { __test_invokeInvite } = await import('../src/Events/customMessage/autoModeration');
+    const { __test_invokeInvite } = await import('../src/Events/customMessage/autoModeration.test-helpers');
     const WarnDB = await import('../src/Database/Schemas/WarnDB');
     (WarnDB.default.findOne as any) = vi.fn(() => ({ lean: async () => null }));
     (WarnDB.default.updateOne as any) = vi.fn(async () => null);
@@ -523,7 +523,7 @@ describe('autoModeration extra branches', () => {
   });
 
   it('__test_invokeCaps covers channel.send true/false and inner branches', async () => {
-    const { __test_invokeCaps } = await import('../src/Events/customMessage/autoModeration');
+    const { __test_invokeCaps } = await import('../src/Events/customMessage/autoModeration.test-helpers');
     const WarnDB = await import('../src/Database/Schemas/WarnDB');
     (WarnDB.default.findOne as any) = vi.fn(() => ({ lean: async () => null }));
     (WarnDB.default.updateOne as any) = vi.fn(async () => null);
@@ -541,7 +541,7 @@ describe('autoModeration extra branches', () => {
   });
 
   it('__test_invokeSpam covers channel.send true/false and inner branches', async () => {
-    const { __test_invokeSpam } = await import('../src/Events/customMessage/autoModeration');
+    const { __test_invokeSpam } = await import('../src/Events/customMessage/autoModeration.test-helpers');
     const WarnDB = await import('../src/Database/Schemas/WarnDB');
     (WarnDB.default.findOne as any) = vi.fn(() => ({ lean: async () => null }));
     (WarnDB.default.updateOne as any) = vi.fn(async () => null);
