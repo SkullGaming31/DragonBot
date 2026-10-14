@@ -47,7 +47,7 @@ Files changed/added (high level):
 - Tests: multiple files under `test/commands` and `test/utilities`
 
 Notes:
-- Permission pre-flight checks were implemented but made permissive in test environments (only fail early when permissions objects explicitly indicate missing rights) to avoid breaking unit tests that use simple mocks.
+- Permission pre-flight checks were implemented but made permissive in test ENVIRONMENTs (only fail early when permissions objects explicitly indicate missing rights) to avoid breaking unit tests that use simple mocks.
 - Audit logging is best-effort and asynchronous so command responsiveness isn't blocked by logging failures.
 - Dashboard scaffold: minimal Next.js dashboard scaffold added for issue #59 (OAuth + NextAuth template and `issues/59.md`).
 - Express API hardening: protected `/api/v1` with API key support and added common security headers and rate limiting in `src/index.ts`.
@@ -120,7 +120,7 @@ Planned MVP:
 - Tests: unit tests for threshold logic, integration tests with mock DB
 
 Implementation notes:
-- Use `guild.commands` registration for slash commands in dev environment.
+- Use `guild.commands` registration for slash commands in dev ENVIRONMENT.
 - Keep updates idempotent and use upsert to store mapping.
 
 ## 2026-07-12 — Reliability, security, and logging hardening
@@ -129,7 +129,7 @@ Implementation notes:
 - Fix: Loot/store/person handlers now use safe fallback penalties when moderation actions fail (for example: attempting to timeout the guild owner). Timeout attempts are skipped for the guild owner and missing-permission errors fall back to balance deductions and structured warnings.
 - Change: Decoupled webhook handling from app bootstrap — `src/Integrations/webhookHandler.ts` exports `handleIntegrationWebhook` and router factories; `src/routes/apiv1.ts` now dynamically loads the `appInstance`/client to avoid circular imports.
 - Change: API key middleware tightened — only accept `x-api-key` header (no query-string API key acceptance) and improved rate-limiting and security headers in `src/index.ts`.
-- Add: Single-instance lockfile and `.no_autorun` sentinel to prevent accidental autorun in developer environments; `DISABLE_AUTORUN` env var respected.
+- Add: Single-instance lockfile and `.no_autorun` sentinel to prevent accidental autorun in developer ENVIRONMENTs; `DISABLE_AUTORUN` env var respected.
 - Change: Centralized logging — introduced/expanded use of `src/Utilities/logger.ts` across commands, events, and utilities; replaced many `console.log`/`console.error` usages (large sweep: `src/Commands/Fun/*`, `src/Commands/Moderator/*`, `src/Commands/Information/*`, and utilities).
 - Fix: Centralize process-level error handling and startup wiring (non-fatal MongoDB connection errors are logged and retried; startup errors surface with clear logs).
 - Fix: Moderation helpers hardened — `src/Utilities/moderation.ts` now skips moderation against the guild owner, respects `AUTOMOD_TEST_USER_IDS`, and logs permission failures rather than throwing.

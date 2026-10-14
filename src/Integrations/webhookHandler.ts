@@ -8,6 +8,20 @@ import { error as logError, debug as logDebug } from '../Utilities/logger';
 
 const SECRET_HEADER = 'x-integration-secret';
 
+function isDuplicateKeyError(error: unknown): boolean {
+	return typeof error === 'object' && error !== null && 'code' in error && error.code === 11000;
+}
+
+async function claimIntegrationEvent(eventId: string, provider: string): Promise<boolean> {
+	try {
+		await IntegrationEventModel.create({ eventId, provider });
+		return true;
+	} catch (error) {
+		if (isDuplicateKeyError(error)) return false;
+		throw error;
+	}
+}
+
 export async function handleIntegrationWebhook(req: Request, res: Response, client?: ExtendedClient) {
 	// If client not provided (tests may call handler directly), attempt to load appInstance dynamically.
 	let effectiveClient: ExtendedClient | undefined = client;
@@ -27,6 +41,15 @@ export async function handleIntegrationWebhook(req: Request, res: Response, clie
 		const isTwitch = headerSource === 'twitch' || !!req.headers['twitch-eventsub-message-type'];
 
 		if (isTwitch) {
+			type HeaderLike = Record<string, string | string[] | undefined>;
+			const validateFn = TwitchAdapter.validate;
+			const rawBody = (req as Request & { rawBody?: Buffer }).rawBody;
+			const signedBody = rawBody ?? req.body as unknown;
+			if (!validateFn || !await Promise.resolve(validateFn(req.headers as HeaderLike, signedBody))) {
+				res.status(401).json({ error: 'Unauthorized' });
+				return;
+			}
+
 			// Twitch EventSub verification challenge
 			const msgType = (req.headers['twitch-eventsub-message-type'] as string) ?? '';
 			if (msgType === 'webhook_callback_verification') {
@@ -45,25 +68,14 @@ export async function handleIntegrationWebhook(req: Request, res: Response, clie
 				return;
 			}
 
-			// Validate Twitch signature (adapter may optionally provide validate)
-			type HeaderLike = Record<string, string | string[] | undefined>;
-			const validateFn = TwitchAdapter.validate;
-			if (validateFn) {
-				const valid = await Promise.resolve(validateFn(req.headers as HeaderLike, req.body as unknown));
-				if (!valid) { res.status(401).json({ error: 'Unauthorized' }); return; }
-			}
-
 			const normalized = await Promise.resolve(TwitchAdapter.normalize(req.headers as HeaderLike, req.body as unknown));
 			if (!normalized) { res.status(202).json({ status: 'ignored' }); return; }
 
 			// Deduplicate
 			const eventKey = normalized.id;
-			try {
-				const existing = await IntegrationEventModel.findOne({ eventId: eventKey }).lean().exec();
-				if (existing) { res.status(202).json({ status: 'duplicate' }); return; }
-				await IntegrationEventModel.create({ eventId: eventKey, provider: normalized.provider });
-			} catch (e) {
-				logError('integration event dedupe check failed', { error: (e as Error)?.message ?? e });
+			if (!await claimIntegrationEvent(eventKey, normalized.provider)) {
+				res.status(202).json({ status: 'duplicate' });
+				return;
 			}
 
 			const configs = await IntegrationConfigModel.find({ provider: 'twitch', enabled: true }).lean().exec();
@@ -130,12 +142,9 @@ export async function handleIntegrationWebhook(req: Request, res: Response, clie
 
 		// Deduplicate
 		const eventKey = String(normalized.id ?? '');
-		try {
-			const existing = await IntegrationEventModel.findOne({ eventId: { $eq: eventKey } }).lean().exec();
-			if (existing) { res.status(202).json({ status: 'duplicate' }); return; }
-			await IntegrationEventModel.create({ eventId: eventKey, provider: normalized.provider });
-		} catch (e) {
-			logError('integration event dedupe check failed', { error: (e as Error)?.message ?? e });
+		if (!await claimIntegrationEvent(eventKey, normalized.provider)) {
+			res.status(202).json({ status: 'duplicate' });
+			return;
 		}
 
 		const configs = await IntegrationConfigModel.find({ provider: source, enabled: true }).lean().exec();

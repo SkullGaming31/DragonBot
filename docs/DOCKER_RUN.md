@@ -14,7 +14,7 @@ docker build -t dragonbot:latest .
 docker volume create dragonbot-data
 ```
 
-3. Run the container with environment variables supplied via a file or your orchestrator.
+3. Run the container with ENVIRONMENT variables supplied via a file or your orchestrator.
    Example (using an env file `.env`):
 
 ```pwsh

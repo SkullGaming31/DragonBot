@@ -48,7 +48,7 @@ describe('index.ts bootstrapping', () => {
   });
 
   it('exposes root and health endpoints and respects API key middleware in dev', async () => {
-    process.env.Enviroment = 'dev';
+    process.env.ENVIRONMENT = 'dev';
     vi.resetModules();
     const { appInstance } = await import('../src/index');
 
@@ -70,8 +70,8 @@ describe('index.ts bootstrapping', () => {
     await request((appInstance as any).app).get('/api/v1/').expect(200).then(r => expect(r.body).toEqual({ api: true }));
   });
 
-  it('enforces API key in non-dev environments', async () => {
-    process.env.Enviroment = 'prod';
+  it('enforces API key in non-dev ENVIRONMENTs', async () => {
+    process.env.ENVIRONMENT = 'prod';
     process.env.API_KEY = 's3cret';
     vi.resetModules();
     const { appInstance } = await import('../src/index');
@@ -89,8 +89,8 @@ describe('index.ts bootstrapping', () => {
   });
 
   it('runs graceful shutdown handlers for process events', async () => {
-    // Prepare clean module environment and mocks
-    process.env.Enviroment = 'dev';
+    // Prepare clean module ENVIRONMENT and mocks
+    process.env.ENVIRONMENT = 'dev';
     vi.resetModules();
 
     const destroySpy = vi.fn(async () => { });

@@ -67,7 +67,14 @@ class App {
 
 			// Security middleware
 			this.app.use(helmet());
-			this.app.use(express.json());
+			this.app.use(express.json({
+				verify: (req, _res, body) => {
+					const source = req.headers['x-integration-source'];
+					if (source === 'twitch' || req.headers['twitch-eventsub-message-type']) {
+						(req as Request & { rawBody?: Buffer }).rawBody = body;
+					}
+				}
+			}));
 			this.app.use(express.urlencoded({ extended: true }));
 			// Configure CORS: default to same-origin; allow override via CORS_ORIGIN env var
 			const corsOptions = process.env.CORS_ORIGIN ? { origin: process.env.CORS_ORIGIN.split(',') } : undefined;
@@ -82,11 +89,11 @@ class App {
 			});
 			this.app.use('/api/', apiLimiter);
 
-			// Simple API key middleware for /api/v1 routes in non-dev environments
+			// Simple API key middleware for /api/v1 routes in non-dev ENVIRONMENTs
 			const apiKey = process.env.API_KEY;
 			const requireApiKey = (req: Request, res: Response, next: NextFunction): void => {
 				// In development, allow requests without API key for convenience
-				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') { next(); return; }
+				if (process.env.ENVIRONMENT === 'dev' || process.env.ENVIRONMENT === 'debug') { next(); return; }
 				// Only accept API key via `x-api-key` header to avoid leaking secrets in URLs
 				const provided = req.header('x-api-key');
 				if (!apiKey) { res.status(500).json({ error: 'API key not configured on server' }); return; }

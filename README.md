@@ -184,11 +184,11 @@ npm run build
 npm start
 ```
 
-### Environment variables
+### ENVIRONMENT variables
 
-The repo uses an intentionally misspelled environment variable key: `Enviroment` (values: `dev | prod | debug`). Do not rename it without updating `src/Structures/Client.ts` and other consumers. Check `.env.example` for a full list, but key vars include:
+The repo uses an intentionally misspelled ENVIRONMENT variable key: `ENVIRONMENT` (values: `dev | prod | debug`). Do not rename it without updating `src/Structures/Client.ts` and other consumers. Check `.env.example` for a full list, but key vars include:
 
-- `Enviroment` — `dev` | `prod` | `debug`
+- `ENVIRONMENT` — `dev` | `prod` | `debug`
 - `DEV_DISCORD_BOT_TOKEN` — token for dev bot login
 - `DISCORD_BOT_TOKEN` — token for production bot login
 - `DEV_DISCORD_GUILD_ID` — guild id used when registering commands in dev
@@ -212,7 +212,7 @@ Notes:
 - Commands live in `src/Commands/<Category>/` and export a `CommandType` (`src/Typings/Command.ts`). The `run` function receives `{ client, interaction, args }` where `interaction` is `ExtendedInteraction`.
 - Events live in `src/Events/*` and implement the `Event` contract (`src/Structures/Event.ts`). `ExtendedClient.registerModules()` auto-loads commands and events.
 
-If you change command registration behaviour or the `Enviroment` variable, coordinate with the repository owner — these are sensitive to production/dev command registration.
+If you change command registration behaviour or the `ENVIRONMENT` variable, coordinate with the repository owner — these are sensitive to production/dev command registration.
 
 
 build the docker image to use for docker desktop

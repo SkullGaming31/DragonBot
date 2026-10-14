@@ -17,7 +17,7 @@ export default new Event('messageCreate', async (message: Message) => {
 
 	// Ignore bot messages, DMs, and non-text channels
 	if (author.bot || !guild || channel.type !== ChannelType.GuildText) return;
-	const userData = await UserModel.findOneAndUpdate({ guildID: guild.id, id: author.id });
+	const userData = await UserModel.findOne({ guildID: guild.id, id: author.id });
 
 	// Check if message is in allowed channels
 	const settings = await SettingsModel.findOne({ GuildID: guild.id });

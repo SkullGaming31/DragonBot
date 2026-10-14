@@ -127,7 +127,7 @@ export default new Command({
 			})) as unknown as ApplicationCommandDataResolvable[];
 
 			// Use the guild where the reload was invoked for fastest propagation. Fall back to env-configured dev guild if available.
-			const targetGuildId = interaction.guildId ?? (process.env.Enviroment === 'dev' ? process.env.DEV_DISCORD_GUILD_ID : undefined);
+			const targetGuildId = interaction.guildId ?? (process.env.ENVIRONMENT === 'dev' ? process.env.DEV_DISCORD_GUILD_ID : undefined);
 			await client.registerCommands({
 				commands: allCommands,
 				guildId: targetGuildId

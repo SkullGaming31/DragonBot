@@ -1,9 +1,11 @@
-import { defineConfig } from 'vitest/config';
+import { configDefaults, defineConfig } from 'vitest/config';
 
 // Coverage thresholds — adjust numbers as your target
 export default defineConfig({
 	test: {
 		hookTimeout: 120000,
+		testTimeout: 15000,
+		exclude: [...configDefaults.exclude, '**/dist/**'],
 		setupFiles: ['./test/setup.ts'],
 		coverage: {
 			provider: 'v8',

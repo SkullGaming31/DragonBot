@@ -22,7 +22,7 @@
   },
   "include": [
     "src/**/*.ts",
-    "environment.d.ts"
+    "ENVIRONMENT.d.ts"
   ],
   "exclude": [
     "node_modules",

@@ -31,7 +31,7 @@ export async function startInMemoryMongo() {
         await mongoose.connect(connectTarget, { serverSelectionTimeoutMS: 5000 });
         // If we're using an external Mongo (CI service or local dev), ensure
         // the test database is clean. Only drop when it's clearly a safe
-        // target: CI environment or localhost/127.0.0.1 to avoid harming
+        // target: CI ENVIRONMENT or localhost/127.0.0.1 to avoid harming
         // accidental production connections.
         const isLocal = /localhost|127\.0\.0\.1/.test(external);
         if (process.env.CI === 'true' || isLocal) {

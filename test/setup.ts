@@ -1,6 +1,6 @@
-// Minimal test environment setup to make CI runs deterministic
-// Set environment variables used in code paths so functions that gate on them don't early-return
-process.env.Enviroment = process.env.Enviroment || 'dev';
+// Minimal test ENVIRONMENT setup to make CI runs deterministic
+// Set ENVIRONMENT variables used in code paths so functions that gate on them don't early-return
+process.env.ENVIRONMENT = process.env.ENVIRONMENT || 'dev';
 process.env.API_KEY = process.env.API_KEY || 'test-api-key';
 process.env.DEV_DISCORD_BOT_TOKEN = process.env.DEV_DISCORD_BOT_TOKEN || 'fake-token';
 process.env.DEV_DISCORD_GUILD_ID = process.env.DEV_DISCORD_GUILD_ID || 'GUILD_TEST';

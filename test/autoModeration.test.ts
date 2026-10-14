@@ -1,5 +1,5 @@
 import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest';
-import AutoModEvent from '../src/Events/customMessage/autoModeration';
+import AutoModEvent, { cleanupStaleMessageHistory } from '../src/Events/customMessage/autoModeration';
 
 // Mocks for discord.js objects
 function makeChannel() {
@@ -119,6 +119,15 @@ describe('autoModeration event', () => {
     expect(msg3.delete).toHaveBeenCalled();
     const ch = msg3.guild.channels.cache.get('chan1');
     expect(ch.send).toHaveBeenCalled();
+  });
+
+  it('removes user histories after the spam window expires', async () => {
+    const msg = makeMessage({ content: 'hi', authorId: 'inactive-user' });
+    const firstMessageTime = Date.now();
+
+    await AutoModEvent.run(msg);
+
+    expect(cleanupStaleMessageHistory(firstMessageTime + 30_001)).toBeGreaterThan(0);
   });
 
   it('escalates to kick on second warning', async () => {

@@ -46,7 +46,7 @@ Example: `/testbutton customid:accept` will create a button whose `customId` is 
 
 Manual end-to-end:
 
-1. Ensure your `.env` has a valid `DEV_DISCORD_BOT_TOKEN` and `Enviroment=dev` (or use the `prod` token for production).
+1. Ensure your `.env` has a valid `DEV_DISCORD_BOT_TOKEN` and `ENVIRONMENT=dev` (or use the `prod` token for production).
 2. Start the bot in dev mode:
 ```powershell
 npm run dev

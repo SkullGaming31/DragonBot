@@ -6,9 +6,9 @@ describe('Database connect', () => {
     const orig = process.env.MONGO_DATABASE_URI;
     const origMongo = process.env.MONGODB_URI;
     const origDev = process.env.MONGO_DEV_URI;
-    const origEnv = process.env.Enviroment;
+    const origEnv = process.env.ENVIRONMENT;
     // Force production behavior for this test so missing URI causes an error
-    process.env.Enviroment = 'prod';
+    process.env.ENVIRONMENT = 'prod';
     process.env.MONGO_DATABASE_URI = '';
     process.env.MONGODB_URI = '';
     process.env.MONGO_DEV_URI = '';
@@ -16,6 +16,6 @@ describe('Database connect', () => {
     process.env.MONGO_DATABASE_URI = orig;
     process.env.MONGODB_URI = origMongo;
     process.env.MONGO_DEV_URI = origDev;
-    process.env.Enviroment = origEnv;
+    process.env.ENVIRONMENT = origEnv;
   });
 });

@@ -126,6 +126,7 @@ export default new Command({
 	],
 	run: async ({ interaction }) => {
 		const { options, user, guild } = interaction;
+		let refundReservedStake: (() => Promise<void>) | undefined;
 		try {
 			await interaction.deferReply();
 
@@ -154,13 +155,45 @@ export default new Command({
 				return interaction.editReply({ content: 'You don\'t have enough coins to start this heist!' });
 			}
 
+			let stakeSettled = false;
+			let refundInFlight: Promise<void> | undefined;
+			const refundStake = (): Promise<void> => {
+				if (stakeSettled) return Promise.resolve();
+				if (refundInFlight) return refundInFlight;
+
+				refundInFlight = (async () => {
+					try {
+						const refundedUser = await UserModel.findOneAndUpdate(
+							{ guildID: guild?.id, id: user.id },
+							{ $inc: { balance: Amount } },
+							{ new: true }
+						);
+						if (!refundedUser) {
+							logError('Unable to refund heist stake: user account not found', { guildId: guild?.id, userId: user.id, amount: Amount });
+							return;
+						}
+						stakeSettled = true;
+					} catch (error) {
+						logError('Unable to refund heist stake', { guildId: guild?.id, userId: user.id, amount: Amount, error: (error as Error)?.message ?? error });
+					}
+				})().finally(() => {
+					refundInFlight = undefined;
+				});
+
+				return refundInFlight;
+			};
+			refundReservedStake = refundStake;
+
 			let heistInProgress = false;
 			const participants: Collection<string, Participant> = new Collection();
 			const baseChance = 0.1;
 			const participantBonus = 0.05;
 			const joinMessagesMap = new Map();
 
-			if (heistInProgress) return interaction.editReply({ content: 'A heist is already in progress. Please wait for it to finish!' });
+			if (heistInProgress) {
+				await refundStake();
+				return interaction.editReply({ content: 'A heist is already in progress. Please wait for it to finish!' });
+			}
 
 			const heistMessage = await interaction.editReply({ content: '**Heist starting in 60 seconds! React with ✅ to participate.**' });
 			const heistMessageDetails = await heistMessage.fetch();
@@ -212,6 +245,7 @@ export default new Command({
 						if (participants.size === 0) {
 							channel.send('Not enough participants joined. Heist cancelled!');
 							heistInProgress = false;
+							await refundStake();
 							await reaction.message.reactions.removeAll();
 						}
 					}
@@ -219,20 +253,23 @@ export default new Command({
 			});
 
 			collector.on('end', async () => {
-				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') {
+				if (process.env.ENVIRONMENT === 'dev' || process.env.ENVIRONMENT === 'debug') {
 					if (participants.size < 1) {
+						await refundStake();
 						await interaction.editReply({ content: 'Not enough participants joined. Heist cancelled!' });
 						await heistMessage.reactions.removeAll();
 						return;
 					}
 				} else {
 					if (participants.size < 2) {
+						await refundStake();
 						await interaction.editReply({ content: 'Not enough participants joined. Heist cancelled!' });
 						await heistMessage.reactions.removeAll();
 						return;
 					}
 				}
 
+				stakeSettled = true;
 				const successChance = baseChance + (participants.size * participantBonus);
 				const randomValue = randomInt(1, 100);
 				const success = randomValue <= successChance * 100;
@@ -300,6 +337,7 @@ export default new Command({
 				}
 			});
 		} catch (error) {
+			await refundReservedStake?.();
 			logError('Heist command error', { error: (error as Error)?.message ?? error });
 		}
 	},

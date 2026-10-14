@@ -11,6 +11,27 @@ import { info as logInfo, error as logError } from '../../Utilities/logger';
 // Simple in-memory message history for spam detection: { guildId: { userId: [timestamps] } }
 const messageHistory: Record<string, Record<string, number[]>> = {};
 const SPAM_WINDOW_MS = 30_000; // 30 seconds
+let lastMessageHistoryCleanup: number | undefined;
+
+export function cleanupStaleMessageHistory(now = Date.now()): number {
+	if (lastMessageHistoryCleanup !== undefined && now >= lastMessageHistoryCleanup && now - lastMessageHistoryCleanup < SPAM_WINDOW_MS) return 0;
+
+	const cutoff = now - SPAM_WINDOW_MS;
+	let removedUsers = 0;
+	for (const [guildId, users] of Object.entries(messageHistory)) {
+		for (const [userId, timestamps] of Object.entries(users)) {
+			while (timestamps.length > 0 && timestamps[0] < cutoff) timestamps.shift();
+			if (timestamps.length === 0) {
+				delete users[userId];
+				removedUsers++;
+			}
+		}
+		if (Object.keys(users).length === 0) delete messageHistory[guildId];
+	}
+
+	lastMessageHistoryCleanup = now;
+	return removedUsers;
+}
 
 function isInvite(text: string) {
 	// matches discord.gg/ or discord.com/invite/ or invite codes
@@ -214,6 +235,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 		// Spam detection (messages in window)
 		if (policy.rules.spam.enabled) {
 			const now = Date.now();
+			cleanupStaleMessageHistory(now);
 			messageHistory[guildId] ??= {};
 			const userHistory = messageHistory[guildId][message.author.id] ??= [];
 			// prune old

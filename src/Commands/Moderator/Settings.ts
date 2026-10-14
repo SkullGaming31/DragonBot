@@ -90,7 +90,7 @@ export default new Command({
 		try {
 			if (!interaction.inCachedGuild()) return;
 			const { guild, options } = interaction;
-			if (process.env.Enviroment === 'debug') {
+			if (process.env.ENVIRONMENT === 'debug') {
 				logDebug('settings: retrieved options');
 			}
 			const SuggestionChan = options.getChannel('sugestchan') || null;
@@ -103,7 +103,7 @@ export default new Command({
 			const EconChannel = options.getChannel('econchan') || null;
 
 			const Administrator = options.getRole('admin') ?? null;
-			if (process.env.Enviroment === 'debug') {
+			if (process.env.ENVIRONMENT === 'debug') {
 				logDebug('settings: administrator role', { administratorId: Administrator?.id });
 			}
 			const Moderator = options.getRole('moderator') ?? null;
@@ -112,7 +112,7 @@ export default new Command({
 			// Find or create a document using async/await
 			let data;
 			try {
-				if (process.env.Enviroment === 'debug') {
+				if (process.env.ENVIRONMENT === 'debug') {
 					logDebug('settings: fetching settings data', { guildId: guild.id });
 				}
 				data = await settings.findOne({ GuildID: guild.id });
@@ -136,7 +136,7 @@ export default new Command({
 					EconChan: EconChannel?.id ?? null,
 					ModerationChannel: ModerationChannel?.id ?? null
 				});
-				if (process.env.Enviroment === 'debug') {
+				if (process.env.ENVIRONMENT === 'debug') {
 					logInfo('settings: created new document', { guildId: guild.id });
 				}
 				await data.save();
@@ -159,7 +159,7 @@ export default new Command({
 						new: true,
 						upsert: true
 					});
-				if (process.env.Enviroment === 'debug') {
+				if (process.env.ENVIRONMENT === 'debug') {
 					logInfo('settings: updated document', { guildId: guild.id });
 				}
 			}

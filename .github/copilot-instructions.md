@@ -3,6 +3,12 @@
 This file gives concise, actionable guidance for an AI coding assistant working on the DragonBot repository.
 Keep guidance concrete and repository-specific. Avoid generic coding rules; prefer references to files and real examples.
 
+## Verify Before Acting
+- Before editing files, running commands that change state, or taking external or disruptive actions, inspect the relevant context and verify the target, assumptions, and expected outcome.
+- Prefer read-only checks first. Do not guess at file contents, current state, or command effects when they can be checked.
+- Ask before proceeding if ambiguity could materially change the scope or behavior.
+- After making a change, run a focused check or test that verifies the requested outcome. Report what passed and disclose checks that could not be completed.
+
 High-level architecture
 - This is a TypeScript Discord bot (discord.js v14) with an Express API. Main entry: `src/index.ts`.
 - `ExtendedClient` (in `src/Structures/Client.ts`) boots the bot, registers commands and events, and calls `client.start()`.
@@ -11,7 +17,7 @@ High-level architecture
 - Database: Mongoose is used in `src/Database/*`. Tests use `mongodb-memory-server` and sometimes start a replica set to exercise transactions (`test/*` files). Look at `test/helpers/mongoMemory.ts` and `test/market.test.ts` for patterns.
 
 Key conventions and quirks
-- Environment variable key is `Enviroment` (note the spelling); many files branch on `process.env.Enviroment` with values `'dev' | 'prod' | 'debug'`. See `src/enviroment.d.ts` and usages in `src/Structures/Client.ts` and `src/Database/index.ts`.
+- ENVIRONMENT variable key is `ENVIRONMENT` (note the spelling); many files branch on `process.env.ENVIRONMENT` with values `'dev' | 'prod' | 'debug'`. See `src/ENVIRONMENT.d.ts` and usages in `src/Structures/Client.ts` and `src/Database/index.ts`.
 - Commands must export a `name` and be set-like objects compatible with discord.js' Chat Input command structure. The runtime expects `client.commands` to be a `Collection<string, CommandType>`.
 - Use `safeInteractionReply` in `src/Utilities/functions.ts` for replying to interactions — it encapsulates common reply/editReply/followUp fallbacks and handles Discord API errors. Prefer this helper instead of calling `interaction.reply` directly in new code.
 - `cooldowns` Map (also in `src/Utilities/functions.ts`) is used for command cooldowns. Use `isOnCooldown` and `setCooldown` helpers.
@@ -53,19 +59,19 @@ Testing patterns and CI notes
   - If `any` is absolutely necessary (e.g., when dealing with a deeply dynamic external payload and adding types would be large), add a comment explaining why and prefer `unknown` at the call site instead.
 - Interaction replies: use `safeInteractionReply` to avoid duplicate-reply errors. See `src/Utilities/functions.ts` for the fallback sequence.
 - Command run signature: the `run` function receives `{ client, interaction, args }` where `interaction` is typed as `ExtendedInteraction` (see `src/Typings/Command.ts`). Use these types in new commands.
-- Register commands: `ExtendedClient.registerModules()` collects commands and registers them either globally or to a dev guild depending on `Enviroment`. If adding registration changes, update that method.
+- Register commands: `ExtendedClient.registerModules()` collects commands and registers them either globally or to a dev guild depending on `ENVIRONMENT`. If adding registration changes, update that method.
 
 Important files to reference when coding
-- `src/Structures/Client.ts` — bot startup, command/event registration, `Enviroment` behavior.
+- `src/Structures/Client.ts` — bot startup, command/event registration, `ENVIRONMENT` behavior.
 - `src/Structures/Event.ts` — event structure and typing patterns.
 - `src/Typings/Command.ts` — command type contract (inputs/outputs).
 - `src/Utilities/functions.ts` — helpers: `safeInteractionReply`, cooldowns.
-- `src/Database/index.ts` — mongoose connection and environment-sensitive config.
+- `src/Database/index.ts` — mongoose connection and ENVIRONMENT-sensitive config.
 - Tests: `test/*` and `test/helpers/mongoMemory.ts` — examples of using mongodb-memory-server and replica sets.
 - CI: `.github/workflows/ci.yml` — how tests are executed in CI and the OpenSSL compatibility workaround.
 
 What to avoid changing without checking maintainers
-- `Enviroment` spelling and runtime branching — changing environment variable names can silently break dev/prod login flows.
+- `ENVIRONMENT` spelling and runtime branching — changing ENVIRONMENT variable names can silently break dev/prod login flows.
 - Command registration behavior: switching between guild-global registration logic must be coordinated with bot tokens and dev guild IDs (see `.env.example`).
 
 Example snippets (use these shapes when adding features)

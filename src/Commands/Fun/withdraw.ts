@@ -40,7 +40,7 @@ export default new Command({
 		const res = await UserModel.findOneAndUpdate(
 			{ guildID: guild?.id, id: user.id, bank: { $gte: amount } },
 			{ $inc: { bank: -amount, balance: amount } },
-			{ new: true, upsert: true }
+			{ new: true }
 		).exec();
 
 		if (!res) return interaction.reply({ content: 'Insufficient funds in bank to withdraw that amount.', flags: MessageFlags.Ephemeral });

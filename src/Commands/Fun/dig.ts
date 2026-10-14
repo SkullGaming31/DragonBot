@@ -63,7 +63,7 @@ export default new Command({
 
 			const zone = options.getString('location') as 'forest' | 'ruins' | 'radiation';
 
-			// Validate environment
+			// Validate ENVIRONMENT
 			const settings = await SettingsModel.findOne({ GuildID: guild?.id });
 			const economyChannel = settings?.EconChan ? guild?.channels.cache.get(settings.EconChan) : interaction.channel;
 			if (!economyChannel) {

@@ -42,6 +42,28 @@ describe('Economy integration', () => {
     expect(u?.balance).toBe(100);
   });
 
+  it('does not create an account when depositing without an existing funded account', async () => {
+    const interaction = makeInteraction('G4', 'U4', '100000');
+
+    const result = await (depositCmd as any).run({ interaction });
+
+    expect(result).toMatchObject({
+      content: 'Insufficient funds to deposit that amount.'
+    });
+    expect(await UserModel.findOne({ guildID: 'G4', id: 'U4' }).exec()).toBeNull();
+  });
+
+  it('does not create an account when withdrawing without an existing funded account', async () => {
+    const interaction = makeInteraction('G5', 'U5', '100000');
+
+    const result = await (withdrawCmd as any).run({ interaction });
+
+    expect(result).toMatchObject({
+      content: 'Insufficient funds in bank to withdraw that amount.'
+    });
+    expect(await UserModel.findOne({ guildID: 'G5', id: 'U5' }).exec()).toBeNull();
+  });
+
   it('handles zero and negative amounts and invalid inputs for deposit', async () => {
     // Create a fresh user
     await UserModel.create({ guildID: 'G2', id: 'U2', balance: 100, bank: 0 });

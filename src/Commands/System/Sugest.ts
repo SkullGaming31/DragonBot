@@ -46,7 +46,7 @@ export default new Command({
 
 		// Validate guild exists
 		if (!guild) {
-			if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') { logWarn('feature: no guild found', {}); }
+			if (process.env.ENVIRONMENT === 'dev' || process.env.ENVIRONMENT === 'debug') { logWarn('feature: no guild found', {}); }
 
 			return interaction.reply({ content: '❌ This command can only be used in a server.', flags: MessageFlags.Ephemeral });
 		}
@@ -83,20 +83,20 @@ export default new Command({
 
 			// Validate target channel
 			if (!targetChannel?.isSendable()) {
-				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') { logWarn('feature: invalid target channel', { guild: guild.id }); }
+				if (process.env.ENVIRONMENT === 'dev' || process.env.ENVIRONMENT === 'debug') { logWarn('feature: invalid target channel', { guild: guild.id }); }
 
 				return interaction.reply({ content: '❌ Could not find a valid channel to send the suggestion.', flags: MessageFlags.Ephemeral });
 			}
 
 			// Check if command is in correct channel (if configured)
 			if (featureChannelId && channel?.id !== featureChannelId) {
-				if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') { logWarn('feature: command used in wrong channel', { guild: guild.id, channel: channel?.id, expected: featureChannelId }); }
+				if (process.env.ENVIRONMENT === 'dev' || process.env.ENVIRONMENT === 'debug') { logWarn('feature: command used in wrong channel', { guild: guild.id, channel: channel?.id, expected: featureChannelId }); }
 
 				return interaction.reply({ content: `❌ Please use this command in the suggestions channel: <#${featureChannelId}>`, flags: MessageFlags.Ephemeral });
 			}
 
 			// Send the suggestion
-			if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') { logInfo('feature: attempting to send suggestion', { guild: guild.id, channel: targetChannel?.id }); }
+			if (process.env.ENVIRONMENT === 'dev' || process.env.ENVIRONMENT === 'debug') { logInfo('feature: attempting to send suggestion', { guild: guild.id, channel: targetChannel?.id }); }
 
 			const M = await targetChannel.send({
 				embeds: [Response],
@@ -126,12 +126,12 @@ export default new Command({
 			});
 
 			// Respond to user
-			if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') { logInfo('feature: sending success response', { guild: guild.id, messageId: M.id }); }
+			if (process.env.ENVIRONMENT === 'dev' || process.env.ENVIRONMENT === 'debug') { logInfo('feature: sending success response', { guild: guild.id, messageId: M.id }); }
 
 			await interaction.reply({ content: `✅ Your suggestion has been submitted${featureChannelId ? '' : ' in this channel'}!`, flags: MessageFlags.Ephemeral });
 
 		} catch (error: unknown) {
-			if (process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug') { logError('Error in feature command', { error: (error as Error)?.message ?? error }); }
+			if (process.env.ENVIRONMENT === 'dev' || process.env.ENVIRONMENT === 'debug') { logError('Error in feature command', { error: (error as Error)?.message ?? error }); }
 
 			await interaction.reply({ content: '❌ Failed to submit your suggestion. Please try again.', flags: MessageFlags.Ephemeral });
 		}

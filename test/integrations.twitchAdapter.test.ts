@@ -42,8 +42,18 @@ describe('TwitchAdapter', () => {
 		expect(normalized).not.toBeNull();
 		expect(normalized?.provider).toBe('twitch');
 		expect(normalized?.eventType).toBe('stream.online');
-		expect(normalized?.id).toBe('sub-1');
+		expect(normalized?.id).toBe(msgId);
 		expect(normalized?.title).toBe('Super Cool Stream');
 		expect(normalized?.url).toContain('coolstreamer');
+
+		const retryHeaders = { ...headers };
+		retryHeaders['twitch-eventsub-message-id'] = 'msg-456';
+		const secondDelivery = await TwitchAdapter.normalize(retryHeaders as any, body as any);
+		expect(secondDelivery?.id).toBe('msg-456');
+		expect(secondDelivery?.id).not.toBe(normalized?.id);
+
+		const missingDeliveryIdHeaders = { ...headers };
+		delete missingDeliveryIdHeaders['twitch-eventsub-message-id'];
+		expect(await TwitchAdapter.normalize(missingDeliveryIdHeaders as any, body as any)).toBeNull();
 	});
 });

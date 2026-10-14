@@ -67,7 +67,7 @@ export default new Event<'messageCreate'>('messageCreate', async (message: Messa
 
 	// TTL (ms) configurable via env; default 30s in dev, 5m in prod
 	const parsed = Number.parseInt(String(process.env.BOT_MENTION_TTL_MS ?? ''), 10);
-	const defaultTtl = process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug' ? 30_000 : 300_000;
+	const defaultTtl = process.env.ENVIRONMENT === 'dev' || process.env.ENVIRONMENT === 'debug' ? 30_000 : 300_000;
 	const ttl = Number.isFinite(parsed) && parsed > 0 ? parsed : defaultTtl;
 
 	let replyMsg: Message | null = null;

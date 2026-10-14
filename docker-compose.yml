@@ -22,12 +22,12 @@ services:
     image: dragonbot:latest
     depends_on:
       - mongo
-    environment:
+    ENVIRONMENT:
       - NODE_ENV=prod
       - PORT=3000
       - MONGO_URI=mongodb://mongo:27017/dragonbot
       - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
-      - Enviroment=${Enviroment}
+      - ENVIRONMENT=${ENVIRONMENT}
     ports:
       - "3000:3000"
     restart: unless-stopped

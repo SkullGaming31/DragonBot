@@ -23,10 +23,10 @@ export const TwitchAdapter: IntegrationAdapter = {
 
 		if (!sigHeader || !msgId || !timestamp) return false;
 
-		const payload = JSON.stringify(body ?? {});
+		const payload = Buffer.isBuffer(body) ? body : Buffer.from(JSON.stringify(body ?? {}));
 
 		// Twitch signature is of form: sha256=hex
-		const expected = crypto.createHmac('sha256', secret).update(msgId + timestamp + payload).digest('hex');
+		const expected = crypto.createHmac('sha256', secret).update(msgId + timestamp).update(payload).digest('hex');
 		const actual = sigHeader.startsWith('sha256=') ? sigHeader.split('=')[1] : sigHeader;
 
 		// timingSafeEqual requires equal-length buffers
@@ -37,20 +37,21 @@ export const TwitchAdapter: IntegrationAdapter = {
 	},
 
 	normalize(headers: Record<string, string | string[] | undefined>, body: unknown): NormalizedEvent | null {
-		const msgType = getHeaderValue(headers, HEADER_TYPE);
 		if (body && typeof body === 'object' && 'subscription' in body && 'event' in body) {
+			const deliveryId = getHeaderValue(headers, HEADER_ID);
+			if (!deliveryId) return null;
+
 			const b = body as { subscription?: Record<string, unknown>; event?: Record<string, unknown> };
 			const eventType = String((b.subscription && (b.subscription as Record<string, unknown>)['type']) ?? '');
 			if (eventType === 'stream.online' || eventType === 'stream.offline') {
 				const ev = b.event as Record<string, unknown>;
 				const broadcasterName = String(ev['broadcaster_user_name'] ?? ev['broadcaster_login'] ?? '');
 				const url = `https://twitch.tv/${String(ev['broadcaster_user_login'] ?? ev['broadcaster_login'] ?? '')}`;
-				const id = String((b.subscription && (b.subscription as Record<string, unknown>)['id']) ?? ev['id'] ?? msgType ?? `${Date.now()}`);
 				const title = String(ev['title'] ?? `${broadcasterName} is streaming`);
 				const normalized: NormalizedEvent = {
 					provider: 'twitch',
 					eventType: eventType,
-					id: id,
+					id: deliveryId,
 					title,
 					url,
 					metadata: body as Record<string, unknown>
@@ -58,12 +59,11 @@ export const TwitchAdapter: IntegrationAdapter = {
 				return normalized;
 			}
 
-			const id = String((b.subscription && (b.subscription as Record<string, unknown>)['id']) ?? `${Date.now()}`);
 			const ev = b.event as Record<string, unknown>;
 			return {
 				provider: 'twitch',
 				eventType: String((b.subscription && (b.subscription as Record<string, unknown>)['type']) ?? ''),
-				id,
+				id: deliveryId,
 				title: ev['title'] ? String(ev['title']) : (ev['message'] ? String(ev['message']) : undefined),
 				url: undefined,
 				metadata: body as Record<string, unknown>

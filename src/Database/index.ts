@@ -19,7 +19,7 @@ export class MongoDBConnectionError extends Error {
  * Establishes a connection to the MongoDB database.
  *
  * @remarks
- * Based on the value of the `ENVIRONMENT` environment variable, the function will
+ * Based on the value of the `ENVIRONMENT` ENVIRONMENT variable, the function will
  * use either the `MONGO_DEV_URI` or `MONGO_DATABASE_URI` variable to connect to
  * the MongoDB database. If the `ENVIRONMENT` variable is neither 'dev' nor 'debug',
  * the function will use the `MONGO_DATABASE_URI` variable.
@@ -34,8 +34,8 @@ export class MongoDBConnectionError extends Error {
  * cannot be established.
  */
 export const connectDatabase = async (): Promise<void> => {
-	// Set mongoose debug mode based on environment
-	const isDev = process.env.Enviroment === 'dev' || process.env.Enviroment === 'debug';
+	// Set mongoose debug mode based on ENVIRONMENT
+	const isDev = process.env.ENVIRONMENT === 'dev' || process.env.ENVIRONMENT === 'debug';
 	mongoose.set('debug', false);
 
 	// MongoDB connection URIs — support several common env var names for compatibility

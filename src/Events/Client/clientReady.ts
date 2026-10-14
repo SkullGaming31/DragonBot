@@ -8,8 +8,8 @@ import { info as logInfo, error as logError } from '../../Utilities/logger';
 export default new Event<'clientReady'>('clientReady', async (client: Client) => {
 	const { user, guilds } = client;
 	logInfo(`${user?.tag} is online`);
-	const Enviroment = process.env.Enviroment;
-	switch (Enviroment) {
+	const ENVIRONMENT = process.env.ENVIRONMENT;
+	switch (ENVIRONMENT) {
 		case 'dev':
 			client.user?.setActivity({ name: 'Under Development', type: ActivityType.Streaming });
 			break;
@@ -21,7 +21,7 @@ export default new Event<'clientReady'>('clientReady', async (client: Client) =>
 			client.user?.setActivity({ name: 'Debugging Code', type: ActivityType.Custom });
 			break;
 		default:
-			logInfo('Development Enviroment', { env: Enviroment });
+			logInfo('Development ENVIRONMENT', { env: ENVIRONMENT });
 			break;
 	}
 

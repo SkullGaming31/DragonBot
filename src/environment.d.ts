@@ -13,7 +13,7 @@ declare global {
 			DEV_DISCORD_CLIENT_ID: string;
 			DEV_DISCORD_CLIENT_SECRET: string;
 			DEV_DISCORD_REDIRECT_URL: string;
-			Enviroment: 'dev' | 'prod' | 'debug';
+			ENVIRONMENT: 'dev' | 'prod' | 'debug';
 			PORT: number;
 			MONGO_DATABASE_URI: string;
 			DEV_MONGO_DATABASE_URI: string;

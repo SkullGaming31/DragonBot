@@ -49,16 +49,16 @@ export function checkVariables(env: NodeJS.ProcessEnv): void {
 			const val = (Object.prototype.hasOwnProperty.call(parsedEnv, key) ? parsedEnv[key] : (env[key] as string | undefined));
 			if (val === undefined || val === '') {
 				missing.push(key);
-				logError(`Missing or empty environment variable in ${sourceLabel}: ${key}`);
+				logError(`Missing or empty ENVIRONMENT variable in ${sourceLabel}: ${key}`);
 			}
 		}
 
 		if (missing.length > 0) {
-			logError(`Detected ${missing.length} missing/empty environment variables (checked ${sourceLabel}). Check .env or .env.example for required keys.`);
+			logError(`Detected ${missing.length} missing/empty ENVIRONMENT variables (checked ${sourceLabel}). Check .env or .env.example for required keys.`);
 		}
 	} catch (err) {
 		// Don't throw during startup; just log the issue and continue.
-		logError('Error checking environment variables', { error: (err as Error)?.message ?? err });
+		logError('Error checking ENVIRONMENT variables', { error: (err as Error)?.message ?? err });
 	}
 }
 

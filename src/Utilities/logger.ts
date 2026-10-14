@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
+import mongoose from 'mongoose';
 import LogEntryModel from '../Database/Schemas/logEntry';
 
 type Level = 'info' | 'warn' | 'error' | 'debug';
@@ -40,15 +41,24 @@ export async function log(level: Level, message: string, meta?: Record<string, u
 	else console.log(line);
 
 	// Write to file for persistence
-	await writeFileLog(line);
+	// Fire-and-forget file write so logging never blocks callers
+	void writeFileLog(line).catch((e) => {
+		console.error('logger: failed to write file log', e);
+	});
 
 	// Save to DB (best-effort)
+	// Only attempt DB writes when mongoose reports a connected state to avoid
+	// triggering internal buffering timeouts when the DB isn't reachable.
 	try {
-		await LogEntryModel.create({ level, message, meta, createdAt: new Date() });
+		if (mongoose.connection && mongoose.connection.readyState === 1) {
+			void LogEntryModel.create({ level, message, meta, createdAt: new Date() }).catch((e) => {
+				console.error('logger: failed to write DB log', e);
+			});
+		}
 	} catch (e) {
-		// ignore DB errors to keep logging non-blocking
-
-		console.error('logger: failed to write DB log', e);
+		// If checking connection state throws for any reason, avoid letting
+		// logging interfere with application flow.
+		console.error('logger: error while attempting DB log', e);
 	}
 }
 
