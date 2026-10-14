@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import rateLimit from 'express-rate-limit';
 import IntegrationConfigModel from '../Database/Schemas/integrationConfig';
 import IntegrationEventModel from '../Database/Schemas/integrationEvent';
 import { NormalizedEvent } from './adapter';
@@ -184,7 +185,14 @@ export async function handleIntegrationWebhook(req: Request, res: Response, clie
 // Router factory: create a router that handles integration webhooks using the provided Discord client.
 export function createIntegrationRouter(client: ExtendedClient) {
 	const router = express.Router();
+	const integrationLimiter = rateLimit({
+		windowMs: 15 * 60 * 1000,
+		max: 200,
+		standardHeaders: true,
+		legacyHeaders: false,
+		handler: (_req, res) => res.status(429).json({ error: 'Too many requests, please try again later.' }),
+	});
 	// Expect JSON body to be parsed by the parent express app
-	router.post('/', (req: Request, res: Response) => handleIntegrationWebhook(req, res, client));
+	router.post('/', integrationLimiter, (req: Request, res: Response) => handleIntegrationWebhook(req, res, client));
 	return router;
 }
