@@ -3,7 +3,7 @@ import { randomBytes } from 'crypto';
 import WarningDB from '../../Database/Schemas/WarnDB';
 import { EmbedBuilder, GuildMember, Guild } from 'discord.js';
 import { postPunishment, escalateByWarnings } from '../../Utilities/moderation';
-import { info as logInfo, error as logError } from '../../Utilities/logger';
+import { error as logError } from '../../Utilities/logger';
 
 function generateUniqueID(): string {
 	return randomBytes(8).toString('hex');

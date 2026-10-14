@@ -1,11 +1,9 @@
-version: '3.8'
-
 services:
   mongo:
     image: mongo:latest
     container_name: mongodb
     healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -20,18 +18,29 @@ services:
       context: .
       dockerfile: Dockerfile
     image: dragonbot:latest
+    container_name: dragonbot
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: "${PORT:-3000}"
+      ENVIRONMENT: "${ENVIRONMENT:-prod}"
+      MONGODB_URI: "mongodb://mongo:27017/${MONGO_DB:-dragonbot}"
+      MONGO_DATABASE_URI: "mongodb://mongo:27017/${MONGO_DB:-dragonbot}"
+      MONGO_DEV_URI: "mongodb://mongo:27017/${MONGO_DB:-dragonbot}"
     depends_on:
-      - mongo
-    ENVIRONMENT:
-      - NODE_ENV=prod
-      - PORT=3000
-      - MONGO_URI=mongodb://mongo:27017/dragonbot
-      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
-      - ENVIRONMENT=${ENVIRONMENT}
+      mongo:
+        condition: service_healthy
     ports:
-      - "3000:3000"
+      - "${PORT:-3000}:${PORT:-3000}"
     restart: unless-stopped
-    command: ["bash","-c","/usr/local/bin/wait-for-mongo.sh mongo 27017 && node dist/src/index.js"]
 
 volumes:
   mongoData_Discord:
+    external: true
+    name: dragonbot_mongoData_Discord
+
+networks:
+  default:
+    external: true
+    name: dragonbot_default

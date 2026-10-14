@@ -4,7 +4,6 @@ import { IntegrationAdapter, NormalizedEvent } from './adapter';
 const HEADER_SIGNATURE = 'twitch-eventsub-message-signature';
 const HEADER_ID = 'twitch-eventsub-message-id';
 const HEADER_TIMESTAMP = 'twitch-eventsub-message-timestamp';
-const HEADER_TYPE = 'twitch-eventsub-message-type';
 
 function getHeaderValue(headers: Record<string, string | string[] | undefined>, name: string): string | undefined {
 	const raw = headers[name] ?? headers[name.toLowerCase() as keyof typeof headers];

@@ -201,3 +201,10 @@
 2026-10-14T20:57:23.450Z [INFO] Global commands registered: 44 {"count":44}
 2026-10-14T20:57:24.284Z [INFO] Connected to the Mongo Database 
 2026-10-14T20:57:24.300Z [INFO] [Server:] listening http://localhost:3002 
+2026-10-14T21:30:25.767Z [INFO] DragonBot#3807 is online
+2026-10-14T21:30:25.765Z [INFO] ENVIRONMENT:  {"env":"prod"}
+2026-10-14T21:30:25.768Z [INFO] Guild: The Dragon's Den
+2026-10-14T21:30:25.768Z [INFO] Guild: Zodiac Dynasty
+2026-10-14T21:30:26.178Z [INFO] Global commands registered: 44 {"count":44}
+2026-10-14T21:30:27.081Z [INFO] Connected to the Mongo Database
+2026-10-14T21:30:27.099Z [INFO] [Server:] listening http://localhost:3002

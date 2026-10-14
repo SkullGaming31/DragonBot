@@ -171,11 +171,13 @@ git clone https://github.com/SkullGaming31/DragonBot.git
 npm ci
 ```
 
-Run the bot in development mode (hot reload via ts-node):
+Run the bot in development mode (fast startup with ts-node transpile-only; typecheck separately):
 
 ```pwsh
-npm run dev
+npm run start:dev
 ```
+
+Run `npm run typecheck` to check TypeScript types.
 
 Build for production output (compiled JS in `dist/`):
 

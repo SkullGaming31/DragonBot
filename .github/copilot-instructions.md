@@ -25,7 +25,7 @@ Key conventions and quirks
 
 Developer workflows (how to build, run, and test)
 - Install: `npm ci` or `npm install`.
-- Dev run: `npm run dev` (uses `ts-node` to run `src/index.ts`).
+- Dev run: `npm run start:dev` (uses `ts-node --transpile-only`; run `npm run typecheck` separately).
 - Build: `npm run build` -> `dist/` (entry `./dist/index.js`).
 - Typecheck: `npm run typecheck` (tsc --noEmit).
 - Lint: `npm run lint` (eslint --fix src) — the project uses a fairly strict `@typescript-eslint` setup; the repo historically moved many `any` -> `unknown` + narrows.

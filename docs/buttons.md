@@ -49,7 +49,7 @@ Manual end-to-end:
 1. Ensure your `.env` has a valid `DEV_DISCORD_BOT_TOKEN` and `ENVIRONMENT=dev` (or use the `prod` token for production).
 2. Start the bot in dev mode:
 ```powershell
-npm run dev
+npm run start:dev
 ```
 3. In your dev server, run the slash command `/testbutton customid:your_id` (optionally add label/style).
 4. Click the button in Discord and observe the bot's behavior/logs.

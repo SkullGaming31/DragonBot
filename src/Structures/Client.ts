@@ -1,39 +1,9 @@
 import { ActivityType, ApplicationCommandDataResolvable, Client, ClientEvents, Collection, GatewayIntentBits, Options, Partials } from 'discord.js';
 import { config } from 'dotenv';
-import { glob } from 'glob';
+import { glob, type GlobOptionsWithFileTypesUnset } from 'glob';
 import { Agent } from 'undici';
 
-// `glob`'s export shape can vary between versions/ESM vs CJS. Wrap the
-// callback-style API in a Promise to ensure a consistent, typed async helper.
-const PG = async (pattern: string, options?: any) => {
-	// Try promise-returning API first (modern glob versions), then callback,
-	// then sync as a last resort. This makes the helper robust across
-	// different installed `glob` versions / runtime shapes.
-	try {
-		const possible = (glob as any)(pattern, options);
-		if (possible && typeof possible.then === 'function') {
-			return (await possible) as string[];
-		}
-	} catch (e) {
-		// ignore and try callback/sync fallback
-	}
-
-	return await new Promise<string[]>((resolve, reject) => {
-		try {
-			(glob as any)(pattern, options ?? {}, (err: Error | null, matches: string[]) => {
-				if (err) return reject(err);
-				resolve(matches ?? []);
-			});
-		} catch (err) {
-			try {
-				const syncMatches = (glob as any).sync ? (glob as any).sync(pattern, options) : [];
-				resolve(syncMatches ?? []);
-			} catch (e) {
-				reject(err);
-			}
-		}
-	});
-};
+const PG = (pattern: string, options?: GlobOptionsWithFileTypesUnset): Promise<string[]> => glob(pattern, options);
 
 import { CommandType } from '../Typings/Command';
 import { ButtonType } from '../Typings/Button';
@@ -270,7 +240,7 @@ export class ExtendedClient extends Client {
 
 		for (const filePath of eventFiles) {
 			const event: Event<keyof ClientEvents> | undefined = await this.importFile(filePath);
-			if (!event || typeof (event as any).run !== 'function' || !('event' in (event as any))) {
+			if (!event || typeof event.run !== 'function' || !event.event) {
 				logWarn('registerModules: invalid event module, skipping', { path: filePath, keys: Object.keys(event ?? {}) });
 				continue;
 			}

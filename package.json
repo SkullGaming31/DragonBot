@@ -25,7 +25,7 @@
 	},
 	"scripts": {
 		"start": "node ./dist/index.js",
-		"start:dev": "ts-node ./src/index.ts",
+		"start:dev": "ts-node --transpile-only ./src/index.ts",
 		"lint": "eslint --fix src",
 		"build": "tsc",
 		"watch": "tsc -w",

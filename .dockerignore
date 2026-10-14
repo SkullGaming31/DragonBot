@@ -7,6 +7,10 @@ node_modules/
 # Ignore the build directory
 dist/
 
+# Keep local environment files and secrets out of the build context
+.env*
+!.env.example
+
 # Ignore .VSCode folder
 .vscode/
 
