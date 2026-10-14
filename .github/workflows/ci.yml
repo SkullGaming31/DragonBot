@@ -91,7 +91,7 @@ jobs:
       - name: Install mongosh
         run: |
           apt-get update
-          apt-get install -y curl ca-certificates gnupg
+          apt-get install -y --no-upgrade curl ca-certificates gnupg
           curl -fsSL https://pgp.mongodb.com/server-6.0.asc | gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg
           echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/debian bullseye/mongodb-org/6.0 main" \
             > /etc/apt/sources.list.d/mongodb-org-6.0.list
