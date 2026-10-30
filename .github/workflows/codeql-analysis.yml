@@ -23,16 +23,16 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v4
         with:
           # Enable JavaScript/TypeScript analysis and GitHub Actions analysis
           languages: javascript,actions
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v2
+        uses: github/codeql-action/autobuild@v4
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v4
         # Allow the action to continue if GitHub rejects the SARIF upload
         # (e.g., when the repository has the default setup enabled).
         continue-on-error: true
