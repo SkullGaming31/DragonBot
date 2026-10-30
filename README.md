@@ -197,7 +197,7 @@ The repo uses an intentionally misspelled ENVIRONMENT variable key: `ENVIRONMENT
 
 ### Tests & CI
 
-Run the test suite locally with Vitest:
+Use Node.js 24 to match CI, and run the test suite locally with Vitest:
 
 ```pwsh
 npm test
@@ -205,7 +205,7 @@ npm test
 
 Notes:
 - Many tests use `mongodb-memory-server`. To exercise MongoDB transactions the tests start a replica set (`MongoMemoryReplSet`). Keep replica-set tests short (use `count:1`) to save time.
-- On CI, runners may lack OpenSSL 1.1 required by MongoDB binaries. The repo's workflow runs the Tests job in the `node:18-bullseye` container so `libcrypto.so.1.1` is available. See `.github/workflows/ci.yml`.
+- On CI, runners may lack OpenSSL 1.1 required by MongoDB binaries. The workflow runs the Tests job in the `node:24-bullseye` container so `libcrypto.so.1.1` is available. See `.github/workflows/ci.yml`.
 
 ### Coding conventions & tips
 

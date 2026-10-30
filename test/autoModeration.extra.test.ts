@@ -75,6 +75,11 @@ vi.mock('../src/Database/Schemas/WarnDB', async () => {
   return { default: base };
 });
 
+vi.mock('../src/Utilities/logger', async () => ({
+  info: vi.fn(),
+  error: vi.fn(),
+}));
+
 describe('autoModeration extra branches', () => {
   beforeEach(() => {
     vi.resetAllMocks();
@@ -82,10 +87,6 @@ describe('autoModeration extra branches', () => {
 
   // helper to mock the logger so we can assert outer catch executed
   function mockLogger() {
-    vi.mock('../src/Utilities/logger', async () => ({
-      info: vi.fn(),
-      error: vi.fn(),
-    }));
     return import('../src/Utilities/logger');
   }
 

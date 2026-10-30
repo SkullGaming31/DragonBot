@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [24.x]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -46,7 +46,7 @@ jobs:
     # Run inside a Docker container that includes OpenSSL 1.1 (Debian Bullseye image)
     runs-on: ubuntu-latest
     container:
-      image: node:20-bullseye
+      image: node:24-bullseye
     services:
       mongo:
         image: mongo:6.0
@@ -59,7 +59,7 @@ jobs:
     timeout-minutes: 20
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [24.x]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -88,25 +88,11 @@ jobs:
       - name: lint (if available)
         run: npm run lint --if-present
 
-      - name: Install mongosh
-        run: |
-          apt-get update
-          apt-get install -y --no-upgrade curl ca-certificates gnupg
-          curl -fsSL https://pgp.mongodb.com/server-6.0.asc | gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg
-          echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/debian bullseye/mongodb-org/6.0 main" \
-            > /etc/apt/sources.list.d/mongodb-org-6.0.list
-          apt-get update
-          apt-get install -y mongodb-mongosh
-          mongosh --version
-
       - name: Initialize Mongo replica set
         env:
           MONGO_URL: mongodb://mongo:27017/admin
-        run: |
-          # Initiate replset (safe to re-run)
-          mongosh "$MONGO_URL" --eval 'try { rs.status() } catch(e) { rs.initiate({_id:"rs0", members:[{_id:0, host:"mongo:27017"}]}) }'
-          # Wait for PRIMARY
-          mongosh "$MONGO_URL" --eval 'for (let i=0; i<60; i++) { try { const s=rs.status(); if (s.myState===1) { print("PRIMARY"); quit(0); } } catch(e) {} sleep(1000); } print("Timed out waiting for PRIMARY"); quit(1)'
+          MONGO_REPLICA_HOST: mongo:27017
+        run: node scripts/initTestReplicaSet.js
 
       - name: Seed DB
         env:
@@ -122,14 +108,7 @@ jobs:
           MONGO_URL: mongodb://mongo:27017/testdb
         run: |
           # Use fewer workers to be gentle on CI runners and reduce memory pressure
-          npx vitest --run --reporter=dot --maxWorkers=2 --coverage
-
-      - name: Run tests with JUnit reporter (artifact)
-        env:
-          CI: true
-        run: |
-          # Produce JUnit XML for test reporting
-          npx vitest --run --reporter junit --reporter-options "output=vitest-junit.xml" --maxWorkers=2 || true
+          npx vitest --run --reporter=dot --reporter=junit --outputFile.junit=vitest-junit.xml --maxWorkers=2 --coverage
 
       - name: Upload JUnit test report
         if: always()
