@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # Multi-stage build: install/build in a full Node image, then run from a slim runtime image as non-root
 
-FROM node:22-bookworm-slim AS builder
+FROM node:25-bookworm-slim AS builder
 
 WORKDIR /app
 # Ensure devDependencies (like TypeScript) are installed during the build
@@ -18,7 +18,7 @@ COPY . .
 RUN npm run build
 
 ### Production image
-FROM node:22-bookworm-slim
+FROM node:25-bookworm-slim
 WORKDIR /app
 
 # Minimal env defaults
