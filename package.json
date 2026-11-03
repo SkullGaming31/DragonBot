@@ -37,7 +37,7 @@
 	"dependencies": {
 		"axios": "^1.21.0",
 		"connect-mongo": "^5.1.0",
-		"cors": "^2.8.5",
+		"cors": "^2.8.6",
 		"discord-api-types": "^0.38.57",
 		"discord.js": "^14.27.0",
 		"dotenv": "^16.5.0",
@@ -53,7 +53,7 @@
 		"@eslint/js": "^9.25.1",
 		"@eslint/json": "^0.13.2",
 		"@eslint/markdown": "^6.4.0",
-		"@types/cors": "^2.8.17",
+		"@types/cors": "^2.8.19",
 		"@types/express": "^5.0.1",
 		"@types/express-session": "^1.18.1",
 		"@types/helmet": "^0.0.48",
