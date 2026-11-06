@@ -6,6 +6,7 @@ node_modules/
 
 # Ignore the build directory
 dist/
+.bot.pid
 
 # Keep local environment files and secrets out of the build context
 .env*

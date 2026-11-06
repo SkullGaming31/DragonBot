@@ -37,6 +37,7 @@ describe('Marketplace commands', () => {
   it('creates a listing via market-create', async () => {
     const guildId = 'GUILD1';
     const userId = 'SELLER1';
+    await UserModel.create({ guildID: guildId, id: userId, inventory: ['Sword of Testing', 'Sword of Testing'] });
 
     const opts = {
       guild: { id: guildId },
@@ -68,7 +69,7 @@ describe('Marketplace commands', () => {
     await UserModel.create({ guildID: guildId, id: sellerId, username: 'seller', balance: 0 });
     await UserModel.create({ guildID: guildId, id: buyerId, username: 'buyer', balance: 1000 });
 
-    const listing = await ListingModel.create({ guildID: guildId, sellerID: sellerId, itemName: 'Shield', price: 250, quantity: 3, active: true, createdAt: new Date() });
+    const listing = await ListingModel.create({ guildID: guildId, sellerID: sellerId, itemName: 'Shield', price: 250, quantity: 3, active: true, escrowed: true, createdAt: new Date() });
 
     const opts = {
       guild: { id: guildId },
@@ -95,6 +96,7 @@ describe('Marketplace commands', () => {
     expect(updatedListing).toBeTruthy();
 
     expect((updatedBuyer as any).balance).toBe(750); // 1000 - 250
+    expect(updatedBuyer!.inventory).toEqual(['Shield']);
     expect((updatedSeller as any).balance).toBe(250);
     expect((updatedListing as any).quantity).toBe(2);
   });
@@ -102,8 +104,8 @@ describe('Marketplace commands', () => {
   it('lists active listings via market-list', async () => {
     const guildId = 'GUILD3';
     // create two listings
-    await ListingModel.create({ guildID: guildId, sellerID: 'S1', itemName: 'Potion', price: 10, quantity: 5, active: true, createdAt: new Date() });
-    await ListingModel.create({ guildID: guildId, sellerID: 'S2', itemName: 'Herb', price: 5, quantity: 3, active: true, createdAt: new Date() });
+    await ListingModel.create({ guildID: guildId, sellerID: 'S1', itemName: 'Potion', price: 10, quantity: 5, active: true, escrowed: true, createdAt: new Date() });
+    await ListingModel.create({ guildID: guildId, sellerID: 'S2', itemName: 'Herb', price: 5, quantity: 3, active: true, escrowed: true, createdAt: new Date() });
 
     const opts = {
       guild: { id: guildId },

@@ -90,15 +90,30 @@ export default new Command({
 			}
 		}
 
-		// Get user document with cooldown info
-		const userDoc = await UserModel.findOne({
-			guildID: guild?.id,
-			id: userId
-		}).select('cooldowns.daily');
+		const identity = { guildID: guild?.id, id: userId };
+		try {
+			await UserModel.updateOne(identity, { $setOnInsert: identity }, { upsert: true });
+		} catch (error) {
+			if (!(typeof error === 'object' && error !== null && 'code' in error && error.code === 11000)) throw error;
+		}
 
-		// Check if cooldown exists and is still active
+		const now = Date.now();
+		const minGold = 100;
+		const maxGold = 1000;
+		const randomGold = Math.floor(Math.random() * (maxGold - minGold + 1)) + minGold;
+		const claimed = await UserModel.findOneAndUpdate(
+			{ ...identity, $or: [{ 'cooldowns.daily': { $exists: false } }, { 'cooldowns.daily': { $lte: now } }] },
+			{ $inc: { balance: randomGold }, $set: { 'cooldowns.daily': now + 86400000 } },
+			{ new: true }
+		);
+		if (claimed) {
+			return interaction.reply({
+				content: `You claimed your daily reward of ${randomGold} gold! Come back tomorrow for another chance.`
+			});
+		}
+
+		const userDoc = await UserModel.findOne(identity).select('cooldowns.daily');
 		if (userDoc?.cooldowns?.daily) {
-			const now = Date.now();
 			const cooldownEnd = userDoc.cooldowns.daily;
 
 			if (now < cooldownEnd) {
@@ -120,23 +135,9 @@ export default new Command({
 			}
 		}
 
-		// Generate random gold amount
-		const minGold = 100;
-		const maxGold = 1000;
-		const randomGold = Math.floor(Math.random() * (maxGold - minGold + 1)) + minGold;
-
-		// Update user balance and set new cooldown
-		await UserModel.findOneAndUpdate(
-			{ guildID: guild?.id, id: userId },
-			{
-				$inc: { balance: randomGold },
-				$set: { 'cooldowns.daily': Date.now() + 86400000 } // 24-hour cooldown
-			},
-			{ upsert: true, new: true }
-		);
-
 		return interaction.reply({
-			content: `You claimed your daily reward of ${randomGold} gold! Come back tomorrow for another chance.`
+			content: 'Unable to claim your daily reward. Please try again.',
+			flags: MessageFlags.Ephemeral
 		});
 	},
 });

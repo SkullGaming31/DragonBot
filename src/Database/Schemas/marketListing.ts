@@ -7,6 +7,7 @@ export interface IListing extends Document {
   price: number;
   quantity: number;
   active: boolean;
+  escrowed: boolean;
   createdAt: Date;
 }
 
@@ -17,6 +18,7 @@ const listingSchema = new Schema<IListing>({
 	price: { type: Number, required: true },
 	quantity: { type: Number, required: true, default: 1 },
 	active: { type: Boolean, default: true },
+	escrowed: { type: Boolean, default: false },
 	createdAt: { type: Date, default: () => new Date() }
 });
 

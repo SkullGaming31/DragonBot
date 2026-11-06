@@ -9,7 +9,7 @@ describe('Integrations webhook handler - Twitch post', () => {
   });
 
   it('accepts a Twitch notification and posts to configured channel', async () => {
-    process.env.TWITCH_EVENTSUB_SECRET = 'testsecret';
+    process.env.TWITCH_EVENTSUB_SECRET = 'unit-test-twitch-secret';
 
     const body = {
       subscription: { id: 'sub-1', type: 'stream.online' },
@@ -39,7 +39,11 @@ describe('Integrations webhook handler - Twitch post', () => {
 
     // Mock IntegrationEventModel to avoid touching real mongoose in tests
     const mockCreateEvent = vi.fn(async (_: any) => ({}));
-    vi.doMock('../src/Database/Schemas/integrationEvent', () => ({ default: { create: mockCreateEvent } }));
+    vi.doMock('../src/Database/Schemas/integrationEvent', () => ({ default: {
+      create: mockCreateEvent,
+      findOne: vi.fn(() => ({ lean: async () => ({ deliveredConfigIds: [] }) })),
+      updateOne: vi.fn().mockResolvedValue({ matchedCount: 1 }),
+    } }));
 
     // Mock appInstance.client.channels.fetch to return an object with send()
     const sent: string[] = [];
@@ -65,13 +69,13 @@ describe('Integrations webhook handler - Twitch post', () => {
     await handleIntegrationWebhook(req, res);
 
     expect(json).toHaveBeenCalledWith({ status: 'accepted' });
-    expect(mockCreateEvent).toHaveBeenCalledWith({ eventId: msgId, provider: 'twitch' });
+    expect(mockCreateEvent).toHaveBeenCalledWith(expect.objectContaining({ eventId: msgId, provider: 'twitch', status: 'processing' }));
     expect(sent.length).toBe(1);
     expect(sent[0]).toContain('Now streaming: Super Cool Stream');
   });
 
   it('returns a callback challenge only after validating its raw-body signature', async () => {
-    process.env.TWITCH_EVENTSUB_SECRET = 'testsecret';
+    process.env.TWITCH_EVENTSUB_SECRET = 'unit-test-twitch-secret';
 
     const body = { challenge: 'challenge-value' };
     const rawBody = Buffer.from('{ "challenge" : "challenge-value" }');
@@ -104,7 +108,7 @@ describe('Integrations webhook handler - Twitch post', () => {
   });
 
   it('rejects an unsigned callback challenge without echoing it', async () => {
-    process.env.TWITCH_EVENTSUB_SECRET = 'testsecret';
+    process.env.TWITCH_EVENTSUB_SECRET = 'unit-test-twitch-secret';
     const { handleIntegrationWebhook } = await import('../src/Integrations/webhookHandler');
     const send = vi.fn();
     const type = vi.fn(() => ({ send }));

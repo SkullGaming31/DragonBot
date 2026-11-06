@@ -5,6 +5,7 @@ import settings from '../../Database/Schemas/settingsDB';
 import WarningDB from '../../Database/Schemas/WarnDB';
 import { Event } from '../../Structures/Event';
 import { error as logError, info as logInfo } from '../../Utilities/logger';
+import { isAutomodTestExempt } from '../../Utilities/moderation';
 
 export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member: GuildMember) => {
 	const guild = member.guild;
@@ -21,11 +22,9 @@ export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member: Guil
 		if (warnCount >= rejoinThreshold) {
 			// Don't apply rejoin ban to guild owner or test IDs
 			try {
-				const rawTestIds = process.env.AUTOMOD_TEST_USER_IDS ?? process.env.AUTOMOD_TEST_USER_ID ?? '';
-				const TEST_USER_IDS = String(rawTestIds).split(',').map(s => s.trim()).filter(Boolean);
 				if (member.id === guild.ownerId) {
 					logInfo('guildMemberAdd: skipping rejoin ban for guild owner', { guild: guild.id, user: member.id });
-				} else if (TEST_USER_IDS.includes(member.id)) {
+				} else if (isAutomodTestExempt(member.id)) {
 					logInfo('guildMemberAdd: skipping rejoin ban for test user', { guild: guild.id, user: member.id });
 				} else {
 					// Attempt to ban the rejoining member to prevent immediate rejoin.

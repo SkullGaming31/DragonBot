@@ -3,6 +3,12 @@ import axios from 'axios';
 import SettingsModel from '../Database/Schemas/settingsDB';
 import { info as logInfo, warn as logWarn, error as logError } from '../Utilities/logger';
 
+export function isAutomodTestExempt(userId: string): boolean {
+	if (process.env.ENVIRONMENT !== 'dev' && process.env.ENVIRONMENT !== 'debug') return false;
+	const ids = process.env.AUTOMOD_TEST_USER_IDS ?? process.env.AUTOMOD_TEST_USER_ID ?? '';
+	return ids.split(',').map(id => id.trim()).filter(Boolean).includes(userId);
+}
+
 /**
  * Post a punishment embed to the configured punishment channel for the guild.
  * Tries multiple legacy keys and optional fallback channel ids.
@@ -84,12 +90,6 @@ export async function escalateByWarnings(
 			// ignore owner lookup failures
 		}
 
-		// Testing guard: do not actually apply moderation to specific test user ids.
-		// Configure a single id or multiple comma-separated ids via env var:
-		// AUTOMOD_TEST_USER_IDS=353674019943219204 or AUTOMOD_TEST_USER_IDS=1,2,3
-		const rawTestIds = process.env.AUTOMOD_TEST_USER_IDS ?? process.env.AUTOMOD_TEST_USER_ID ?? '353674019943219204';
-		const TEST_USER_IDS = String(rawTestIds).split(',').map(s => s.trim()).filter(Boolean);
-
 		// interpret provided warningCount as "before update" by default
 		const total = isBeforeUpdate ? warningCount + 1 : warningCount;
 
@@ -97,10 +97,10 @@ export async function escalateByWarnings(
 
 		if (total === 1) {
 			if (member.moderatable) {
-				if (TEST_USER_IDS.includes(member.id)) {
+				if (isAutomodTestExempt(member.id)) {
 					// Do not apply timeout in tests for listed test user ids; log instead
 					logInfo('automod TEST_MODE: would timeout user', { guild: guild.id, user: member.id, reason });
-					return 'timeout';
+					return null;
 				}
 				await member.timeout(5 * 60 * 1000, reason).catch((err) => {
 					logWarn('escalateByWarnings: timeout failed', { guild: guild.id, user: member.id, error: (err as Error)?.message ?? err });
@@ -128,9 +128,9 @@ export async function escalateByWarnings(
 
 		if (total === 2) {
 			if (member.kickable) {
-				if (TEST_USER_IDS.includes(member.id)) {
+				if (isAutomodTestExempt(member.id)) {
 					logInfo('automod TEST_MODE: would kick user', { guild: guild.id, user: member.id, reason });
-					return 'kick';
+					return null;
 				}
 				await member.kick(reason).catch((err) => {
 					logWarn('escalateByWarnings: kick failed', { guild: guild.id, user: member.id, error: (err as Error)?.message ?? err });
@@ -158,9 +158,9 @@ export async function escalateByWarnings(
 		// 3 or more
 		if (total >= 3) {
 			if (member.bannable) {
-				if (TEST_USER_IDS.includes(member.id)) {
+				if (isAutomodTestExempt(member.id)) {
 					logInfo('automod TEST_MODE: would ban user', { guild: guild.id, user: member.id, reason });
-					return 'ban';
+					return null;
 				}
 				await member.ban({ reason, deleteMessageSeconds: 5 }).catch((err) => {
 					logWarn('escalateByWarnings: ban failed', { guild: guild.id, user: member.id, error: (err as Error)?.message ?? err });

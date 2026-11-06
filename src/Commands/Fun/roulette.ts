@@ -47,7 +47,7 @@ export default new Command({
 				flags: MessageFlags.Ephemeral
 			});
 		}
-		let userDoc = await UserModel.findOne({ guildID: guild?.id, username: user.username });
+		let userDoc = await UserModel.findOne({ guildID: guild?.id, id: user.id });
 		if (!userDoc) {
 			// Create a new user document if it doesn't exist
 			// console.log('Creating new user document');

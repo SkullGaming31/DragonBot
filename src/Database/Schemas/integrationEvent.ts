@@ -4,6 +4,10 @@ export interface IIntegrationEvent extends Document {
 	eventId: string;
 	provider?: string;
 	createdAt: Date;
+	status?: 'processing' | 'failed' | 'complete';
+	leaseToken?: string | null;
+	leaseUntil?: Date | null;
+	deliveredConfigIds?: string[];
 }
 
 const ttlSeconds = Number(process.env.INTEGRATION_EVENT_TTL_SEC ?? '86400'); // default 1 day
@@ -11,6 +15,10 @@ const ttlSeconds = Number(process.env.INTEGRATION_EVENT_TTL_SEC ?? '86400'); // 
 const integrationEventSchema = new Schema<IIntegrationEvent>({
 	eventId: { type: String, required: true, unique: true },
 	provider: { type: String, default: null },
+	status: { type: String, enum: ['processing', 'failed', 'complete'] },
+	leaseToken: { type: String, default: null },
+	leaseUntil: { type: Date, default: null },
+	deliveredConfigIds: { type: [String], default: [] },
 	createdAt: { type: Date, default: Date.now }
 });
 

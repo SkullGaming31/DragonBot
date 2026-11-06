@@ -23,7 +23,7 @@ describe('Integrations webhook handler', () => {
 	});
 
 	it('accepts a valid webhook and posts templated message to configured channels', async () => {
-		process.env.INTEGRATIONS_SECRET = 'sup3rs3cr3tk3y';
+		process.env.INTEGRATIONS_SECRET = 'unit-test-integration-secret';
 
 		// Mock IntegrationConfigModel.find().lean().exec() to return one enabled config
 		const fakeConfig = {
@@ -40,7 +40,11 @@ describe('Integrations webhook handler', () => {
 
 		// Mock IntegrationEventModel to avoid touching real mongoose in tests
 		const mockCreateEvent = vi.fn(async (_: any) => ({}));
-		vi.doMock('../src/Database/Schemas/integrationEvent', () => ({ default: { create: mockCreateEvent } }));
+		vi.doMock('../src/Database/Schemas/integrationEvent', () => ({ default: {
+			create: mockCreateEvent,
+			findOne: vi.fn(() => ({ lean: async () => ({ deliveredConfigIds: [] }) })),
+			updateOne: vi.fn().mockResolvedValue({ matchedCount: 1 }),
+		} }));
 
 		// Mock appInstance.client.channels.fetch to return an object with send()
 		const sent: string[] = [];
@@ -51,7 +55,7 @@ describe('Integrations webhook handler', () => {
 		const { handleIntegrationWebhook } = await import('../src/Integrations/webhookHandler');
 
 		const req: any = {
-			headers: { 'x-integration-secret': 'sup3rs3cr3tk3y', 'x-integration-source': 'generic' },
+			headers: { 'x-integration-secret': 'unit-test-integration-secret', 'x-integration-source': 'generic' },
 			body: { title: 'Cool Stream', url: 'https://twitch.tv/canadiendragon' }
 		};
 
@@ -62,24 +66,28 @@ describe('Integrations webhook handler', () => {
 		await handleIntegrationWebhook(req, res);
 
 		expect(json).toHaveBeenCalledWith({ status: 'accepted' });
-		expect(mockCreateEvent).toHaveBeenCalledWith({ eventId: expect.any(String), provider: 'generic' });
+		expect(mockCreateEvent).toHaveBeenCalledWith(expect.objectContaining({ eventId: expect.any(String), provider: 'generic', status: 'processing' }));
 		expect(sent.length).toBe(1);
 		expect(sent[0]).toContain('Now streaming: Cool Stream');
 	});
 
 	it('returns duplicate when the atomic event claim hits a duplicate key', async () => {
-		process.env.INTEGRATIONS_SECRET = 'sup3rs3cr3tk3y';
+		process.env.INTEGRATIONS_SECRET = 'unit-test-integration-secret';
 
 		const duplicateKeyError = Object.assign(new Error('duplicate key'), { code: 11000 });
 		const mockCreateEvent = vi.fn().mockRejectedValue(duplicateKeyError);
 		const mockFindConfig = vi.fn();
 		vi.doMock('../src/Database/Schemas/integrationConfig', () => ({ default: { find: mockFindConfig } }));
-		vi.doMock('../src/Database/Schemas/integrationEvent', () => ({ default: { create: mockCreateEvent } }));
+		vi.doMock('../src/Database/Schemas/integrationEvent', () => ({ default: {
+			create: mockCreateEvent,
+			findOneAndUpdate: vi.fn().mockResolvedValue(null),
+			findOne: vi.fn().mockResolvedValue({ status: 'complete' }),
+		} }));
 		vi.doMock('../src/index', () => ({ appInstance: { client: { channels: { fetch: vi.fn() } } } }));
 
 		const { handleIntegrationWebhook } = await import('../src/Integrations/webhookHandler');
 		const req: any = {
-			headers: { 'x-integration-secret': 'sup3rs3cr3tk3y', 'x-integration-source': 'generic' },
+			headers: { 'x-integration-secret': 'unit-test-integration-secret', 'x-integration-source': 'generic' },
 			body: { id: 'event-1', title: 'Cool Stream' }
 		};
 		const json = vi.fn();
@@ -89,12 +97,12 @@ describe('Integrations webhook handler', () => {
 
 		expect(status).toHaveBeenCalledWith(202);
 		expect(json).toHaveBeenCalledWith({ status: 'duplicate' });
-		expect(mockCreateEvent).toHaveBeenCalledWith({ eventId: 'event-1', provider: 'generic' });
+		expect(mockCreateEvent).toHaveBeenCalledWith(expect.objectContaining({ eventId: 'event-1', provider: 'generic', status: 'processing' }));
 		expect(mockFindConfig).not.toHaveBeenCalled();
 	});
 
 	it('returns an error instead of sending when the event claim fails for another reason', async () => {
-		process.env.INTEGRATIONS_SECRET = 'sup3rs3cr3tk3y';
+		process.env.INTEGRATIONS_SECRET = 'unit-test-integration-secret';
 
 		const mockCreateEvent = vi.fn().mockRejectedValue(new Error('database unavailable'));
 		const mockFindConfig = vi.fn();
@@ -104,7 +112,7 @@ describe('Integrations webhook handler', () => {
 
 		const { handleIntegrationWebhook } = await import('../src/Integrations/webhookHandler');
 		const req: any = {
-			headers: { 'x-integration-secret': 'sup3rs3cr3tk3y', 'x-integration-source': 'generic' },
+			headers: { 'x-integration-secret': 'unit-test-integration-secret', 'x-integration-source': 'generic' },
 			body: { id: 'event-2', title: 'Cool Stream' }
 		};
 		const json = vi.fn();

@@ -6,6 +6,7 @@ import { NormalizedEvent } from './adapter';
 import type { ExtendedClient } from '../Structures/Client';
 import TwitchAdapter from './twitchAdapter';
 import { error as logError, debug as logDebug } from '../Utilities/logger';
+import { randomUUID } from 'crypto';
 
 const SECRET_HEADER = 'x-integration-secret';
 
@@ -13,13 +14,79 @@ function isDuplicateKeyError(error: unknown): boolean {
 	return typeof error === 'object' && error !== null && 'code' in error && error.code === 11000;
 }
 
-async function claimIntegrationEvent(eventId: string, provider: string): Promise<boolean> {
+async function claimIntegrationEvent(eventId: string, provider: string, token: string): Promise<'claimed' | 'duplicate' | 'busy'> {
+	const now = new Date();
+	const leaseUntil = new Date(now.getTime() + 300000);
 	try {
-		await IntegrationEventModel.create({ eventId, provider });
-		return true;
+		await IntegrationEventModel.create({ eventId, provider, status: 'processing', leaseToken: token, leaseUntil });
+		return 'claimed';
 	} catch (error) {
-		if (isDuplicateKeyError(error)) return false;
+		if (!isDuplicateKeyError(error)) throw error;
+	}
+	const event = await IntegrationEventModel.findOneAndUpdate(
+		{ eventId, provider, $or: [{ status: 'failed' }, { status: 'processing', leaseUntil: { $lte: now } }] },
+		{ $set: { status: 'processing', leaseToken: token, leaseUntil } }, { new: true }
+	);
+	if (event) return 'claimed';
+	const current = await IntegrationEventModel.findOne({ eventId });
+	return current && (current.status === 'complete' || !current.status) ? 'duplicate' : 'busy';
+}
+
+async function deliverEvent(event: NormalizedEvent, client?: ExtendedClient): Promise<'accepted' | 'duplicate' | 'busy'> {
+	const token = randomUUID();
+	const eventId = String(event.id);
+	const claim = await claimIntegrationEvent(eventId, event.provider, token);
+	if (claim !== 'claimed') return claim;
+
+	try {
+		const claimed = await IntegrationEventModel.findOne({ eventId, leaseToken: token }).lean();
+		if (!claimed) throw new Error('Integration event lease lost');
+		const delivered = new Set(claimed.deliveredConfigIds ?? []);
+		const configs = await IntegrationConfigModel.find({ provider: event.provider, enabled: true }).lean().exec();
+		for (const cfg of configs) {
+			const configId = String(cfg._id);
+			if (delivered.has(configId) || !cfg.channelId) continue;
+			if (!client) throw new Error('Discord client unavailable');
+			const channel = await client.channels.fetch(cfg.channelId);
+			if (!channel || !('send' in channel) || typeof channel.send !== 'function') throw new Error(`Integration channel unavailable: ${cfg.channelId}`);
+			const meta = event.metadata as unknown;
+			let broadcaster = '';
+			if (meta && typeof meta === 'object' && 'event' in meta) {
+				const sourceEvent = meta.event;
+				if (sourceEvent && typeof sourceEvent === 'object') {
+					const source = sourceEvent as Record<string, unknown>;
+					broadcaster = String(source.broadcaster_user_login ?? source.broadcaster_login ?? '');
+				}
+			}
+			const message = cfg.template
+				? String(cfg.template)
+					.replace(/\{\{title\}\}/g, event.title ?? '')
+					.replace(/\{\{url\}\}/g, event.url ?? '')
+					.replace(/\{\{broadcaster\}\}/g, broadcaster)
+					.replace(/\{\{provider\}\}/g, event.provider)
+					.replace(/\{\{eventType\}\}/g, event.eventType ?? '')
+				: `New ${event.provider} event: ${event.title ?? 'untitled'}\n${event.url ?? ''}`;
+			await channel.send(message);
+			const result = await IntegrationEventModel.updateOne({ eventId, status: 'processing', leaseToken: token }, { $addToSet: { deliveredConfigIds: configId }, $set: { leaseUntil: new Date(Date.now() + 300000) } });
+			if (!result.matchedCount) throw new Error('Integration event lease lost after delivery');
+		}
+		const completed = await IntegrationEventModel.updateOne({ eventId, status: 'processing', leaseToken: token }, { $set: { status: 'complete', leaseToken: null, leaseUntil: null } });
+		if (!completed.matchedCount) throw new Error('Integration event lease lost before completion');
+		return 'accepted';
+	} catch (error) {
+		await IntegrationEventModel.updateOne({ eventId, status: 'processing', leaseToken: token }, { $set: { status: 'failed', leaseToken: null, leaseUntil: null } });
 		throw error;
+	}
+}
+
+async function respondToEvent(event: NormalizedEvent, res: Response, client?: ExtendedClient): Promise<void> {
+	const status = await deliverEvent(event, client);
+	if (status === 'busy') {
+		res.status(503).json({ error: 'Event delivery in progress; retry later' });
+	} else if (status === 'duplicate') {
+		res.status(202).json({ status });
+	} else {
+		res.json({ status });
 	}
 }
 
@@ -72,50 +139,7 @@ export async function handleIntegrationWebhook(req: Request, res: Response, clie
 			const normalized = await Promise.resolve(TwitchAdapter.normalize(req.headers as HeaderLike, req.body as unknown));
 			if (!normalized) { res.status(202).json({ status: 'ignored' }); return; }
 
-			// Deduplicate
-			const eventKey = normalized.id;
-			if (!await claimIntegrationEvent(eventKey, normalized.provider)) {
-				res.status(202).json({ status: 'duplicate' });
-				return;
-			}
-
-			const configs = await IntegrationConfigModel.find({ provider: 'twitch', enabled: true }).lean().exec();
-
-			for (const cfg of configs) {
-				try {
-					if (!cfg.channelId) continue;
-					const channel = await effectiveClient?.channels.fetch(cfg.channelId).catch(() => null);
-					if (!channel || !('send' in channel)) continue;
-
-					let message: string;
-					if (cfg.template) {
-						message = String(cfg.template);
-						message = message.replace(/\{\{title\}\}/g, normalized.title ?? '');
-						message = message.replace(/\{\{url\}\}/g, normalized.url ?? '');
-						const meta = normalized.metadata as unknown;
-						let broadcaster = '';
-						if (meta && typeof meta === 'object' && 'event' in (meta as Record<string, unknown>)) {
-							const ev = (meta as Record<string, unknown>)['event'];
-							if (ev && typeof ev === 'object') {
-								broadcaster = String((ev as Record<string, unknown>)['broadcaster_user_login'] ?? (ev as Record<string, unknown>)['broadcaster_login'] ?? '');
-							}
-						}
-						message = message.replace(/\{\{broadcaster\}\}/g, broadcaster);
-						message = message.replace(/\{\{provider\}\}/g, normalized.provider ?? '');
-						message = message.replace(/\{\{eventType\}\}/g, normalized.eventType ?? '');
-					} else {
-						message = `New ${normalized.provider} event: ${normalized.title ?? 'untitled'}\n${normalized.url ?? ''}`;
-					}
-
-					// eslint-disable-next-line no-unused-vars
-					const sendFn = (channel as unknown as { send?: (m: string) => Promise<unknown> }).send;
-					if (typeof sendFn === 'function') await sendFn(message).catch(() => null);
-				} catch (e) {
-					logError('Failed to post integration message for config', { config: cfg, error: (e as Error)?.message ?? e });
-				}
-			}
-
-			res.json({ status: 'accepted' });
+			await respondToEvent(normalized, res, effectiveClient);
 			return;
 		}
 
@@ -141,41 +165,7 @@ export async function handleIntegrationWebhook(req: Request, res: Response, clie
 			metadata: req.body
 		};
 
-		// Deduplicate
-		const eventKey = String(normalized.id ?? '');
-		if (!await claimIntegrationEvent(eventKey, normalized.provider)) {
-			res.status(202).json({ status: 'duplicate' });
-			return;
-		}
-
-		const configs = await IntegrationConfigModel.find({ provider: source, enabled: true }).lean().exec();
-
-		for (const cfg of configs) {
-			try {
-				if (!cfg.channelId) continue;
-				const channel = await effectiveClient?.channels.fetch(cfg.channelId).catch(() => null);
-				if (!channel || !('send' in channel)) continue;
-
-				let message: string;
-				if (cfg.template) {
-					message = String(cfg.template);
-					message = message.replace(/\{\{title\}\}/g, normalized.title ?? '');
-					message = message.replace(/\{\{url\}\}/g, normalized.url ?? '');
-					message = message.replace(/\{\{provider\}\}/g, normalized.provider ?? '');
-					message = message.replace(/\{\{eventType\}\}/g, normalized.eventType ?? '');
-				} else {
-					message = `New ${normalized.provider} event: ${normalized.title ?? 'untitled'}\n${normalized.url ?? ''}`;
-				}
-
-				// eslint-disable-next-line no-unused-vars
-				const sendFn = (channel as unknown as { send?: (m: string) => Promise<unknown> }).send;
-				if (typeof sendFn === 'function') await sendFn(message).catch(() => null);
-			} catch (e) {
-				logError('Failed to post integration message for config', { config: cfg, error: (e as Error)?.message ?? e });
-			}
-		}
-
-		res.json({ status: 'accepted' });
+		await respondToEvent(normalized, res, effectiveClient);
 	} catch (err) {
 		logError('integration webhook error', { error: (err as Error)?.message ?? err });
 		res.status(500).json({ error: 'internal error' });

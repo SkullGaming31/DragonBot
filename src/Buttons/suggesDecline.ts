@@ -1,5 +1,5 @@
 import { ButtonType } from '../Typings/Button';
-import { EmbedBuilder, MessageFlags, ButtonStyle, APIEmbedField } from 'discord.js';
+import { EmbedBuilder, MessageFlags, ButtonStyle, APIEmbedField, PermissionFlagsBits } from 'discord.js';
 import SuggestionModel, { ISuggestion } from '../Database/Schemas/SuggestDB';
 import { error as logError } from '../Utilities/logger';
 
@@ -9,6 +9,10 @@ const handler: ButtonType = {
 	defaultStyle: ButtonStyle.Danger,
 	run: async ({ interaction }) => {
 		const { message, guild } = interaction;
+		if (!guild || !interaction.memberPermissions?.has(PermissionFlagsBits.ManageMessages)) {
+			await interaction.reply({ content: 'You need the Manage Messages permission to manage suggestions.', flags: MessageFlags.Ephemeral });
+			return;
+		}
 		if (!message) return;
 
 		const data = await SuggestionModel.findOne<ISuggestion>({ guildId: guild?.id, messageId: message.id });
@@ -27,11 +31,12 @@ const handler: ButtonType = {
 
 		try {
 			await message.edit({ embeds: [EmbedBuilder.from(embed).setFields(fields).setColor('Red').setTimestamp()], components: [] });
+			await SuggestionModel.deleteOne({ guildId: guild.id, messageId: message.id });
 		} catch (err) {
-			logError('Failed to edit suggestion message on decline', { error: (err as Error)?.message ?? err });
+			logError('Failed to decline suggestion', { error: (err as Error)?.message ?? err, guild: guild.id, message: message.id });
+			await interaction.reply({ content: 'Could not fully process the suggestion. Please contact an administrator.', flags: MessageFlags.Ephemeral });
+			return;
 		}
-
-		await SuggestionModel.deleteOne({ guildId: guild?.id, messageId: message.id }).catch(() => null);
 		await interaction.reply({ content: 'Suggestion Declined', flags: MessageFlags.Ephemeral });
 	}
 };

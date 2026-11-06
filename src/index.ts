@@ -176,12 +176,17 @@ if (process.env.DISABLE_AUTOSTART === 'true' || fsSync.existsSync(sentinelPath))
 			const raw = fsSync.readFileSync(lockPath, 'utf8').trim();
 			const otherPid = Number(raw) || NaN;
 			if (!Number.isNaN(otherPid)) {
-				try {
-					process.kill(otherPid, 0);
-					info(`Another instance is already running (PID ${otherPid}), exiting.`);
-					process.exit(0);
-				} catch {
-					// Process not running; remove stale lock
+				if (otherPid !== process.pid) {
+					try {
+						process.kill(otherPid, 0);
+						info(`Another instance is already running (PID ${otherPid}), exiting.`);
+						process.exit(0);
+					} catch {
+						// Process not running; remove stale lock
+						try { fsSync.unlinkSync(lockPath); } catch { /** */ }
+					}
+				} else {
+					// A restarted container may reuse its previous process ID (often PID 1).
 					try { fsSync.unlinkSync(lockPath); } catch { /** */ }
 				}
 			} else {

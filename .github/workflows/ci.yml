@@ -47,14 +47,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: node:24-bullseye
-    services:
-      mongo:
-        image: mongo:6.0
-        # Start mongod with replica set enabled so tests that require transactions work in CI
-        options: '--health-cmd "mongosh --eval \"db.adminCommand({ ping: 1 })\"" --health-interval 5s --health-timeout 2s --health-retries 5'
-        command: "--replSet rs0 --bind_ip_all"
-        ports:
-          - 27017:27017
     needs: lint
     timeout-minutes: 20
     strategy:
@@ -88,24 +80,7 @@ jobs:
       - name: lint (if available)
         run: npm run lint --if-present
 
-      - name: Initialize Mongo replica set
-        env:
-          MONGO_URL: mongodb://mongo:27017/admin
-          MONGO_REPLICA_HOST: mongo:27017
-        run: node scripts/initTestReplicaSet.js
-
-      - name: Seed DB
-        env:
-          CI: true
-          MONGO_URL: mongodb://mongo:27017/testdb
-        run: |
-          # Run the seeding script — it will initiate the replset and wait for primary if needed
-          node scripts/seedTestDb.js
-
       - name: Run tests (vitest)
-        env:
-          CI: true
-          MONGO_URL: mongodb://mongo:27017/testdb
         run: |
           # Use fewer workers to be gentle on CI runners and reduce memory pressure
           npx vitest --run --reporter=dot --reporter=junit --outputFile.junit=vitest-junit.xml --maxWorkers=2 --coverage
@@ -117,5 +92,4 @@ jobs:
           name: vitest-junit
           path: vitest-junit.xml
 
-# Note: to test MongoDB transactions in CI, run mongodb-memory-server in replica-set mode or use a hosted
-# MongoDB with transactions enabled in a separate job. Replica-set setup increases CI runtime.
+# Database tests use isolated mongodb-memory-server replica sets.

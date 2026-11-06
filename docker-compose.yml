@@ -2,6 +2,7 @@ services:
   mongo:
     image: mongo:latest
     container_name: mongodb
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
       interval: 10s
@@ -12,6 +13,17 @@ services:
       - "27017:27017"
     volumes:
       - mongoData_Discord:/data/db
+
+  mongo-init:
+    image: mongo:latest
+    depends_on:
+      mongo:
+        condition: service_healthy
+    volumes:
+      - ./scripts/initDockerReplica.js:/initDockerReplica.js:ro
+    entrypoint: ["mongosh"]
+    command: ["--quiet", "mongodb://mongo:27017/admin?directConnection=true", "--file", "/initDockerReplica.js"]
+    restart: "no"
 
   bot:
     build:
@@ -25,12 +37,12 @@ services:
       NODE_ENV: production
       PORT: "${PORT:-3000}"
       ENVIRONMENT: "${ENVIRONMENT:-prod}"
-      MONGODB_URI: "mongodb://mongo:27017/${MONGO_DB:-dragonbot}"
-      MONGO_DATABASE_URI: "mongodb://mongo:27017/${MONGO_DB:-dragonbot}"
-      MONGO_DEV_URI: "mongodb://mongo:27017/${MONGO_DB:-dragonbot}"
+      MONGODB_URI: "mongodb://mongo:27017/${MONGO_DB:-dragonbot}?replicaSet=rs0"
+      MONGO_DATABASE_URI: "mongodb://mongo:27017/${MONGO_DB:-dragonbot}?replicaSet=rs0"
+      MONGO_DEV_URI: "mongodb://mongo:27017/${MONGO_DB:-dragonbot}?replicaSet=rs0"
     depends_on:
-      mongo:
-        condition: service_healthy
+      mongo-init:
+        condition: service_completed_successfully
     ports:
       - "${PORT:-3000}:${PORT:-3000}"
     restart: unless-stopped
