@@ -66,7 +66,8 @@ export default new Event<'guildMemberAdd'>('guildMemberAdd', async (member: Guil
 	if (!logsChannelOBJ || logsChannelOBJ.type !== ChannelType.GuildText) return;
 
 	const rulesChannel = channelMention(guild.rulesChannelId || '');
-	const messageToSend = guild.rulesChannel ? `Welcome to ${guild.name}'s server! Please read the rules in ${rulesChannel}. dont forget to pop into the introduction channel and introduce yourself to everyone` : `Welcome to ${guild.name}'s server!`;
+	const defaultMessage = guild.rulesChannel ? `Welcome to ${guild.name}'s server! Please read the rules in ${rulesChannel}. dont forget to pop into the introduction channel and introduce yourself to everyone` : `Welcome to ${guild.name}'s server!`;
+	const messageToSend = data.WelcomeMessage?.trim() ? data.WelcomeMessage : defaultMessage;
 
 	const embed = new EmbedBuilder()
 		.setTitle('New Member')

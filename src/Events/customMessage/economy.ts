@@ -5,6 +5,7 @@ import TicketModel from '../../Database/Schemas/ticketDB';
 import TicketSetupModel from '../../Database/Schemas/ticketSetupDB';
 import { Event } from '../../Structures/Event';
 import { info as logInfo, warn as logWarn, error as logError } from '../../Utilities/logger';
+import { economyDisabled } from '../../Utilities/economyCommands';
 
 const BASE_CURRENCY_CHANCE = 0.1;
 const DEV_BASE_CURRENCY_CHANCE = 0.9;
@@ -45,6 +46,7 @@ export default new Event('messageCreate', async (message: Message) => {
 	// Award currency if random chance is met
 	if (Math.random() <= finalChance) {
 		try {
+			if (await economyDisabled(guild.id)) return;
 			const userId = author.id;
 
 			// Generate random currency amount (10-300)

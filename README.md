@@ -90,6 +90,21 @@ This is the Discord Bot for my personal Discord Server<br />
 - [TypeScript](https://www.typescriptlang.org/)
 - [Mongoose](https://mongodb.com)
 
+## Economy dashboard controls
+
+The dashboard can enable or disable economy commands per server and disable
+individual commands. Turning off the economy also stops automatic message
+rewards; balances remain unchanged. Re-enabling it in the dashboard enables all
+individual commands when saved. Servers without
+economy settings keep the existing enabled behavior.
+The moderation-only `/editpoints` command remains available to permitted
+moderators even when the economy is disabled.
+
+DragonBot and the dashboard backend must connect to the same MongoDB database
+and use the shared `economysettings` collection. Economy commands, including
+`/begin`, require a server context. When adding an economy command, update
+both `src/Utilities/economyCommands.ts` and the dashboard's economy API list.
+
 ## Reaction Roles Manager (quick note)
 
 - The bot includes a Reaction Roles Manager (see `docs/reactionRoles.md`). It exposes two ways to create mappings:

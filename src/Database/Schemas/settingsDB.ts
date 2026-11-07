@@ -8,6 +8,7 @@ export interface ISettings extends Document {
 	rulesChannel?: string;
 	Welcome?: boolean;
 	WelcomeChannel?: string;
+	WelcomeMessage?: string | null;
 	PromotionChannel?: string;
 	punishmentChannel?: string;
 	SuggestChan?: string;
@@ -23,6 +24,7 @@ const settingsSchema = new Schema<ISettings>({
 	rulesChannel: { type: String, default: null },
 	Welcome: { type: Boolean, default: false },
 	WelcomeChannel: { type: String, default: null },
+	WelcomeMessage: { type: String, default: null, maxlength: 4000 },
 	PromotionChannel: { type: String, default: null },
 	punishmentChannel: { type: String, default: null },
 	SuggestChan: { type: String, default: null },

@@ -8,6 +8,7 @@ import { safeInteractionReply, setCooldown } from '../../Utilities/functions';
 import { appInstance } from '../../index';
 import { error as logError, warn as logWarn } from '../../Utilities/logger';
 import { recordCommandTimestamp } from '../../Utilities/metricsReporter';
+import { economyCommands, economyCommandDisabled } from '../../Utilities/economyCommands';
 
 export default new Event<'interactionCreate'>('interactionCreate', async (interaction) => {
 	const { user } = interaction;
@@ -25,6 +26,16 @@ export default new Event<'interactionCreate'>('interactionCreate', async (intera
 
 		// await logInfo(`[Interaction] executing command: ${command.name} command object id: {command}$`);
 		try {
+			if (economyCommands.has(commandName)) {
+				if (!interaction.guildId) {
+					await safeInteractionReply(interaction, { content: 'Economy commands can only be used in a server.', flags: MessageFlags.Ephemeral });
+					return;
+				}
+				if (await economyCommandDisabled(interaction.guildId, commandName)) {
+					await safeInteractionReply(interaction, { content: 'This economy command is disabled in this server.', flags: MessageFlags.Ephemeral });
+					return;
+				}
+			}
 			await command.run({
 				args: interaction.options as CommandInteractionOptionResolver,
 				client,

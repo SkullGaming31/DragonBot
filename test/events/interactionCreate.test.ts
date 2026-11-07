@@ -9,12 +9,17 @@ const mocks = vi.hoisted(() => ({
 	record: vi.fn(),
 	error: vi.fn(),
 	warn: vi.fn(),
+	economyDisabled: vi.fn(),
 }));
 
 vi.mock('../../src/index', () => ({ appInstance: { client: { commands: mocks.commands, buttons: mocks.buttons } } }));
 vi.mock('../../src/Utilities/functions', () => ({ setCooldown: mocks.setCooldown, safeInteractionReply: mocks.safeReply }));
 vi.mock('../../src/Utilities/metricsReporter', () => ({ recordCommandTimestamp: mocks.record }));
 vi.mock('../../src/Utilities/logger', () => ({ error: mocks.error, warn: mocks.warn }));
+vi.mock('../../src/Utilities/economyCommands', () => ({
+	economyCommands: new Set(['daily']),
+	economyCommandDisabled: mocks.economyDisabled,
+}));
 
 import event from '../../src/Events/Interaction/interactionCreate';
 
@@ -56,6 +61,46 @@ describe('interaction dispatcher', () => {
 		expect(run).toHaveBeenCalledWith(expect.objectContaining({ interaction: i, args: i.options }));
 		expect(mocks.record).toHaveBeenCalledWith('example', 'Fun');
 		expect(mocks.setCooldown).toHaveBeenCalledWith('example', 'user1', 30);
+	});
+
+	it('blocks disabled economy commands without running or recording them', async () => {
+		const run = vi.fn();
+		mocks.commands.set('daily', { run, Category: 'Fun' });
+		mocks.economyDisabled.mockResolvedValueOnce(true);
+		const i = interaction({ commandName: 'daily', guildId: 'guild1' });
+		await event.run(i as never);
+		expect(mocks.economyDisabled).toHaveBeenCalledWith('guild1', 'daily');
+		expect(mocks.safeReply).toHaveBeenCalledWith(i, expect.objectContaining({ flags: MessageFlags.Ephemeral }));
+		expect(run).not.toHaveBeenCalled();
+		expect(mocks.record).not.toHaveBeenCalled();
+	});
+
+	it('runs enabled economy commands and rejects direct messages', async () => {
+		const run = vi.fn().mockResolvedValue(undefined);
+		mocks.commands.set('daily', { run });
+		mocks.economyDisabled.mockResolvedValueOnce(false);
+		await event.run(interaction({ commandName: 'daily', guildId: 'guild1' }) as never);
+		await event.run(interaction({ commandName: 'daily', guildId: null }) as never);
+		expect(run).toHaveBeenCalledTimes(1);
+		expect(mocks.safeReply).toHaveBeenCalledTimes(1);
+	});
+
+	it('does not apply economy settings to the moderation command editpoints', async () => {
+		const run = vi.fn().mockResolvedValue(undefined);
+		mocks.commands.set('editpoints', { run });
+		await event.run(interaction({ commandName: 'editpoints', guildId: 'guild1' }) as never);
+		expect(run).toHaveBeenCalledOnce();
+		expect(mocks.economyDisabled).not.toHaveBeenCalled();
+	});
+
+	it('fails closed when economy settings cannot be read', async () => {
+		const run = vi.fn();
+		mocks.commands.set('daily', { run });
+		mocks.economyDisabled.mockRejectedValueOnce(new Error('database unavailable'));
+		const i = interaction({ commandName: 'daily', guildId: 'guild1' });
+		await event.run(i as never);
+		expect(run).not.toHaveBeenCalled();
+		expect(i.reply).toHaveBeenCalledWith(expect.objectContaining({ content: 'An internal error occurred while executing this command.' }));
 	});
 
 	it.each([

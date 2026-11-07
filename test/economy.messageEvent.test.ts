@@ -20,7 +20,10 @@ vi.mock('../src/Database/Schemas/ticketSetupDB', () => ({
 	default: { findOne: vi.fn() }
 }));
 
+vi.mock('../src/Utilities/economyCommands', () => ({ economyDisabled: vi.fn() }));
+
 import { UserModel } from '../src/Database/Schemas/userModel';
+import { economyDisabled } from '../src/Utilities/economyCommands';
 import economyEvent from '../src/Events/customMessage/economy';
 
 describe('message economy event', () => {
@@ -39,6 +42,21 @@ describe('message economy event', () => {
 		await expect(economyEvent.run(message as never)).resolves.toBeUndefined();
 
 		expect(UserModel.findOne).toHaveBeenCalledWith({ guildID: 'guild1', id: 'user1' });
+		expect(UserModel.findOneAndUpdate).not.toHaveBeenCalled();
+	});
+
+	it('does not award passive gold when the economy is disabled', async () => {
+		vi.spyOn(Math, 'random').mockReturnValue(0);
+		vi.mocked(economyDisabled).mockResolvedValueOnce(true);
+		const message = {
+			author: { bot: false, id: 'user1' },
+			guild: { id: 'guild1' },
+			channel: { type: ChannelType.GuildText, name: 'skull-chat' },
+			member: { roles: { cache: { some: () => false } } },
+			content: 'a valid message'
+		};
+		await economyEvent.run(message as never);
+		expect(economyDisabled).toHaveBeenCalledWith('guild1');
 		expect(UserModel.findOneAndUpdate).not.toHaveBeenCalled();
 	});
 });
