@@ -13,7 +13,6 @@ vi.mock('../src/Utilities/logger', () => ({ error: vi.fn(), debug: vi.fn(), info
 
 describe('isolated QA regression tests', () => {
 	beforeAll(async () => {
-		vi.stubEnv('MONGOMS_RUNTIME_DOWNLOAD', 'false');
 		vi.stubEnv('INTEGRATIONS_SECRET', 'qa-local-only');
 		await startInMemoryMongo();
 		await Promise.all([UserModel.init(), IntegrationEvent.init()]);

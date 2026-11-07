@@ -220,7 +220,8 @@ npm test
 
 Notes:
 - Many tests use `mongodb-memory-server`. To exercise MongoDB transactions the tests start a replica set (`MongoMemoryReplSet`). Keep replica-set tests short (use `count:1`) to save time.
-- On CI, runners may lack OpenSSL 1.1 required by MongoDB binaries. The workflow runs the Tests job in the `node:24-bullseye` container so `libcrypto.so.1.1` is available. See `.github/workflows/ci.yml`.
+- CI runs tests in `node:24-bullseye` and pins `MONGOMS_VERSION` to MongoDB 7.0.26, which has a Debian 11 binary. The container also provides `libcrypto.so.1.1`. See `.github/workflows/ci.yml`.
+- Database tests download a MongoDB binary on first use unless a matching binary is already cached. Set `MONGOMS_VERSION` to override the version when needed.
 
 ### Coding conventions & tips
 

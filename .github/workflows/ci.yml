@@ -47,6 +47,9 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: node:24-bullseye
+    env:
+      # MongoDB 8.2 has no Debian 11 build; keep this compatible with Bullseye.
+      MONGOMS_VERSION: '7.0.26'
     needs: lint
     timeout-minutes: 20
     strategy:

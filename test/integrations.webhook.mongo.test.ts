@@ -16,10 +16,6 @@ describe('webhook persistence integration', () => {
 	app.use('/integrations', createIntegrationRouter({ channels: { fetch } } as never));
 
 	beforeAll(async () => {
-		// Explicitly bypass the helper's optional external database path.
-		vi.stubEnv('CI', 'false');
-		vi.stubEnv('USE_LOCAL_MONGO', '0');
-		vi.stubEnv('MONGOMS_RUNTIME_DOWNLOAD', 'false');
 		vi.stubEnv('INTEGRATIONS_SECRET', 'isolated-test-secret');
 		await startInMemoryMongo();
 		await IntegrationEvent.init();

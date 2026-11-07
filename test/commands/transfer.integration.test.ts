@@ -15,10 +15,6 @@ function makeInteraction(amount: string, target = 'recipient') {
 
 describe('transfer transactions', () => {
 	beforeAll(async () => {
-		// The shared helper can otherwise connect to and drop an external database.
-		vi.stubEnv('CI', 'false');
-		vi.stubEnv('USE_LOCAL_MONGO', '0');
-		vi.stubEnv('MONGOMS_RUNTIME_DOWNLOAD', 'false');
 		await startInMemoryMongo();
 		await UserModel.init();
 	});
